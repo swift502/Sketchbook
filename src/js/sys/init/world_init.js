@@ -34,10 +34,21 @@ loader.load(AP_MODELS + 'credits_sign/sign.fbx', function ( object ) {
             });
         }
     } );
-
-    object.translateZ(4);
+    object.translateZ(4.5);
+    object.translateX(0.5);
     object.rotateY(Math.PI/2);
-
-    // console.log(object);
+    object.children
     scene.add( object );
-} );
+
+    object2 = object.clone();
+    object2.traverse( function ( child ) {
+        if(child.name == 'credits') {
+            child.material = new THREE.MeshLambertMaterial({
+                map: new THREE.TextureLoader().load(AP_MODELS + 'credits_sign/credits2.png' ),
+                transparent: true
+            });
+        }
+    });
+    object2.translateZ(-1);
+    scene.add(object2);
+});

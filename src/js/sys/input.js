@@ -109,7 +109,8 @@ function handleKey(event, key, value) {
         action.justPressed = false;
         action.justReleased = false;
         
-        event.preventDefault();
+        // Breaks dat.GUI
+        // event.preventDefault();
     }
 }
 
