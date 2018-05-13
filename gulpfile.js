@@ -4,36 +4,18 @@ var uglify = require('gulp-uglify');
 var uglifycss = require('gulp-uglifycss');
 
 var styles = [
-    './src/css/dat.gui.css',
-    './src/css/main.css'
+    './src/css/*',
 ];
 
 var scripts = [
 
     './src/js/sys/config/config_prod.js',
-
-    './src/js/lib/core/inflate.min.js',
-    './src/js/lib/core/FBXLoader.js',
-
-    './src/js/lib/shaders/EffectComposer.js',
-    './src/js/lib/shaders/RenderPass.js',
-    './src/js/lib/shaders/MaskPass.js',
-    './src/js/lib/shaders/ShaderPass.js',
-    './src/js/lib/shaders/FXAAShader.js',
-    './src/js/lib/shaders/CopyShader.js',
-    './src/js/lib/shaders/Sky.js',
-
-    './src/js/lib/utils/OrbitControls.js',
-    './src/js/lib/utils/Detector.js',
-    './src/js/lib/utils/Stats.js',
-    './src/js/lib/utils/dat.gui.js',
     
-    './src/js/simulation/SimulatorBase.js',
-    './src/js/simulation/BounceSimulator.js',
-    './src/js/simulation/BounceVSimulator.js',
-    './src/js/simulation/RotationSimulator.js',
-    './src/js/characters/CharacterStates.js',
-    './src/js/characters/Character.js',
+    './src/js/lib/shaders/*',
+    './src/js/lib/utils/*',
+
+    './src/js/simulation/*',
+    './src/js/characters/*',
 
     './src/js/sys/functions.js',
     './src/js/sys/input.js',
