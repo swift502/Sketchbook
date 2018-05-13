@@ -1,0 +1,28 @@
+{
+  "name": "three-sketchbook",
+  "version": "1.0.0",
+  "description": "A test ground for various custom 3D features. Built with [three.js](https://github.com/mrdoob/three.js).",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swift502/three-sketchbook.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/swift502/three-sketchbook/issues"
+  },
+  "homepage": "https://github.com/swift502/three-sketchbook#readme",
+  "devDependencies": {
+    "@types/three": "^0.91.3",
+    "@types/dat.gui": "^0.6.0",
+    "@types/stats": "^0.16.30",
+    "gulp": "^4.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^3.0.0",
+    "gulp-uglifycss": "^1.0.9"
+  }
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Sketchbook</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../docs/resources/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../docs/resources/images/favicon-16x16.png">
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dat.gui.css">
+</head>
+
+<body>
+    <!-- Config -->
+    <script src="js/sys/config/config_dev.js"></script>
+
+    <!-- Core -->
+    <script src="js/lib/core/three.js"></script>
+    <script src="js/lib/core/ammo.js"></script>
+    <script src="js/lib/core/inflate.min.js"></script>
+    <script src="js/lib/core/FBXLoader.js"></script>
+
+    <!-- Graphics -->
+    <script src="js/lib/shaders/EffectComposer.js"></script>
+    <script src="js/lib/shaders/RenderPass.js"></script>
+    <script src="js/lib/shaders/MaskPass.js"></script>
+    <script src="js/lib/shaders/ShaderPass.js"></script>
+    <script src="js/lib/shaders/FXAAShader.js"></script>
+    <script src="js/lib/shaders/CopyShader.js"></script>
+    <script src="js/lib/shaders/Sky.js"></script>
+
+    <!-- Utilities -->
+    <script src="js/lib/utils/OrbitControls.js"></script>
+    <script src="js/lib/utils/Detector.js"></script>
+    <script src="js/lib/utils/Stats.js"></script>
+    <script src="js/lib/utils/dat.gui.js"></script>
+
+    <!-- Objects -->
+    <script src="js/simulation/SimulatorBase.js"></script>
+    <script src="js/simulation/BounceSimulator.js"></script>
+    <script src="js/simulation/BounceVSimulator.js"></script>
+    <script src="js/simulation/RotationSimulator.js"></script>
+    <script src="js/characters/CharacterStates.js"></script>
+    <script src="js/characters/Character.js"></script>
+
+    <!-- System -->
+    <script src="js/sys/functions.js"></script>
+    <script src="js/sys/input.js"></script>
+
+    <script src="js/sys/init/three_init.js"></script>
+    <script src="js/sys/init/ammo_init.js"></script>
+    <script src="js/sys/init/characters_init.js"></script>
+    <script src="js/sys/init/world_init.js"></script>
+    
+    <script src="js/main.js"></script>
+    <script src="js/sys/renderLoop.js"></script>
+
+</body>
+
+</html>
