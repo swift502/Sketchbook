@@ -29,26 +29,31 @@ loader.load(AP_MODELS + 'credits_sign/sign.fbx', function ( object ) {
         }
         if(child.name == 'credits') {
             child.material = new THREE.MeshLambertMaterial({
-                map: new THREE.TextureLoader().load(AP_MODELS + 'credits_sign/credits.png' ),
+                map: new THREE.TextureLoader().load(AP_MODELS + 'credits_sign/credits2.png' ),
                 transparent: true
             });
         }
     } );
     object.translateZ(4.5);
-    object.translateX(0.5);
+    object.translateX(-0.5);
     object.rotateY(Math.PI/2);
     object.children
     scene.add( object );
 
     object2 = object.clone();
+    object2.scale.multiplyScalar(1.7);
     object2.traverse( function ( child ) {
         if(child.name == 'credits') {
             child.material = new THREE.MeshLambertMaterial({
-                map: new THREE.TextureLoader().load(AP_MODELS + 'credits_sign/credits2.png' ),
+                map: new THREE.TextureLoader().load(AP_MODELS + 'credits_sign/credits.png' ),
                 transparent: true
             });
+            child.translateZ(-0.2);
+        }
+        if(child.name == 'sign') {
+            child.translateZ(-0.2);
         }
     });
-    object2.translateZ(-1);
+    object2.translateZ(1);
     scene.add(object2);
 });
