@@ -35,7 +35,7 @@ function Character() {
     this.angularVelocity = 0;
     this.orientation = new THREE.Vector3(0, 0, 1);
     this.orientationTarget = new THREE.Vector3(0, 0, 1);
-    this.rotationSimulator = new RotationSimulator(60, 100, 0.9);
+    this.rotationSimulator = new RotationSimulator(60, 10, 0.5);
 
     // States
     this.charState = CharStates.defaultState;
@@ -104,7 +104,31 @@ Character.prototype.bounceMovement = function(timeStep) {
     this.velocity = this.velocitySimulator.position;
 
     // Updating values
-    this.position.add(new THREE.Vector3().copy(this.orientation).multiplyScalar(this.velocity * getMoveSpeed(timeStep)));
+
+    
+    var curVel = this.capsule.userData.physicsBody.getLinearVelocity();
+    var charVelVector = new THREE.Vector3().copy(this.orientation).multiplyScalar(this.velocity * getMoveSpeed(timeStep));
+    var vector = new Ammo.btVector3(charVelVector.x, curVel.y(), charVelVector.z);
+        
+    this.capsule.userData.physicsBody.setLinearVelocity(vector);
+
+    var ms = this.capsule.userData.physicsBody.getMotionState();
+
+    if ( ms ) {
+        ms.getWorldTransform( transformAux1 );
+        var p = transformAux1.getOrigin();
+        // console.log(p);
+        // var q = transformAux1.getRotation();
+
+        this.position.set( p.x(), p.y() - 0.57, p.z() );
+        // objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
+    }
+
+    // });
+
+    
+
+
     this.acceleration = this.velocitySimulator.velocity;
 }
 
@@ -154,4 +178,10 @@ Character.prototype.rotateModel = function() {
     this.visuals.rotateZ(-this.angularVelocity * 2.3);
     this.visuals.position.setY(Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
     
+}
+
+Character.prototype.jump = function() {
+    var curVel = this.capsule.userData.physicsBody.getLinearVelocity();
+    curVel.setY(curVel.y() + 4);
+    this.capsule.userData.physicsBody.setLinearVelocity(curVel);
 }

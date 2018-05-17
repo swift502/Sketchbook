@@ -1,5 +1,5 @@
 // Physics
-var gravityConstant = -9.8;
+var gravityConstant = -12;
 var physicsWorld;
 var rigidBodies = [];
 var margin = 0.05;
@@ -14,7 +14,12 @@ var sbConfig;
 var playerCol;
 var updatePhysics;
 
+var capsule;
+var ammo;
+
 Ammo().then(function(Ammo) {
+
+    ammo = Ammo;
 
     transformAux1 = new Ammo.btTransform();
 
@@ -29,7 +34,7 @@ Ammo().then(function(Ammo) {
     // physicsWorld.get_m_sparsesdf().Initialize();
     // console.log(physicsWorld.getWorldInfo());
 
-    function createRigidBody( threeObject, physicsShape, mass, pos, quat ) {
+    function createRigidBody( threeObject, physicsShape, mass, pos, quat, friction ) {
         threeObject.position.copy( pos );
         threeObject.quaternion.copy( quat );
         var transform = new Ammo.btTransform();
@@ -40,6 +45,8 @@ Ammo().then(function(Ammo) {
         var localInertia = new Ammo.btVector3( 0, 0, 0 );
         physicsShape.calculateLocalInertia( mass, localInertia );
         var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
+        rbInfo.set_m_friction(friction);
+        // console.log(rbInfo);
         var body = new Ammo.btRigidBody( rbInfo );
         threeObject.userData.physicsBody = body;
         scene.add( threeObject );
@@ -51,18 +58,26 @@ Ammo().then(function(Ammo) {
         physicsWorld.addRigidBody( body );
     }
 
-    function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
+    function createParalellepiped( sx, sy, sz, mass, pos, quat, material, friction ) {
         var threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
         var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
         shape.setMargin( margin );
-        createRigidBody( threeObject, shape, mass, pos, quat );
+        createRigidBody( threeObject, shape, mass, pos, quat, friction );
+        return threeObject;
+    }
+
+    function createCapsule() {
+        var threeObject = new THREE.Mesh( CapsuleGeometry(0.3, 0.6, 12).rotateX(Math.PI/2), new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true } ) );
+        var shape = new Ammo.btCapsuleShape( 0.25, 0.5 );
+        shape.setMargin( 0 );
+        createRigidBody( threeObject, shape, 10, new THREE.Vector3(0, 0, 0), new THREE.Quaternion(0, 0, 0, 1), 0);
         return threeObject;
     }
 
     // Ground
     pos = new THREE.Vector3( 0, - 0.5, 0 );
     quat = new THREE.Quaternion( 0, 0, 0, 1 );
-    var ground = createParalellepiped( 10, 1, 10, 0, pos, quat, new THREE.MeshLambertMaterial( { color: 0xcccccc } ) );
+    var ground = createParalellepiped( 10, 1, 10, 0, pos, quat, new THREE.MeshLambertMaterial( { color: 0xcccccc } ), 0.8 );
     ground.castShadow = true;
     ground.receiveShadow = true;
 
@@ -73,7 +88,11 @@ Ammo().then(function(Ammo) {
     var brickHeight = brickLength * 0.5;
     var numBricksLength = 6;
     var numBricksHeight = 8;
-    var brick = createParalellepiped( brickDepth, brickHeight, brickLength, brickMass, new THREE.Vector3(2, 1, 0), new THREE.Quaternion(0, 0, 0, 1), new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+
+    for(i = 0; i < 12; i++) {
+        var brick = createParalellepiped( brickDepth, brickHeight, brickLength, brickMass, new THREE.Vector3(-2, i/3, i%3), new THREE.Quaternion(0, 0, 0, 1), new THREE.MeshPhongMaterial( { color: 0xffffff } ), 0.8 );
+    }
+
     brick.castShadow = true;
     brick.receiveShadow = true;
 
@@ -117,12 +136,35 @@ Ammo().then(function(Ammo) {
     // clothSoftBody.setActivationState( 4 );
 
     // Player
-    playerCol = createParalellepiped( 0.5, 1, 0.5, 1, new THREE.Vector3(0, 0.5, 0), new THREE.Quaternion(0, 0, 0, 1), new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: true } ) );
+    // playerCol = createParalellepiped( 0.5, 1, 0.5, 1, new THREE.Vector3(0, 0.5, 0), new THREE.Quaternion(0, 0, 0, 1), new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: true } ) );
+    // playerCol.visible = false;
+
+    playerCol = createCapsule();
     playerCol.visible = false;
+    player.capsule = playerCol;
+    // playerCol.userData.physicsBody.setDamping(0,1);
+    playerCol.userData.physicsBody.setAngularFactor(new Ammo.btVector3(0, 0, 0));
+    // console.log(playerCol);
 
     var lerp = 0;
 
     updatePhysics = function( deltaTime ) {
+
+
+        // phys = playerCol.userData.physicsBody;
+        // t = phys.getWorldTransform();
+        // t.setOrigin(new Ammo.btVector3(
+        //     player.position.x + new THREE.Vector3().copy(player.orientation).multiplyScalar(player.velocity).x * 0.3,
+        //     player.position.y + 0.5,
+        //     player.position.z + new THREE.Vector3().copy(player.orientation).multiplyScalar(player.velocity).z * 0.3));
+        // t.setRotation(new Ammo.btQuaternion(0, 0, 0, 1));
+        // phys.setAngularVelocity(new Ammo.btVector3(0, 1000, 0));
+        // phys.applyCentralImpulse(new Ammo.btVector3(player.velocity.x, player.velocity.y, player.velocity.z));
+        // console.log(phys);
+
+        // player.position.set(t.getOrigin().x(), t.getOrigin().y() - 0.5, t.getOrigin().z());
+        // player.visuals.quaternion.set(t.getRotation().x(), t.getRotation().y(), t.getRotation().z(), t.getRotation().w());
+        // console.log(t.getRotation());
 
         // Step world
         physicsWorld.stepSimulation( deltaTime );
@@ -131,20 +173,6 @@ Ammo().then(function(Ammo) {
         lerp += deltaTime;
         if(lerp > 1/60) lerp %= 1/60;
 
-
-        phys = playerCol.userData.physicsBody;
-        t = phys.getWorldTransform();
-        t.setOrigin(new Ammo.btVector3(
-            player.position.x + new THREE.Vector3().copy(player.orientation).multiplyScalar(player.velocity).x * 0.3,
-            player.position.y + 0.5,
-            player.position.z + new THREE.Vector3().copy(player.orientation).multiplyScalar(player.velocity).z * 0.3));
-        t.setRotation(new Ammo.btQuaternion(0, 0, 0, 1));
-        phys.setWorldTransform(t);
-        // phys.applyCentralImpulse(new Ammo.btVector3(player.velocity.x, player.velocity.y, player.velocity.z));
-        // console.log(player.velocity);
-        
-
-    
         // Update cloth
         // sbConfig.set_timescale(params.Time_Scale);
         var softBody = cloth.userData.physicsBody;
@@ -178,6 +206,49 @@ Ammo().then(function(Ammo) {
                 ms.getWorldTransform( transformAux1 );
                 var p = transformAux1.getOrigin();
                 var q = transformAux1.getRotation();
+
+                if(p.y() < -1) {
+                    p.setY(10);
+                    transformAux1.setOrigin(p);
+                    ms.setWorldTransform(transformAux1);
+                    objPhys.setMotionState(ms);
+                }
+
+                if(p.y() > 10) {
+                    p.setY(-1);
+                    transformAux1.setOrigin(p);
+                    ms.setWorldTransform(transformAux1);
+                    objPhys.setMotionState(ms);
+                }
+
+                if(p.x() > 8) {
+                    p.setX(-8);
+                    transformAux1.setOrigin(p);
+                    ms.setWorldTransform(transformAux1);
+                    objPhys.setMotionState(ms);
+                }
+
+                if(p.x() < -8) {
+                    p.setX(8);
+                    transformAux1.setOrigin(p);
+                    ms.setWorldTransform(transformAux1);
+                    objPhys.setMotionState(ms);
+                }
+
+                if(p.z() > 8) {
+                    p.setZ(-8);
+                    transformAux1.setOrigin(p);
+                    ms.setWorldTransform(transformAux1);
+                    objPhys.setMotionState(ms);
+                }
+
+                if(p.z() < -8) {
+                    p.setZ(8);
+                    transformAux1.setOrigin(p);
+                    ms.setWorldTransform(transformAux1);
+                    objPhys.setMotionState(ms);
+                }
+
                 objThree.position.set( p.x(), p.y(), p.z() );
                 objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
             }

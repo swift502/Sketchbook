@@ -22,6 +22,10 @@ CharStates.Idle.update = function(character, timeStep) {
 }
 CharStates.Idle.changeState = function(character) {
 
+    if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
+        character.jump();
+    }
+
     if(controls.lastControl.isDirection()) {
         character.setState(CharStates.Start);
     }
@@ -34,7 +38,7 @@ CharStates.Walk = getDefaultState();
 CharStates.Walk.init = function(character) {
 
     character.setAnimation('run', 0.1);
-    character.velocitySimulator.mass = 100;
+    character.velocitySimulator.mass = 50;
 
     if(noDirection()) {
         character.setState(CharStates.End);
@@ -48,6 +52,10 @@ CharStates.Walk.update = function(character, timeStep) {
     character.update(timeStep);
 }
 CharStates.Walk.changeState = function(character) {
+
+    if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
+        character.jump();
+    }
 
     if(noDirection()) {
         character.setState(CharStates.End);
@@ -63,7 +71,7 @@ CharStates.Start.init = function(character) {
     var duration = character.setAnimation('start_forward', 0.1);
     CharStates.Start.time = duration;
     CharStates.Start.timer = 0;
-    character.velocitySimulator.mass = 60;
+    character.velocitySimulator.mass = 30;
 }
 CharStates.Start.update = function(character, timeStep) {
 
@@ -76,6 +84,10 @@ CharStates.Start.update = function(character, timeStep) {
     character.update(timeStep);
 }
 CharStates.Start.changeState = function(character) {
+    if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
+        character.jump();
+    }
+
     if(noDirection()) {
         character.setState(CharStates.End);
     }
@@ -91,7 +103,7 @@ CharStates.End.init = function(character) {
     CharStates.End.time = duration;
     CharStates.End.timer = 0;
     character.orientationTarget = character.orientation;
-    character.velocitySimulator.mass = 120;
+    character.velocitySimulator.mass = 50;
 }
 CharStates.End.update = function(character, timeStep) {
 
@@ -103,6 +115,10 @@ CharStates.End.update = function(character, timeStep) {
     character.update(timeStep);
 }
 CharStates.End.changeState = function(character) {
+
+    if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
+        character.jump();
+    }
 
     if(anyDirection()) {
         character.setState(CharStates.Start);
@@ -142,6 +158,6 @@ function getDefaultState() {
     return Object.assign({}, CharStates.defaultState);
 }
 
-function getMoveSpeed(timeStep) {
-    return timeStep * 3;
+function getMoveSpeed() {
+    return 3;
 }

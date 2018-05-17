@@ -5,7 +5,8 @@ var params = {
     Shadows: true,
     FXAA: true,
     Auto_Rotate: false,
-    Bounce_Debug: false
+    Bounce_Debug: false,
+    Draw_Capsule: false
 };
 
 // GUI init
@@ -48,10 +49,10 @@ function Update(timeStep) {
 
     dirLight.position.set(player.position.x + sun.x * 5, player.position.y + sun.y * 5, player.position.z + sun.z * 5);
 
-    orbitControls.target.set(player.position.x, player.position.y + 0.5, player.position.z);
+    orbitControls.target.set(player.position.x, player.position.y + 0.6, player.position.z);
     
     if(params.Auto_Rotate) camera.lookAt(player.position);
-    camera.position.set(player.position.x, player.position.y + 0.5, player.position.z);
+    camera.position.set(player.position.x, player.position.y + 0.6, player.position.z);
     camera.translateZ(2);
     if(params.Auto_Rotate) camera.position.setComponent(1, 1);
     

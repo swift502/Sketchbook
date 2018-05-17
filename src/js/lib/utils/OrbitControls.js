@@ -189,7 +189,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			}
 
-			scale = 0.7;
+			scale = 1;    //Custom scale
 			panOffset.set( 0, 0, 0 );
 
 			// update condition is:

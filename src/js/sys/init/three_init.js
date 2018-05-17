@@ -39,6 +39,8 @@ function ParamGUI(params) {
     gui.add(params, 'FXAA');
     gui.add(params, 'Auto_Rotate');
     var bd = gui.add(params, 'Bounce_Debug');
+    var dc = gui.add(params, 'Draw_Capsule');
+    
     gui.open();
     
     timeController.onChange(function(value) {
@@ -55,6 +57,15 @@ function ParamGUI(params) {
             sphere.visible =  false;
             sphere2.visible = false;
             sphere3.visible = false;
+        }
+    });
+    
+    dc.onChange(function(enabled) {
+        if(enabled) {
+            playerCol.visible =  true;
+        }
+        else {
+            playerCol.visible =  false;
         }
     });
 
@@ -144,7 +155,6 @@ scene.add(dirLight);
 
 // Orbit controls
 var orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
-orbitControls.scale = 0.5;
 orbitControls.enableZoom = false;
 orbitControls.enablePan = false;
 orbitControls.update();
