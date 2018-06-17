@@ -39,6 +39,7 @@ function Character() {
 
     // States
     this.charState = CharStates.defaultState;
+    this.wantToJump = false;
 };
 
 Character.prototype = Object.create(THREE.Object3D.prototype);
@@ -96,6 +97,8 @@ Character.prototype.setAnimation = function(clipName, fadeIn) {
     return action._clip.duration;
 }
 
+// var gay = 1;
+
 Character.prototype.bounceMovement = function(timeStep) {
 
     // Simulator
@@ -103,32 +106,59 @@ Character.prototype.bounceMovement = function(timeStep) {
     this.velocitySimulator.simulate(timeStep);
     this.velocity = this.velocitySimulator.position;
 
-    // Updating values
+    // Ray casting
+    var rayCastLength = 0.6;
 
+    var Start = new Ammo.btVector3(playerCol.position.x, playerCol.position.y, playerCol.position.z);
+    var End = new Ammo.btVector3(playerCol.position.x, playerCol.position.y - rayCastLength, playerCol.position.z);
+    var RayCallback = new Ammo.ClosestRayResultCallback(Start, End);
+    // console.log(callback.get_m_hitPointWorld());
+
+
+    // Perform raycast
+    physicsWorld.rayTest(Start, End, RayCallback);
     
     var curVel = this.capsule.userData.physicsBody.getLinearVelocity();
     var charVelVector = new THREE.Vector3().copy(this.orientation).multiplyScalar(this.velocity * getMoveSpeed(timeStep));
-    var vector = new Ammo.btVector3(charVelVector.x, curVel.y(), charVelVector.z);
-        
-    this.capsule.userData.physicsBody.setLinearVelocity(vector);
+    var Velocityvector = new Ammo.btVector3(charVelVector.x, curVel.y(), charVelVector.z);
+
+    var rayHasHit = false;
+    var rayPos = 0;
+
+    if(this.wantToJump) {
+        this.doJump();
+        this.wantToJump = false;
+    }
+    else {
+        if(RayCallback.hasHit()) {
+            var hitPoint = RayCallback.get_m_hitPointWorld();
+            var hitNormal = RayCallback.get_m_hitNormalWorld();
+
+            rayPos = hitPoint.y();
+
+            Velocityvector.setY(0);
+            rayHasHit = true;
+            raycastBox.position.set(hitPoint.x(),hitPoint.y(),hitPoint.z());
+        }
+        else {
+            raycastBox.position.set(0,0,0);
+        }
+    
+        this.capsule.userData.physicsBody.setLinearVelocity(Velocityvector);
+        if(rayHasHit){
+            var o = this.capsule.userData.physicsBody.getWorldTransform().getOrigin();
+            o.setY(rayPos + rayCastLength - 0.01);
+        }
+    }
 
     var ms = this.capsule.userData.physicsBody.getMotionState();
 
     if ( ms ) {
         ms.getWorldTransform( transformAux1 );
         var p = transformAux1.getOrigin();
-        // console.log(p);
-        // var q = transformAux1.getRotation();
-
-        this.position.set( p.x(), p.y() - 0.57, p.z() );
-        // objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
+        this.position.set( p.x(), p.y() - 0.6, p.z() );
     }
-
-    // });
-
     
-
-
     this.acceleration = this.velocitySimulator.velocity;
 }
 
@@ -181,7 +211,14 @@ Character.prototype.rotateModel = function() {
 }
 
 Character.prototype.jump = function() {
+    this.wantToJump = true;
+}
+
+Character.prototype.doJump = function() {
     var curVel = this.capsule.userData.physicsBody.getLinearVelocity();
     curVel.setY(curVel.y() + 4);
     this.capsule.userData.physicsBody.setLinearVelocity(curVel);
+    
+    var o = this.capsule.userData.physicsBody.getWorldTransform().getOrigin();
+    o.setY(o.y() + 0.02);
 }

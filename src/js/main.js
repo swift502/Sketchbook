@@ -39,13 +39,13 @@ function Update(timeStep) {
     sphere.position.set(bvx.position, 0, bvz.position);
 
     // mixer.update( timeStep );
-
     
     updatePhysics(timeStep);
-
+    
     params.Time_Scale = THREE.Math.lerp(params.Time_Scale, timeScaleTarget, 0.2);
     player.charState.update(player, timeStep);
     player.updateMatrixWorld();
+    
 
     dirLight.position.set(player.position.x + sun.x * 5, player.position.y + sun.y * 5, player.position.z + sun.z * 5);
 

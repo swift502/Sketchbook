@@ -230,3 +230,14 @@ sphere3.castShadow = true;
 sphere3.receiveShadow = true;
 sphere3.visible = false;
 scene.add(sphere3);
+
+//ray cast debug
+var boxGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+var boxMat = new THREE.MeshLambertMaterial({
+    color: 0xff0000
+});
+var raycastBox = new THREE.Mesh(boxGeo, boxMat);
+raycastBox.castShadow = true;
+raycastBox.receiveShadow = true;
+// raycastBox.visible = true;
+scene.add(raycastBox);

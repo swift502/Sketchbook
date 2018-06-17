@@ -1,5 +1,5 @@
 // Physics
-var gravityConstant = -12;
+var gravityConstant = -10;
 var physicsWorld;
 var rigidBodies = [];
 var margin = 0.05;
@@ -34,6 +34,8 @@ Ammo().then(function(Ammo) {
     // physicsWorld.get_m_sparsesdf().Initialize();
     // console.log(physicsWorld.getWorldInfo());
 
+    console.log(physicsWorld);
+
     function createRigidBody( threeObject, physicsShape, mass, pos, quat, friction ) {
         threeObject.position.copy( pos );
         threeObject.quaternion.copy( quat );
@@ -67,10 +69,10 @@ Ammo().then(function(Ammo) {
     }
 
     function createCapsule() {
-        var threeObject = new THREE.Mesh( CapsuleGeometry(0.3, 0.6, 12).rotateX(Math.PI/2), new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true } ) );
-        var shape = new Ammo.btCapsuleShape( 0.25, 0.5 );
+        var threeObject = new THREE.Mesh( CapsuleGeometry(0.25, 0.5, 12).rotateX(Math.PI/2), new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true } ) );
+        var shape = new Ammo.btCapsuleShape( 0.2, 0.4 );
         shape.setMargin( 0 );
-        createRigidBody( threeObject, shape, 10, new THREE.Vector3(0, 0, 0), new THREE.Quaternion(0, 0, 0, 1), 0);
+        createRigidBody( threeObject, shape, 1, new THREE.Vector3(0, 0, 0), new THREE.Quaternion(0, 0, 0, 1), 0);
         return threeObject;
     }
 
@@ -82,7 +84,7 @@ Ammo().then(function(Ammo) {
     ground.receiveShadow = true;
 
     // Brick
-    var brickMass = 0.5;
+    var brickMass = 10;
     var brickLength = 1.2;
     var brickDepth = 0.6;
     var brickHeight = brickLength * 0.5;
@@ -90,7 +92,7 @@ Ammo().then(function(Ammo) {
     var numBricksHeight = 8;
 
     for(i = 0; i < 12; i++) {
-        var brick = createParalellepiped( brickDepth, brickHeight, brickLength, brickMass, new THREE.Vector3(-2, i/3, i%3), new THREE.Quaternion(0, 0, 0, 1), new THREE.MeshPhongMaterial( { color: 0xffffff } ), 0.8 );
+        var brick = createParalellepiped( brickDepth, brickHeight, brickLength, brickMass, new THREE.Vector3(-2, i/3, i%3), new THREE.Quaternion(0, 0, 0, 1), new THREE.MeshPhongMaterial( { color: 0xffffff } ), 0.1 );
     }
 
     brick.castShadow = true;
@@ -167,7 +169,12 @@ Ammo().then(function(Ammo) {
         // console.log(t.getRotation());
 
         // Step world
-        physicsWorld.stepSimulation( deltaTime );
+        // console.log(physicsWorld.getLocalTime());
+        physicsWorld.stepSimulation( deltaTime, 1000 );
+
+        // console.log(physicsWorld.getLocalTime());
+
+        // console.log(i);
         // console.log(physicsWorld.b());
     
         lerp += deltaTime;
