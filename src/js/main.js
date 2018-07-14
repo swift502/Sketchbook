@@ -18,12 +18,8 @@ bV.target = player.position;
 bvx = new BounceSimulator(60, 30, 0.98);
 bvz = new BounceSimulator(60, 30, 0.98);
 
-
-
-/**
- * Update
- * Handles all logic updates.
- */
+// Update
+// Handles all logic updates.
 function Update(timeStep) {
 
     //bounceV debug
@@ -35,17 +31,13 @@ function Update(timeStep) {
     bvz.target = player.position.z;
     bvx.simulate(timeStep);
     bvz.simulate(timeStep);
-    // console.log(bvx.target, bvz.target);
     sphere.position.set(bvx.position, 0, bvz.position);
 
-    // mixer.update( timeStep );
-    
     updatePhysics(timeStep);
     
     params.Time_Scale = THREE.Math.lerp(params.Time_Scale, timeScaleTarget, 0.2);
     player.charState.update(player, timeStep);
     player.updateMatrixWorld();
-    
 
     dirLight.position.set(player.position.x + sun.x * 5, player.position.y + sun.y * 5, player.position.z + sun.z * 5);
 

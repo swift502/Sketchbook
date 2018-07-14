@@ -1,35 +1,42 @@
+
+//Character class
+//The visual hierarchy goes:
+//  this->visuals->modelContainer->characterModel
 function Character() {
     
     THREE.Object3D.call(this);
 
+    // Geometry
+    this.height = 1;
+
     // Default model
-    var cube = new THREE.Mesh(
+    this.characterModel = new THREE.Mesh(
         new THREE.BoxGeometry(0.5, 1, 0.5),
         new THREE.MeshLambertMaterial({ color: 0xffffff }));
-    cube.position.set(0, 0.5, 0);
-    cube.castShadow = true;
+    this.characterModel.position.set(0, 0.5, 0);
+    this.characterModel.castShadow = true;
 
-    // Create visuals group
+    // Create visual groups
+    // visuals group is centered for easy character tilting
+    // modelContainer is used to reliably ground the character, as animation can alter the position of the model itself
     this.visuals = new THREE.Group();
     this.add(this.visuals);
-    this.visuals.conteiner = new THREE.Group();
-    this.visuals.conteiner.position.set(0, -0.5, 0);
-    this.visuals.add(this.visuals.conteiner);
-    // helper = new THREE.AxesHelper(1);
-    // this.visuals.add(helper);
+    this.modelContainer = new THREE.Group();
+    this.modelContainer.position.y = -this.height/2;
+    this.visuals.add(this.modelContainer);
 
     // Attach model to visuals
-    this.visuals.model = cube;
-    this.visuals.conteiner.add(cube);
+    this.modelContainer.add(this.characterModel);
 
     // Animation
-    this.mixer = new THREE.AnimationMixer(this.visuals);
+    this.mixer = new THREE.AnimationMixer(this.characterModel);
 
     // Movement
     this.acceleration = 0;
     this.velocity = 0;
     this.velocityTarget = 0;
     this.velocitySimulator = new BounceSimulator(60, 80, 0.8);
+    this.moveSpeed = 4;
 
     // Rotation
     this.angularVelocity = 0;
@@ -39,21 +46,98 @@ function Character() {
 
     // States
     this.charState = CharStates.defaultState;
+
+    // Physics
+    // Player Capsule
+    var playerMass = 1;
+    var playerHeight = 0.5;
+    var playerRadius = 0.25;
+    var playerSegments = 12;
+    var playerFriction = 0;
+    var playerCollisionGroup = 2;
+    this.characterCapsule = addParallelCapsule(playerMass, new CANNON.Vec3(1, 1, 1), playerHeight, playerRadius, playerSegments, playerFriction);
+
+    // Pass reference to character for callbacks
+    this.characterCapsule.physical.character = this;
+
+    // Move character to different collision group for raycasting
+    this.characterCapsule.physical.collisionFilterGroup = playerCollisionGroup;
+
+    // Disable character rotation
+    this.characterCapsule.physical.fixedRotation = true;
+    this.characterCapsule.physical.updateMassProperties();
+
+    // Ray casting
+    this.rayResult = new CANNON.RaycastResult();
+    this.rayHasHit = false;
+    this.rayCastLength = 0.6;
     this.wantToJump = false;
+    this.justJumped = false;
+
+    // PreStep event
+    this.characterCapsule.physical.preStep = function() {
+
+        // Player ray casting
+        // Create ray
+        var start = new CANNON.Vec3(this.position.x, this.position.y, this.position.z);
+        var end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength, this.position.z);
+        // Raycast options
+        var rayCastOptions = {
+            collisionFilterMask: ~2 /* cast against everything except second group (player) */,
+            skipBackfaces: true     /* ignore back faces */
+        }
+        // Cast the ray
+        this.character.rayHasHit = physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
+        
+        // Jumping
+        if(this.character.wantToJump && this.character.rayHasHit) {
+            this.character.characterCapsule.physical.velocity.y += 4;
+            this.character.wantToJump = false;
+            this.character.justJumped = true;
+        }
+    }
+
+    // PostStep event
+    this.characterCapsule.physical.postStep = function() {
+    
+        // Player ray casting
+        // Get velocities
+        var simulatedVelocity = new CANNON.Vec3().copy(this.velocity);
+        var arcadeVelocity = new THREE.Vector3().copy(this.character.orientation).multiplyScalar(this.character.velocity * this.character.moveSpeed);
+    
+        // If just jumped, don't stick to ground
+        if(this.character.justJumped) this.character.justJumped = false;
+        else {
+            // If we're hitting the ground, stick to ground
+            if(this.character.rayHasHit) {
+                raycastBox.position.copy(this.character.rayResult.hitPointWorld);
+                this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength;
+                this.velocity.set(arcadeVelocity.x, 0, arcadeVelocity.z);
+            }
+            else {
+                // If we're in air, leave vertical velocity to physics
+                raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
+                this.velocity.set(arcadeVelocity.x, simulatedVelocity.y, arcadeVelocity.z);
+            }
+        }
+    }
 };
 
 Character.prototype = Object.create(THREE.Object3D.prototype);
 
 Character.prototype.setModel = function(model) {
-    this.visuals.conteiner.remove(this.visuals.model);
+    this.modelContainer.remove(this.characterModel);
+    this.characterModel = model;
+    this.modelContainer.add(this.characterModel);
 
-    this.visuals.model = model;
-    this.visuals.conteiner.add(model);
-
-    this.mixer = new THREE.AnimationMixer(model);
+    this.mixer = new THREE.AnimationMixer(this.characterModel);
 
     // helper = new THREE.AxesHelper(1);
-    // model.add(helper);
+    // this.visuals.add(helper);
+}
+
+Character.prototype.setModelOffset = function(offset) {
+    this.visuals.position.copy(offset);
 }
 
 Character.prototype.setState = function(state) {
@@ -84,10 +168,13 @@ Character.prototype.update = function(timeStep, parameters) {
     if(parameters.rotateModel)     this.rotateModel();
     if(parameters.updateAnimation) this.mixer.update(timeStep);
     
+    this.position.set(this.characterCapsule.physical.interpolatedPosition.x,
+        this.characterCapsule.physical.interpolatedPosition.y - 0.5,
+        this.characterCapsule.physical.interpolatedPosition.z);
 }
 
 Character.prototype.setAnimation = function(clipName, fadeIn) {
-    var clips = this.visuals.model.animations;
+    var clips = this.characterModel.animations;
     var clip = THREE.AnimationClip.findByName( clips, clipName );
     var action = this.mixer.clipAction( clip );
     this.mixer.stopAllAction();
@@ -104,39 +191,6 @@ Character.prototype.bounceMovement = function(timeStep) {
     this.velocitySimulator.simulate(timeStep);
     this.velocity = this.velocitySimulator.position;
 
-    // Ray casting
-    var rayCastLength = 0.6;
-
-    var physicsCapsule = playerCapsule.physical;
-
-    var start = new CANNON.Vec3(physicsCapsule.interpolatedPosition.x, physicsCapsule.interpolatedPosition.y, physicsCapsule.interpolatedPosition.z);
-    var end = new CANNON.Vec3(physicsCapsule.interpolatedPosition.x, physicsCapsule.interpolatedPosition.y - rayCastLength, physicsCapsule.interpolatedPosition.z);
-    var rayResult = new CANNON.RaycastResult();
-    var rayHasHit = physicsWorld.raycastClosest(start, end, {collisionFilterMask: ~2 /*cast against everything except second group (player)*/, skipBackfaces: true}, rayResult);
-    
-    var simulatedVelocity = new CANNON.Vec3().copy(physicsCapsule.velocity);
-    var arcadeVelocity = new THREE.Vector3().copy(this.orientation).multiplyScalar(this.velocity * getMoveSpeed());
-    
-
-    if(this.wantToJump && rayHasHit) {
-        this.doJump();
-        this.wantToJump = false;
-    }
-    else {
-        if(rayHasHit) {
-            raycastBox.position.copy(rayResult.hitPointWorld);
-            physicsCapsule.position.y = rayResult.hitPointWorld.y + rayCastLength;
-            physicsCapsule.velocity.set(arcadeVelocity.x, 0, arcadeVelocity.z);
-        }
-        else {
-            raycastBox.position.set(physicsCapsule.interpolatedPosition.x, physicsCapsule.interpolatedPosition.y  - rayCastLength, physicsCapsule.interpolatedPosition.z);
-            physicsCapsule.velocity.set(arcadeVelocity.x, simulatedVelocity.y, arcadeVelocity.z);
-        }
-    }
-    
-    this.position.set(  physicsCapsule.interpolatedPosition.x,
-                        physicsCapsule.interpolatedPosition.y - 0.5,
-                        physicsCapsule.interpolatedPosition.z);
     this.acceleration = this.velocitySimulator.velocity;
 }
 
@@ -185,21 +239,13 @@ Character.prototype.rotateModel = function() {
     this.visuals.rotateX(this.acceleration * 3);
     this.visuals.rotateZ(-this.angularVelocity * 2.3);
     this.visuals.position.setY(Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
-    
 }
 
 Character.prototype.jump = function() {
     this.wantToJump = true;
 }
 
-Character.prototype.doJump = function() {
-    // var curVel = playerCapsule.physical.velocity;
-    // curVel.y += 4;
-    // this.capsule.userData.physicsBody.setLinearVelocity(curVel);
-
-    playerCapsule.physical.velocity.y += 4;
-    playerCapsule.physical.position.y += 0.1;
-    
-    // var o = this.capsule.userData.physicsBody.getWorldTransform().getOrigin();
-    // o.setY(o.y() + 0.02);
-}
+// Character.prototype.doJump = function() {
+//     playerCapsule.physical.velocity.y += 4;
+//     playerCapsule.physical.position.y += 0.02;
+// }

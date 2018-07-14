@@ -1,4 +1,8 @@
 
+//
+// Simulation
+//
+
 function bounce(source, dest, velocity, mass, damping) {
     var acceleration = dest - source;
     acceleration /= mass;
@@ -17,6 +21,10 @@ function bounceV(source, dest, velocity, mass, damping) {
     velocity.multiplyScalar(damping);
     source.add(velocity);
 }
+
+//
+// Geometry
+//
 
 const CapsuleGeometry = (radius = 1, height = 2, N = 32) => {
     const geometry = new THREE.Geometry();
@@ -113,3 +121,112 @@ const CapsuleGeometry = (radius = 1, height = 2, N = 32) => {
   
     return geometry;
   }
+
+//
+// Physics
+//
+
+function addParallelBox(mass, position, size, friction) {
+
+    var mat = new CANNON.Material();
+    mat.friction = friction;
+
+    var shape = new CANNON.Box(size);
+    shape.material = mat;
+
+    // Add phys sphere
+    physBox = new CANNON.Body({
+        mass: mass,
+        position: position,
+        shape: shape
+        });
+
+    physBox.material = mat;
+    physicsWorld.addBody(physBox);
+    
+    // Add visual box
+    var geometry = new THREE.BoxGeometry( size.x*2, size.y*2, size.z*2 );
+    var material = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
+    var visualBox = new THREE.Mesh( geometry, material );
+    scene.add( visualBox );
+
+    var pair = {
+        physical: physBox,
+        visual: visualBox
+    };
+  
+    parallelPairs.push(pair);
+    return pair;
+}
+
+function addParallelSphere(mass, position, radius, friction) {
+
+    var mat = new CANNON.Material();
+    mat.friction = friction;
+
+    var shape = new CANNON.Sphere(radius);
+    shape.material = mat;
+
+    // Add phys sphere
+    var physSphere = new CANNON.Body({
+        mass: mass, // kg
+        position: position, // m
+        shape: shape
+    });
+    physSphere.material = mat;
+    physicsWorld.addBody(physSphere);
+    
+    // Add visual sphere
+    var geometry2 = new THREE.SphereGeometry(radius);
+    var material2 = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
+    var visualSphere = new THREE.Mesh( geometry2, material2 );
+    scene.add( visualSphere );
+
+    var pair = {
+      physical: physSphere,
+      visual: visualSphere
+    };
+
+    parallelPairs.push(pair);
+    return pair;
+}
+
+function addParallelCapsule(mass, position, height, radius, segments, friction) {
+
+    var mat = new CANNON.Material();
+    mat.friction = friction;
+
+    var physicalCapsule = new CANNON.Body({
+        mass: mass,
+        position: position
+    });
+    
+    // Compound shape
+    var sphereShape = new CANNON.Sphere(radius);
+    var cylinderShape = new CANNON.Cylinder(radius, radius, height / 2, segments);
+    cylinderShape.transformAllPoints(new CANNON.Vec3(), new CANNON.Quaternion(0.707,0,0,0.707));
+
+    // Materials
+    physicalCapsule.material = mat;
+    sphereShape.material = mat;
+    cylinderShape.material = mat;
+
+    physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, height / 2, 0));
+    physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, -height / 2, 0));
+    physicalCapsule.addShape(cylinderShape, new CANNON.Vec3( 0, 0, 0));
+    physicsWorld.addBody(physicalCapsule);
+
+    var visualCapsule = new THREE.Mesh(
+        CapsuleGeometry(radius, height, segments).rotateX(Math.PI/2),
+        new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true} )
+    );
+    scene.add(visualCapsule);
+
+    var pair = {
+        physical: physicalCapsule,
+        visual: visualCapsule
+      };
+
+    parallelPairs.push(pair);
+    return pair;
+}

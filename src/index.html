@@ -14,11 +14,10 @@
 
 <body>
     <!-- Config -->
-    <script src="js/sys/config/config_dev.js"></script>
+    <script src="js/sys/config/ConfigDev.js"></script>
 
     <!-- Core -->
     <script src="js/lib/core/three.js"></script>
-    <!--<script src="js/lib/core/ammo.js"></script>-->
     <script src="js/lib/core/cannon.js"></script>
 
     <!-- Graphics -->
@@ -38,6 +37,11 @@
     <script src="js/lib/utils/inflate.min.js"></script>
     <script src="js/lib/utils/FBXLoader.js"></script>
 
+    <!-- System -->
+    <script src="js/sys/GlobalVariables.js"></script>
+    <script src="js/sys/Functions.js"></script>
+    <script src="js/sys/Input.js"></script>
+
     <!-- Objects -->
     <script src="js/simulation/SimulatorBase.js"></script>
     <script src="js/simulation/BounceSimulator.js"></script>
@@ -46,18 +50,14 @@
     <script src="js/characters/CharacterStates.js"></script>
     <script src="js/characters/Character.js"></script>
 
-    <!-- System -->
-    <script src="js/sys/functions.js"></script>
-    <script src="js/sys/input.js"></script>
-
     <!-- Init -->
-    <script src="js/init/three_init.js"></script>
-    <script src="js/init/cannon_init.js"></script>
-    <script src="js/init/characters_init.js"></script>
-    <script src="js/init/world_init.js"></script>
+    <script src="js/init/InitThree.js"></script>
+    <script src="js/init/InitCannon.js"></script>
+    <script src="js/init/InitCharacters.js"></script>
+    <script src="js/init/InitWorld.js"></script>
     
-    <script src="js/main.js"></script>
-    <script src="js/sys/renderLoop.js"></script>
+    <script src="js/Main.js"></script>
+    <script src="js/sys/RenderLoop.js"></script>
 
 </body>
 

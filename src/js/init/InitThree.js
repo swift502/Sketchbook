@@ -1,6 +1,6 @@
-/////////////////////////
-// HTML initialization //
-/////////////////////////
+//
+// HTML initialization
+//
 
 // WebGL not supported
 if (!Detector.webgl) Detector.addGetWebGLMessage();
@@ -79,12 +79,9 @@ function ParamGUI(params) {
     });
 }
 
-//////////////////////////
-// Scene initialization //
-//////////////////////////
-
-// Scene
-var scene  = new THREE.Scene();
+//
+// Scene initialization
+//
 
 // Fog
 // scene.fog = new THREE.FogExp2(0xC8D3D5, 0.25);

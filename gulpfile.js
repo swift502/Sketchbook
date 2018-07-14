@@ -9,7 +9,7 @@ var styles = [
 
 var scripts = [
 
-    './src/js/sys/config/config_prod.js',
+    './src/js/sys/config/ConfigProd.js',
     
     './src/js/lib/shaders/*',
     './src/js/lib/utils/*',
@@ -17,16 +17,16 @@ var scripts = [
     './src/js/simulation/*',
     './src/js/characters/*',
 
-    './src/js/sys/functions.js',
-    './src/js/sys/input.js',
+    './src/js/sys/Functions.js',
+    './src/js/sys/Input.js',
 
-    './src/js/init/three_init.js',
-    './src/js/init/ammo_init.js',
-    './src/js/init/characters_init.js',
-    './src/js/init/world_init.js',
+    './src/js/init/InitThree.js',
+    './src/js/init/InitCannon.js',
+    './src/js/init/InitCharacters.js',
+    './src/js/init/InitWorld.js',
 
-    './src/js/main.js',
-    './src/js/sys/renderLoop.js'
+    './src/js/Main.js',
+    './src/js/sys/RenderLoop.js'
 ];
 
 

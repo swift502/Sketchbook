@@ -157,7 +157,3 @@ function anyDirection() {
 function getDefaultState() {
     return Object.assign({}, CharStates.defaultState);
 }
-
-function getMoveSpeed() {
-    return 4;
-}
