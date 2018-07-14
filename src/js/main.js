@@ -3,7 +3,7 @@ var params = {
     FPS_Limit: 60,
     Time_Scale: 1,
     Shadows: true,
-    FXAA: true,
+    FXAA: false,
     Auto_Rotate: false,
     Bounce_Debug: false,
     Draw_Capsule: false

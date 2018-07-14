@@ -97,8 +97,6 @@ Character.prototype.setAnimation = function(clipName, fadeIn) {
     return action._clip.duration;
 }
 
-// var gay = 1;
-
 Character.prototype.bounceMovement = function(timeStep) {
 
     // Simulator
@@ -109,56 +107,36 @@ Character.prototype.bounceMovement = function(timeStep) {
     // Ray casting
     var rayCastLength = 0.6;
 
-    var Start = new Ammo.btVector3(playerCol.position.x, playerCol.position.y, playerCol.position.z);
-    var End = new Ammo.btVector3(playerCol.position.x, playerCol.position.y - rayCastLength, playerCol.position.z);
-    var RayCallback = new Ammo.ClosestRayResultCallback(Start, End);
-    // console.log(callback.get_m_hitPointWorld());
+    var physicsCapsule = playerCapsule.physical;
 
-
-    // Perform raycast
-    physicsWorld.rayTest(Start, End, RayCallback);
+    var start = new CANNON.Vec3(physicsCapsule.interpolatedPosition.x, physicsCapsule.interpolatedPosition.y, physicsCapsule.interpolatedPosition.z);
+    var end = new CANNON.Vec3(physicsCapsule.interpolatedPosition.x, physicsCapsule.interpolatedPosition.y - rayCastLength, physicsCapsule.interpolatedPosition.z);
+    var rayResult = new CANNON.RaycastResult();
+    var rayHasHit = physicsWorld.raycastClosest(start, end, {collisionFilterMask: ~2 /*cast against everything except second group (player)*/, skipBackfaces: true}, rayResult);
     
-    var curVel = this.capsule.userData.physicsBody.getLinearVelocity();
-    var charVelVector = new THREE.Vector3().copy(this.orientation).multiplyScalar(this.velocity * getMoveSpeed(timeStep));
-    var Velocityvector = new Ammo.btVector3(charVelVector.x, curVel.y(), charVelVector.z);
+    var simulatedVelocity = new CANNON.Vec3().copy(physicsCapsule.velocity);
+    var arcadeVelocity = new THREE.Vector3().copy(this.orientation).multiplyScalar(this.velocity * getMoveSpeed());
+    
 
-    var rayHasHit = false;
-    var rayPos = 0;
-
-    if(this.wantToJump) {
+    if(this.wantToJump && rayHasHit) {
         this.doJump();
         this.wantToJump = false;
     }
     else {
-        if(RayCallback.hasHit()) {
-            var hitPoint = RayCallback.get_m_hitPointWorld();
-            var hitNormal = RayCallback.get_m_hitNormalWorld();
-
-            rayPos = hitPoint.y();
-
-            Velocityvector.setY(0);
-            rayHasHit = true;
-            raycastBox.position.set(hitPoint.x(),hitPoint.y(),hitPoint.z());
+        if(rayHasHit) {
+            raycastBox.position.copy(rayResult.hitPointWorld);
+            physicsCapsule.position.y = rayResult.hitPointWorld.y + rayCastLength;
+            physicsCapsule.velocity.set(arcadeVelocity.x, 0, arcadeVelocity.z);
         }
         else {
-            raycastBox.position.set(0,0,0);
-        }
-    
-        this.capsule.userData.physicsBody.setLinearVelocity(Velocityvector);
-        if(rayHasHit){
-            var o = this.capsule.userData.physicsBody.getWorldTransform().getOrigin();
-            o.setY(rayPos + rayCastLength - 0.01);
+            raycastBox.position.set(physicsCapsule.interpolatedPosition.x, physicsCapsule.interpolatedPosition.y  - rayCastLength, physicsCapsule.interpolatedPosition.z);
+            physicsCapsule.velocity.set(arcadeVelocity.x, simulatedVelocity.y, arcadeVelocity.z);
         }
     }
-
-    var ms = this.capsule.userData.physicsBody.getMotionState();
-
-    if ( ms ) {
-        ms.getWorldTransform( transformAux1 );
-        var p = transformAux1.getOrigin();
-        this.position.set( p.x(), p.y() - 0.6, p.z() );
-    }
     
+    this.position.set(  physicsCapsule.interpolatedPosition.x,
+                        physicsCapsule.interpolatedPosition.y - 0.5,
+                        physicsCapsule.interpolatedPosition.z);
     this.acceleration = this.velocitySimulator.velocity;
 }
 
@@ -215,10 +193,13 @@ Character.prototype.jump = function() {
 }
 
 Character.prototype.doJump = function() {
-    var curVel = this.capsule.userData.physicsBody.getLinearVelocity();
-    curVel.setY(curVel.y() + 4);
-    this.capsule.userData.physicsBody.setLinearVelocity(curVel);
+    // var curVel = playerCapsule.physical.velocity;
+    // curVel.y += 4;
+    // this.capsule.userData.physicsBody.setLinearVelocity(curVel);
+
+    playerCapsule.physical.velocity.y += 4;
+    playerCapsule.physical.position.y += 0.1;
     
-    var o = this.capsule.userData.physicsBody.getWorldTransform().getOrigin();
-    o.setY(o.y() + 0.02);
+    // var o = this.capsule.userData.physicsBody.getWorldTransform().getOrigin();
+    // o.setY(o.y() + 0.02);
 }
