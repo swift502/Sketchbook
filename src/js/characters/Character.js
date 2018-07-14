@@ -8,6 +8,7 @@ function Character() {
 
     // Geometry
     this.height = 1;
+    this.modelOffset = new THREE.Vector3();
 
     // Default model
     this.characterModel = new THREE.Mesh(
@@ -45,7 +46,7 @@ function Character() {
     this.rotationSimulator = new RotationSimulator(60, 10, 0.5);
 
     // States
-    this.charState = CharStates.defaultState;
+    this.charState = new CS_DefaultState(this);
 
     // Physics
     // Player Capsule
@@ -71,7 +72,7 @@ function Character() {
     this.rayResult = new CANNON.RaycastResult();
     this.rayHasHit = false;
     this.rayCastLength = 0.6;
-    this.wantToJump = false;
+    this.wantsToJump = false;
     this.justJumped = false;
 
     // PreStep event
@@ -90,11 +91,11 @@ function Character() {
         this.character.rayHasHit = physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
         
         // Jumping
-        if(this.character.wantToJump && this.character.rayHasHit) {
+        if(this.character.wantsToJump && this.character.rayHasHit) {
             this.character.characterCapsule.physical.velocity.y += 4;
-            this.character.wantToJump = false;
             this.character.justJumped = true;
         }
+        this.character.wantsToJump = false;
     }
 
     // PostStep event
@@ -131,18 +132,14 @@ Character.prototype.setModel = function(model) {
     this.modelContainer.add(this.characterModel);
 
     this.mixer = new THREE.AnimationMixer(this.characterModel);
-
-    // helper = new THREE.AxesHelper(1);
-    // this.visuals.add(helper);
 }
 
 Character.prototype.setModelOffset = function(offset) {
-    this.visuals.position.copy(offset);
+    this.modelOffset.copy(offset);
 }
 
 Character.prototype.setState = function(state) {
     this.charState = state;
-    state.init(this);
 }
 
 Character.prototype.setOrientationTarget = function(vector) {
@@ -162,6 +159,8 @@ Character.prototype.update = function(timeStep, parameters) {
     if(parameters.bounceVelocity == undefined) parameters.bounceVelocity = true;
     if(parameters.rotateModel == undefined) parameters.rotateModel = true;
     if(parameters.updateAnimation == undefined) parameters.updateAnimation = true;
+
+    this.visuals.position.copy(this.modelOffset);
 
     if(parameters.bounceRotation)  this.bounceMovement(timeStep);
     if(parameters.bounceVelocity)  this.bounceRotation(timeStep);
@@ -238,11 +237,11 @@ Character.prototype.rotateModel = function() {
     // console.log(this.visuals);
     this.visuals.rotateX(this.acceleration * 3);
     this.visuals.rotateZ(-this.angularVelocity * 2.3);
-    this.visuals.position.setY(Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
+    this.visuals.position.setY(this.visuals.position.y + Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
 }
 
 Character.prototype.jump = function() {
-    this.wantToJump = true;
+    this.wantsToJump = true;
 }
 
 // Character.prototype.doJump = function() {

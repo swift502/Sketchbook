@@ -1,127 +1,125 @@
-var CharStates = {}
-
-CharStates.defaultState = {
-    init: function(character) {},
-    update: function(character, timeStep) {},
-    changeState: function(character) {}
+//
+// Default state
+//
+function CS_DefaultState(character) {
+    this.character = character;
 }
+CS_DefaultState.prototype.update = function(timeStep) {}
+CS_DefaultState.prototype.changeState = function() {}
 
 //
-// IDLE
+// Idle
 //
-CharStates.Idle = getDefaultState();
-CharStates.Idle.init = function(character) {
+function CS_Idle(character) {
+    CS_DefaultState.call(this, character);
 
-    character.setAnimation('idle', 0.3);
-    character.orientationTarget = character.orientation;
+    this.character.setAnimation('idle', 0.3);
+    this.character.orientationTarget = this.character.orientation;
 }
-CharStates.Idle.update = function(character, timeStep) {
-
-    character.velocityTarget = 0;
-    character.update(timeStep);
+CS_Idle.prototype = Object.create(CS_DefaultState.prototype);
+CS_Idle.prototype.update = function(timeStep) {
+    this.character.velocityTarget = 0;
+    this.character.update(timeStep);
 }
-CharStates.Idle.changeState = function(character) {
-
+CS_Idle.prototype.changeState = function() {
     if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
-        character.jump();
+        this.character.jump();
     }
 
     if(controls.lastControl.isDirection()) {
-        character.setState(CharStates.Start);
+        this.character.setState(new CS_Start(this.character));
     }
 }
 
 //
-// WALK
+// Walk
 //
-CharStates.Walk = getDefaultState();
-CharStates.Walk.init = function(character) {
+function CS_Walk(character) {
+    CS_DefaultState.call(this, character);
 
-    character.setAnimation('run', 0.1);
-    character.velocitySimulator.mass = 50;
+    this.character.setAnimation('run', 0.1);
+    this.character.velocitySimulator.mass = 50;
 
     if(noDirection()) {
-        character.setState(CharStates.End);
+        this.character.setState(new CS_End(this.character));
     }
 }
-CharStates.Walk.update = function(character, timeStep) {
-
-    character.orientationTarget = getMoveDirections();
+CS_Walk.prototype = Object.create(CS_DefaultState.prototype);
+CS_Walk.prototype.update = function(timeStep) {
+    this.character.orientationTarget = getMoveDirections();
     // character.setOrientationTarget(getMoveDirections());
-    character.velocityTarget = 0.8;
-    character.update(timeStep);
+    this.character.velocityTarget = 0.8;
+    this.character.update(timeStep);
 }
-CharStates.Walk.changeState = function(character) {
-
+CS_Walk.prototype.changeState = function() {
     if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
-        character.jump();
+        this.character.jump();
     }
 
     if(noDirection()) {
-        character.setState(CharStates.End);
+        this.character.setState(new CS_End(this.character));
     }
 }
 
 //
-// START
+// Start
 //
-CharStates.Start = getDefaultState();
-CharStates.Start.init = function(character) {
+function CS_Start(character) {
+    CS_DefaultState.call(this, character);
 
     var duration = character.setAnimation('start_forward', 0.1);
-    CharStates.Start.time = duration;
-    CharStates.Start.timer = 0;
-    character.velocitySimulator.mass = 30;
+    this.time = duration;
+    this.timer = 0;
+    this.character.velocitySimulator.mass = 30;
 }
-CharStates.Start.update = function(character, timeStep) {
+CS_Start.prototype = Object.create(CS_DefaultState.prototype);
+CS_Start.prototype.update = function(timeStep) {
+    this.timer += timeStep;
+    if(this.timer > this.time - timeStep) this.character.setState(new CS_Walk(this.character));
 
-    CharStates.Start.timer += timeStep;
-    if(CharStates.Start.timer > CharStates.Start.time - timeStep) character.setState(CharStates.Walk);
+    this.character.setOrientationTarget(getMoveDirections());
+    this.character.velocityTarget = 0.8;
 
-    character.setOrientationTarget(getMoveDirections());
-    character.velocityTarget = 0.8;
-
-    character.update(timeStep);
+    this.character.update(timeStep);
 }
-CharStates.Start.changeState = function(character) {
+CS_Start.prototype.changeState = function() {
     if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
-        character.jump();
+        this.character.jump();
     }
 
     if(noDirection()) {
-        character.setState(CharStates.End);
+        this.character.setState(new CS_End(this.character));
     }
 }
 
 //
-// END
+// End
 //
-CharStates.End = getDefaultState();
-CharStates.End.init = function(character) {
+function CS_End(character) {
+    CS_DefaultState.call(this, character);
 
     var duration = character.setAnimation('stop', 0.1);
-    CharStates.End.time = duration;
-    CharStates.End.timer = 0;
-    character.orientationTarget = character.orientation;
-    character.velocitySimulator.mass = 50;
+    this.time = duration;
+    this.timer = 0;
+    this.character.orientationTarget = character.orientation;
+    this.character.velocitySimulator.mass = 50;
 }
-CharStates.End.update = function(character, timeStep) {
-
-    CharStates.End.timer += timeStep;
-    if(CharStates.End.timer > CharStates.End.time - timeStep) character.setState(CharStates.Idle);
+CS_End.prototype = Object.create(CS_DefaultState.prototype);
+CS_End.prototype.update = function(timeStep) {
+    this.timer += timeStep;
+    if(this.timer > this.time - timeStep) this.character.setState(new CS_Idle(this.character));
     
-    character.velocityTarget = 0;
+    this.character.velocityTarget = 0;
 
-    character.update(timeStep);
+    this.character.update(timeStep);
 }
-CharStates.End.changeState = function(character) {
-
+CS_End.prototype.changeState = function() {
     if(controls.lastControl == controls.jump && controls.lastControl.justPressed) {
-        character.jump();
+        this.character.jump();
     }
 
     if(anyDirection()) {
-        character.setState(CharStates.Start);
+        this.character.setState(new CS_Start(this.character));
     }
 }
 

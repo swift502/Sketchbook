@@ -6,7 +6,7 @@ var params = {
     FXAA: false,
     Auto_Rotate: false,
     Bounce_Debug: false,
-    Draw_Capsule: false
+    Draw_Capsule: true
 };
 
 // GUI init
@@ -36,7 +36,7 @@ function Update(timeStep) {
     updatePhysics(timeStep);
     
     params.Time_Scale = THREE.Math.lerp(params.Time_Scale, timeScaleTarget, 0.2);
-    player.charState.update(player, timeStep);
+    player.charState.update(timeStep);
     player.updateMatrixWorld();
 
     dirLight.position.set(player.position.x + sun.x * 5, player.position.y + sun.y * 5, player.position.z + sun.z * 5);

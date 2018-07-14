@@ -103,7 +103,7 @@ function handleKey(event, key, value) {
         controls.lastControl = action;
 
         // Tell player to handle states according to new input
-        player.charState.changeState(player);
+        player.charState.changeState();
 
         // Reset the 'just' attributes
         action.justPressed = false;

@@ -62,10 +62,10 @@ function ParamGUI(params) {
     
     dc.onChange(function(enabled) {
         if(enabled) {
-            playerCol.visible =  true;
+            player.characterCapsule.visual.visible =  true;
         }
         else {
-            playerCol.visible =  false;
+            player.characterCapsule.visual.visible =  false;
         }
     });
 
