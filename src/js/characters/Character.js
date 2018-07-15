@@ -56,7 +56,7 @@ function Character() {
     var playerSegments = 12;
     var playerFriction = 0;
     var playerCollisionGroup = 2;
-    this.characterCapsule = addParallelCapsule(playerMass, new CANNON.Vec3(0, 6, 0), playerHeight, playerRadius, playerSegments, playerFriction);
+    this.characterCapsule = addParallelCapsule(playerMass, new CANNON.Vec3(2, 1, 2), playerHeight, playerRadius, playerSegments, playerFriction);
     this.characterCapsule.visual.visible = false;
     // Pass reference to character for callbacks
     this.characterCapsule.physical.character = this;

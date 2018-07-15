@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
+// var uglify = require('gulp-uglify');
+var minify = require('gulp-minify');
 var uglifycss = require('gulp-uglifycss');
 
 var styles = [
@@ -17,6 +18,7 @@ var scripts = [
     './src/js/simulation/*',
     './src/js/characters/*',
 
+    './src/js/sys/GlobalVariables.js',
     './src/js/sys/Functions.js',
     './src/js/sys/Input.js',
 
@@ -52,7 +54,11 @@ function js() {
 function js_min() {
     return gulp.src(scripts)
     .pipe(concat('sketchbook.min.js'))
-    .pipe(uglify())
+    .pipe(minify({
+        ext:{
+            min:'.js'
+        }
+    }))
     .pipe(gulp.dest('./docs/js/'));
 }
 

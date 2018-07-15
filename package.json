@@ -17,11 +17,12 @@
   },
   "homepage": "https://github.com/swift502/three-sketchbook#readme",
   "devDependencies": {
-    "@types/three": "^0.91.3",
     "@types/dat.gui": "^0.6.0",
     "@types/stats": "^0.16.30",
+    "@types/three": "^0.91.3",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
+    "gulp-minify": "^3.1.0",
     "gulp-uglify": "^3.0.0",
     "gulp-uglifycss": "^1.0.9"
   }
