@@ -4,6 +4,7 @@ var keymap = {
     's':      { action: 'down'     },
     'a':      { action: 'left'     },
     'd':      { action: 'right'    },
+    'shift':  { action: 'run'    },
     ' ':      { action: 'jump'     },
     'e':      { action: 'use'      },
     'mouse0': { action: 'primary'  },

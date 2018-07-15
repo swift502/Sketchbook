@@ -1,4 +1,4 @@
-function RotationSimulator(fps, mass, damping) {
+function SpringRSimulator(fps, mass, damping) {
 
     SimulatorBase.call(this, fps);
 
@@ -15,19 +15,19 @@ function RotationSimulator(fps, mass, damping) {
     this.lastLerp = 0;
 }
 
-RotationSimulator.prototype = Object.create(SimulatorBase.prototype);
+SpringRSimulator.prototype = Object.create(SimulatorBase.prototype);
 
 /**
  * Advances the simulation by given time step
  * @param {number} timeStep 
  */
-RotationSimulator.prototype.simulate = function(timeStep) {
+SpringRSimulator.prototype.simulate = function(timeStep) {
     
     if(timeStep == undefined) console.log('Pass the timeStep!');
 
     this.generateFrames(timeStep);
     
-    //Rotation lerping
+    //SpringR lerping
     // Lerp from 0 to next frame
     var lerp = THREE.Math.lerp(0, this.cache[1].position, this.offset / this.frameTime);
     // Substract last lerp from current to make output relative
@@ -41,7 +41,7 @@ RotationSimulator.prototype.simulate = function(timeStep) {
  * Generates frames between last simulation call and the current one
  * @param {timeStep} timeStep 
  */
-RotationSimulator.prototype.generateFrames = function(timeStep) {
+SpringRSimulator.prototype.generateFrames = function(timeStep) {
 
     // Initialize cache by pushing two frames
     if(this.cache.length == 0) {
@@ -71,7 +71,7 @@ RotationSimulator.prototype.generateFrames = function(timeStep) {
 /**
  * Gets another simulation frame
  */
-RotationSimulator.prototype.getFrame = function(lastFrame) {
+SpringRSimulator.prototype.getFrame = function(lastFrame) {
 
     var newFrame = Object.assign({}, this.lastFrame());
 
@@ -82,5 +82,5 @@ RotationSimulator.prototype.getFrame = function(lastFrame) {
         this.lastLerp = this.lastLerp - this.lastFrame().position;
     }
 
-    return bounce(newFrame.position, this.target, newFrame.velocity, this.mass, this.damping);
+    return spring(newFrame.position, this.target, newFrame.velocity, this.mass, this.damping);
 }

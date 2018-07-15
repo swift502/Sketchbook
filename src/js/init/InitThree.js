@@ -38,9 +38,12 @@ function ParamGUI(params) {
     var shadowSwitch = gui.add(params, 'Shadows');
     gui.add(params, 'FXAA');
     gui.add(params, 'Auto_Rotate');
-    var bd = gui.add(params, 'Bounce_Debug');
-    var dc = gui.add(params, 'Draw_Capsule');
-    
+
+    var debug_folder = gui.addFolder('Debug');
+    var bd = debug_folder.add(params, 'Spring_Debug');
+    var dc = debug_folder.add(params, 'Draw_Capsule');
+    var rcd = debug_folder.add(params, 'RayCast_Debug');
+
     gui.open();
     
     timeController.onChange(function(value) {
@@ -66,6 +69,15 @@ function ParamGUI(params) {
         }
         else {
             player.characterCapsule.visual.visible =  false;
+        }
+    });
+
+    rcd.onChange(function(enabled) {
+        if(enabled) {
+            raycastBox.visible =  true;
+        }
+        else {
+            raycastBox.visible =  false;
         }
     });
 
@@ -236,5 +248,5 @@ var boxMat = new THREE.MeshLambertMaterial({
 var raycastBox = new THREE.Mesh(boxGeo, boxMat);
 raycastBox.castShadow = true;
 raycastBox.receiveShadow = true;
-// raycastBox.visible = true;
+raycastBox.visible = false;
 scene.add(raycastBox);

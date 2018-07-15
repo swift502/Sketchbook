@@ -1,4 +1,4 @@
-function BounceVSimulator(fps, mass, damping) {
+function SpringVSimulator(fps, mass, damping) {
 
     SimulatorBase.call(this, fps);
 
@@ -12,13 +12,13 @@ function BounceVSimulator(fps, mass, damping) {
     this.damping = damping;
 }
 
-BounceVSimulator.prototype = Object.create(SimulatorBase.prototype);
+SpringVSimulator.prototype = Object.create(SimulatorBase.prototype);
 
 /**
  * Advances the simulation by given time step
  * @param {number} timeStep 
  */
-BounceVSimulator.prototype.simulate = function(timeStep) {
+SpringVSimulator.prototype.simulate = function(timeStep) {
     
     if(timeStep == undefined) console.log('Pass the timeStep!');
 
@@ -34,7 +34,7 @@ BounceVSimulator.prototype.simulate = function(timeStep) {
  * Generates frames between last simulation call and the current one
  * @param {timeStep} timeStep 
  */
-BounceVSimulator.prototype.generateFrames = function(timeStep) {
+SpringVSimulator.prototype.generateFrames = function(timeStep) {
 
     // Initialize cache by pushing two frames
     if(this.cache.length == 0) {
@@ -64,14 +64,14 @@ BounceVSimulator.prototype.generateFrames = function(timeStep) {
 /**
  * Gets another simulation frame
  */
-BounceVSimulator.prototype.getFrame = function() {
+SpringVSimulator.prototype.getFrame = function() {
     // Deep clone data from previous frame
-    var newBounce = {
+    var newSpring = {
         position: this.lastFrame().position.clone(),
         velocity: this.lastFrame().velocity.clone()
     }
-    // Calculate new bounce
-    bounceV(newBounce.position, this.target, newBounce.velocity, this.mass, this.damping);
-    // Return new bounce
-    return newBounce;
+    // Calculate new Spring
+    springV(newSpring.position, this.target, newSpring.velocity, this.mass, this.damping);
+    // Return new Spring
+    return newSpring;
 }

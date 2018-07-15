@@ -1,4 +1,4 @@
-function BounceSimulator(fps, mass, damping) {
+function SpringSimulator(fps, mass, damping) {
 
     SimulatorBase.call(this, fps);
 
@@ -12,13 +12,13 @@ function BounceSimulator(fps, mass, damping) {
     this.damping = damping;
 }
 
-BounceSimulator.prototype = Object.create(SimulatorBase.prototype);
+SpringSimulator.prototype = Object.create(SimulatorBase.prototype);
 
 /**
  * Advances the simulation by given time step
  * @param {number} timeStep 
  */
-BounceSimulator.prototype.simulate = function(timeStep) {
+SpringSimulator.prototype.simulate = function(timeStep) {
     
     if(timeStep == undefined) console.log('Pass the timeStep!');
 
@@ -33,7 +33,7 @@ BounceSimulator.prototype.simulate = function(timeStep) {
  * Generates frames between last simulation call and the current one
  * @param {timeStep} timeStep 
  */
-BounceSimulator.prototype.generateFrames = function(timeStep) {
+SpringSimulator.prototype.generateFrames = function(timeStep) {
 
     // Initialize cache by pushing two frames
     if(this.cache.length == 0) {
@@ -63,6 +63,6 @@ BounceSimulator.prototype.generateFrames = function(timeStep) {
 /**
  * Gets another simulation frame
  */
-BounceSimulator.prototype.getFrame = function() {
-    return bounce(this.lastFrame().position, this.target, this.lastFrame().velocity, this.mass, this.damping);
+SpringSimulator.prototype.getFrame = function() {
+    return spring(this.lastFrame().position, this.target, this.lastFrame().velocity, this.mass, this.damping);
 }

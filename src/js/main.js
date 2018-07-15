@@ -5,28 +5,29 @@ var params = {
     Shadows: true,
     FXAA: false,
     Auto_Rotate: false,
-    Bounce_Debug: false,
-    Draw_Capsule: true
+    Spring_Debug: false,
+    Draw_Capsule: false,
+    RayCast_Debug: false
 };
 
 // GUI init
 ParamGUI(params);
 
-bV = new BounceVSimulator(60, 20, 0.98);
+bV = new SpringVSimulator(60, 20, 0.98);
 bV.target = player.position;
 
-bvx = new BounceSimulator(60, 30, 0.98);
-bvz = new BounceSimulator(60, 30, 0.98);
+bvx = new SpringSimulator(60, 30, 0.98);
+bvz = new SpringSimulator(60, 30, 0.98);
 
 // Update
 // Handles all logic updates.
 function Update(timeStep) {
 
-    //bounceV debug
+    //SpringV debug
     bV.simulate(timeStep);
     sphere2.position.copy(bV.position);
 
-    //Bounce debug
+    //Spring debug
     bvx.target = player.position.x;
     bvz.target = player.position.z;
     bvx.simulate(timeStep);
