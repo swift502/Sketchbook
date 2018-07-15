@@ -31,6 +31,30 @@ function CS_DefaultState(character) {
 CS_DefaultState.prototype.update = function(timeStep) {}
 CS_DefaultState.prototype.changeState = function() {}
 
+CS_DefaultState.prototype.noDirection = function() {
+    return !this.character.controls.up.value && !this.character.controls.down.value && !this.character.controls.left.value && !this.character.controls.right.value;
+}
+
+CS_DefaultState.prototype.anyDirection = function() {
+    return this.character.controls.up.value || this.character.controls.down.value || this.character.controls.left.value || this.character.controls.right.value;
+}
+
+CS_DefaultState.prototype.justPressed = function(control) {
+    return this.character.controls.lastControl == control && control.justPressed;
+}
+
+CS_DefaultState.prototype.isPressed = function(control) {
+    return control.value;
+}
+
+CS_DefaultState.prototype.justReleased = function(control) {
+    return this.character.controls.lastControl == control && control.justReleased;
+}
+
+CS_DefaultState.prototype.fallInAir = function() {
+    if(!this.character.rayHasHit) this.character.setState(CharStates.Falling);
+}
+
 //
 // Idle
 //
@@ -45,14 +69,14 @@ CS_Idle.prototype.update = function(timeStep) {
     this.character.velocityTarget = 0;
     this.character.update(timeStep);
 
-    fallInAir(this.character);
+    this.fallInAir();
 }
 CS_Idle.prototype.changeState = function() {
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpIdle);
     }
 
-    if(anyDirection()) {
+    if(this.anyDirection()) {
         this.character.setState(CharStates.StartWalkForward);
     }
 }
@@ -65,7 +89,7 @@ function CS_Walk(character) {
 
     this.character.setAnimation('run', 0.1);
 
-    if(noDirection()) {
+    if(this.noDirection()) {
         this.character.setState(CharStates.EndWalk);
     }
 }
@@ -77,18 +101,18 @@ CS_Walk.prototype.update = function(timeStep) {
     this.character.velocityTarget = 0.8;
     this.character.update(timeStep);
 
-    fallInAir(this.character);
+    this.fallInAir();
 
-    if(isPressed(controls.run)) {
+    if(this.isPressed(this.character.controls.run)) {
         this.character.setState(CharStates.Sprint);
     }
 }
 CS_Walk.prototype.changeState = function() {
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpRunning);
     }
 
-    if(noDirection()) {
+    if(this.noDirection()) {
         this.character.setState(CharStates.EndWalk);
     }
 }
@@ -111,16 +135,16 @@ CS_Sprint.prototype.update = function(timeStep) {
     this.character.velocityTarget = 1.4;
     this.character.update(timeStep);
 
-    fallInAir(this.character);
+    this.fallInAir();
 }
 CS_Sprint.prototype.changeState = function() {
-    if(justReleased(controls.run)) {
+    if(this.justReleased(this.character.controls.run)) {
         this.character.setState(CharStates.Walk);
     }
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpRunning);
     }
-    if(noDirection()) {
+    if(this.noDirection()) {
         this.character.setState(CharStates.EndWalk);
     }
 }
@@ -147,18 +171,18 @@ CS_StartWalkForward.prototype.update = function(timeStep) {
 
     this.character.update(timeStep);
 
-    fallInAir(this.character);
+    this.fallInAir();
 }
 CS_StartWalkForward.prototype.changeState = function() {
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpRunning);
     }
 
-    if(noDirection()) {
+    if(this.noDirection()) {
         this.character.setState(CharStates.EndWalk);
     }
 
-    if(justPressed(controls.run)) {
+    if(this.justPressed(this.character.controls.run)) {
         this.character.setState(CharStates.Sprint);
     }
 }
@@ -186,15 +210,15 @@ CS_EndWalk.prototype.update = function(timeStep) {
 
     this.character.update(timeStep);
 
-    fallInAir(this.character);
+    this.fallInAir();
 }
 CS_EndWalk.prototype.changeState = function() {
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpIdle);
     }
 
-    if(anyDirection()) {
-        if(isPressed(controls.run)) {
+    if(this.anyDirection()) {
+        if(this.isPressed(this.character.controls.run)) {
             this.character.setState(CharStates.Sprint);
         }
         else {
@@ -221,7 +245,7 @@ CS_JumpIdle.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
     // Move in air
     if(this.timer > 0.3) {
-        this.character.velocityTarget = anyDirection() ? 0.8 : 0;
+        this.character.velocityTarget = this.anyDirection() ? 0.8 : 0;
     }
     this.character.update(timeStep);
 
@@ -290,11 +314,11 @@ function CS_Falling(character) {
 CS_Falling.prototype = Object.create(CS_DefaultState.prototype);
 CS_Falling.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = anyDirection() ? 0.8 : 0;
+    this.character.velocityTarget = this.anyDirection() ? 0.8 : 0;
     this.character.update(timeStep);
 
     if(this.character.rayHasHit) {
-        if(anyDirection()) {
+        if(this.anyDirection()) {
             this.character.setState(CharStates.DropRunning);
         }
         else {
@@ -315,7 +339,7 @@ function CS_DropIdle(character) {
     this.animationLength = this.character.setAnimation('drop_idle', 0.1);
     this.timer = 0;
     
-    if(anyDirection()) {
+    if(this.anyDirection()) {
         this.character.setState(CharStates.StartWalkForward);
     }
 }
@@ -330,13 +354,13 @@ CS_DropIdle.prototype.update = function(timeStep) {
         this.character.setState(CharStates.Idle);
     }
 
-    fallInAir(this.character);
+    this.fallInAir();
 }
 CS_DropIdle.prototype.changeState = function() {
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpIdle);
     }
-    if(anyDirection()) {
+    if(this.anyDirection()) {
         this.character.setState(CharStates.StartWalkForward);
     }
 }
@@ -362,18 +386,18 @@ CS_DropRunning.prototype.update = function(timeStep) {
         this.character.setState(CharStates.Walk);
     }
 
-    fallInAir(this.character);
+    this.fallInAir();
 }
 CS_DropRunning.prototype.changeState = function() {
-    if(noDirection(controls.jump)) {
+    if(this.noDirection(this.character.controls.jump)) {
         this.character.setState(CharStates.EndWalk);
     }
 
-    if(anyDirection() && justPressed(controls.run)) {
+    if(this.anyDirection() && this.justPressed(this.character.controls.run)) {
         this.character.setState(CharStates.Sprint);
     }
 
-    if(justPressed(controls.jump)) {
+    if(this.justPressed(this.character.controls.jump)) {
         this.character.setState(CharStates.JumpRunning);
     }
 }
@@ -399,30 +423,8 @@ CS_DropRunning.prototype.changeState = function() {
 //     return worldDirection;
 // }
 
-function noDirection() {
-    return !controls.up.value && !controls.down.value && !controls.left.value && !controls.right.value;
-}
 
-function anyDirection() {
-    return controls.up.value || controls.down.value || controls.left.value || controls.right.value;
-}
 
 // function getDefaultState() {
 //     return Object.assign({}, CharStates.defaultState);
 // }
-
-function justPressed(control) {
-    return controls.lastControl == control && control.justPressed;
-}
-
-function isPressed(control) {
-    return control.value;
-}
-
-function justReleased(control) {
-    return controls.lastControl == control && control.justReleased;
-}
-
-function fallInAir(character) {
-    if(!character.rayHasHit) character.setState(CharStates.Falling);
-}

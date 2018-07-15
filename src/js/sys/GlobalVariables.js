@@ -6,3 +6,5 @@ var parallelPairs = [];
 
 // Scene
 var scene  = new THREE.Scene();
+
+var characters = [];

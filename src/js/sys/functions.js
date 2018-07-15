@@ -122,6 +122,56 @@ const CapsuleGeometry = (radius = 1, height = 2, N = 32) => {
     return geometry;
   }
 
+  const cloneFbx = (fbx) => {
+    const clone = fbx.clone(true)
+    clone.animations = fbx.animations
+    clone.skeleton = { bones: [] }
+
+    const skinnedMeshes = {}
+
+    fbx.traverse(node => {
+        if (node.isSkinnedMesh) {
+            skinnedMeshes[node.name] = node
+        }
+    })
+
+    const cloneBones = {}
+    const cloneSkinnedMeshes = {}
+
+    clone.traverse(node => {
+        if (node.isBone) {
+            cloneBones[node.name] = node
+        }
+
+        if (node.isSkinnedMesh) {
+            cloneSkinnedMeshes[node.name] = node
+        }
+    })
+
+    for (let name in skinnedMeshes) {
+        const skinnedMesh = skinnedMeshes[name]
+        const skeleton = skinnedMesh.skeleton
+        const cloneSkinnedMesh = cloneSkinnedMeshes[name]
+
+        const orderedCloneBones = []
+
+        for (let i=0; i<skeleton.bones.length; i++) {
+            const cloneBone = cloneBones[skeleton.bones[i].name]
+            orderedCloneBones.push(cloneBone)
+        }
+
+        cloneSkinnedMesh.bind(
+            new THREE.Skeleton(orderedCloneBones, skeleton.boneInverses),
+            cloneSkinnedMesh.matrixWorld)
+
+        // For animation to work correctly:
+        clone.skeleton.bones.push(cloneSkinnedMesh)
+        clone.skeleton.bones.push(...orderedCloneBones)
+    }
+
+    return clone
+}
+
 //
 // Physics
 //
@@ -148,6 +198,8 @@ function addParallelBox(mass, position, size, friction) {
     var geometry = new THREE.BoxGeometry( size.x*2, size.y*2, size.z*2 );
     var material = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
     var visualBox = new THREE.Mesh( geometry, material );
+    visualBox.castShadow = true;
+    visualBox.receiveShadow = true;
     scene.add( visualBox );
 
     var pair = {
@@ -180,6 +232,8 @@ function addParallelSphere(mass, position, radius, friction) {
     var geometry2 = new THREE.SphereGeometry(radius);
     var material2 = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
     var visualSphere = new THREE.Mesh( geometry2, material2 );
+    visualSphere.castShadow = true;
+    visualSphere.receiveShadow = true;
     scene.add( visualSphere );
 
     var pair = {

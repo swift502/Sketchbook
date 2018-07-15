@@ -19,32 +19,17 @@ function Control() {
     this.justReleased = false;
 }
 
-Control.prototype.isDirection = function() {
-    if( this == controls.up ||
-        this == controls.down ||
-        this == controls.left ||
-        this == controls.right) {
-            return true;
-        }
-    else {
-        return false;
-    }
-}
-
-// Controls
-var controls = {
-    up:        new Control(),
-    down:      new Control(),
-    left:      new Control(),
-    right:     new Control(),
-    run:       new Control(),
-    jump:      new Control(),
-    use:       new Control(),
-    primary:   new Control(),
-    secondary: new Control(),
-    tertiary:  new Control(),
-    lastControl: new Control()
-}
+// Control.prototype.isDirection = function() {
+//     if( this == controls.up ||
+//         this == controls.down ||
+//         this == controls.left ||
+//         this == controls.right) {
+//             return true;
+//         }
+//     else {
+//         return false;
+//     }
+// }
 
 // Event listeners
 document.addEventListener("keydown", keyDown, false);
@@ -93,7 +78,7 @@ function handleKey(event, key, value) {
     if (key in keymap) {
 
         // Get action and set it's parameters
-        var action = controls[keymap[key].action];
+        var action = player.controls[keymap[key].action];
         action.value = value;
 
         // Set the 'just' attributes
@@ -101,7 +86,7 @@ function handleKey(event, key, value) {
         else action.justReleased = true;
 
         // Tag control as last activated
-        controls.lastControl = action;
+        player.controls.lastControl = action;
 
         // Tell player to handle states according to new input
         player.charState.changeState();

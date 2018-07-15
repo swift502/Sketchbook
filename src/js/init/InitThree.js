@@ -139,10 +139,6 @@ sky.material.uniforms.sunPosition.value.copy(sun);
 var ambientLight = new THREE.AmbientLight(0x888888); // soft white light
 scene.add(ambientLight);
 
-// Player
-var player = new Character();
-scene.add(player);
-
 // Sun light with shadowmap
 var dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
 dirLight.target = player;

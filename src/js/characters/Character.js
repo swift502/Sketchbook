@@ -2,7 +2,7 @@
 //Character class
 //The visual hierarchy goes:
 //  this->visuals->modelContainer->characterModel
-function Character() {
+function Character(initPosition) {
     
     THREE.Object3D.call(this);
 
@@ -47,6 +47,25 @@ function Character() {
 
     // States
     this.setState(CharStates.DefaultState);
+    this.viewVector = new THREE.Vector3();
+
+    // Controls
+    this.behaviour = new DefaultAI(this);
+
+    // Controls
+    this.controls = {
+        up:        new Control(),
+        down:      new Control(),
+        left:      new Control(),
+        right:     new Control(),
+        run:       new Control(),
+        jump:      new Control(),
+        use:       new Control(),
+        primary:   new Control(),
+        secondary: new Control(),
+        tertiary:  new Control(),
+        lastControl: new Control()
+    }
 
     // Physics
     // Player Capsule
@@ -56,7 +75,7 @@ function Character() {
     var playerSegments = 12;
     var playerFriction = 0;
     var playerCollisionGroup = 2;
-    this.characterCapsule = addParallelCapsule(playerMass, new CANNON.Vec3(2, 1, 2), playerHeight, playerRadius, playerSegments, playerFriction);
+    this.characterCapsule = addParallelCapsule(playerMass, initPosition, playerHeight, playerRadius, playerSegments, playerFriction);
     this.characterCapsule.visual.visible = false;
     // Pass reference to character for callbacks
     this.characterCapsule.physical.character = this;
@@ -260,15 +279,15 @@ Character.prototype.SpringRotation = function(timeStep) {
     // console.log(rot);
     this.orientation.applyAxisAngle(normal, rot);
     this.angularVelocity = this.rotationSimulator.velocity;
-    sphere3.position.copy(new THREE.Vector3().copy(this.orientation).add(player.position).multiplyScalar(1));
+    // sphere3.position.copy(new THREE.Vector3().copy(this.orientation).add(player.position).multiplyScalar(1));
 }
 
 Character.prototype.setGlobalDirectionGoal = function () {
     
-    var positiveX = controls.right.value ? -1 : 0;
-    var negativeX = controls.left.value  ?  1 : 0;
-    var positiveZ = controls.up.value    ?  1 : 0;
-    var negativeZ = controls.down.value  ? -1 : 0;
+    var positiveX = this.controls.right.value ? -1 : 0;
+    var negativeX = this.controls.left.value  ?  1 : 0;
+    var positiveZ = this.controls.up.value    ?  1 : 0;
+    var negativeZ = this.controls.down.value  ? -1 : 0;
     
     // If no direction is pressed, set target as current orientation
     if(positiveX == 0 && negativeX == 0 && positiveZ == 0 && negativeZ == 0) {
@@ -277,11 +296,12 @@ Character.prototype.setGlobalDirectionGoal = function () {
     else {
         var localDirection = new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
 
-        var vCamera = new THREE.Vector3(camera.position.x, 0, camera.position.z);
-        var vPlayer = new THREE.Vector3(player.position.x, 0, player.position.z);
+        // var vCamera = new THREE.Vector3(camera.position.x, 0, camera.position.z);
+        // var vPlayer = new THREE.Vector3(this.position.x, 0, this.position.z);
 
-        var vertical = new THREE.Vector3().subVectors(vPlayer, vCamera).normalize();
-        var horizontal = new THREE.Vector3(vertical.z, 0, -vertical.x).normalize();
+        // var vertical = new THREE.Vector3().subVectors(vPlayer, vCamera).normalize();
+        var vertical = this.viewVector.clone();
+        var horizontal = new THREE.Vector3(vertical.z, 0, -vertical.x);
 
         vertical.multiplyScalar(localDirection.z);
         horizontal.multiplyScalar(localDirection.x);
