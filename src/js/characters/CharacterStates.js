@@ -60,13 +60,16 @@ CS_DefaultState.prototype.fallInAir = function() {
 //
 function CS_Idle(character) {
     CS_DefaultState.call(this, character);
+
+    this.character.velocitySimulator.damping = 0.6;
+    this.character.velocitySimulator.mass = 10;
     
     this.character.setAnimation('idle', 0.3);
-    this.character.orientationTarget = this.character.orientation;
+    // this.character.orientationTarget = this.character.orientation;
 }
 CS_Idle.prototype = Object.create(CS_DefaultState.prototype);
 CS_Idle.prototype.update = function(timeStep) {
-    this.character.velocityTarget = 0;
+    this.character.setVelocityTarget(0);
     this.character.update(timeStep);
 
     this.fallInAir();
@@ -98,7 +101,7 @@ CS_Walk.prototype.update = function(timeStep) {
     // this.character.orientationTarget = getMoveDirections();
     // character.setOrientationTarget(getMoveDirections());
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = 0.8;
+    this.character.setVelocityTarget(0.8);
     this.character.update(timeStep);
 
     this.fallInAir();
@@ -113,7 +116,7 @@ CS_Walk.prototype.changeState = function() {
     }
 
     if(this.noDirection()) {
-        this.character.setState(CharStates.EndWalk);
+        this.character.setState(CharStates.Idle);
     }
 }
 
@@ -132,7 +135,7 @@ function CS_Sprint(character) {
 CS_Sprint.prototype = Object.create(CS_DefaultState.prototype);
 CS_Sprint.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = 1.4;
+    this.character.setVelocityTarget(1.4);
     this.character.update(timeStep);
 
     this.fallInAir();
@@ -167,7 +170,7 @@ CS_StartWalkForward.prototype.update = function(timeStep) {
     if(this.timer > this.time - timeStep) this.character.setState(CharStates.Walk);
 
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = 0.8;
+    this.character.setVelocityTarget(0.8);
 
     this.character.update(timeStep);
 
@@ -179,7 +182,7 @@ CS_StartWalkForward.prototype.changeState = function() {
     }
 
     if(this.noDirection()) {
-        this.character.setState(CharStates.EndWalk);
+        this.character.setState(CharStates.Idle);
     }
 
     if(this.justPressed(this.character.controls.run)) {
@@ -196,7 +199,7 @@ function CS_EndWalk(character) {
     var duration = character.setAnimation('stop', 0.1);
     this.time = duration;
     this.timer = 0;
-    this.character.orientationTarget = character.orientation;
+    // this.character.orientationTarget = character.orientation;
 }
 CS_EndWalk.prototype = Object.create(CS_DefaultState.prototype);
 CS_EndWalk.prototype.update = function(timeStep) {
@@ -206,7 +209,7 @@ CS_EndWalk.prototype.update = function(timeStep) {
         this.character.setState(CharStates.Idle);
     }
     
-    this.character.velocityTarget = 0;
+    this.character.setVelocityTarget(0);
 
     this.character.update(timeStep);
 
@@ -233,7 +236,7 @@ CS_EndWalk.prototype.changeState = function() {
 function CS_JumpIdle(character) {
     CS_DefaultState.call(this, character);
 
-    this.character.velocitySimulator.mass = 200;
+    this.character.velocitySimulator.mass = 100;
 
     this.animationLength = this.character.setAnimation('jump_idle', 0.1);
     this.timer = 0;
@@ -245,7 +248,7 @@ CS_JumpIdle.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
     // Move in air
     if(this.timer > 0.3) {
-        this.character.velocityTarget = this.anyDirection() ? 0.8 : 0;
+        this.character.setVelocityTarget(this.anyDirection() ? 0.8 : 0);
     }
     this.character.update(timeStep);
 
@@ -254,6 +257,8 @@ CS_JumpIdle.prototype.update = function(timeStep) {
     if(this.timer > 0.3 && !this.alreadyJumped) {
         this.character.jump();
         this.alreadyJumped = true;
+
+        this.character.rotationSimulator.damping = 0;
     }
 
     if(this.timer > 0.35 && this.character.rayHasHit) {
@@ -271,7 +276,7 @@ CS_JumpIdle.prototype.update = function(timeStep) {
 function CS_JumpRunning(character) {
     CS_DefaultState.call(this, character);
 
-    this.character.velocitySimulator.mass = 200;
+    this.character.velocitySimulator.mass = 100;
 
     this.animationLength = this.character.setAnimation('jump_running', 0.1);
     this.timer = 0;
@@ -282,7 +287,9 @@ CS_JumpRunning.prototype = Object.create(CS_DefaultState.prototype);
 CS_JumpRunning.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
     // Move in air
-    this.character.velocityTarget = 0.8;
+    if(this.timer > 0.2) {
+        this.character.setVelocityTarget(this.anyDirection() ? 0.8 : 0);
+    }
     this.character.update(timeStep);
 
     //Physically jump
@@ -290,6 +297,8 @@ CS_JumpRunning.prototype.update = function(timeStep) {
     if(this.timer > 0.2 && !this.alreadyJumped) {
         this.character.jump();
         this.alreadyJumped = true;
+
+        this.character.rotationSimulator.damping = 0;
     }
 
     if(this.timer > 0.3 && this.character.rayHasHit) {
@@ -307,14 +316,15 @@ CS_JumpRunning.prototype.update = function(timeStep) {
 function CS_Falling(character) {
     CS_DefaultState.call(this, character);
 
-    this.character.velocitySimulator.mass = 200;
+    this.character.velocitySimulator.mass = 100;
+    this.character.rotationSimulator.damping = 0;
 
     this.character.setAnimation('falling', 0.3);
 }
 CS_Falling.prototype = Object.create(CS_DefaultState.prototype);
 CS_Falling.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = this.anyDirection() ? 0.8 : 0;
+    this.character.setVelocityTarget(this.anyDirection() ? 0.8 : 0);
     this.character.update(timeStep);
 
     if(this.character.rayHasHit) {
@@ -346,7 +356,7 @@ function CS_DropIdle(character) {
 CS_DropIdle.prototype = Object.create(CS_DefaultState.prototype);
 CS_DropIdle.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = 0;
+    this.character.setVelocityTarget(0);
     this.character.update(timeStep);
 
     this.timer += timeStep;
@@ -378,7 +388,7 @@ function CS_DropRunning(character) {
 CS_DropRunning.prototype = Object.create(CS_DefaultState.prototype);
 CS_DropRunning.prototype.update = function(timeStep) {
     this.character.setGlobalDirectionGoal();
-    this.character.velocityTarget = 0.8;
+    this.character.setVelocityTarget(0.8);
     this.character.update(timeStep);
 
     this.timer += timeStep;

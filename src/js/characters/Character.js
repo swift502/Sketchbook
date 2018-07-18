@@ -18,8 +18,8 @@ function Character(initPosition) {
     this.characterModel.castShadow = true;
 
     // Create visual groups
-    // visuals group is centered for easy character tilting
-    // modelContainer is used to reliably ground the character, as animation can alter the position of the model itself
+    // The "visuals" group is centered for easy character tilting
+    // "modelContainer" is used to reliably ground the character, as animation can alter the position of the model itself
     this.visuals = new THREE.Group();
     this.add(this.visuals);
     this.modelContainer = new THREE.Group();
@@ -33,10 +33,10 @@ function Character(initPosition) {
     this.mixer = new THREE.AnimationMixer(this.characterModel);
 
     // Movement
-    this.acceleration = 0;
-    this.velocity = 0;
-    this.velocityTarget = 0;
-    this.velocitySimulator = new SpringSimulator(60, 50, 0.8);
+    this.acceleration = new THREE.Vector3();
+    this.velocity = new THREE.Vector3();
+    this.velocityTarget = new THREE.Vector3();
+    this.velocitySimulator = new SpringVSimulator(60, 50, 0.8);
     this.moveSpeed = 4;
 
     // Rotation
@@ -51,8 +51,6 @@ function Character(initPosition) {
 
     // Controls
     this.behaviour = new DefaultAI(this);
-
-    // Controls
     this.controls = {
         up:        new Control(),
         down:      new Control(),
@@ -69,19 +67,20 @@ function Character(initPosition) {
 
     // Physics
     // Player Capsule
-    var playerMass = 1;
-    var playerHeight = 0.5;
-    var playerRadius = 0.25;
-    var playerSegments = 12;
-    var playerFriction = 0;
-    var playerCollisionGroup = 2;
-    this.characterCapsule = addParallelCapsule(playerMass, initPosition, playerHeight, playerRadius, playerSegments, playerFriction);
+    var characterMass = 1;
+    var characterHeight = 0.5;
+    var characterRadius = 0.25;
+    var characterSegments = 12;
+    var characterFriction = 0;
+    var characterCollisionGroup = 2;
+    this.characterCapsule = addParallelCapsule(characterMass, initPosition, characterHeight, characterRadius, characterSegments, characterFriction);
     this.characterCapsule.visual.visible = false;
+
     // Pass reference to character for callbacks
     this.characterCapsule.physical.character = this;
 
     // Move character to different collision group for raycasting
-    this.characterCapsule.physical.collisionFilterGroup = playerCollisionGroup;
+    this.characterCapsule.physical.collisionFilterGroup = characterCollisionGroup;
 
     // Disable character rotation
     this.characterCapsule.physical.fixedRotation = true;
@@ -125,8 +124,10 @@ function Character(initPosition) {
         // Player ray casting
         // Get velocities
         var simulatedVelocity = new CANNON.Vec3().copy(this.velocity);
-        var arcadeVelocity = new THREE.Vector3().copy(this.character.orientation).multiplyScalar(this.character.velocity * this.character.moveSpeed);
-    
+        var arcadeVelocity = this.character.velocity.clone().multiplyScalar(this.character.moveSpeed);
+        arcadeVelocity = appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
+        // console.log(arcadeVelocity);
+
         // If just jumped, don't stick to ground
         if(this.character.justJumped) this.character.justJumped = false;
         else {
@@ -157,6 +158,10 @@ Character.prototype.setModel = function(model) {
 
 Character.prototype.setModelOffset = function(offset) {
     this.modelOffset.copy(offset);
+}
+
+Character.prototype.setViewVector = function(vector) {
+    this.viewVector.copy(vector).normalize();
 }
 
 Character.prototype.setState = function(state) {
@@ -201,6 +206,20 @@ Character.prototype.setState = function(state) {
     }
 }
 
+Character.prototype.setVelocity = function(velZ, velX = 0) {
+    this.velocity.z = velZ;
+    this.velocity.x = velX;
+}
+
+Character.prototype.setVelocityTarget = function(velZ, velX = 0) {
+    this.velocityTarget.z = velZ;
+    this.velocityTarget.x = velX;
+}
+
+Character.prototype.setOrientationTarget = function(vector) {
+    this.orientationTarget.copy(vector).setY(0).normalize();
+}
+
 Character.prototype.update = function(timeStep, parameters) {
 
     //Default values
@@ -212,8 +231,8 @@ Character.prototype.update = function(timeStep, parameters) {
 
     this.visuals.position.copy(this.modelOffset);
 
-    if(parameters.SpringRotation)  this.SpringMovement(timeStep);
-    if(parameters.SpringVelocity)  this.SpringRotation(timeStep);
+    if(parameters.SpringVelocity)  this.SpringMovement(timeStep);
+    if(parameters.SpringRotation)  this.SpringRotation(timeStep);
     if(parameters.rotateModel)     this.rotateModel();
     if(parameters.updateAnimation) this.mixer.update(timeStep);
     
@@ -236,11 +255,12 @@ Character.prototype.setAnimation = function(clipName, fadeIn) {
 Character.prototype.SpringMovement = function(timeStep) {
 
     // Simulator
-    this.velocitySimulator.target = this.velocityTarget;
+    this.velocitySimulator.target.copy(this.velocityTarget);
     this.velocitySimulator.simulate(timeStep);
-    this.velocity = this.velocitySimulator.position;
-
-    this.acceleration = this.velocitySimulator.velocity;
+    
+    // Update values
+    this.velocity.copy(this.velocitySimulator.position);
+    this.acceleration.copy(this.velocitySimulator.velocity);
 }
 
 Character.prototype.SpringRotation = function(timeStep) {
@@ -248,7 +268,7 @@ Character.prototype.SpringRotation = function(timeStep) {
     //Spring rotation
     //Figure out angle between current and target orientation
     var normal = new THREE.Vector3(0, 1, 0);
-    var dot = this.orientation.normalize().dot(this.orientationTarget.normalize());
+    var dot = this.orientation.dot(this.orientationTarget);
 
     // If dot is close to 1, we'll round angle to zero
     var dot_treshold = 0.9995;
@@ -262,7 +282,7 @@ Character.prototype.SpringRotation = function(timeStep) {
     else {
         // Get angle difference in radians
         angle = Math.acos(dot);
-        // Cross product returns vector pointing up or down
+        // Get vector pointing up or down
         var cross = new THREE.Vector3().crossVectors(this.orientation, this.orientationTarget);
         // Compare cross with normal to find out direction
         if (normal.dot(cross) < 0) {
@@ -275,8 +295,9 @@ Character.prototype.SpringRotation = function(timeStep) {
     this.rotationSimulator.simulate(timeStep);
     var rot = this.rotationSimulator.position;
 
+    // console.log(this.orientationTarget);
+
     // Updating values
-    // console.log(rot);
     this.orientation.applyAxisAngle(normal, rot);
     this.angularVelocity = this.rotationSimulator.velocity;
     // sphere3.position.copy(new THREE.Vector3().copy(this.orientation).add(player.position).multiplyScalar(1));
@@ -291,29 +312,21 @@ Character.prototype.setGlobalDirectionGoal = function () {
     
     // If no direction is pressed, set target as current orientation
     if(positiveX == 0 && negativeX == 0 && positiveZ == 0 && negativeZ == 0) {
-        this.orientationTarget = this.orientation;
+        this.setOrientationTarget(this.orientation);
     }
     else {
+
         var localDirection = new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
-
-        // var vCamera = new THREE.Vector3(camera.position.x, 0, camera.position.z);
-        // var vPlayer = new THREE.Vector3(this.position.x, 0, this.position.z);
-
-        // var vertical = new THREE.Vector3().subVectors(vPlayer, vCamera).normalize();
-        var vertical = this.viewVector.clone();
-        var horizontal = new THREE.Vector3(vertical.z, 0, -vertical.x);
-
-        vertical.multiplyScalar(localDirection.z);
-        horizontal.multiplyScalar(localDirection.x);
-
-        this.orientationTarget = new THREE.Vector3().addVectors(vertical, horizontal).normalize();
+        var flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z);
+        this.setOrientationTarget(appplyVectorMatrixXZ(flatViewVector, localDirection));
     }
 }
 
+
+
 Character.prototype.rotateModel = function() {
     this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
-    // console.log(this.visuals);
-    this.visuals.rotateX(this.acceleration * 3);
+    this.visuals.rotateX(this.acceleration.z * 3);
     this.visuals.rotateZ(-this.angularVelocity * 2.3);
     this.visuals.position.setY(this.visuals.position.y + Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
 }
@@ -321,8 +334,3 @@ Character.prototype.rotateModel = function() {
 Character.prototype.jump = function() {
     this.wantsToJump = true;
 }
-
-// Character.prototype.doJump = function() {
-//     playerCapsule.physical.velocity.y += 4;
-//     playerCapsule.physical.position.y += 0.02;
-// }

@@ -1,6 +1,6 @@
 // Variables
 var params = {
-    FPS_Limit: 60,
+    FPS_Limit: 30,
     Time_Scale: 1,
     Shadows: true,
     FXAA: false,
