@@ -1,35 +1,11 @@
-// Keymap
-var keymap = {
-    'w':      { action: 'up'       },
-    's':      { action: 'down'     },
-    'a':      { action: 'left'     },
-    'd':      { action: 'right'    },
-    'shift':  { action: 'run'    },
-    ' ':      { action: 'jump'     },
-    'e':      { action: 'use'      },
-    'mouse0': { action: 'primary'  },
-    'mouse2': { action: 'secondary'},
-    'mouse1': { action: 'tertiary' }
-}
 
-// Generic control class
+
+// Control class
 function Control() {
     this.value = false;
     this.justPressed = false;
     this.justReleased = false;
 }
-
-// Control.prototype.isDirection = function() {
-//     if( this == controls.up ||
-//         this == controls.down ||
-//         this == controls.left ||
-//         this == controls.right) {
-//             return true;
-//         }
-//     else {
-//         return false;
-//     }
-// }
 
 // Event listeners
 document.addEventListener("keydown", keyDown, false);
@@ -40,64 +16,16 @@ document.addEventListener("wheel", mouseWheel, false);
 
 // Event handlers
 function keyDown(event) {
-
-    // event.preventDefault();
-
-    // Special input cases
-    if(event.key == 'c') cameraCycle();
-    else if(event.key == 'r') controls.run.value = !controls.run.value;
-    else {
-        // Update controls
-        handleKey(event, event.key, true);
-    }
+    CurrentGameMode.handleKey(event, event.key, true);
 }
 function keyUp(event) {
-    
-    handleKey(event, event.key, false);
+    CurrentGameMode.handleKey(event, event.key, false);
 }
 function mouseDown(event) {
-    
-    handleKey(event, 'mouse' + event.button, true);
+    CurrentGameMode.handleKey(event, 'mouse' + event.button, true);
 }
 function mouseUp(event) {
-    handleKey(event, 'mouse' + event.button, false);
-}
-
-/**
- * Handles game actions based on supplied inputs.
- * @param {*} event Keyboard or mouse event
- * @param {char} key Key or button pressed
- * @param {boolean} value Value to be assigned to action
- */
-function handleKey(event, key, value) {
-
-    // Shift modifier fix
-    key = key.toLowerCase();
-
-    // Is key bound to action
-    if (key in keymap) {
-
-        // Get action and set it's parameters
-        var action = player.controls[keymap[key].action];
-        action.value = value;
-
-        // Set the 'just' attributes
-        if(value) action.justPressed = true;
-        else action.justReleased = true;
-
-        // Tag control as last activated
-        player.controls.lastControl = action;
-
-        // Tell player to handle states according to new input
-        player.charState.changeState();
-
-        // Reset the 'just' attributes
-        action.justPressed = false;
-        action.justReleased = false;
-        
-        // Breaks dat.GUI
-        // event.preventDefault();
-    }
+    CurrentGameMode.handleKey(event, 'mouse' + event.button, false);
 }
 
 /**
@@ -117,11 +45,4 @@ function mouseWheel(event) {
         timeScaleTarget = Math.min(timeScaleTarget, 9999999999);
         if(params.Time_Scale > 0.9) params.Time_Scale *= timeScaleChangeSpeed;
     }
-}
-
-/**
- *  Cycling cameras
- */
-function cameraCycle() {
-
 }

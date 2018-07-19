@@ -43,11 +43,11 @@ FollowPlayerAI.prototype.update = function(timeStep) {
         if(rndInt == 0) {
             this.character.setOrientationTarget(this.character.viewVector);
         }
-        else if(rndInt == 1 || rndInt == 2) {
+        else if(rndInt == 1) {
             this.character.setOrientationTarget(new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5));
             // console.log(this.character.orientationTarget);
         }
-        else if(rndInt == 3) {
+        else if(rndInt == 2) {
             this.character.setState(CharStates.JumpIdle);
         }
         // console.log()

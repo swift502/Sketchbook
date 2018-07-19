@@ -258,7 +258,7 @@ CS_JumpIdle.prototype.update = function(timeStep) {
         this.character.jump();
         this.alreadyJumped = true;
 
-        this.character.rotationSimulator.damping = 0;
+        this.character.rotationSimulator.damping = 0.3;
     }
 
     if(this.timer > 0.35 && this.character.rayHasHit) {
@@ -298,7 +298,7 @@ CS_JumpRunning.prototype.update = function(timeStep) {
         this.character.jump();
         this.alreadyJumped = true;
 
-        this.character.rotationSimulator.damping = 0;
+        this.character.rotationSimulator.damping = 0.3;
     }
 
     if(this.timer > 0.3 && this.character.rayHasHit) {
@@ -317,7 +317,7 @@ function CS_Falling(character) {
     CS_DefaultState.call(this, character);
 
     this.character.velocitySimulator.mass = 100;
-    this.character.rotationSimulator.damping = 0;
+    this.character.rotationSimulator.damping = 0.3;
 
     this.character.setAnimation('falling', 0.3);
 }
@@ -411,30 +411,3 @@ CS_DropRunning.prototype.changeState = function() {
         this.character.setState(CharStates.JumpRunning);
     }
 }
-
-// function getMoveDirections() {
-    
-//     var positiveX = controls.right.value ? -1 : 0;
-//     var negativeX = controls.left.value  ?  1 : 0;
-//     var positiveZ = controls.up.value    ?  1 : 0;
-//     var negativeZ = controls.down.value  ? -1 : 0;
-    
-//     var localDirection = new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
-
-//     var vCamera = new THREE.Vector3(camera.position.x, 0, camera.position.z);
-//     var vPlayer = new THREE.Vector3(player.position.x, 0, player.position.z);
-
-//     var vertical = new THREE.Vector3().subVectors(vPlayer, vCamera).normalize();
-//     var horizontal = new THREE.Vector3(vertical.z, 0, -vertical.x).normalize();
-
-//     vertical.multiplyScalar(localDirection.z);
-//     horizontal.multiplyScalar(localDirection.x);
-//     var worldDirection = new THREE.Vector3().addVectors(vertical, horizontal).normalize();;
-//     return worldDirection;
-// }
-
-
-
-// function getDefaultState() {
-//     return Object.assign({}, CharStates.defaultState);
-// }

@@ -1,7 +1,7 @@
 
 
 // Player
-var player = new Character(new CANNON.Vec3(2, 1, 2));
+player = new Character(new CANNON.Vec3(2, 1, 2));
 player.behaviour = new PlayerAI(player);
 characters.push(player);
 scene.add(player);

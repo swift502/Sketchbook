@@ -15,18 +15,20 @@ var scripts = [
     './src/js/lib/shaders/*',
     './src/js/lib/utils/*',
 
-    './src/js/simulation/*',
-    './src/js/characters/*',
-
     './src/js/sys/GlobalVariables.js',
     './src/js/sys/Functions.js',
     './src/js/sys/Input.js',
 
+    './src/js/game_modes/*',
+    './src/js/simulation/*',
+    './src/js/characters/*',
+
+    './src/js/init/InitCharacters.js',
     './src/js/init/InitThree.js',
     './src/js/init/InitCannon.js',
-    './src/js/init/InitCharacters.js',
     './src/js/init/InitWorld.js',
 
+    './src/js/sys/Debug.js',
     './src/js/Main.js',
     './src/js/sys/RenderLoop.js'
 ];

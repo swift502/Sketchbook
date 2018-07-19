@@ -164,17 +164,6 @@ orbitControls.enableZoom = false;
 orbitControls.enablePan = false;
 orbitControls.update();
 
-// Plane
-// var geometry = new THREE.PlaneGeometry(10, 10, 3, 3);
-// var material = new THREE.MeshLambertMaterial({
-//     color: 0xcccccc
-// });
-// geometry.rotateX(-Math.PI / 2);
-// var plane = new THREE.Mesh(geometry, material);
-// // plane.position.set(0, -10, 0);
-// plane.receiveShadow = true;
-// scene.add(plane);
-
 // Helpers
 var helper = new THREE.GridHelper(10, 10, 0x000000, 0x000000);
 helper.position.set(0, 0.01, 0);
@@ -188,61 +177,3 @@ helper = new THREE.DirectionalLightHelper(dirLight, 3);
 helper = new THREE.CameraHelper(dirLight.shadow.camera);
 // scene.add( helper );
 
-//Simulator debug
-// var material = new THREE.LineDashedMaterial({
-//     color: 0x000000,
-//     dashSize: 0.05,
-//     gapSize: 0.01,
-// });
-// var vertices = [
-//     new THREE.Vector3( 0, 0, 0 ),
-//     new THREE.Vector3( 0, 1, 0)
-// ];
-// var lineGeo = new THREE.Geometry().setFromPoints( vertices );
-// var line = new THREE.Line( lineGeo, material );
-// line.computeLineDistances();
-// var Lines = [line, line.clone()];
-// scene.add(Lines[0]);
-// scene.add(Lines[1]);
-
-// Spring debugs
-var sphereGeo = new THREE.SphereGeometry(0.3, 32, 32);
-var sphereMat = new THREE.MeshLambertMaterial({
-    color: 0xff0000
-});
-var sphere = new THREE.Mesh(sphereGeo, sphereMat);
-sphere.castShadow = true;
-sphere.receiveShadow = true;
-sphere.visible = false;
-scene.add(sphere);
-
-var sphereGeo2 = new THREE.SphereGeometry(0.3, 32, 32);
-var sphereMat2 = new THREE.MeshLambertMaterial({
-    color: 0x00ff00
-});
-var sphere2 = new THREE.Mesh(sphereGeo2, sphereMat2);
-sphere2.castShadow = true;
-sphere2.receiveShadow = true;
-sphere2.visible = false;
-scene.add(sphere2);
-
-var sphereGeo3 = new THREE.SphereGeometry(0.3, 32, 32);
-var sphereMat3 = new THREE.MeshLambertMaterial({
-    color: 0x0000ff
-});
-var sphere3 = new THREE.Mesh(sphereGeo3, sphereMat3);
-sphere3.castShadow = true;
-sphere3.receiveShadow = true;
-sphere3.visible = false;
-scene.add(sphere3);
-
-//ray cast debug
-var boxGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-var boxMat = new THREE.MeshLambertMaterial({
-    color: 0xff0000
-});
-var raycastBox = new THREE.Mesh(boxGeo, boxMat);
-raycastBox.castShadow = true;
-raycastBox.receiveShadow = true;
-raycastBox.visible = false;
-scene.add(raycastBox);

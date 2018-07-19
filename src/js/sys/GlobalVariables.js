@@ -7,4 +7,9 @@ var parallelPairs = [];
 // Scene
 var scene  = new THREE.Scene();
 
+// Characters
+var player;
+
 var characters = [];
+
+var CurrentGameMode;
