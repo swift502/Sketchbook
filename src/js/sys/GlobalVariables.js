@@ -5,7 +5,7 @@ var physicsWorld = new CANNON.World();
 var parallelPairs = [];
 
 // Scene
-var scene  = new THREE.Scene();
+var scene = new THREE.Scene();
 
 // Characters
 var player;

@@ -122,56 +122,6 @@ const CapsuleGeometry = (radius = 1, height = 2, N = 32) => {
     return geometry;
   }
 
-  const cloneFbx = (fbx) => {
-    const clone = fbx.clone(true)
-    clone.animations = fbx.animations
-    clone.skeleton = { bones: [] }
-
-    const skinnedMeshes = {}
-
-    fbx.traverse(node => {
-        if (node.isSkinnedMesh) {
-            skinnedMeshes[node.name] = node
-        }
-    })
-
-    const cloneBones = {}
-    const cloneSkinnedMeshes = {}
-
-    clone.traverse(node => {
-        if (node.isBone) {
-            cloneBones[node.name] = node
-        }
-
-        if (node.isSkinnedMesh) {
-            cloneSkinnedMeshes[node.name] = node
-        }
-    })
-
-    for (let name in skinnedMeshes) {
-        const skinnedMesh = skinnedMeshes[name]
-        const skeleton = skinnedMesh.skeleton
-        const cloneSkinnedMesh = cloneSkinnedMeshes[name]
-
-        const orderedCloneBones = []
-
-        for (let i=0; i<skeleton.bones.length; i++) {
-            const cloneBone = cloneBones[skeleton.bones[i].name]
-            orderedCloneBones.push(cloneBone)
-        }
-
-        cloneSkinnedMesh.bind(
-            new THREE.Skeleton(orderedCloneBones, skeleton.boneInverses),
-            cloneSkinnedMesh.matrixWorld)
-
-        // For animation to work correctly:
-        clone.skeleton.bones.push(cloneSkinnedMesh)
-        clone.skeleton.bones.push(...orderedCloneBones)
-    }
-
-    return clone
-}
-
 /**
  * Constructs a 2D matrix from first vector, replacing the Y axes with the global Y axis,
  * and applies this matrix to the second vector. Saves performance when compared to full 3D matrix application.
@@ -295,4 +245,20 @@ function addParallelCapsule(mass, position, height, radius, segments, friction) 
 
     parallelPairs.push(pair);
     return pair;
+}
+
+//
+// Helpers
+//
+
+function createArray(length) {
+    var arr = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    }
+
+    return arr;
 }

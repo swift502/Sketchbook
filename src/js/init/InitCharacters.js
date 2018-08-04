@@ -28,7 +28,7 @@ loader.load(AP_MODELS + 'game_man/game_man.fbx', function ( object ) {
 } );
 
 var bobs = [];
-for(var i = 0; i < 2; i++) {
+for(var i = 0; i < 0; i++) {
     bob = new Character(new CANNON.Vec3(-2, 1, 2));
     bobs.push(bob);
     bob.behaviour = new FollowPlayerAI(bob);

@@ -37,7 +37,6 @@ loader.load(AP_MODELS + 'credits_sign/sign.fbx', function ( object ) {
     object.translateZ(4.5);
     object.translateX(-0.5);
     object.rotateY(Math.PI/2);
-    object.children
     scene.add( object );
 
     object2 = object.clone();
@@ -57,3 +56,5 @@ loader.load(AP_MODELS + 'credits_sign/sign.fbx', function ( object ) {
     object2.translateZ(1);
     scene.add(object2);
 });
+
+

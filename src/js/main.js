@@ -21,7 +21,29 @@ function Update(timeStep) {
 
     updatePhysics(timeStep);
     debugUpdate(timeStep);
+
+
+    // cloth
+    // for ( var i = 0, il = Nx+1; i !== il; i++ ) {
+    //     for ( var j = 0, jl = Ny+1; j !== jl; j++ ) {
+    //         var idx = j*(Nx+1) + i;
+    //         clothGeometry.vertices[idx].copy(particles[i][j].position);
+    //     }
+    // }
+
+    // clothGeometry.computeFaceNormals();
+    // clothGeometry.computeVertexNormals();
+    // clothGeometry.normalsNeedUpdate = true;
+    // clothGeometry.verticesNeedUpdate = true;
     
+    var t = physicsWorld.time;
+    if(clothMesh!= null) clothMesh.position.set(Math.sin(t), Math.sin(t * 2) * 0.5 - 1, 0 + 2);
+
+    clothNodes.forEach(node => {
+        node.update();
+    });
+    // console.log(clothNodes[0].bone);
+
     params.Time_Scale = THREE.Math.lerp(params.Time_Scale, timeScaleTarget, 0.2);
 
     characters.forEach(char => {

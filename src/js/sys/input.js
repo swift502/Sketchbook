@@ -16,16 +16,20 @@ document.addEventListener("wheel", mouseWheel, false);
 
 // Event handlers
 function keyDown(event) {
-    CurrentGameMode.handleKey(event, event.key, true);
+    if(CurrentGameMode != null)
+        CurrentGameMode.handleKey(event, event.key, true);
 }
 function keyUp(event) {
-    CurrentGameMode.handleKey(event, event.key, false);
+    if(CurrentGameMode != null)
+        CurrentGameMode.handleKey(event, event.key, false);
 }
 function mouseDown(event) {
-    CurrentGameMode.handleKey(event, 'mouse' + event.button, true);
+    if(CurrentGameMode != null)
+        CurrentGameMode.handleKey(event, 'mouse' + event.button, true);
 }
 function mouseUp(event) {
-    CurrentGameMode.handleKey(event, 'mouse' + event.button, false);
+    if(CurrentGameMode != null)
+        CurrentGameMode.handleKey(event, 'mouse' + event.button, false);
 }
 
 /**
