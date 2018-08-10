@@ -14013,9 +14013,13 @@ var step_tmp1 = new Vec3();
  */
 World.prototype.step = function(dt, timeSinceLastCalled, maxSubSteps){
     maxSubSteps = maxSubSteps || 10;
-    timeSinceLastCalled = timeSinceLastCalled || 0;
+    
+    if (typeof timeSinceLastCalled === 'undefined') {
+        
+    }
+    // timeSinceLastCalled = timeSinceLastCalled || -1;
 
-    if(timeSinceLastCalled === 0){ // Fixed, simple stepping
+    if(timeSinceLastCalled === -1){ // Fixed, simple stepping
 
         this.internalStep(dt);
 
@@ -14033,7 +14037,9 @@ World.prototype.step = function(dt, timeSinceLastCalled, maxSubSteps){
             substeps++;
         }
 
-        var t = (this.accumulator % dt) / dt;
+        this.accumulator %= dt;
+
+        var t = this.accumulator / dt;
         for(var j=0; j !== this.bodies.length; j++){
             var b = this.bodies[j];
             b.previousPosition.lerp(b.position, t, b.interpolatedPosition);

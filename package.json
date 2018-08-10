@@ -25,5 +25,8 @@
     "gulp-minify": "^3.1.0",
     "gulp-uglify": "^3.0.0",
     "gulp-uglifycss": "^1.0.9"
+  },
+  "dependencies": {
+    "gulp-clean-css": "^3.9.4"
   }
 }

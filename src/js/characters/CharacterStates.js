@@ -1,32 +1,15 @@
 //
-// States Enum
-//
-var CharStates = {
-    DefaultState: 'DefaultState',
-    Idle: 'Idle',
-    Walk: 'Walk',
-    Sprint: 'Sprint',
-    StartWalkForward: 'StartWalkForward',
-    EndWalk: 'EndWalk',
-    JumpIdle: 'JumpIdle',
-    JumpRunning: 'JumpRunning',
-    Falling: 'Falling',
-    DropIdle: 'DropIdle',
-    DropRunning: 'DropRunning'
-}
-Object.freeze(CharStates);
-
-//
 // Default state
 //
 function CS_DefaultState(character) {
+
     this.character = character;
 
-    this.character.velocitySimulator.damping = 0.8;
-    this.character.velocitySimulator.mass = 50;
+    this.character.velocitySimulator.damping = this.character.defaultVelocitySimulatorDamping;
+    this.character.velocitySimulator.mass = this.character.defaultVelocitySimulatorMass;
 
-    this.character.rotationSimulator.damping = 0.5;
-    this.character.rotationSimulator.mass = 10;
+    this.character.rotationSimulator.damping = this.character.defaultRotationSimulatorDamping;
+    this.character.rotationSimulator.mass = this.character.defaultRotationSimulatorMass;
 }
 CS_DefaultState.prototype.update = function(timeStep) {}
 CS_DefaultState.prototype.changeState = function() {}
@@ -52,23 +35,24 @@ CS_DefaultState.prototype.justReleased = function(control) {
 }
 
 CS_DefaultState.prototype.fallInAir = function() {
-    if(!this.character.rayHasHit) this.character.setState(CharStates.Falling);
+    if(!this.character.rayHasHit) this.character.setState(CS_Falling);
 }
 
 //
 // Idle
 //
 function CS_Idle(character) {
+    
     CS_DefaultState.call(this, character);
 
     this.character.velocitySimulator.damping = 0.6;
     this.character.velocitySimulator.mass = 10;
     
     this.character.setAnimation('idle', 0.3);
-    // this.character.orientationTarget = this.character.orientation;
 }
 CS_Idle.prototype = Object.create(CS_DefaultState.prototype);
 CS_Idle.prototype.update = function(timeStep) {
+    
     this.character.setVelocityTarget(0);
     this.character.update(timeStep);
 
@@ -76,11 +60,11 @@ CS_Idle.prototype.update = function(timeStep) {
 }
 CS_Idle.prototype.changeState = function() {
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpIdle);
+        this.character.setState(CS_JumpIdle);
     }
 
     if(this.anyDirection()) {
-        this.character.setState(CharStates.StartWalkForward);
+        this.character.setState(CS_StartWalkForward);
     }
 }
 
@@ -93,13 +77,11 @@ function CS_Walk(character) {
     this.character.setAnimation('run', 0.1);
 
     if(this.noDirection()) {
-        this.character.setState(CharStates.EndWalk);
+        this.character.setState(CS_EndWalk);
     }
 }
 CS_Walk.prototype = Object.create(CS_DefaultState.prototype);
 CS_Walk.prototype.update = function(timeStep) {
-    // this.character.orientationTarget = getMoveDirections();
-    // character.setOrientationTarget(getMoveDirections());
     this.character.setGlobalDirectionGoal();
     this.character.setVelocityTarget(0.8);
     this.character.update(timeStep);
@@ -107,16 +89,16 @@ CS_Walk.prototype.update = function(timeStep) {
     this.fallInAir();
 
     if(this.isPressed(this.character.controls.run)) {
-        this.character.setState(CharStates.Sprint);
+        this.character.setState(CS_Sprint);
     }
 }
 CS_Walk.prototype.changeState = function() {
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpRunning);
+        this.character.setState(CS_JumpRunning);
     }
 
     if(this.noDirection()) {
-        this.character.setState(CharStates.Idle);
+        this.character.setState(CS_Idle);
     }
 }
 
@@ -142,13 +124,13 @@ CS_Sprint.prototype.update = function(timeStep) {
 }
 CS_Sprint.prototype.changeState = function() {
     if(this.justReleased(this.character.controls.run)) {
-        this.character.setState(CharStates.Walk);
+        this.character.setState(CS_Walk);
     }
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpRunning);
+        this.character.setState(CS_JumpRunning);
     }
     if(this.noDirection()) {
-        this.character.setState(CharStates.EndWalk);
+        this.character.setState(CS_EndWalk);
     }
 }
 
@@ -167,7 +149,7 @@ function CS_StartWalkForward(character) {
 CS_StartWalkForward.prototype = Object.create(CS_DefaultState.prototype);
 CS_StartWalkForward.prototype.update = function(timeStep) {
     this.timer += timeStep;
-    if(this.timer > this.time - timeStep) this.character.setState(CharStates.Walk);
+    if(this.timer > this.time - timeStep) this.character.setState(CS_Walk);
 
     this.character.setGlobalDirectionGoal();
     this.character.setVelocityTarget(0.8);
@@ -178,15 +160,15 @@ CS_StartWalkForward.prototype.update = function(timeStep) {
 }
 CS_StartWalkForward.prototype.changeState = function() {
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpRunning);
+        this.character.setState(CS_JumpRunning);
     }
 
     if(this.noDirection()) {
-        this.character.setState(CharStates.Idle);
+        this.character.setState(CS_Idle);
     }
 
     if(this.justPressed(this.character.controls.run)) {
-        this.character.setState(CharStates.Sprint);
+        this.character.setState(CS_Sprint);
     }
 }
 
@@ -199,33 +181,30 @@ function CS_EndWalk(character) {
     var duration = character.setAnimation('stop', 0.1);
     this.time = duration;
     this.timer = 0;
-    // this.character.orientationTarget = character.orientation;
 }
 CS_EndWalk.prototype = Object.create(CS_DefaultState.prototype);
 CS_EndWalk.prototype.update = function(timeStep) {
     this.timer += timeStep;
     if(this.timer > this.time - timeStep) {
 
-        this.character.setState(CharStates.Idle);
+        this.character.setState(CS_Idle);
     }
     
     this.character.setVelocityTarget(0);
-
     this.character.update(timeStep);
-
     this.fallInAir();
 }
 CS_EndWalk.prototype.changeState = function() {
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpIdle);
+        this.character.setState(CS_JumpIdle);
     }
 
     if(this.anyDirection()) {
         if(this.isPressed(this.character.controls.run)) {
-            this.character.setState(CharStates.Sprint);
+            this.character.setState(CS_Sprint);
         }
         else {
-            this.character.setState(CharStates.StartWalkForward);
+            this.character.setState(CS_StartWalkForward);
         }
     }
 }
@@ -262,11 +241,11 @@ CS_JumpIdle.prototype.update = function(timeStep) {
     }
 
     if(this.timer > 0.35 && this.character.rayHasHit) {
-        this.character.setState(CharStates.DropIdle);
+        this.character.setState(CS_DropIdle);
     }
 
     if(this.timer > this.animationLength - timeStep) {
-        this.character.setState(CharStates.Falling);
+        this.character.setState(CS_Falling);
     }
 }
 
@@ -302,11 +281,11 @@ CS_JumpRunning.prototype.update = function(timeStep) {
     }
 
     if(this.timer > 0.3 && this.character.rayHasHit) {
-        this.character.setState(CharStates.DropRunning);
+        this.character.setState(CS_DropRunning);
     }
 
     if(this.timer > this.animationLength - timeStep) {
-        this.character.setState(CharStates.Falling);
+        this.character.setState(CS_Falling);
     }
 }
 
@@ -329,10 +308,10 @@ CS_Falling.prototype.update = function(timeStep) {
 
     if(this.character.rayHasHit) {
         if(this.anyDirection()) {
-            this.character.setState(CharStates.DropRunning);
+            this.character.setState(CS_DropRunning);
         }
         else {
-            this.character.setState(CharStates.DropIdle);
+            this.character.setState(CS_DropIdle);
         }
     }
 }
@@ -350,7 +329,7 @@ function CS_DropIdle(character) {
     this.timer = 0;
     
     if(this.anyDirection()) {
-        this.character.setState(CharStates.StartWalkForward);
+        this.character.setState(CS_StartWalkForward);
     }
 }
 CS_DropIdle.prototype = Object.create(CS_DefaultState.prototype);
@@ -361,17 +340,17 @@ CS_DropIdle.prototype.update = function(timeStep) {
 
     this.timer += timeStep;
     if(this.timer > this.animationLength - timeStep) {
-        this.character.setState(CharStates.Idle);
+        this.character.setState(CS_Idle);
     }
 
     this.fallInAir();
 }
 CS_DropIdle.prototype.changeState = function() {
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpIdle);
+        this.character.setState(CS_JumpIdle);
     }
     if(this.anyDirection()) {
-        this.character.setState(CharStates.StartWalkForward);
+        this.character.setState(CS_StartWalkForward);
     }
 }
 
@@ -393,21 +372,21 @@ CS_DropRunning.prototype.update = function(timeStep) {
 
     this.timer += timeStep;
     if(this.timer > this.animationLength - timeStep) {
-        this.character.setState(CharStates.Walk);
+        this.character.setState(CS_Walk);
     }
 
     this.fallInAir();
 }
 CS_DropRunning.prototype.changeState = function() {
     if(this.noDirection(this.character.controls.jump)) {
-        this.character.setState(CharStates.EndWalk);
+        this.character.setState(CS_EndWalk);
     }
 
     if(this.anyDirection() && this.justPressed(this.character.controls.run)) {
-        this.character.setState(CharStates.Sprint);
+        this.character.setState(CS_Sprint);
     }
 
     if(this.justPressed(this.character.controls.jump)) {
-        this.character.setState(CharStates.JumpRunning);
+        this.character.setState(CS_JumpRunning);
     }
 }

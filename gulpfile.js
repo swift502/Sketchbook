@@ -2,7 +2,8 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 // var uglify = require('gulp-uglify');
 var minify = require('gulp-minify');
-var uglifycss = require('gulp-uglifycss');
+//var uglifycss = require('gulp-uglifycss');
+var cleanCSS = require('gulp-clean-css');
 
 var styles = [
     './src/css/*',
@@ -10,25 +11,25 @@ var styles = [
 
 var scripts = [
 
-    './src/js/sys/config/ConfigProd.js',
+    './src/js/sys/ConfigProd.js',
     
     './src/js/lib/shaders/*',
     './src/js/lib/utils/*',
 
-    './src/js/sys/GlobalVariables.js',
+    './src/js/sketchbook/GlobalVariables.js',
     './src/js/sys/Functions.js',
     './src/js/sys/Input.js',
 
-    './src/js/game_modes/*',
+    './src/js/sketchbook/GameModes.js',
     './src/js/simulation/*',
     './src/js/characters/*',
 
-    './src/js/init/InitCharacters.js',
-    './src/js/init/InitThree.js',
-    './src/js/init/InitCannon.js',
-    './src/js/init/InitWorld.js',
+    './src/js/sketchbook/InitCharacters.js',
+    './src/js/sketchbook/InitThree.js',
+    './src/js/sketchbook/InitCannon.js',
+    './src/js/sketchbook/InitWorld.js',
 
-    './src/js/sys/Debug.js',
+    './src/js/sketchbook/Debug.js',
     './src/js/Main.js',
     './src/js/sys/RenderLoop.js'
 ];
@@ -43,7 +44,7 @@ function css() {
 function css_min() {
     return gulp.src(styles)
     .pipe(concat('sketchbook.min.css'))
-    .pipe(uglifycss())
+    .pipe(cleanCSS())
     .pipe(gulp.dest('./docs/css/'));
 }
 

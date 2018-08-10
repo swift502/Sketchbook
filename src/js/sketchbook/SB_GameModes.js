@@ -2,9 +2,12 @@
  * Character controls game mode. Allows player to control a character.
  * @param {Character} character Character to control 
  */
-function GM_CharacterControls(character) {
+function GM_CharacterControls(sketchbook, character) {
 
+    this.sketchbook = sketchbook;
     this.character = character;
+
+    sketchbook.dirLight.target = character
 
     // Keymap
     this.keymap = {
@@ -56,4 +59,21 @@ GM_CharacterControls.prototype.handleKey = function(event, key, value) {
         // Breaks dat.GUI
         // event.preventDefault();
     }
+}
+
+GM_CharacterControls.prototype.update = function() {
+
+    // Look in camera's direction
+    this.character.viewVector = new THREE.Vector3().subVectors(this.character.position, this.sketchbook.camera.position);
+    
+    // Make light follow player (for shadows)
+    this.sketchbook.dirLight.position.set(this.character.position.x + this.sketchbook.sun.x * 5, this.character.position.y + this.sketchbook.sun.y * 5, this.character.position.z + this.sketchbook.sun.z * 5);
+    
+    // Orbit contorls
+    this.sketchbook.orbitControls.target.set(this.character.position.x, this.character.position.y + 0.6, this.character.position.z);
+    if(this.sketchbook.params.Auto_Rotate) this.sketchbook.camera.lookAt(this.character.position);
+    this.sketchbook.camera.position.set(this.character.position.x, this.character.position.y + 0.6, this.character.position.z);
+    this.sketchbook.camera.translateZ(2);
+    if(this.sketchbook.params.Auto_Rotate) this.sketchbook.camera.position.setComponent(1, 1);
+    this.sketchbook.orbitControls.update();
 }

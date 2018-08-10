@@ -1,52 +1,79 @@
-
 //Character class
-//The visual hierarchy goes:
-//  this->visuals->modelContainer->characterModel
-function Character(initPosition) {
+function Character(sketchbook, initPosition) {
     
     THREE.Object3D.call(this);
+    
+    var scope = this;
+    this.sketchbook = sketchbook;
 
     // Geometry
     this.height = 1;
     this.modelOffset = new THREE.Vector3();
 
     // Default model
-    this.characterModel = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, 1, 0.5),
-        new THREE.MeshLambertMaterial({ color: 0xffffff }));
-    this.characterModel.position.set(0, 0.5, 0);
-    this.characterModel.castShadow = true;
+    var loader = new THREE.FBXLoader();
+    loader.load(AP_MODELS + 'game_man/game_man.fbx', function ( object ) {
 
-    // Create visual groups
-    // The "visuals" group is centered for easy character tilting
-    // "modelContainer" is used to reliably ground the character, as animation can alter the position of the model itself
-    this.visuals = new THREE.Group();
-    this.add(this.visuals);
-    this.modelContainer = new THREE.Group();
-    this.modelContainer.position.y = -this.height/2;
-    this.visuals.add(this.modelContainer);
+        object.traverse( function ( child ) {
+            if ( child.isMesh ) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+            if( child.name == 'game_man') {
+                child.material = new THREE.MeshLambertMaterial({
+                    map: new THREE.TextureLoader().load(AP_MODELS + 'game_man/game_man.png' ),
+                    skinning: true
+                });
+            }
+        } );
 
-    // Attach model to visuals
-    this.modelContainer.add(this.characterModel);
+        // Create visual groups
+        // The visual hierarchy goes:
+        // this->visuals->modelContainer->characterModel
 
-    // Animation
-    this.mixer = new THREE.AnimationMixer(this.characterModel);
+        // The visuals group is centered for easy character tilting
+        scope.visuals = new THREE.Group();
+        scope.add(scope.visuals);
+
+        // Model container is used to reliably ground the character, as animation can alter the position of the model itself
+        scope.modelContainer = new THREE.Group();
+        scope.modelContainer.position.y = -scope.height/2;
+        scope.visuals.add(scope.modelContainer);
+
+        // Assign model to character
+        scope.characterModel = object;
+        // Attach model to model container
+        scope.modelContainer.add(object);
+    
+        // Animation
+        scope.mixer = new THREE.AnimationMixer(object);
+
+        // scope.player.setModel(object);
+        scope.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+        scope.setState(CS_Idle);
+    } );
 
     // Movement
     this.acceleration = new THREE.Vector3();
     this.velocity = new THREE.Vector3();
     this.velocityTarget = new THREE.Vector3();
-    this.velocitySimulator = new SpringVSimulator(60, 50, 0.8);
+    // Velocity spring simulator
+    this.defaultVelocitySimulatorDamping = 0.8;
+    this.defaultVelocitySimulatorMass = 50;
+    this.velocitySimulator = new SpringVSimulator(60, this.defaultVelocitySimulatorMass, this.defaultVelocitySimulatorDamping);
     this.moveSpeed = 4;
 
     // Rotation
     this.angularVelocity = 0;
     this.orientation = new THREE.Vector3(0, 0, 1);
     this.orientationTarget = new THREE.Vector3(0, 0, 1);
-    this.rotationSimulator = new SpringRSimulator(60, 10, 0.5);
+    // Rotation spring simulator
+    this.defaultRotationSimulatorDamping = 0.5;
+    this.defaultRotationSimulatorMass = 10;
+    this.rotationSimulator = new SpringRSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
 
     // States
-    this.setState(CharStates.DefaultState);
+    this.setState(CS_DefaultState);
     this.viewVector = new THREE.Vector3();
 
     // Controls
@@ -73,7 +100,7 @@ function Character(initPosition) {
     var characterSegments = 12;
     var characterFriction = 0;
     var characterCollisionGroup = 2;
-    this.characterCapsule = addParallelCapsule(characterMass, initPosition, characterHeight, characterRadius, characterSegments, characterFriction);
+    this.characterCapsule = Sketchbook.prototype.createCharacterCapsule(characterMass, initPosition, characterHeight, characterRadius, characterSegments, characterFriction);
     this.characterCapsule.visual.visible = false;
 
     // Pass reference to character for callbacks
@@ -94,6 +121,15 @@ function Character(initPosition) {
     this.wantsToJump = false;
     this.justJumped = false;
 
+    // Ray cast debug
+    var boxGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    var boxMat = new THREE.MeshLambertMaterial({
+        color: 0xff0000
+    });
+    this.raycastBox = new THREE.Mesh(boxGeo, boxMat);
+    this.raycastBox.visible = false;
+    this.sketchbook.scene.add(this.raycastBox);
+
     // PreStep event
     this.characterCapsule.physical.preStep = function() {
 
@@ -103,11 +139,11 @@ function Character(initPosition) {
         var end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength, this.position.z);
         // Raycast options
         var rayCastOptions = {
-            collisionFilterMask: ~2 /* cast against everything except second group (player) */,
+            collisionFilterMask: ~2 /* cast against everything except second collision group (player) */,
             skipBackfaces: true     /* ignore back faces */
         }
         // Cast the ray
-        this.character.rayHasHit = physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
+        this.character.rayHasHit = this.character.sketchbook.physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
         
         // Jumping
         if(this.character.wantsToJump && this.character.rayHasHit) {
@@ -126,20 +162,19 @@ function Character(initPosition) {
         var simulatedVelocity = new CANNON.Vec3().copy(this.velocity);
         var arcadeVelocity = this.character.velocity.clone().multiplyScalar(this.character.moveSpeed);
         arcadeVelocity = appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
-        // console.log(arcadeVelocity);
 
         // If just jumped, don't stick to ground
         if(this.character.justJumped) this.character.justJumped = false;
         else {
             // If we're hitting the ground, stick to ground
             if(this.character.rayHasHit) {
-                raycastBox.position.copy(this.character.rayResult.hitPointWorld);
+                if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
                 this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
                 this.velocity.set(arcadeVelocity.x, 0, arcadeVelocity.z);
             }
             else {
                 // If we're in air, leave vertical velocity to physics
-                raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
+                if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
                 this.velocity.set(arcadeVelocity.x, simulatedVelocity.y, arcadeVelocity.z);
             }
         }
@@ -149,6 +184,7 @@ function Character(initPosition) {
 Character.prototype = Object.create(THREE.Object3D.prototype);
 
 Character.prototype.setModel = function(model) {
+    
     this.modelContainer.remove(this.characterModel);
     this.characterModel = model;
     this.modelContainer.add(this.characterModel);
@@ -164,46 +200,12 @@ Character.prototype.setViewVector = function(vector) {
     this.viewVector.copy(vector).normalize();
 }
 
-Character.prototype.setState = function(state) {
-
-    switch (state) {
-        case CharStates.DefaultState:
-            this.charState = new CS_DefaultState(this);
-            break;
-        case CharStates.Idle:
-            this.charState = new CS_Idle(this);
-            break;
-        case CharStates.Walk:
-            this.charState = new CS_Walk(this);
-            break;
-        case CharStates.Sprint:
-            this.charState = new CS_Sprint(this);
-            break;
-        case CharStates.StartWalkForward:
-            this.charState = new CS_StartWalkForward(this);
-            break;
-        case CharStates.EndWalk:
-            this.charState = new CS_EndWalk(this);
-            break;
-        case CharStates.JumpIdle:
-            this.charState = new CS_JumpIdle(this);
-            break;
-        case CharStates.JumpRunning:
-            this.charState = new CS_JumpRunning(this);
-            break;
-        case CharStates.Falling:
-            this.charState = new CS_Falling(this);
-            break;
-        case CharStates.DropIdle:
-            this.charState = new CS_DropIdle(this);
-            break;
-        case CharStates.DropRunning:
-            this.charState = new CS_DropRunning(this);
-            break;
-        default:
-            console.log("Unknown state: " + state);
-            this.charState = new CS_DefaultState(this); 
-    }
+/**
+ * Set state to the player. Pass state class (function) name.
+ * @param {function} State 
+ */
+Character.prototype.setState = function(State) {
+    this.charState = new State(this);
 }
 
 Character.prototype.setVelocity = function(velZ, velX = 0) {
@@ -217,6 +219,7 @@ Character.prototype.setVelocityTarget = function(velZ, velX = 0) {
 }
 
 Character.prototype.setOrientationTarget = function(vector) {
+
     this.orientationTarget.copy(vector).setY(0).normalize();
 }
 
@@ -242,6 +245,7 @@ Character.prototype.update = function(timeStep, parameters) {
 }
 
 Character.prototype.setAnimation = function(clipName, fadeIn) {
+    
     var clips = this.characterModel.animations;
     var clip = THREE.AnimationClip.findByName( clips, clipName );
     var action = this.mixer.clipAction( clip );
@@ -300,7 +304,7 @@ Character.prototype.SpringRotation = function(timeStep) {
     // Updating values
     this.orientation.applyAxisAngle(normal, rot);
     this.angularVelocity = this.rotationSimulator.velocity;
-    // sphere3.position.copy(new THREE.Vector3().copy(this.orientation).add(player.position).multiplyScalar(1));
+
 }
 
 Character.prototype.setGlobalDirectionGoal = function () {
@@ -310,19 +314,19 @@ Character.prototype.setGlobalDirectionGoal = function () {
     var positiveZ = this.controls.up.value    ?  1 : 0;
     var negativeZ = this.controls.down.value  ? -1 : 0;
     
+    var localDirection = new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
+    var flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z);
+
     // If no direction is pressed, set target as current orientation
-    if(positiveX == 0 && negativeX == 0 && positiveZ == 0 && negativeZ == 0) {
+    // if(positiveX == 0 && negativeX == 0 && positiveZ == 0 && negativeZ == 0) {
+    if((localDirection.x == 0 && localDirection.y == 0 && localDirection.z == 0) ||
+       (flatViewVector.x == 0 && flatViewVector.y == 0 && flatViewVector.z == 0)) {
         this.setOrientationTarget(this.orientation);
     }
     else {
-
-        var localDirection = new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
-        var flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z);
         this.setOrientationTarget(appplyVectorMatrixXZ(flatViewVector, localDirection));
     }
 }
-
-
 
 Character.prototype.rotateModel = function() {
     this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
