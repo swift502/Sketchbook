@@ -1,5 +1,5 @@
 //Character class
-function Character(sketchbook, initPosition) {
+function Character() {
     
     THREE.Object3D.call(this);
     
@@ -95,6 +95,7 @@ function Character(sketchbook, initPosition) {
     // Physics
     // Player Capsule
     var characterMass = 1;
+    var initPosition = new CANNON.Vec3(0, 0, 0);
     var characterHeight = 0.5;
     var characterRadius = 0.25;
     var characterSegments = 12;
@@ -128,7 +129,6 @@ function Character(sketchbook, initPosition) {
     });
     this.raycastBox = new THREE.Mesh(boxGeo, boxMat);
     this.raycastBox.visible = false;
-    this.sketchbook.scene.add(this.raycastBox);
 
     // PreStep event
     this.characterCapsule.physical.preStep = function() {
@@ -206,6 +206,10 @@ Character.prototype.setViewVector = function(vector) {
  */
 Character.prototype.setState = function(State) {
     this.charState = new State(this);
+}
+
+Character.prototype.setPosition = function(pos) {
+    this.characterCapsule.physical.position.copy(pos);
 }
 
 Character.prototype.setVelocity = function(velZ, velX = 0) {

@@ -2,7 +2,7 @@ Sketchbook.prototype.initInput = function() {
 
     var scope = this;
 
-   // Input
+    // Input
     // Event listeners
     document.addEventListener("keydown", keyDown, false);
     document.addEventListener("keyup", keyUp, false);
@@ -47,9 +47,14 @@ Sketchbook.prototype.initInput = function() {
     }
 }
 
-// Control class
+// Control classes
 function Control() {
     this.value = false;
     this.justPressed = false;
     this.justReleased = false;
+}
+
+function LerpControl() {
+    this.value = false;
+    this.floatValue = 0;
 }

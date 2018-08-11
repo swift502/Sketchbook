@@ -2,18 +2,11 @@ function Sketchbook() {
 
     // Global variables
     // Characters
-    this.player;
     this.characters = [];
     this.loader = new THREE.FBXLoader();
 
     // Three
     this.scene = new THREE.Scene();
-    this.renderer;
-    this.camera;
-    this.dirLight;
-    this.sun;
-    this.orbitControls;
-    this.stats;
 
     // Cannon
     this.physicsWorld = new CANNON.World();
@@ -21,37 +14,22 @@ function Sketchbook() {
     this.physicsFramerate = 1/60;
     this.physicsMaxPrediction = 10;
 
-    // Debug
-    this.sphere;
-    this.sphere2;
-    this.sphere3;
-    this.raycastBox;
-
     // RenderLoop
     this.clock = new THREE.Clock();
     this.delta = 0;
     this.sinceLastFrame = 0;
     this.justRendered = false;
-    this.composer;
 
     this.initInput();
     this.initThree();
     this.initCannon();
     this.initWorld();
+
+    this.cameraControls = new CameraControls(this.camera);
+    this.gameMode = new GM_FreeCameraControls(this);
     
-    // Variables
-    this.params = {
-        FPS_Limit: 60,
-        Time_Scale: 1,
-        Shadows: true,
-        FXAA: false,
-        Auto_Rotate: false,
-        Draw_Capsules: false,
-        RayCast_Debug: false
-    };
-    params = this.params;
     // GUI init
-    this.ParamGUI(this.params);
+    this.ParamGUI();
 }
 
 Sketchbook.prototype.ControlCharacter = function(character) {
@@ -63,7 +41,6 @@ Sketchbook.prototype.ControlCharacter = function(character) {
 Sketchbook.prototype.Update = function(timeStep) {
 
     this.updatePhysics(timeStep);
-    // this.debugUpdate(timeStep);
 
     this.characters.forEach(char => {
         char.behaviour.update(timeStep);
@@ -72,6 +49,10 @@ Sketchbook.prototype.Update = function(timeStep) {
 
     this.gameMode.update(timeStep);
 
+    // Rotate and position camera according to cameraTarget and angles
+    this.cameraControls.update();
+
+    // Lerp timescale parameter
     this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
 }
 

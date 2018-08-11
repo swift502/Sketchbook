@@ -40,7 +40,7 @@ Sketchbook.prototype.initThree = function() {
 
     // Camera
     this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 120);
-    this.camera.position.set(1, 1, 1);
+    // this.camera.position.set(1, 1, 1);
 
     // Scene render pass
     var renderScene = new THREE.RenderPass(this.scene, this.camera);
@@ -99,10 +99,10 @@ Sketchbook.prototype.initThree = function() {
     this.scene.add(this.dirLight);
 
     // Orbit controls
-    this.orbitControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-    this.orbitControls.enableZoom = false;
-    this.orbitControls.enablePan = false;
-    this.orbitControls.update();
+    // this.orbitControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    // this.orbitControls.enableZoom = false;
+    // this.orbitControls.enablePan = false;
+    // this.orbitControls.update();
 
     // Helpers
     var helper = new THREE.GridHelper(10, 10, 0x000000, 0x000000);
@@ -122,16 +122,27 @@ Sketchbook.prototype.initThree = function() {
  * ParamGUI
  * Initialize user-editable global variables.
  */
-Sketchbook.prototype.ParamGUI = function(params) {
+Sketchbook.prototype.ParamGUI = function() {
 
     var scope = this;
 
+    // Variables
+    var params = {
+        FPS_Limit: 60,
+        Time_Scale: 1,
+        Shadows: true,
+        FXAA: false,
+        Draw_Capsules: false,
+        RayCast_Debug: false
+    };
+    this.params = params;
+
     var gui = new dat.GUI();
-    gui.add(params, 'FPS_Limit', 0, 60);
-    var timeController = gui.add(params, 'Time_Scale', 0, 1).listen();
-    var shadowSwitch = gui.add(params, 'Shadows');
-    gui.add(params, 'FXAA');
-    gui.add(params, 'Auto_Rotate');
+    var graphics_folder = gui.addFolder('Rendering');
+    graphics_folder.add(params, 'FPS_Limit', 0, 60);
+    var timeController = graphics_folder.add(params, 'Time_Scale', 0, 1).listen();
+    var shadowSwitch = graphics_folder.add(params, 'Shadows');
+    graphics_folder.add(params, 'FXAA');
 
     var debug_folder = gui.addFolder('Debug');
     var dc = debug_folder.add(params, 'Draw_Capsules');
