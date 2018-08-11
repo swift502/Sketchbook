@@ -17,11 +17,14 @@ A test ground for various custom 3D features. Built with JavaScript.
     * Variable time scale
     * [cannon.js](https://github.com/schteppe/cannon.js) physics
     * Custom damped-spring simulation
-
+    * Camera orbit controls
+    * Free camera mode
+    
 * Characters
     * Third-person camera
     * Raycast character controller with capsule collision
     * State based animation system
+    * Character behaviour (AI)
 
 ## Planned
 

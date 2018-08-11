@@ -29,7 +29,7 @@ function Sketchbook() {
     this.gameMode = new GM_FreeCameraControls(this);
     
     // GUI init
-    this.ParamGUI();
+    this.paramGUI();
 }
 
 Sketchbook.prototype.ControlCharacter = function(character) {

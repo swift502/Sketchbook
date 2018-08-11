@@ -16,22 +16,22 @@ var scripts = [
     './src/js/lib/shaders/*',
     './src/js/lib/utils/*',
 
-    './src/js/sketchbook/GlobalVariables.js',
     './src/js/sys/Functions.js',
-    './src/js/sys/Input.js',
 
-    './src/js/sketchbook/GameModes.js',
     './src/js/simulation/*',
     './src/js/characters/*',
 
-    './src/js/sketchbook/InitCharacters.js',
-    './src/js/sketchbook/InitThree.js',
-    './src/js/sketchbook/InitCannon.js',
-    './src/js/sketchbook/InitWorld.js',
+    './src/js/sketchbook/Sketchbook.js',
+    './src/js/sketchbook/SB_Input.js',
+    './src/js/sketchbook/SB_GUI.js',
+    './src/js/sketchbook/SB_CameraControls.js',
+    './src/js/sketchbook/SB_GameModes.js',
+    './src/js/sketchbook/SB_Characters.js',
+    './src/js/sketchbook/SB_Three.js',
+    './src/js/sketchbook/SB_Cannon.js',
+    './src/js/sketchbook/SB_World.js',
 
-    './src/js/sketchbook/Debug.js',
     './src/js/Main.js',
-    './src/js/sys/RenderLoop.js'
 ];
 
 

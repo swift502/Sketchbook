@@ -37,7 +37,6 @@ function GM_FreeCameraControls(sketchbook) {
 GM_FreeCameraControls.prototype.init = function() {
     this.sketchbook.cameraControls.target.copy(this.sketchbook.camera.position);
     this.sketchbook.cameraControls.setRadius(0);
-
     this.sketchbook.dirLight.target = this.camera;
 }
 
@@ -120,7 +119,6 @@ function GM_CharacterControls(sketchbook, character) {
 }
 
 GM_CharacterControls.prototype.init = function() {
-
     this.sketchbook.cameraControls.setRadius(2);
     this.sketchbook.dirLight.target = this.character;
 }
@@ -138,28 +136,12 @@ GM_CharacterControls.prototype.handleKey = function(event, key, value) {
 
     //Free cam
     if(key == 'c' && value == true && event.shiftKey == true) {
+        this.character.resetControls();
         this.sketchbook.gameMode = new GM_FreeCameraControls(this.sketchbook, this);
     }
     // Is key bound to action
     if (key in this.keymap) {
-
-        // Get action and set it's parameters
-        var action = this.character.controls[this.keymap[key].action];
-        action.value = value;
-
-        // Set the 'just' attributes
-        if(value) action.justPressed = true;
-        else action.justReleased = true;
-
-        // Tag control as last activated
-        this.character.controls.lastControl = action;
-
-        // Tell player to handle states according to new input
-        this.character.charState.changeState();
-
-        // Reset the 'just' attributes
-        action.justPressed = false;
-        action.justReleased = false;
+        this.character.setControl(this.keymap[key].action, value);
     }
 }
 

@@ -3,15 +3,23 @@ var sketchbook = new Sketchbook();
 
 // Player
 var player = new Character();
-player.setPosition(new CANNON.Vec3(-2, 1, 0));
+player.setPosition(new CANNON.Vec3(0, 1, 2));
 sketchbook.AddCharacter(player);
 sketchbook.ControlCharacter(player);
 
 // Bobs
-for(i = 0; i < 0; i++) {
+
     var bob = new Character();
-    bob.setPosition(new CANNON.Vec3(2, 1, 0));
+    bob.setPosition(new CANNON.Vec3(2, 1, 2));
+    bob.setBehaviour(new CharacterAI_FollowCharacter(bob, player));
     sketchbook.AddCharacter(bob);
+
+
+for(i = 0; i < 3; i++) {
+    var bobik = new Character();
+    bobik.setPosition(new CANNON.Vec3(2, 1, 0));
+    bobik.setBehaviour(new CharacterAI_Random(bobik));
+    sketchbook.AddCharacter(bobik);
 }
 
 // Start rendering loop

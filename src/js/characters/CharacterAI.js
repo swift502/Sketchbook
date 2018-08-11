@@ -1,40 +1,61 @@
-function DefaultAI(character) {
+function CharacterAI_Default(character) {
     this.character = character;
 }
 
-DefaultAI.prototype.update = function(timeStep) {
+CharacterAI_Default.prototype.update = function(timeStep) {
     this.character.charState.update(timeStep);
 }
 
-function FollowPlayerAI(character) {
+function CharacterAI_FollowCharacter(character, targetCharacter, stopDistance = 2) {
     this.character = character;
+    this.targetCharacter = targetCharacter;
+    this.stopDistance = stopDistance;
 }
 
-FollowPlayerAI.prototype.update = function(timeStep) {
+CharacterAI_FollowCharacter.prototype.update = function(timeStep) {
     
-     var viewVector = new THREE.Vector3().subVectors(this.character.sketchbook.player.position, this.character.position);
+     var viewVector = new THREE.Vector3().subVectors(this.targetCharacter.position, this.character.position);
      this.character.setViewVector(viewVector);
 
-     var rndInt = Math.floor(Math.random() * 100);
-
      // Follow character
-    if(viewVector.length() > 2) {
-        this.character.controls.up.value = true;
+    if(viewVector.length() > this.stopDistance) {
+        if(!this.character.controls.up.value) this.character.setControl('up', true);
     }
     //Stand still
     else {
-        this.character.controls.up.value = false;
+        if(this.character.controls.up.value) this.character.setControl('up', false);
         
-        if(rndInt == 0) {
-            // Look at character
-            this.character.setOrientationTarget(this.character.viewVector);
-        }
-        else if(rndInt == 1) {
-            // Look in random direction
-            this.character.setOrientationTarget(new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5));
-        }
+        // Look at character
+        this.character.setOrientationTarget(viewVector);
     }
 
     this.character.charState.update(timeStep);
-    this.character.charState.changeState();
+}
+
+function CharacterAI_Random(character, randomFrequency = 100) {
+    this.character = character;
+    this.randomFrequency = randomFrequency;
+}
+
+CharacterAI_Random.prototype.update = function(timeStep) {
+    
+    var rndInt = Math.floor(Math.random() * this.randomFrequency);
+
+    if(rndInt == 0) {
+        this.character.setViewVector(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+        this.character.setOrientationTarget(this.character.viewVector);
+    }
+
+    if(rndInt == 1) {
+        var rndBool = Math.random() > 0.5 ? true : false;
+        this.character.setControl('up', rndBool);
+        this.character.setControl('run',rndBool);
+        this.character.setControl('jump',rndBool);
+        // this.character.setControl('use',rndBool);
+        // this.character.setControl('primary',rndBool);
+        // this.character.setControl('secondary',rndBool);
+        // this.character.setControl('tertiary', rndBool);
+    }
+
+    this.character.charState.update(timeStep);
 }

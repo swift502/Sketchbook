@@ -77,7 +77,7 @@ function Character() {
     this.viewVector = new THREE.Vector3();
 
     // Controls
-    this.behaviour = new DefaultAI(this);
+    this.behaviour = new CharacterAI_Default(this);
     this.controls = {
         up:        new Control(),
         down:      new Control(),
@@ -226,6 +226,46 @@ Character.prototype.setOrientationTarget = function(vector) {
 
     this.orientationTarget.copy(vector).setY(0).normalize();
 }
+
+Character.prototype.setBehaviour = function(bhv) {
+    this.behaviour = bhv;
+}
+
+Character.prototype.setControl = function(key, value) {
+
+    // Get action and set it's parameters
+    var action = this.controls[key];
+
+    action.value = value;
+
+    // Set the 'just' attributes
+    if(value) action.justPressed = true;
+    else action.justReleased = true;
+
+    // Tag control as last activated
+    this.controls.lastControl = action;
+
+    // Tell player to handle states according to new input
+    this.charState.changeState();
+
+    // Reset the 'just' attributes
+    action.justPressed = false;
+    action.justReleased = false;
+}
+
+Character.prototype.resetControls = function() {
+    this.setControl('up', false);
+    this.setControl('down', false);
+    this.setControl('left', false);
+    this.setControl('right', false);
+    this.setControl('run', false);
+    this.setControl('jump', false);
+    this.setControl('use', false);
+    this.setControl('primary', false);
+    this.setControl('secondary', false);
+    this.setControl('tertiary', false);
+}
+
 
 Character.prototype.update = function(timeStep, parameters) {
 
