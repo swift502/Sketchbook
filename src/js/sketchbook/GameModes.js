@@ -21,7 +21,7 @@ function GM_FreeCameraControls(sketchbook) {
         'e':      { action: 'up'       },
         'q':      { action: 'down'     },
         'shift':  { action: 'fast'     }
-    }
+    };
 
     this.controls = {
         forward:   new LerpControl(),
@@ -31,14 +31,14 @@ function GM_FreeCameraControls(sketchbook) {
         back:      new LerpControl(),
         down:      new LerpControl(),
         fast:      new LerpControl()
-    }
+    };
 }
 
 GM_FreeCameraControls.prototype.init = function() {
     this.sketchbook.cameraControls.target.copy(this.sketchbook.camera.position);
     this.sketchbook.cameraControls.setRadius(0);
     this.sketchbook.dirLight.target = this.camera;
-}
+};
 
 /**
  * Handles game actions based on supplied inputs.
@@ -63,17 +63,17 @@ GM_FreeCameraControls.prototype.handleKey = function(event, key, value) {
         var action = this.controls[this.keymap[key].action];
         action.value = value;
     }
-}
+};
 
 GM_FreeCameraControls.prototype.update = function() {
     
     // Make light follow camera (for shadows)
     this.sketchbook.dirLight.position.set(this.camera.position.x + this.sketchbook.sun.x * 5, this.camera.position.y + this.sketchbook.sun.y * 5, this.camera.position.z + this.sketchbook.sun.z * 5);
    
-    for(key in this.controls){
+    for(var key in this.controls){
         var ctrl = this.controls[key];
         ctrl.floatValue = THREE.Math.lerp(ctrl.floatValue, +ctrl.value , 0.3);
-    };
+    }
 
     var forward = new THREE.Vector3(  0,  0, -1 ).applyQuaternion(this.camera.quaternion);
     var back    = new THREE.Vector3(  0,  0,  1 ).applyQuaternion(this.camera.quaternion);
@@ -90,7 +90,7 @@ GM_FreeCameraControls.prototype.update = function() {
     this.sketchbook.cameraControls.target.add(right.multiplyScalar(speed * this.controls.right.floatValue));
     this.sketchbook.cameraControls.target.add(up.multiplyScalar(speed * this.controls.up.floatValue));
     this.sketchbook.cameraControls.target.add(down.multiplyScalar(speed * this.controls.down.floatValue));
-}
+};
 
 /**
  * Character controls game mode. Allows player to control a character.
@@ -115,13 +115,13 @@ function GM_CharacterControls(sketchbook, character) {
         'mouse0': { action: 'primary'  },
         'mouse2': { action: 'secondary'},
         'mouse1': { action: 'tertiary' }
-    }
+    };
 }
 
 GM_CharacterControls.prototype.init = function() {
     this.sketchbook.cameraControls.setRadius(2);
     this.sketchbook.dirLight.target = this.character;
-}
+};
 
 /**
  * Handles game actions based on supplied inputs.
@@ -143,7 +143,7 @@ GM_CharacterControls.prototype.handleKey = function(event, key, value) {
     if (key in this.keymap) {
         this.character.setControl(this.keymap[key].action, value);
     }
-}
+};
 
 GM_CharacterControls.prototype.update = function() {
 
@@ -160,4 +160,4 @@ GM_CharacterControls.prototype.update = function() {
             this.character.position.y + this.character.height / 1.7,
             this.character.position.z)
     );
-}
+};

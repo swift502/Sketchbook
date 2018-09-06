@@ -4,7 +4,7 @@
   "description": "A test ground for various custom 3D features. Built with [three.js](https://github.com/mrdoob/three.js).",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -20,13 +20,15 @@
     "@types/dat.gui": "^0.6.0",
     "@types/stats": "^0.16.30",
     "@types/three": "^0.91.3",
+    "eslint": "^5.5.0",
     "gulp": "^4.0.0",
+    "gulp-clean-css": "^3.9.4",
     "gulp-concat": "^2.6.1",
     "gulp-minify": "^3.1.0",
     "gulp-uglify": "^3.0.0",
-    "gulp-uglifycss": "^1.0.9"
+    "gulp-uglifycss": "^1.0.9",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0"
   },
-  "dependencies": {
-    "gulp-clean-css": "^3.9.4"
-  }
+  "dependencies": {}
 }

@@ -101,7 +101,7 @@ function Character() {
     var characterSegments = 12;
     var characterFriction = 0;
     var characterCollisionGroup = 2;
-    this.characterCapsule = Sketchbook.prototype.createCharacterCapsule(characterMass, initPosition, characterHeight, characterRadius, characterSegments, characterFriction);
+    this.characterCapsule = World.prototype.createCharacterCapsule(characterMass, initPosition, characterHeight, characterRadius, characterSegments, characterFriction);
     this.characterCapsule.visual.visible = false;
 
     // Pass reference to character for callbacks
@@ -208,8 +208,8 @@ Character.prototype.setState = function(State) {
     this.charState = new State(this);
 }
 
-Character.prototype.setPosition = function(pos) {
-    this.characterCapsule.physical.position.copy(pos);
+Character.prototype.setPosition = function(x, y, z) {
+    this.characterCapsule.physical.position = new CANNON.Vec3(x, y, z);
 }
 
 Character.prototype.setVelocity = function(velZ, velX = 0) {
@@ -382,3 +382,5 @@ Character.prototype.rotateModel = function() {
 Character.prototype.jump = function() {
     this.wantsToJump = true;
 }
+
+export { Character };

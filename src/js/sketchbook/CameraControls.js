@@ -33,13 +33,13 @@ function CameraControls(camera) {
 
     function onMouseUp(event) {
         document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+        document.removeEventListener( 'mouseup', onMouseUp, false );
     }
 }
 
 CameraControls.prototype.setRadius = function(value) {
     this.radius = Math.max( 0.001, value );
-}
+};
 
 CameraControls.prototype.update = function() {
     this.camera.position.x = this.target.x + this.radius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
@@ -47,4 +47,4 @@ CameraControls.prototype.update = function() {
     this.camera.position.z = this.target.z + this.radius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
     this.camera.updateMatrix();
     this.camera.lookAt(this.target);
-}
+};

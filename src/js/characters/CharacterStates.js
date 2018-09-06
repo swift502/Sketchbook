@@ -390,3 +390,17 @@ CS_DropRunning.prototype.changeState = function() {
         this.character.setState(CS_JumpRunning);
     }
 }
+
+export {
+    CS_DefaultState,
+    CS_Idle,
+    CS_Walk,
+    CS_Sprint,
+    CS_StartWalkForward,
+    CS_EndWalk,
+    CS_JumpIdle,
+    CS_JumpRunning,
+    CS_Falling,
+    CS_DropIdle,
+    CS_DropRunning
+};

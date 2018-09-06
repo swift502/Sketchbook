@@ -59,3 +59,9 @@ CharacterAI_Random.prototype.update = function(timeStep) {
 
     this.character.charState.update(timeStep);
 }
+
+export {
+    CharacterAI_Default,
+    CharacterAI_FollowCharacter,
+    CharacterAI_Random
+};
