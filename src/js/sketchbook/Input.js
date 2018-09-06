@@ -1,12 +1,12 @@
 
 // Control classes
-function Control() {
+export function EventControl() {
     this.value = false;
     this.justPressed = false;
     this.justReleased = false;
 }
 
-function LerpControl() {
+export function LerpControl() {
     this.value = false;
     this.floatValue = 0;
 }
