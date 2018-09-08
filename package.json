@@ -21,12 +21,6 @@
     "@types/stats": "^0.16.30",
     "@types/three": "^0.91.3",
     "eslint": "^5.5.0",
-    "gulp": "^4.0.0",
-    "gulp-clean-css": "^3.9.4",
-    "gulp-concat": "^2.6.1",
-    "gulp-minify": "^3.1.0",
-    "gulp-uglify": "^3.0.0",
-    "gulp-uglifycss": "^1.0.9",
     "webpack": "^4.17.1",
     "webpack-cli": "^3.1.0"
   },

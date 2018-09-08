@@ -1,6 +1,6 @@
-import { Vector3 } from '../lib/core/three';
+// import THREE from 'three';
 
-export class Default {
+export class CharacterAI_Default {
     constructor(character) {
         this.character = character;
     }
@@ -12,7 +12,7 @@ export class Default {
 
 
 
-export class FollowCharacter {
+export class CharacterAI_FollowCharacter {
     constructor(character, targetCharacter, stopDistance = 2) {
         this.character = character;
         this.targetCharacter = targetCharacter;
@@ -21,7 +21,7 @@ export class FollowCharacter {
 
     update(timeStep) {
 
-        let viewVector = new Vector3().subVectors(this.targetCharacter.position, this.character.position);
+        let viewVector = new THREE.Vector3().subVectors(this.targetCharacter.position, this.character.position);
         this.character.setViewVector(viewVector);
 
         // Follow character
@@ -42,7 +42,7 @@ export class FollowCharacter {
 
 
 
-export class Random {
+export class CharacterAI_Random {
     constructor(character, randomFrequency = 100) {
         this.character = character;
         this.randomFrequency = randomFrequency;
@@ -53,7 +53,7 @@ export class Random {
         let rndInt = Math.floor(Math.random() * this.randomFrequency);
     
         if(rndInt == 0) {
-            this.character.setViewVector(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
+            this.character.setViewVector(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
             this.character.setOrientationTarget(this.character.viewVector);
         }
     

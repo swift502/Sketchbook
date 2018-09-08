@@ -1,7 +1,7 @@
 import { SimulatorBase, spring } from './SimulatorBase';
-import { Math } from '../lib/core/three';
+// import THREE from 'three';
 
-export class SpringRSimulator extends SimulatorBase {
+export class RelativeSpringSimulator extends SimulatorBase {
 
     constructor(fps, mass, damping) {
 
@@ -33,13 +33,13 @@ export class SpringRSimulator extends SimulatorBase {
         
         //SpringR lerping
         // Lerp from 0 to next frame
-        let lerp = Math.lerp(0, this.cache[1].position, this.offset / this.frameTime);
+        let lerp = THREE.Math.lerp(0, this.cache[1].position, this.offset / this.frameTime);
 
         // Substract last lerp from current to make output relative
         this.position = (lerp - this.lastLerp);
         this.lastLerp = lerp;
         
-        this.velocity = Math.lerp(this.cache[0].velocity, this.cache[1].velocity,  this.offset / this.frameTime);
+        this.velocity = THREE.Math.lerp(this.cache[0].velocity, this.cache[1].velocity,  this.offset / this.frameTime);
     }
 
     /**

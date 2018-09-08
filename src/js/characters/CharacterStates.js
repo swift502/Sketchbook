@@ -1,7 +1,7 @@
 //
 // Default state
 //
-class DefaultState {
+export class CharacterState_DefaultState {
 
     constructor(character) {
         this.character = character;
@@ -38,14 +38,14 @@ class DefaultState {
     }
 
     fallInAir() {
-        if(!this.character.rayHasHit) this.character.setState(Falling);
+        if(!this.character.rayHasHit) this.character.setState(CharacterState_Falling);
     }
 }
 
 //
 // Idle
 //
-export class Idle extends DefaultState {
+export class CharacterState_Idle extends CharacterState_DefaultState {
 
     constructor(character) {
 
@@ -66,11 +66,11 @@ export class Idle extends DefaultState {
     }
     changeState() {
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpIdle);
+            this.character.setState(CharacterState_JumpIdle);
         }
     
         if(this.anyDirection()) {
-            this.character.setState(StartWalkForward);
+            this.character.setState(CharacterState_StartWalkForward);
         }
     }
 }
@@ -78,7 +78,7 @@ export class Idle extends DefaultState {
 //
 // Walk
 //
-export class Walk extends DefaultState {
+export class CharacterState_Walk extends CharacterState_DefaultState {
 
     constructor(character) {
         super(character);
@@ -86,7 +86,7 @@ export class Walk extends DefaultState {
         this.character.setAnimation('run', 0.1);
     
         if(this.noDirection()) {
-            this.character.setState(EndWalk);
+            this.character.setState(CharacterState_EndWalk);
         }
     }
 
@@ -98,16 +98,16 @@ export class Walk extends DefaultState {
         this.fallInAir();
     
         if(this.isPressed(this.character.controls.run)) {
-            this.character.setState(Sprint);
+            this.character.setState(CharacterState_Sprint);
         }
     }
     changeState() {
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpRunning);
+            this.character.setState(CharacterState_JumpRunning);
         }
     
         if(this.noDirection()) {
-            this.character.setState(Idle);
+            this.character.setState(CharacterState_Idle);
         }
     }
 }
@@ -117,7 +117,7 @@ export class Walk extends DefaultState {
 //
 // Sprint
 //
-export class Sprint extends DefaultState {
+export class CharacterState_Sprint extends CharacterState_DefaultState {
 
     constructor(character) {
 
@@ -140,13 +140,13 @@ export class Sprint extends DefaultState {
 
     changeState() {
         if(this.justReleased(this.character.controls.run)) {
-            this.character.setState(Walk);
+            this.character.setState(CharacterState_Walk);
         }
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpRunning);
+            this.character.setState(CharacterState_JumpRunning);
         }
         if(this.noDirection()) {
-            this.character.setState(EndWalk);
+            this.character.setState(CharacterState_EndWalk);
         }
     }
 }
@@ -156,7 +156,7 @@ export class Sprint extends DefaultState {
 //
 // Start Walk Forward
 //
-export class StartWalkForward extends DefaultState {
+export class CharacterState_StartWalkForward extends CharacterState_DefaultState {
 
     constructor(character) {
 
@@ -171,7 +171,7 @@ export class StartWalkForward extends DefaultState {
 
     update(timeStep) {
         this.timer += timeStep;
-        if(this.timer > this.time - timeStep) this.character.setState(Walk);
+        if(this.timer > this.time - timeStep) this.character.setState(CharacterState_Walk);
     
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(0.8);
@@ -183,15 +183,15 @@ export class StartWalkForward extends DefaultState {
 
     changeState() {
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpRunning);
+            this.character.setState(CharacterState_JumpRunning);
         }
     
         if(this.noDirection()) {
-            this.character.setState(Idle);
+            this.character.setState(CharacterState_Idle);
         }
     
         if(this.justPressed(this.character.controls.run)) {
-            this.character.setState(Sprint);
+            this.character.setState(CharacterState_Sprint);
         }
     }
 }
@@ -201,7 +201,7 @@ export class StartWalkForward extends DefaultState {
 //
 // End Walk
 //
-export class EndWalk extends DefaultState {
+export class CharacterState_EndWalk extends CharacterState_DefaultState {
 
     constructor(character) {
 
@@ -216,7 +216,7 @@ export class EndWalk extends DefaultState {
         this.timer += timeStep;
         if(this.timer > this.time - timeStep) {
     
-            this.character.setState(Idle);
+            this.character.setState(CharacterState_Idle);
         }
         
         this.character.setVelocityTarget(0);
@@ -226,15 +226,15 @@ export class EndWalk extends DefaultState {
 
     changeState() {
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpIdle);
+            this.character.setState(CharacterState_JumpIdle);
         }
     
         if(this.anyDirection()) {
             if(this.isPressed(this.character.controls.run)) {
-                this.character.setState(Sprint);
+                this.character.setState(CharacterState_Sprint);
             }
             else {
-                this.character.setState(StartWalkForward);
+                this.character.setState(CharacterState_StartWalkForward);
             }
         }
     }
@@ -245,7 +245,7 @@ export class EndWalk extends DefaultState {
 //
 // Jump Idle
 //
-export class JumpIdle extends DefaultState {
+export class CharacterState_JumpIdle extends CharacterState_DefaultState {
 
     constructor(character) {
 
@@ -277,11 +277,11 @@ export class JumpIdle extends DefaultState {
         }
 
         if(this.timer > 0.35 && this.character.rayHasHit) {
-            this.character.setState(DropIdle);
+            this.character.setState(CharacterState_DropIdle);
         }
 
         if(this.timer > this.animationLength - timeStep) {
-            this.character.setState(Falling);
+            this.character.setState(CharacterState_Falling);
         }
     }
 }
@@ -289,7 +289,7 @@ export class JumpIdle extends DefaultState {
 //
 // Jump Running
 //
-export class JumpRunning extends DefaultState {
+export class CharacterState_JumpRunning extends CharacterState_DefaultState {
 
     constructor(character) {
 
@@ -321,11 +321,11 @@ export class JumpRunning extends DefaultState {
         }
     
         if(this.timer > 0.3 && this.character.rayHasHit) {
-            this.character.setState(DropRunning);
+            this.character.setState(CharacterState_DropRunning);
         }
     
         if(this.timer > this.animationLength - timeStep) {
-            this.character.setState(Falling);
+            this.character.setState(CharacterState_Falling);
         }
     }
 }
@@ -333,7 +333,7 @@ export class JumpRunning extends DefaultState {
 //
 // Falling
 //
-export class Falling extends DefaultState {
+export class CharacterState_Falling extends CharacterState_DefaultState {
 
     constructor(character) {
         super(character);
@@ -351,10 +351,10 @@ export class Falling extends DefaultState {
     
         if(this.character.rayHasHit) {
             if(this.anyDirection()) {
-                this.character.setState(DropRunning);
+                this.character.setState(CharacterState_DropRunning);
             }
             else {
-                this.character.setState(DropIdle);
+                this.character.setState(CharacterState_DropIdle);
             }
         }
     }
@@ -363,7 +363,7 @@ export class Falling extends DefaultState {
 //
 // Drop Idle
 //
-export class DropIdle extends DefaultState {
+export class CharacterState_DropIdle extends CharacterState_DefaultState {
 
     constructor(character) {
         super(character);
@@ -375,7 +375,7 @@ export class DropIdle extends DefaultState {
         this.timer = 0;
         
         if(this.anyDirection()) {
-            this.character.setState(StartWalkForward);
+            this.character.setState(CharacterState_StartWalkForward);
         }
     }
 
@@ -386,7 +386,7 @@ export class DropIdle extends DefaultState {
     
         this.timer += timeStep;
         if(this.timer > this.animationLength - timeStep) {
-            this.character.setState(Idle);
+            this.character.setState(CharacterState_Idle);
         }
     
         this.fallInAir();
@@ -394,10 +394,10 @@ export class DropIdle extends DefaultState {
 
     changeState() {
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpIdle);
+            this.character.setState(CharacterState_JumpIdle);
         }
         if(this.anyDirection()) {
-            this.character.setState(StartWalkForward);
+            this.character.setState(CharacterState_StartWalkForward);
         }
     }
 }
@@ -405,7 +405,7 @@ export class DropIdle extends DefaultState {
 //
 // Drop Running
 //
-export class DropRunning extends DefaultState {
+export class CharacterState_DropRunning extends CharacterState_DefaultState {
 
     constructor(character) {
         super(character);
@@ -421,7 +421,7 @@ export class DropRunning extends DefaultState {
     
         this.timer += timeStep;
         if(this.timer > this.animationLength - timeStep) {
-            this.character.setState(Walk);
+            this.character.setState(CharacterState_Walk);
         }
     
         this.fallInAir();
@@ -429,15 +429,15 @@ export class DropRunning extends DefaultState {
 
     changeState() {
         if(this.noDirection(this.character.controls.jump)) {
-            this.character.setState(EndWalk);
+            this.character.setState(CharacterState_EndWalk);
         }
     
         if(this.anyDirection() && this.justPressed(this.character.controls.run)) {
-            this.character.setState(Sprint);
+            this.character.setState(CharacterState_Sprint);
         }
     
         if(this.justPressed(this.character.controls.jump)) {
-            this.character.setState(JumpRunning);
+            this.character.setState(CharacterState_JumpRunning);
         }
     }
 }

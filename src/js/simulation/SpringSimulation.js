@@ -1,3 +1,3 @@
 export { SpringSimulator } from './SpringSimulator';
-export { SpringVSimulator } from './SpringVSimulator';
-export { SpringRSimulator } from './SpringRSimulator';
+export { VectorSpringSimulator } from './VectorSpringSimulator';
+export { RelativeSpringSimulator } from './RelativeSpringSimulator';

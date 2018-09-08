@@ -1,5 +1,4 @@
-
-console.log(getGlobalProperties(''));
+console.log(getGlobalProperties());
 
 // Initialize sketchbook
 var sketchbook = new World();
@@ -12,10 +11,10 @@ sketchbook.ControlCharacter(player);
 
 // Bobs
 
-    var bob = new Character();
-    bob.setPosition(2, 1, 2);
-    bob.setBehaviour(new CharacterAI_FollowCharacter(bob, player));
-    sketchbook.AddCharacter(bob);
+var bob = new Character();
+bob.setPosition(2, 1, 2);
+bob.setBehaviour(new CharacterAI_FollowCharacter(bob, player));
+sketchbook.AddCharacter(bob);
 
 
 // for(i = 0; i < 3; i++) {

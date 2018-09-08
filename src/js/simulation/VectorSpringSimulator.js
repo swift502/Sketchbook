@@ -1,7 +1,7 @@
+// import THREE from 'three';
 import { SimulatorBase, springV } from './SimulatorBase';
-import { Vector3 } from '../lib/core/three';
 
-export class SpringVSimulator extends SimulatorBase {
+export class VectorSpringSimulator extends SimulatorBase {
 
     constructor(fps, mass, damping) {
 
@@ -9,11 +9,11 @@ export class SpringVSimulator extends SimulatorBase {
         super(fps);
 
         // Simulated values
-        this.position = new Vector3();
-        this.velocity = new Vector3();
+        this.position = new THREE.Vector3();
+        this.velocity = new THREE.Vector3();
 
         // Simulation parameters
-        this.target = new Vector3();
+        this.target = new THREE.Vector3();
         this.mass = mass;
         this.damping = damping;
     }
@@ -44,8 +44,8 @@ export class SpringVSimulator extends SimulatorBase {
         if(this.cache.length == 0) {
             for (let i = 0; i < 2; i++) {
                 this.cache.push({
-                    position: new Vector3(),
-                    velocity: new Vector3()
+                    position: new THREE.Vector3(),
+                    velocity: new THREE.Vector3()
                 });
             }
         }

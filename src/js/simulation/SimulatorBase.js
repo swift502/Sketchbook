@@ -1,4 +1,4 @@
-import { Vector3 } from '../lib/core/three';
+// import THREE from 'three';
 
 export class SimulatorBase {
 
@@ -29,7 +29,7 @@ export function spring(source, dest, velocity, mass, damping) {
 }
 
 export function springV(source, dest, velocity, mass, damping) {
-    let acceleration = new Vector3().subVectors(dest, source);
+    let acceleration = new THREE.Vector3().subVectors(dest, source);
     acceleration.divideScalar(mass);
     velocity.add(acceleration);
     velocity.multiplyScalar(damping);
