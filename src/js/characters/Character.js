@@ -1,5 +1,5 @@
-// import THREE from 'three';
-// import CANNON from 'cannon';
+import * as THREE from 'three';
+import * as CANNON from 'cannon';
 
 import { Object3D } from 'three';
 import { Utilities as Utils } from '../sketchbook/Utilities';

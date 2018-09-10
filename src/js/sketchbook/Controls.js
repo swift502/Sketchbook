@@ -1,4 +1,4 @@
-export class Control_EventControl {
+class EventControl {
     constructor() {
         this.value = false;
         this.justPressed = false;
@@ -6,9 +6,14 @@ export class Control_EventControl {
     }
 }
 
-export class Control_LerpControl {
+class LerpControl {
     constructor() {
         this.value = false;
         this.floatValue = 0;
     }
 }
+
+export let Controls = {
+    EventControl: EventControl,
+    LerpControl: LerpControl
+};

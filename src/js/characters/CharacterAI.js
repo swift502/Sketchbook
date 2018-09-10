@@ -1,6 +1,6 @@
-// import THREE from 'three';
+import * as THREE from 'three';
 
-export class CharacterAI_Default {
+class Default {
     constructor(character) {
         this.character = character;
     }
@@ -10,9 +10,7 @@ export class CharacterAI_Default {
     }
 }
 
-
-
-export class CharacterAI_FollowCharacter {
+class FollowCharacter {
     constructor(character, targetCharacter, stopDistance = 2) {
         this.character = character;
         this.targetCharacter = targetCharacter;
@@ -40,9 +38,7 @@ export class CharacterAI_FollowCharacter {
     }
 }
 
-
-
-export class CharacterAI_Random {
+class Random {
     constructor(character, randomFrequency = 100) {
         this.character = character;
         this.randomFrequency = randomFrequency;
@@ -66,3 +62,9 @@ export class CharacterAI_Random {
         this.character.charState.update(timeStep);
     }
 }
+
+export let CharacterAI = {
+    Default: Default,
+    FollowCharacter: FollowCharacter,
+    Random: Random
+};

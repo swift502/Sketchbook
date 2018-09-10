@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     mode: "development",
@@ -18,5 +19,14 @@ module.exports = {
     externals: {
         three: 'THREE',
         cannon: 'CANNON'
-    }
+    },
+    plugins: [
+            new webpack.ProvidePlugin({
+                Detector: path.resolve(__dirname, './src/js/lib/utils/Detector.js'),
+                Stats: path.resolve(__dirname, './src/js/lib/utils/Detector.js')
+            })
+        ],
+    // module: {
+    //     noParse: /Detector/
+    // }
 };

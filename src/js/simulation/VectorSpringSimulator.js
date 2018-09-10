@@ -1,4 +1,4 @@
-// import THREE from 'three';
+import * as THREE from 'three';
 import { SimulatorBase, springV } from './SimulatorBase';
 
 export class VectorSpringSimulator extends SimulatorBase {

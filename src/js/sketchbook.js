@@ -13,6 +13,21 @@ import './lib/utils/inflate.min';
 import './lib/utils/FBXLoader';
 import './lib/utils/SceneUtils';
 
+// require('./lib/shaders/EffectComposer');
+// require('./lib/shaders/RenderPass');
+// require('./lib/shaders/MaskPass');
+// require('./lib/shaders/ShaderPass');
+// require('./lib/shaders/FXAAShader');
+// require('./lib/shaders/CopyShader');
+// require('./lib/shaders/Sky');
+
+// require('./lib/utils/Detector');
+// require('./lib/utils/Stats');
+// require('./lib/utils/dat.gui');
+// require('./lib/utils/inflate.min');
+// require('./lib/utils/FBXLoader');
+// require('./lib/utils/SceneUtils');
+
 export { CameraControls } from './sketchbook/CameraControls';
 export { Character } from './characters/Character';
 export { CharacterAI_Default } from './characters/CharacterAI';

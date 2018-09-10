@@ -1,11 +1,12 @@
-// import THREE from 'three';
-import * as Controls from './Controls';
+import * as THREE from 'three';
+import { Controls } from './Controls';
 
 /**
  * Free camera game mode.
  * @param {Character} character Character to control 
  */
-export class GameMode_FreeCameraControls {
+
+class FreeCameraControls {
 
     constructor(sketchbook) {
         this.sketchbook = sketchbook;
@@ -28,13 +29,13 @@ export class GameMode_FreeCameraControls {
         };
     
         this.controls = {
-            forward:   new Controls.Control_LerpControl(),
-            left:      new Controls.Control_LerpControl(),
-            right:     new Controls.Control_LerpControl(),
-            up:        new Controls.Control_LerpControl(),
-            back:      new Controls.Control_LerpControl(),
-            down:      new Controls.Control_LerpControl(),
-            fast:      new Controls.Control_LerpControl()
+            forward:   new Controls.LerpControl(),
+            left:      new Controls.LerpControl(),
+            right:     new Controls.LerpControl(),
+            up:        new Controls.LerpControl(),
+            back:      new Controls.LerpControl(),
+            down:      new Controls.LerpControl(),
+            fast:      new Controls.LerpControl()
         };
     }
     
@@ -73,7 +74,7 @@ export class GameMode_FreeCameraControls {
         
         // Make light follow camera (for shadows)
         this.sketchbook.dirLight.position.set(this.camera.position.x + this.sketchbook.sun.x * 5, this.camera.position.y + this.sketchbook.sun.y * 5, this.camera.position.z + this.sketchbook.sun.z * 5);
-       
+    
         for(let key in this.controls){
             let ctrl = this.controls[key];
             ctrl.floatValue = Math.lerp(ctrl.floatValue, +ctrl.value , 0.3);
@@ -101,7 +102,7 @@ export class GameMode_FreeCameraControls {
  * Character controls game mode. Allows player to control a character.
  * @param {Character} character Character to control 
  */
-export class GameMode_CharacterControls {
+class CharacterControls {
 
     constructor(sketchbook, character) {
         this.sketchbook = sketchbook;
@@ -168,3 +169,8 @@ export class GameMode_CharacterControls {
         );
     }
 }
+
+export let GameModes = {
+    FreeCameraControls: FreeCameraControls,
+    CharacterControls: CharacterControls
+};

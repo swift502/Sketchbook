@@ -1,5 +1,5 @@
+import * as THREE from 'three';
 import { SimulatorBase, spring } from './SimulatorBase';
-// import THREE from 'three';
 
 export class RelativeSpringSimulator extends SimulatorBase {
 

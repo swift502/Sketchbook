@@ -9,10 +9,10 @@ module.exports = {
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    "globals": {
-        "THREE": false,
-        "CANNON": false
-    },
+    // "globals": {
+    //     "THREE": false,
+    //     "CANNON": false
+    // },
     "rules": {
         "no-undef": 2,
         "no-unused-vars": 1,

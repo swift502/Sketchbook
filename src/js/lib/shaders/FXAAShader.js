@@ -1,3 +1,7 @@
+/* eslint-disable no-var, no-useless-escape*/
+
+import * as THREE from 'three';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author davidedc / http://www.sketchpatch.net/
@@ -8,29 +12,33 @@
  * http://www.glge.org/demos/fxaa/
  */
 
-THREE.FXAAShader = {
+export var FXAAShader = {
 
-	uniforms: {
+    uniforms: {
 
-		"tDiffuse":   { value: null },
-		"resolution": { value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+        "tDiffuse": {
+            value: null
+        },
+        "resolution": {
+            value: new THREE.Vector2(1 / 1024, 1 / 512)
+        }
 
-	},
+    },
 
-	vertexShader: [
+    vertexShader: [
 
-		"varying vec2 vUv;",
+        "varying vec2 vUv;",
 
-		"void main() {",
+        "void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+        "vUv = uv;",
+        "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
-		"}"
+        "}"
 
-	].join( "\n" ),
+    ].join("\n"),
 
-	fragmentShader: [
+    fragmentShader: [
         "precision highp float;",
         "",
         "uniform sampler2D tDiffuse;",
@@ -1110,6 +1118,6 @@ THREE.FXAAShader = {
         "  // TODO avoid querying texture twice for same texel",
         "  gl_FragColor.a = texture2D(tDiffuse, vUv).a;",
         "}"
-	].join("\n")
+    ].join("\n")
 
 };

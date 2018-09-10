@@ -1,10 +1,10 @@
-// import THREE from 'three';
-// import CANNON from 'cannon';
+import * as THREE from 'three';
+import * as CANNON from 'cannon';
 
-// import { Detector } from '../lib/utils/Detector';
-// import { Stats } from '../lib/utils/Stats';
+import { Detector } from '../lib/utils/Detector';
+import { Stats } from '../lib/utils/Stats';
 import { CameraControls } from './CameraControls';
-// import { GUI } from '../lib/utils/dat.gui';
+import { GUI } from '../lib/utils/dat.gui';
 import { Utilities as Utils } from './Utilities';
 
 import * as GameModes from './GameModes';

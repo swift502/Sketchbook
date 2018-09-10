@@ -1,10 +1,12 @@
+/* eslint-disable */
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
  * Full-screen textured quad shader
  */
 
-THREE.CopyShader = {
+export var CopyShader = {
 
 	uniforms: {
 
