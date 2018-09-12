@@ -1,6 +1,6 @@
 /* eslint-disable no-var, no-unused-vars*/
 
-import { Pass } from './EffectComposer';
+import { Pass } from './Pass';
 
 /**
  * @author alteredq / http://alteredqualia.com/

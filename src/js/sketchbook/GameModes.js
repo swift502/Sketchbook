@@ -40,8 +40,8 @@ class FreeCameraControls {
     }
     
     init() {
-        this.sketchbook.cameraControls.target.copy(this.sketchbook.camera.position);
-        this.sketchbook.cameraControls.setRadius(0);
+        this.sketchbook.cameraController.target.copy(this.sketchbook.camera.position);
+        this.sketchbook.cameraController.setRadius(0);
         this.sketchbook.dirLight.target = this.camera;
     }
     
@@ -77,7 +77,7 @@ class FreeCameraControls {
     
         for(let key in this.controls){
             let ctrl = this.controls[key];
-            ctrl.floatValue = Math.lerp(ctrl.floatValue, +ctrl.value , 0.3);
+            ctrl.floatValue = THREE.Math.lerp(ctrl.floatValue, +ctrl.value , 0.3);
         }
     
         let forward = new THREE.Vector3(  0,  0, -1 ).applyQuaternion(this.camera.quaternion);
@@ -89,12 +89,12 @@ class FreeCameraControls {
         
         let speed = this.movementSpeed * (this.controls.fast.value ? 3 : 1);
     
-        this.sketchbook.cameraControls.target.add(forward.multiplyScalar(speed * this.controls.forward.floatValue));
-        this.sketchbook.cameraControls.target.add(back.multiplyScalar(speed * this.controls.back.floatValue));
-        this.sketchbook.cameraControls.target.add(left.multiplyScalar(speed * this.controls.left.floatValue));
-        this.sketchbook.cameraControls.target.add(right.multiplyScalar(speed * this.controls.right.floatValue));
-        this.sketchbook.cameraControls.target.add(up.multiplyScalar(speed * this.controls.up.floatValue));
-        this.sketchbook.cameraControls.target.add(down.multiplyScalar(speed * this.controls.down.floatValue));
+        this.sketchbook.cameraController.target.add(forward.multiplyScalar(speed * this.controls.forward.floatValue));
+        this.sketchbook.cameraController.target.add(back.multiplyScalar(speed * this.controls.back.floatValue));
+        this.sketchbook.cameraController.target.add(left.multiplyScalar(speed * this.controls.left.floatValue));
+        this.sketchbook.cameraController.target.add(right.multiplyScalar(speed * this.controls.right.floatValue));
+        this.sketchbook.cameraController.target.add(up.multiplyScalar(speed * this.controls.up.floatValue));
+        this.sketchbook.cameraController.target.add(down.multiplyScalar(speed * this.controls.down.floatValue));
     }
 }
 
@@ -126,7 +126,7 @@ class CharacterControls {
     }
     
     init() {
-        this.sketchbook.cameraControls.setRadius(2);
+        this.sketchbook.cameraController.setRadius(2);
         this.sketchbook.dirLight.target = this.character;
     }
     
@@ -161,7 +161,7 @@ class CharacterControls {
         this.sketchbook.dirLight.position.set(this.character.position.x + this.sketchbook.sun.x * 5, this.character.position.y + this.sketchbook.sun.y * 5, this.character.position.z + this.sketchbook.sun.z * 5);
         
         // Position camera
-        this.sketchbook.cameraControls.target.copy(
+        this.sketchbook.cameraController.target.copy(
             new THREE.Vector3(
                 this.character.position.x,
                 this.character.position.y + this.character.height / 1.7,

@@ -1,13 +1,16 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
+import * as Shaders from '../lib/shaders/ShaderExports';
 
-import { Detector } from '../lib/utils/Detector';
-import { Stats } from '../lib/utils/Stats';
-import { CameraControls } from './CameraControls';
-import { GUI } from '../lib/utils/dat.gui';
+import { CameraController } from './CameraController';
+import { Character } from '../characters/Character';
+import { GameModes } from './GameModes';
 import { Utilities as Utils } from './Utilities';
 
-import * as GameModes from './GameModes';
+import { Detector } from '../lib/utils/Detector';
+import { FBXLoader } from '../lib/utils/FBXLoader';
+import { Stats } from '../lib/utils/Stats';
+import { GUI } from '../lib/utils/dat.gui';
 
 export class World {
 
@@ -59,7 +62,7 @@ export class World {
         this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 120);
 
         // Scene render pass
-        let renderScene = new THREE.RenderPass(this.graphicsWorld, this.camera);
+        let renderScene = new Shaders.RenderPass(this.graphicsWorld, this.camera);
 
         // DPR for FXAA
         let dpr = 1;
@@ -67,18 +70,18 @@ export class World {
             dpr = window.devicePixelRatio;
         }
         // FXAA
-        let effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
+        let effectFXAA = new Shaders.ShaderPass(Shaders.FXAAShader);
         effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
         effectFXAA.renderToScreen = true;
 
         // Composer
-        this.composer = new THREE.EffectComposer(this.renderer);
+        this.composer = new Shaders.EffectComposer(this.renderer);
         this.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
         this.composer.addPass(renderScene);
         this.composer.addPass(effectFXAA);
 
         // Sky
-        let sky = new THREE.Sky();
+        let sky = new Shaders.Sky();
         sky.scale.setScalar(100);
         this.graphicsWorld.add(sky);
 
@@ -190,7 +193,7 @@ export class World {
             else {
                 scope.timeScaleTarget *= scope.timeScaleChangeSpeed;
                 if(scope.timeScaleTarget < scope.timeScaleBottomLimit) scope.timeScaleTarget = scope.timeScaleBottomLimit;
-                scope.timeScaleTarget = Math.min(scope.timeScaleTarget, 9999999999);
+                scope.timeScaleTarget = Math.min(scope.timeScaleTarget, 1);
                 if(scope.params.Time_Scale > 0.9) scope.params.Time_Scale *= scope.timeScaleChangeSpeed;
             }
         }
@@ -253,13 +256,11 @@ export class World {
         //#endregion
 
         //Initialization
-        this.cameraControls = new CameraControls(this.camera);
-        this.gameMode = new GameModes.GameMode_FreeCameraControls(this);
-        this.loader = new THREE.FBXLoader();
-    }
+        this.cameraController = new CameraController(this.camera);
+        this.gameMode = new GameModes.FreeCameraControls(this);
+        this.loader = new FBXLoader();
 
-    ControlCharacter(character) {
-        this.gameMode = new GameModes.GameMode_FreeCameraControls(this, character);
+        this.Render(this);
     }
     
     // Update
@@ -276,10 +277,10 @@ export class World {
         this.gameMode.update(timeStep);
     
         // Rotate and position camera according to cameraTarget and angles
-        this.cameraControls.update();
+        this.cameraController.update();
     
         // Lerp timescale parameter
-        this.params.Time_Scale = Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
+        this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
     }
     
     /**
@@ -323,19 +324,19 @@ export class World {
     }
     
     /**
-     * Start
-     * Starts sketchbook rendering and logic
-     */
-    Start() {
-        this.Render(this);
-    }
-    
-    /**
      * Adds character to sketchbook
      * @param {Character} character 
      */
-    AddCharacter(character) {
+    SpawnCharacter(options) {
+
+        let defaults = {
+            position: new THREE.Vector3()
+        };
+        options = Utils.setDefaults(options, defaults);
     
+        let character = new Character(this);
+        character.setPosition(options.position.x, options.position.y, options.position.z);
+
         // Register character
         this.characters.push(character);
         
@@ -351,6 +352,8 @@ export class World {
     
         // Add to graphicsWorld
         this.graphicsWorld.add(character);
+
+        return character;
     }
     
     updatePhysics(timeStep) {
@@ -391,22 +394,25 @@ export class World {
     
     createBoxPrimitive(options) {
     
-        let mass = options.mass || 1;
-        let position = options.position || new CANNON.Vec3();
-        let size = options.size || new CANNON.Vec3(0.3, 0.3, 0.3);
-        let friction = options.friction || 0.3;
-        let visible = options.visible || true;
+        let defaults = {
+            mass: 1,
+            position: new CANNON.Vec3(),
+            size: new CANNON.Vec3(0.3, 0.3, 0.3),
+            friction: 0.3,
+            visible: true
+        };
+        options = Utils.setDefaults(options, defaults);
 
         let mat = new CANNON.Material();
-        mat.friction = friction;
+        mat.friction = options.friction;
     
-        let shape = new CANNON.Box(size);
+        let shape = new CANNON.Box(options.size);
         shape.material = mat;
     
         // Add phys sphere
         let physBox = new CANNON.Body({
-            mass: mass,
-            position: position,
+            mass: options.mass,
+            position: options.position,
             shape: shape
         });
     
@@ -414,12 +420,12 @@ export class World {
         this.physicsWorld.addBody(physBox);
         
         // Add visual box
-        let geometry = new THREE.BoxGeometry( size.x*2, size.y*2, size.z*2 );
+        let geometry = new THREE.BoxGeometry( options.size.x*2, options.size.y*2, options.size.z*2 );
         let material = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
         let visualBox = new THREE.Mesh( geometry, material );
         visualBox.castShadow = true;
         visualBox.receiveShadow = true;
-        visualBox.visible = visible;
+        visualBox.visible = options.visible;
         this.graphicsWorld.add( visualBox );
     
         let pair = {
@@ -433,34 +439,37 @@ export class World {
     
     createSpherePrimitive(options) {
     
-        let mass = options.mass || 1;
-        let position = options.position || new CANNON.Vec3();
-        let radius = options.radius || 0.3;
-        let friction = options.friction || 0.3;
-        let visible = options.visible || true;
+        let defaults = {
+            mass: 1,
+            position: new CANNON.Vec3(),
+            radius:  0.3,
+            friction: 0.3,
+            visible: true
+        };
+        options = Utils.setDefaults(options, defaults);
 
         let mat = new CANNON.Material();
-        mat.friction = friction;
+        mat.friction = options.friction;
     
-        let shape = new CANNON.Sphere(radius);
+        let shape = new CANNON.Sphere(options.radius);
         shape.material = mat;
     
         // Add phys sphere
         let physSphere = new CANNON.Body({
-            mass: mass, // kg
-            position: position, // m
+            mass: options.mass, // kg
+            position: options.position, // m
             shape: shape
         });
         physSphere.material = mat;
         this.physicsWorld.addBody(physSphere);
         
         // Add visual sphere
-        let geometry2 = new THREE.SphereGeometry(radius);
+        let geometry2 = new THREE.SphereGeometry(options.radius);
         let material2 = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
         let visualSphere = new THREE.Mesh( geometry2, material2 );
         visualSphere.castShadow = true;
         visualSphere.receiveShadow = true;
-        visualSphere.visible = visible;
+        visualSphere.visible = options.visible;
         this.graphicsWorld.add( visualSphere );
     
         let pair = {
@@ -474,25 +483,28 @@ export class World {
     
     createCapsulePrimitive(options) {
     
-        let mass = options.mass || 1;
-        let position = options.position || new CANNON.Vec3();
-        let height = options.height || 0.5;
-        let radius = options.radius || 0.25;
-        let segments = options.segments || 8;
-        let friction = options.friction || 0.3;
-        let visible = options.visible || true;
+        let defaults = {
+            mass: 1,
+            position: new CANNON.Vec3(),
+            height: 0.5,
+            radius:  0.3,
+            segments: 8,
+            friction: 0.3,
+            visible: true
+        };
+        options = Utils.setDefaults(options, defaults);
 
         let mat = new CANNON.Material();
-        mat.friction = friction;
+        mat.friction = options.friction;
     
         let physicalCapsule = new CANNON.Body({
-            mass: mass,
-            position: position
+            mass: options.mass,
+            position: options.position
         });
         
         // Compound shape
-        let sphereShape = new CANNON.Sphere(radius);
-        let cylinderShape = new CANNON.Cylinder(radius, radius, height / 2, segments);
+        let sphereShape = new CANNON.Sphere(options.radius);
+        let cylinderShape = new CANNON.Cylinder(options.radius, options.radius, options.height / 2, options.segments);
         cylinderShape.transformAllPoints(new CANNON.Vec3(), new CANNON.Quaternion(0.707,0,0,0.707));
     
         // Materials
@@ -500,15 +512,15 @@ export class World {
         sphereShape.material = mat;
         cylinderShape.material = mat;
     
-        physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, height / 2, 0));
-        physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, -height / 2, 0));
+        physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, options.height / 2, 0));
+        physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, -options.height / 2, 0));
         physicalCapsule.addShape(cylinderShape, new CANNON.Vec3( 0, 0, 0));
     
         let visualCapsule = new THREE.Mesh(
-            Utils.createCapsuleGeometry(radius, height, segments).rotateX(Math.PI/2),
+            Utils.createCapsuleGeometry(options.radius, options.height, options.segments).rotateX(Math.PI/2),
             new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true} )
         );
-        visualCapsule.visible = visible;
+        visualCapsule.visible = options.visible;
     
         let pair = {
             physical: physicalCapsule,
@@ -517,6 +529,110 @@ export class World {
     
         return pair;
     }
-}
 
+    LoadDefaultWorld() {
+    
+        // Ground
+        this.createBoxPrimitive({
+            mass: 0,
+            position: new CANNON.Vec3(0, -1, 0),
+            size: new CANNON.Vec3(5,1,5),
+            friction:0.3
+        });
+    
+        // Stuff
+        this.createBoxPrimitive({
+            mass: 10,
+            position: new CANNON.Vec3(0, 2, 0),
+            size: new CANNON.Vec3(1,1,1),
+            friction:0.3
+        });
+        this.createBoxPrimitive({
+            mass: 5,
+            position: new CANNON.Vec3(3, 1, -3),
+            size: new CANNON.Vec3(0.5,0.5,0.5),
+            friction:0.3
+        });
+        this.createBoxPrimitive({
+            mass: 3,
+            position: new CANNON.Vec3(-2.5, 1, -2.5),
+            size: new CANNON.Vec3(0.3,0.3,0.3),
+            friction:0.3
+        });
+    
+        // this.addParallelSphere(5, new CANNON.Vec3(1.5, 2, 1.5), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(1.5, 2, -1.5), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, -1.5), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, 1.5), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(0, 2, 1.5), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(0, 2, -1.5), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(1.5, 2, 0), 0.3, 0.3);
+        // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, 0), 0.3, 0.3);
+    
+        let scope = this;
+    
+        this.loader.load('resources/models/credits_sign/sign.fbx', function ( object ) {
+    
+            object.traverse( function ( child ) {
+                
+                if ( child.isMesh ) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+                if(child.name == 'grass') {
+                    child.material = new THREE.MeshLambertMaterial({
+                        map: new THREE.TextureLoader().load('resources/models/credits_sign/grass.png' ),
+                        transparent: true,
+                        depthWrite: false,
+                        side: THREE.DoubleSide
+                    });
+                    child.castShadow = false;
+                }
+                if(child.name == 'sign') {
+                    child.material = new THREE.MeshLambertMaterial({
+                        map: new THREE.TextureLoader().load('resources/models/credits_sign/sign.png' )
+                    });
+                }
+                if(child.name == 'sign_shadow') {
+                    child.material = new THREE.MeshLambertMaterial({
+                        map: new THREE.TextureLoader().load('resources/models/credits_sign/sign_shadow.png' ),
+                        transparent: true,
+                    });
+                    child.renderOrder = -1;
+                }
+                if(child.name == 'credits') {
+                    child.material = new THREE.MeshLambertMaterial({
+                        map: new THREE.TextureLoader().load('resources/models/credits_sign/credits2.png' ),
+                        transparent: true
+                    });
+                }
+            } );
+            object.translateZ(4.5);
+            object.translateX(-0.5);
+            object.rotateY(Math.PI/2);
+            scope.scene.add( object );
+            scope.addParallelBox(0, new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
+                new CANNON.Vec3(0.3, 0.45 ,0.1), 0.3, false);
+    
+            let object2 = object.clone();
+            object2.scale.multiplyScalar(1.7);
+            object2.traverse( function ( child ) {
+                if(child.name == 'credits') {
+                    child.material = new THREE.MeshLambertMaterial({
+                        map: new THREE.TextureLoader().load('resources/models/credits_sign/credits.png' ),
+                        transparent: true
+                    });
+                    child.translateZ(-0.2);
+                }
+                if(child.name == 'sign') {
+                    child.translateZ(-0.2);
+                }
+            });
+            object2.translateZ(1);
+            scope.scene.add(object2);
+            scope.addParallelBox(0, new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
+                new CANNON.Vec3(0.4, 0.58 ,0.16), 0.3, false);
+        });
+    }
+}
 

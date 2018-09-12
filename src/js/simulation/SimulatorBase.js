@@ -8,11 +8,11 @@ export class SimulatorBase {
         this.cache = []; // At least two frames
     }
 
-    set setFPS(value) {
+    setFPS(value) {
         this.frameTime = 1/value;
     }
 
-    get lastFrame() {
+    lastFrame() {
         return this.cache[this.cache.length - 1];
     }
 }

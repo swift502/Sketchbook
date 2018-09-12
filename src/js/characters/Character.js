@@ -1,16 +1,17 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
-import { Object3D } from 'three';
 import { Utilities as Utils } from '../sketchbook/Utilities';
 
-import * as Springs from '../simulation/SpringSimulation';
-import * as Controls from '../sketchbook/Controls';
-import * as CharacterAI from './CharacterAI';
-import * as CharacterStates from './CharacterStates';
+import * as Springs from '../simulation/SpringExports';
+import { FBXLoader } from '../lib/utils/FBXLoader';
+import { Controls } from '../sketchbook/Controls';
+import { CharacterAI } from './CharacterAI';
+import { CharacterStates } from './CharacterStates';
+import { GameModes } from '../sketchbook/GameModes';
 
 //Character class
-export class Character extends Object3D {
+export class Character extends THREE.Object3D {
     
     constructor(world) {
 
@@ -26,7 +27,7 @@ export class Character extends Object3D {
         this.modelOffset = new THREE.Vector3();
 
         // Default model
-        const loader = new THREE.FBXLoader();
+        const loader = new FBXLoader();
         loader.load('resources/models/game_man/game_man.fbx', function (object) {
 
             object.traverse( function ( child ) {
@@ -65,7 +66,7 @@ export class Character extends Object3D {
 
             // scope.player.setModel(object);
             scope.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-            scope.setState(CharacterStates.CharacterState_Idle);
+            scope.setState(CharacterStates.Idle);
         } );
 
         // Movement
@@ -88,23 +89,23 @@ export class Character extends Object3D {
         this.rotationSimulator = new Springs.RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
 
         // States
-        this.setState(CharacterStates.CharacterState_DefaultState);
+        this.setState(CharacterStates.DefaultState);
         this.viewVector = new THREE.Vector3();
 
         // Controls
-        this.behaviour = new CharacterAI.CharacterAI_Default(this);
+        this.behaviour = new CharacterAI.Default(this);
         this.controls = {
-            up:        new Controls.Control_EventControl(),
-            down:      new Controls.Control_EventControl(),
-            left:      new Controls.Control_EventControl(),
-            right:     new Controls.Control_EventControl(),
-            run:       new Controls.Control_EventControl(),
-            jump:      new Controls.Control_EventControl(),
-            use:       new Controls.Control_EventControl(),
-            primary:   new Controls.Control_EventControl(),
-            secondary: new Controls.Control_EventControl(),
-            tertiary:  new Controls.Control_EventControl(),
-            lastControl: new Controls.Control_EventControl()
+            up:        new Controls.EventControl(),
+            down:      new Controls.EventControl(),
+            left:      new Controls.EventControl(),
+            right:     new Controls.EventControl(),
+            run:       new Controls.EventControl(),
+            jump:      new Controls.EventControl(),
+            use:       new Controls.EventControl(),
+            primary:   new Controls.EventControl(),
+            secondary: new Controls.EventControl(),
+            tertiary:  new Controls.EventControl(),
+            lastControl: new Controls.EventControl()
         };
 
         // Physics
@@ -113,10 +114,18 @@ export class Character extends Object3D {
         const initPosition = new CANNON.Vec3(0, 0, 0);
         const characterHeight = 0.5;
         const characterRadius = 0.25;
-        const characterSegments = 12;
+        const characterSegments = 8;
         const characterFriction = 0;
         const characterCollisionGroup = 2;
-        this.characterCapsule = world.createCharacterCapsule(characterMass, initPosition, characterHeight, characterRadius, characterSegments, characterFriction);
+        this.characterCapsule = world.createCapsulePrimitive({
+            mass: characterMass,
+            position: initPosition,
+            height: characterHeight,
+            radius: characterRadius,
+            segments: characterSegments,
+            friction: characterFriction,
+            visible: false
+        });
         this.characterCapsule.visual.visible = false;
 
         // Pass reference to character for callbacks
@@ -266,6 +275,10 @@ export class Character extends Object3D {
         action.justReleased = false;
     }
     
+    Control() {
+        this.world.gameMode = new GameModes.CharacterControls(this.world, this);
+    }
+
     resetControls() {
         this.setControl('up', false);
         this.setControl('down', false);

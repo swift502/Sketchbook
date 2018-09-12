@@ -11,7 +11,7 @@ class Default {
 }
 
 class FollowCharacter {
-    constructor(character, targetCharacter, stopDistance = 2) {
+    constructor(character, targetCharacter, stopDistance = 1.3) {
         this.character = character;
         this.targetCharacter = targetCharacter;
         this.stopDistance = stopDistance;

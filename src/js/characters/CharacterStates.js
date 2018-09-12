@@ -11,9 +11,13 @@ class DefaultState {
 
         this.character.rotationSimulator.damping = this.character.defaultRotationSimulatorDamping;
         this.character.rotationSimulator.mass = this.character.defaultRotationSimulatorMass;
+
+        this.timer = 0;
     }
 
-    update(timeStep) {}
+    update(timeStep) {
+        this.timer += timeStep;
+    }
 
     changeState() {}
 
@@ -58,6 +62,7 @@ class Idle extends DefaultState {
     }
 
     update(timeStep) {
+        super.update(timeStep);
     
         this.character.setVelocityTarget(0);
         this.character.update(timeStep);
@@ -91,6 +96,8 @@ class Walk extends DefaultState {
     }
 
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(0.8);
         this.character.update(timeStep);
@@ -131,6 +138,8 @@ class Sprint extends DefaultState {
     }
 
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(1.4);
         this.character.update(timeStep);
@@ -164,14 +173,13 @@ class StartWalkForward extends DefaultState {
 
         this.character.velocitySimulator.mass = 30;
     
-        let duration = character.setAnimation('start_forward', 0.1);
-        this.time = duration;
-        this.timer = 0;
+        this.animationLength = character.setAnimation('start_forward', 0.1);
     }
 
     update(timeStep) {
-        this.timer += timeStep;
-        if(this.timer > this.time - timeStep) this.character.setState(Walk);
+        super.update(timeStep);
+
+        if(this.timer > this.animationLength - timeStep) this.character.setState(Walk);
     
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(0.8);
@@ -207,14 +215,13 @@ class EndWalk extends DefaultState {
 
         super(character);
 
-        let duration = character.setAnimation('stop', 0.1);
-        this.time = duration;
-        this.timer = 0;
+        this.animationLength = character.setAnimation('stop', 0.1);
     }
 
     update(timeStep) {
-        this.timer += timeStep;
-        if(this.timer > this.time - timeStep) {
+        super.update(timeStep);
+
+        if(this.timer > this.animationLength - timeStep) {
     
             this.character.setState(Idle);
         }
@@ -254,12 +261,13 @@ class JumpIdle extends DefaultState {
         this.character.velocitySimulator.mass = 100;
     
         this.animationLength = this.character.setAnimation('jump_idle', 0.1);
-        this.timer = 0;
     
         this.alreadyJumped = false;
     }
 
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         // Move in air
         if(this.timer > 0.3) {
@@ -268,7 +276,6 @@ class JumpIdle extends DefaultState {
         this.character.update(timeStep);
 
         //Physically jump
-        this.timer += timeStep;
         if(this.timer > 0.3 && !this.alreadyJumped) {
             this.character.jump();
             this.alreadyJumped = true;
@@ -298,12 +305,13 @@ class JumpRunning extends DefaultState {
         this.character.velocitySimulator.mass = 100;
     
         this.animationLength = this.character.setAnimation('jump_running', 0.1);
-        this.timer = 0;
     
         this.alreadyJumped = false;
     }
 
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         // Move in air
         if(this.timer > 0.2) {
@@ -312,7 +320,6 @@ class JumpRunning extends DefaultState {
         this.character.update(timeStep);
     
         //Physically jump
-        this.timer += timeStep;
         if(this.timer > 0.2 && !this.alreadyJumped) {
             this.character.jump();
             this.alreadyJumped = true;
@@ -345,6 +352,8 @@ class Falling extends DefaultState {
     }
 
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(this.anyDirection() ? 0.8 : 0);
         this.character.update(timeStep);
@@ -372,7 +381,6 @@ class DropIdle extends DefaultState {
         this.character.velocitySimulator.mass = 15;
 
         this.animationLength = this.character.setAnimation('drop_idle', 0.1);
-        this.timer = 0;
         
         if(this.anyDirection()) {
             this.character.setState(StartWalkForward);
@@ -380,11 +388,12 @@ class DropIdle extends DefaultState {
     }
 
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(0);
         this.character.update(timeStep);
     
-        this.timer += timeStep;
         if(this.timer > this.animationLength - timeStep) {
             this.character.setState(Idle);
         }
@@ -411,15 +420,15 @@ class DropRunning extends DefaultState {
         super(character);
 
         this.animationLength = this.character.setAnimation('drop_running', 0.1);
-        this.timer = 0;
     }
     
     update(timeStep) {
+        super.update(timeStep);
+
         this.character.setGlobalDirectionGoal();
         this.character.setVelocityTarget(0.8);
         this.character.update(timeStep);
     
-        this.timer += timeStep;
         if(this.timer > this.animationLength - timeStep) {
             this.character.setState(Walk);
         }

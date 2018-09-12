@@ -1,7 +1,7 @@
 /* eslint-disable no-var, no-unused-vars*/
 
 import * as THREE from 'three';
-import { Pass } from './EffectComposer';
+import { Pass } from './Pass';
 
 /**
  * @author alteredq / http://alteredqualia.com/

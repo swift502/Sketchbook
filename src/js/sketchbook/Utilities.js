@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import _ from '../lib/utils/lodash';
 
 export class Utilities {
     //
@@ -128,6 +129,10 @@ export class Utilities {
         }
 
         return arr;
+    }
+
+    static setDefaults(options, defaults){
+        return _.defaults({}, _.clone(options), defaults);
     }
 
     static getGlobalProperties(prefix = '') {

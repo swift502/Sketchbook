@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-export class CameraControls {
+export class CameraController {
+
     constructor(camera) {
 
         this.camera = camera;
@@ -13,8 +14,12 @@ export class CameraControls {
         this.onMouseDownPosition = new THREE.Vector2();
         this.onMouseDownTheta = this.theta;
         this.onMouseDownPhi = this.phi;
-    
-        document.addEventListener( 'mousedown', this.onMouseDown, false );
+        
+        this.boundOnMouseDown = evt => this.onMouseDown(evt);
+        this.boundOnMouseMove = evt => this.onMouseMove(evt);
+        this.boundOnMouseUp = evt => this.onMouseUp(evt);
+
+        document.addEventListener( "mousedown", this.boundOnMouseDown, false );
     }
 
     onMouseDown(event) {
@@ -22,8 +27,8 @@ export class CameraControls {
         this.onMouseDownTheta = this.theta;
         this.onMouseDownPhi = this.phi;
 
-        document.addEventListener( 'mousemove', this.onMouseMove, false );
-        document.addEventListener( 'mouseup', this.onMouseUp, false );
+        document.addEventListener( "mousemove", this.boundOnMouseMove, false );
+        document.addEventListener( "mouseup", this.boundOnMouseUp, false );
     }
 
     onMouseMove(event) {
@@ -33,8 +38,8 @@ export class CameraControls {
     }
 
     onMouseUp(event) {
-        document.removeEventListener( 'mousemove', this.onMouseMove, false );
-        document.removeEventListener( 'mouseup', this.onMouseUp, false );
+        document.removeEventListener( "mousemove", this.boundOnMouseMove, false );
+        document.removeEventListener( "mouseup", this.boundOnMouseUp, false );
     }
 
     setRadius(value) {
