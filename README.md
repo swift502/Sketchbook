@@ -1,5 +1,5 @@
 <p align="center">
-   <a href="https://swift502.github.io/Sketchbook"><img src="https://i.imgur.com/i4Kdb5H.png"></a>
+   <a href="https://swift502.github.io/Sketchbook"><img src="https://i.imgur.com/5J4OaUm.png"></a>
    <br>
    Play it here! <a href="https://swift502.github.io/Sketchbook">swift502.github.io/Sketchbook</a>
 </p>
