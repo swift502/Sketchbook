@@ -4,7 +4,6 @@ import * as CANNON from 'cannon';
 import { Utilities as Utils } from '../sketchbook/Utilities';
 
 import * as Springs from '../simulation/SpringExports';
-import { FBXLoader } from '../lib/utils/FBXLoader';
 import { Controls } from '../sketchbook/Controls';
 import { CharacterAI } from './CharacterAI';
 import { CharacterStates } from './CharacterStates';
@@ -27,8 +26,7 @@ export class Character extends THREE.Object3D {
         this.modelOffset = new THREE.Vector3();
 
         // Default model
-        const loader = new FBXLoader();
-        loader.load('resources/models/game_man/game_man.fbx', function (object) {
+        this.world.loader.load('resources/models/game_man/game_man.fbx', function (object) {
 
             object.traverse( function ( child ) {
                 if ( child.isMesh ) {

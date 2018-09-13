@@ -3100,7 +3100,7 @@ Object.assign(BinaryParser.prototype, {
 
         var version = reader.getUint32();
 
-        console.log('FBXLoader: FBX binary version: ' + version);
+        // console.log('FBXLoader: FBX binary version: ' + version);
 
         var allNodes = new FBXTree();
 
@@ -3376,12 +3376,6 @@ Object.assign(BinaryParser.prototype, {
                     }
 
                 }
-
-                // if (window.Zlib === undefined) {
-
-                    // console.error('FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js');
-
-                // }
 
                 var inflate = new Zlib.Inflate(new Uint8Array(reader.getArrayBuffer(compressedLength))); // eslint-disable-line no-undef
                 var reader2 = new BinaryReader(inflate.decompress().buffer);

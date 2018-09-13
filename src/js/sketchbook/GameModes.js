@@ -87,7 +87,7 @@ class FreeCameraControls {
         let up      = new THREE.Vector3(  0,  1,  0 ).applyQuaternion(this.camera.quaternion);
         let down    = new THREE.Vector3(  0, -1,  0 ).applyQuaternion(this.camera.quaternion);
         
-        let speed = this.movementSpeed * (this.controls.fast.value ? 3 : 1);
+        let speed = this.movementSpeed * (this.controls.fast.value ? 5 : 1);
     
         this.sketchbook.cameraController.target.add(forward.multiplyScalar(speed * this.controls.forward.floatValue));
         this.sketchbook.cameraController.target.add(back.multiplyScalar(speed * this.controls.back.floatValue));

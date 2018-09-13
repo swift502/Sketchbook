@@ -1,28 +1,30 @@
 {
-  "name": "three-sketchbook",
+  "name": "Sketchbook",
   "version": "1.0.0",
   "description": "A test ground for various custom 3D features. Built with [three.js](https://github.com/mrdoob/three.js).",
   "main": "index.html",
   "scripts": {
-    "build": "webpack"
+    "watch": "webpack --config webpack.dev.js --watch",
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swift502/three-sketchbook.git"
+    "url": "git+https://github.com/swift502/sketchbook.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/swift502/three-sketchbook/issues"
+    "url": "https://github.com/swift502/sketchbook/issues"
   },
-  "homepage": "https://github.com/swift502/three-sketchbook#readme",
+  "homepage": "https://github.com/swift502/sketchbook#readme",
   "devDependencies": {
     "@types/dat.gui": "^0.6.0",
     "@types/stats": "^0.16.30",
     "@types/three": "^0.91.3",
     "eslint": "^5.5.0",
     "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0"
+    "webpack-cli": "^3.1.0",
+    "webpack-merge": "^4.1.4"
   },
   "dependencies": {}
 }

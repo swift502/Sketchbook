@@ -570,7 +570,7 @@ export class World {
         // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, 0), 0.3, 0.3);
     
         let scope = this;
-    
+
         this.loader.load('resources/models/credits_sign/sign.fbx', function ( object ) {
     
             object.traverse( function ( child ) {
@@ -607,12 +607,18 @@ export class World {
                     });
                 }
             } );
+
             object.translateZ(4.5);
             object.translateX(-0.5);
             object.rotateY(Math.PI/2);
-            scope.scene.add( object );
-            scope.addParallelBox(0, new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
-                new CANNON.Vec3(0.3, 0.45 ,0.1), 0.3, false);
+            scope.graphicsWorld.add( object );
+            scope.createBoxPrimitive({
+                mass: 0,
+                position: new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
+                size: new CANNON.Vec3(0.3, 0.45 ,0.1),
+                friction: 0.3,
+                visible: false
+            });
     
             let object2 = object.clone();
             object2.scale.multiplyScalar(1.7);
@@ -629,9 +635,14 @@ export class World {
                 }
             });
             object2.translateZ(1);
-            scope.scene.add(object2);
-            scope.addParallelBox(0, new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
-                new CANNON.Vec3(0.4, 0.58 ,0.16), 0.3, false);
+            scope.graphicsWorld.add(object2);
+            scope.createBoxPrimitive({
+                mass: 0,
+                position: new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
+                size: new CANNON.Vec3(0.4, 0.58 ,0.16),
+                friction: 0.3,
+                visible: false
+            });
         });
     }
 }
