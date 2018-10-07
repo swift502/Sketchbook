@@ -3,7 +3,7 @@ import { SimulatorBase, spring } from './SimulatorBase';
 
 export class RelativeSpringSimulator extends SimulatorBase {
 
-    constructor(fps, mass, damping) {
+    constructor(fps, mass, damping, startPosition = 0, startVelocity = 0) {
 
         //Construct base
         super(fps);
@@ -19,6 +19,14 @@ export class RelativeSpringSimulator extends SimulatorBase {
 
         // Last lerped position for relative output
         this.lastLerp = 0;
+
+        // Initialize cache by pushing two frames
+        for (let i = 0; i < 2; i++) {
+            this.cache.push({
+                position: startPosition,
+                velocity: startVelocity
+            });
+        }
     }
 
     /**
@@ -43,44 +51,13 @@ export class RelativeSpringSimulator extends SimulatorBase {
     }
 
     /**
-     * Generates frames between last simulation call and the current one
-     * @param {timeStep} timeStep 
-     */
-    generateFrames(timeStep) {
-
-        // Initialize cache by pushing two frames
-        if(this.cache.length == 0) {
-            for (let i = 0; i < 2; i++) {
-                this.cache.push({
-                    position: 0,
-                    velocity: 0
-                });
-            }
-        }
-
-        // Update cache
-        // Find out how many frames needs to be generated
-        let totalTimeStep = this.offset + timeStep;
-        let framesToGenerate = Math.floor(totalTimeStep / this.frameTime);
-        this.offset = totalTimeStep % this.frameTime;
-
-        // Generate simulation frames
-        if(framesToGenerate > 0) {
-            for (let i = 0; i < framesToGenerate; i++) {
-                this.cache.push(this.getFrame(i + 1 == framesToGenerate));
-            }
-            this.cache = this.cache.slice(-2);
-        }
-    }
-
-    /**
      * Gets another simulation frame
      */
-    getFrame(lastFrame) {
+    getFrame(isLastFrame) {
 
         let newFrame = Object.assign({}, this.lastFrame());
 
-        if(lastFrame) {
+        if(isLastFrame) {
             // Reset position
             newFrame.position = 0;
             // Transition to next frame

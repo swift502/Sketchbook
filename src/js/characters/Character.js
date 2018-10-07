@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 import { Utilities as Utils } from '../sketchbook/Utilities';
+import { Springs } from '../simulation/Springs';
 
-import * as Springs from '../simulation/SpringExports';
 import { Controls } from '../sketchbook/Controls';
 import { CharacterAI } from './CharacterAI';
 import { CharacterStates } from './CharacterStates';

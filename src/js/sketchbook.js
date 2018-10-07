@@ -6,4 +6,4 @@ export { Controls } from './sketchbook/Controls';
 export { GameModes } from './sketchbook/GameModes';
 export { Utilities } from './sketchbook/Utilities';
 export { World } from './sketchbook/World';
-export * from './simulation/SpringExports';
+export * from './simulation/Springs';

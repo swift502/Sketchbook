@@ -3,7 +3,7 @@ import { SimulatorBase, springV } from './SimulatorBase';
 
 export class VectorSpringSimulator extends SimulatorBase {
 
-    constructor(fps, mass, damping) {
+    constructor(fps, mass, damping, startPosition = new THREE.Vector3(), startVelocity = new THREE.Vector3()) {
 
         //Construct base
         super(fps);
@@ -16,6 +16,14 @@ export class VectorSpringSimulator extends SimulatorBase {
         this.target = new THREE.Vector3();
         this.mass = mass;
         this.damping = damping;
+
+        // Initialize cache by pushing two frames
+        for (let i = 0; i < 2; i++) {
+            this.cache.push({
+                position: startPosition,
+                velocity: startVelocity
+            });
+        }
     }
     
     /**
@@ -35,40 +43,9 @@ export class VectorSpringSimulator extends SimulatorBase {
     }
 
     /**
-     * Generates frames between last simulation call and the current one
-     * @param {timeStep} timeStep 
-     */
-    generateFrames(timeStep) {
-
-        // Initialize cache by pushing two frames
-        if(this.cache.length == 0) {
-            for (let i = 0; i < 2; i++) {
-                this.cache.push({
-                    position: new THREE.Vector3(),
-                    velocity: new THREE.Vector3()
-                });
-            }
-        }
-
-        // Update cache
-        // Find out how many frames needs to be generated
-        let totalTimeStep = this.offset + timeStep;
-        let framesToGenerate = Math.floor(totalTimeStep / this.frameTime);
-        this.offset = totalTimeStep % this.frameTime;
-
-        // Generate simulation frames
-        if(framesToGenerate > 0) {
-            for (let i = 0; i < framesToGenerate; i++) {
-                this.cache.push(this.getFrame());
-            }
-            this.cache = this.cache.slice(-2);
-        }
-    }
-
-    /**
      * Gets another simulation frame
      */
-    getFrame() {
+    getFrame(isLastFrame) {
         // Deep clone data from previous frame
         let newSpring = {
             position: this.lastFrame().position.clone(),

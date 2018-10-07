@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import * as Shaders from '../lib/shaders/ShaderExports';
 
 import { CameraController } from './CameraController';
 import { Character } from '../characters/Character';
 import { GameModes } from './GameModes';
 import { Utilities as Utils } from './Utilities';
+import { Shaders } from '../lib/shaders/Shaders';
 
 import { Detector } from '../lib/utils/Detector';
 import { FBXLoader } from '../lib/utils/FBXLoader';
@@ -327,7 +327,7 @@ export class World {
      * Adds character to sketchbook
      * @param {Character} character 
      */
-    SpawnCharacter(options) {
+    SpawnCharacter(options = []) {
 
         let defaults = {
             position: new THREE.Vector3()

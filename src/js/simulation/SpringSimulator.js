@@ -3,7 +3,7 @@ import { SimulatorBase, spring } from './SimulatorBase';
 
 export class SpringSimulator extends SimulatorBase {
 
-    constructor(fps, mass, damping) {
+    constructor(fps, mass, damping, startPosition = 0, startVelocity = 0) {
         
         // Construct base
         super(fps);
@@ -16,6 +16,14 @@ export class SpringSimulator extends SimulatorBase {
         this.target = 0;
         this.mass = mass;
         this.damping = damping;
+
+        // Initialize cache by pushing two frames
+        for (let i = 0; i < 2; i++) {
+            this.cache.push({
+                position: startPosition,
+                velocity: startVelocity
+            });
+        }
     }
 
     /**
@@ -34,40 +42,9 @@ export class SpringSimulator extends SimulatorBase {
     }
 
     /**
-     * Generates frames between last simulation call and the current one
-     * @param {timeStep} timeStep 
-     */
-    generateFrames(timeStep) {
-
-        // Initialize cache by pushing two frames
-        if(this.cache.length == 0) {
-            for (let i = 0; i < 2; i++) {
-                this.cache.push({
-                    position: 0,
-                    velocity: 0
-                });
-            }
-        }
-
-        // Update cache
-        // Find out how many frames needs to be generated
-        let totalTimeStep = this.offset + timeStep;
-        let framesToGenerate = Math.floor(totalTimeStep / this.frameTime);
-        this.offset = totalTimeStep % this.frameTime;
-
-        // Generate simulation frames
-        if(framesToGenerate > 0) {
-            for (let i = 0; i < framesToGenerate; i++) {
-                this.cache.push(this.getFrame());
-            }
-            this.cache = this.cache.slice(-2);
-        }
-    }
-
-    /**
      * Gets another simulation frame
      */
-    getFrame() {
+    getFrame(isLastFrame) {
         return spring(this.lastFrame().position, this.target, this.lastFrame().velocity, this.mass, this.damping);
     }
 }
