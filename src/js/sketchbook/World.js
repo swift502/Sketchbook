@@ -392,7 +392,7 @@ export class World {
         });
     }
     
-    createBoxPrimitive(options) {
+    createBoxPrimitive(options = []) {
     
         let defaults = {
             mass: 1,
@@ -437,7 +437,7 @@ export class World {
         return pair;
     }
     
-    createSpherePrimitive(options) {
+    createSpherePrimitive(options = []) {
     
         let defaults = {
             mass: 1,
@@ -481,7 +481,7 @@ export class World {
         return pair;
     }
     
-    createCapsulePrimitive(options) {
+    createCapsulePrimitive(options = []) {
     
         let defaults = {
             mass: 1,

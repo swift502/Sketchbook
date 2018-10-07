@@ -7,7 +7,8 @@ module.exports = {
     resolve: {
         alias: {
             'three': path.resolve(__dirname, 'src/js/lib/core/three.js'),
-            'cannon': path.resolve(__dirname, 'src/js/lib/core/cannon.js')
+            'cannon': path.resolve(__dirname, 'src/js/lib/core/cannon.js'),
+            'lodash': path.resolve(__dirname, 'src/js/lib/utils/lodash')
         }
     },
     output: {

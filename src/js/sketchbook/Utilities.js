@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import _ from '../lib/utils/lodash';
+import _ from 'lodash';
 
 export class Utilities {
     //
