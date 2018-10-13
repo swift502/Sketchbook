@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import _ from 'lodash';
 
 export class Utilities {
-    //
-    // Geometry
-    //
+
+    //#region Geometry
+
     static createCapsuleGeometry(radius = 1, height = 2, N = 32) {
         const geometry = new THREE.Geometry();
         const TWOPI = Math.PI*2;
@@ -101,6 +101,10 @@ export class Utilities {
         return geometry;
     }
 
+    //#endregion
+
+    //#region Maths
+
     /**
      * Constructs a 2D matrix from first vector, replacing the Y axes with the global Y axis,
      * and applies this matrix to the second vector. Saves performance when compared to full 3D matrix application.
@@ -110,14 +114,48 @@ export class Utilities {
      */
     static appplyVectorMatrixXZ(a, b) {
         return new THREE.Vector3(
-            a.x * b.z + a.z * b.x, 0,
-            a.z * b.z + -a.x * b.x
+            (a.x * b.z + a.z * b.x) / 2, 0,
+            (a.z * b.z + -a.x * b.x) / 2
         );
     }
 
-    //
-    // Other
-    //
+    /**
+     * Finds an angle between two vectors
+     * @param {THREE.Vector3} v1 
+     * @param {THREE.Vector3} v2 
+     */
+    static getAngleBetweenVectors(v1, v2, normal = new THREE.Vector3(0, 1, 0), dot_treshold = 0.0005) {
+
+        let angle;
+        let dot = v1.dot(v2);
+
+        // If dot is close to 1, we'll round angle to zero
+        if (dot > 1 - dot_treshold) {
+            angle = 0;
+        }
+        else {
+            // Dot too close to -1
+            if(dot < -1 + dot_treshold) {
+                angle = Math.PI / 2;
+            }
+            else {
+                // Get angle difference in radians
+                angle = Math.acos(dot);
+            }   
+
+            // Get vector pointing up or down
+            let cross = new THREE.Vector3().crossVectors(v1, v2);
+            // Compare cross with normal to find out direction
+            if (normal.dot(cross) < 0) {
+                angle = -angle;
+            }
+        }
+
+        return angle;
+    }
+    //#endregion
+
+    //#region Miscellaneous
 
     static createArray(length) {
         let arr = new Array(length || 0),
@@ -143,4 +181,6 @@ export class Utilities {
         }
         return keyValues; // build the string
     }
+
+    //#endregion
 }

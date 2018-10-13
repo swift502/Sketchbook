@@ -21,8 +21,8 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
     * Custom damped-spring simulation
 * Characters
     * Third-person camera
-    * Raycast character controller with capsule collision
-    * State based animation system
+    * Raycast character controller with capsule collisions
+    * Flexible state based animation system
     * Character AI
 
 #### Not yet implemented

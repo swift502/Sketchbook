@@ -70,12 +70,13 @@ export class Character extends THREE.Object3D {
         // Movement
         this.acceleration = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
+        this.simulatedVelocityInfluence = new THREE.Vector3();
         this.velocityTarget = new THREE.Vector3();
         // Velocity spring simulator
         this.defaultVelocitySimulatorDamping = 0.8;
         this.defaultVelocitySimulatorMass = 50;
         this.velocitySimulator = new Springs.VectorSpringSimulator(60, this.defaultVelocitySimulatorMass, this.defaultVelocitySimulatorDamping);
-        this.moveSpeed = 4;
+        this.moveSpeed = 8;
 
         // Rotation
         this.angularVelocity = 0;
@@ -108,20 +109,13 @@ export class Character extends THREE.Object3D {
 
         // Physics
         // Player Capsule
-        const characterMass = 1;
-        const initPosition = new CANNON.Vec3(0, 0, 0);
-        const characterHeight = 0.5;
-        const characterRadius = 0.25;
-        const characterSegments = 8;
-        const characterFriction = 0;
-        const characterCollisionGroup = 2;
         this.characterCapsule = world.createCapsulePrimitive({
-            mass: characterMass,
-            position: initPosition,
-            height: characterHeight,
-            radius: characterRadius,
-            segments: characterSegments,
-            friction: characterFriction,
+            mass: 1,
+            position: new CANNON.Vec3(0, 0, 0),
+            height: 0.5,
+            radius: 0.25,
+            segments: 8,
+            friction: 0,
             visible: false
         });
         this.characterCapsule.visual.visible = false;
@@ -130,7 +124,7 @@ export class Character extends THREE.Object3D {
         this.characterCapsule.physical.character = this;
 
         // Move character to different collision group for raycasting
-        this.characterCapsule.physical.collisionFilterGroup = characterCollisionGroup;
+        this.characterCapsule.physical.collisionFilterGroup = 2;
 
         // Disable character rotation
         this.characterCapsule.physical.fixedRotation = true;
@@ -143,6 +137,10 @@ export class Character extends THREE.Object3D {
         this.raySafeOffset = 0.03;
         this.wantsToJump = false;
         this.justJumped = false;
+        this.initJumpSpeed = -1;
+        this.lastGroundImpactData = {
+            velocity: new CANNON.Vec3()
+        };
 
         // Ray cast debug
         const boxGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
@@ -169,10 +167,28 @@ export class Character extends THREE.Object3D {
             
             // Jumping
             if(this.character.wantsToJump && this.character.rayHasHit) {
-                this.character.characterCapsule.physical.velocity.y += 4;
-                this.character.characterCapsule.physical.position.y += this.character.raySafeOffset;
+
+                // If initJumpSpeed is set
+                if(this.character.initJumpSpeed > -1) {
+                    
+                    // Flatten velocity
+                    this.velocity.y = 0;
+                    
+                    // Velocity needs to be at least as much as initJumpSpeed
+                    if(this.velocity.lengthSquared() < this.character.initJumpSpeed ** 2) {
+                        this.velocity.normalize();
+                        this.velocity.mult(this.character.initJumpSpeed, this.velocity);
+                    }
+                }
+
+                // Add positive vertical velocity
+                this.velocity.y += 4;
+                //Move above ground
+                this.position.y += this.character.raySafeOffset;
+                // Set flag for postStep and character states
                 this.character.justJumped = true;
             }
+            //Reset flag
             this.character.wantsToJump = false;
         };
 
@@ -181,9 +197,15 @@ export class Character extends THREE.Object3D {
         
             // Player ray casting
             // Get velocities
-            let simulatedVelocity = new CANNON.Vec3().copy(this.velocity);
-            let arcadeVelocity = this.character.velocity.clone().multiplyScalar(this.character.moveSpeed);
+            let simulatedVelocity = new THREE.Vector3().copy(this.velocity);
+            let arcadeVelocity = new THREE.Vector3().copy(this.character.velocity).multiplyScalar(this.character.moveSpeed);
             arcadeVelocity = Utils.appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
+
+            let newVelocity = new THREE.Vector3(
+                THREE.Math.lerp(arcadeVelocity.x, simulatedVelocity.x, this.character.simulatedVelocityInfluence.x),
+                THREE.Math.lerp(arcadeVelocity.y, simulatedVelocity.y, this.character.simulatedVelocityInfluence.y),
+                THREE.Math.lerp(arcadeVelocity.z, simulatedVelocity.z, this.character.simulatedVelocityInfluence.z),
+            );
 
             // If just jumped, don't stick to ground
             if(this.character.justJumped) this.character.justJumped = false;
@@ -192,12 +214,14 @@ export class Character extends THREE.Object3D {
                 if(this.character.rayHasHit) {
                     if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
                     this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
-                    this.velocity.set(arcadeVelocity.x, 0, arcadeVelocity.z);
+                    this.velocity.set(newVelocity.x, 0, newVelocity.z);
                 }
                 else {
-                    // If we're in air, leave vertical velocity to physics
+                    // If we're in air
                     if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
-                    this.velocity.set(arcadeVelocity.x, simulatedVelocity.y, arcadeVelocity.z);
+                   
+                    this.velocity.copy(newVelocity);
+                    this.character.lastGroundImpactData.velocity.copy(this.velocity);
                 }
             }
         };
@@ -210,6 +234,10 @@ export class Character extends THREE.Object3D {
         this.modelContainer.add(this.characterModel);
     
         this.mixer = new THREE.AnimationMixer(this.characterModel);
+    }
+
+    setSimulatedVelocityInfluence(x, y = x, z = x) {
+        this.simulatedVelocityInfluence.set(x, y, z);
     }
     
     setModelOffset(offset) {
@@ -232,12 +260,12 @@ export class Character extends THREE.Object3D {
         this.characterCapsule.physical.position = new CANNON.Vec3(x, y, z);
     }
     
-    setVelocity(velZ, velX = 0) {
+    setArcadeVelocity(velZ, velX = 0) {
         this.velocity.z = velZ;
         this.velocity.x = velX;
     }
     
-    setVelocityTarget(velZ, velX = 0) {
+    setArcadeVelocityTarget(velZ, velX = 0) {
         this.velocityTarget.z = velZ;
         this.velocityTarget.x = velX;
     }
@@ -291,25 +319,28 @@ export class Character extends THREE.Object3D {
     }
     
     
-    update(timeStep, parameters) {
+    update(timeStep, options) {
     
-        //Default values
-        if(parameters == undefined) parameters = {};
-        if(parameters.SpringRotation == undefined) parameters.SpringRotation = true;
-        if(parameters.SpringVelocity == undefined) parameters.SpringVelocity = true;
-        if(parameters.rotateModel == undefined) parameters.rotateModel = true;
-        if(parameters.updateAnimation == undefined) parameters.updateAnimation = true;
-    
+        let defaults = {
+            SpringRotation: true,
+            RotationMultiplier: 1,
+            SpringVelocity: true,
+            rotateModel:  true,
+            updateAnimation: true
+        };
+        options = Utils.setDefaults(options, defaults);
+
         this.visuals.position.copy(this.modelOffset);
-    
-        if(parameters.SpringVelocity)  this.SpringMovement(timeStep);
-        if(parameters.SpringRotation)  this.SpringRotation(timeStep);
-        if(parameters.rotateModel)     this.rotateModel();
-        if(parameters.updateAnimation) this.mixer.update(timeStep);
+        if(options.SpringVelocity)  this.SpringMovement(timeStep);
+        if(options.SpringRotation)  this.SpringRotation(timeStep, options.RotationMultiplier);
+        if(options.rotateModel)     this.rotateModel();
+        if(options.updateAnimation) this.mixer.update(timeStep);
         
-        this.position.set(this.characterCapsule.physical.interpolatedPosition.x,
+        this.position.set(
+            this.characterCapsule.physical.interpolatedPosition.x,
             this.characterCapsule.physical.interpolatedPosition.y - this.height/2,
-            this.characterCapsule.physical.interpolatedPosition.z);
+            this.characterCapsule.physical.interpolatedPosition.z
+        );
     }
     
     setAnimation(clipName, fadeIn) {
@@ -335,78 +366,61 @@ export class Character extends THREE.Object3D {
         this.acceleration.copy(this.velocitySimulator.velocity);
     }
     
-    SpringRotation(timeStep) {
+    SpringRotation(timeStep, RotationMultiplier) {
     
         //Spring rotation
         //Figure out angle between current and target orientation
-        let normal = new THREE.Vector3(0, 1, 0);
-        let dot = this.orientation.dot(this.orientationTarget);
-    
+        let angle = Utils.getAngleBetweenVectors(this.orientation, this.orientationTarget);
 
-        let angle = 0;
-
-        // If dot is close to 1, we'll round angle to zero
-        let dot_treshold = 0.9995;
-        if (dot > dot_treshold) {
-            angle = 0;
-        }
-        // Dot too close to -1
-        else if(dot < -dot_treshold) {
-            angle = Math.PI / 2;
-        }
-        else {
-            // Get angle difference in radians
-            angle = Math.acos(dot);
-            // Get vector pointing up or down
-            let cross = new THREE.Vector3().crossVectors(this.orientation, this.orientationTarget);
-            // Compare cross with normal to find out direction
-            if (normal.dot(cross) < 0) {
-                angle = -angle;
-            }
-        }
-        
         // Simulator
-        this.rotationSimulator.target = angle;
+        this.rotationSimulator.target = angle * RotationMultiplier;
         this.rotationSimulator.simulate(timeStep);
         let rot = this.rotationSimulator.position;
     
-        // console.log(this.orientationTarget);
-    
         // Updating values
-        this.orientation.applyAxisAngle(normal, rot);
+        this.orientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), rot);
         this.angularVelocity = this.rotationSimulator.velocity;
     
     }
-    
-    setGlobalDirectionGoal() {
-        
+
+    getLocalMovementDirection() {
         const positiveX = this.controls.right.value ? -1 : 0;
         const negativeX = this.controls.left.value  ?  1 : 0;
         const positiveZ = this.controls.up.value    ?  1 : 0;
         const negativeZ = this.controls.down.value  ? -1 : 0;
         
-        const localDirection = new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
-        const flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z);
+        return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
+    }
     
-        // If no direction is pressed, set target as current orientation
-        // if(positiveX == 0 && negativeX == 0 && positiveZ == 0 && negativeZ == 0) {
-        if((localDirection.x == 0 && localDirection.y == 0 && localDirection.z == 0) ||
-           (flatViewVector.x == 0 && flatViewVector.y == 0 && flatViewVector.z == 0)) {
+    getCameraRelativeMovementVector() {
+        
+        const localDirection = this.getLocalMovementDirection();
+        const flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z);
+
+        return Utils.appplyVectorMatrixXZ(flatViewVector, localDirection);
+    }
+
+    setGlobalDirectionGoal() {
+        
+        let moveVector = this.getCameraRelativeMovementVector();
+
+        if(moveVector.x == 0 && moveVector.y == 0 && moveVector.z == 0) {
             this.setOrientationTarget(this.orientation);
         }
         else {
-            this.setOrientationTarget(Utils.appplyVectorMatrixXZ(flatViewVector, localDirection));
+            this.setOrientationTarget(moveVector);
         }
     }
     
     rotateModel() {
         this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
-        this.visuals.rotateX(this.acceleration.z * 3);
-        this.visuals.rotateZ(-this.angularVelocity * 2.3);
+        // this.visuals.rotateX(this.acceleration.z * 3);
+        // this.visuals.rotateZ(-this.angularVelocity * 2.3);
         this.visuals.position.setY(this.visuals.position.y + Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
     }
     
-    jump() {
+    jump(initJumpSpeed = -1) {
         this.wantsToJump = true;
+        this.initJumpSpeed = initJumpSpeed;
     }
 }
