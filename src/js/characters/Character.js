@@ -275,8 +275,9 @@ export class Character extends THREE.Object3D {
         this.orientationTarget.copy(vector).setY(0).normalize();
     }
     
-    setBehaviour(bhv) {
-        this.behaviour = bhv;
+    setBehaviour(behaviour) {
+        behaviour.character = this;
+        this.behaviour = behaviour;
     }
     
     setControl(key, value) {

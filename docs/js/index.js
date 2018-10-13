@@ -9,5 +9,8 @@ let player = world.SpawnCharacter();
 player.Control();
 
 // Spawn a friend
-// let bob = world.SpawnCharacter();
-// bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(bob, player));
+let bob = world.SpawnCharacter();
+bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
+
+let john = world.SpawnCharacter();
+john.setBehaviour(new Sketchbook.CharacterAI.Random());

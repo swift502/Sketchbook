@@ -371,20 +371,20 @@ export class World {
                 pair.physical.position.y = -1;
             }
     
-            if(pair.physical.position.x > 8) {	
-                pair.physical.position.x = -8;
+            if(pair.physical.position.x > 5) {	
+                pair.physical.position.x = -5;
             }
     
-            if(pair.physical.position.x < -8) {	
-                pair.physical.position.x = 8;
+            if(pair.physical.position.x < -5) {	
+                pair.physical.position.x = 5;
             }
     
-            if(pair.physical.position.z > 8) {	
-                pair.physical.position.z = -8;
+            if(pair.physical.position.z > 5) {	
+                pair.physical.position.z = -5;
             }
     
-            if(pair.physical.position.z < -8) {	
-                pair.physical.position.z = 8;
+            if(pair.physical.position.z < -5) {	
+                pair.physical.position.z = 5;
             }
     
             pair.visual.position.copy(pair.physical.interpolatedPosition);
@@ -543,31 +543,30 @@ export class World {
         // Stuff
         this.createBoxPrimitive({
             mass: 10,
-            position: new CANNON.Vec3(0, 2, 0),
-            size: new CANNON.Vec3(1,1,1),
+            position: new CANNON.Vec3(-4, 1, 0),
+            size: new CANNON.Vec3(1,0.5,4),
+            friction:0.3
+        });
+        this.createBoxPrimitive({
+            mass: 10,
+            position: new CANNON.Vec3(4, 2, 3),
+            size: new CANNON.Vec3(1,2,1),
+            friction:0.3
+        });
+
+        //planks 
+        this.createBoxPrimitive({
+            mass: 5,
+            position: new CANNON.Vec3(0, 5, 3),
+            size: new CANNON.Vec3(4,0.02,0.3),
             friction:0.3
         });
         this.createBoxPrimitive({
             mass: 5,
-            position: new CANNON.Vec3(3, 1, -3),
-            size: new CANNON.Vec3(0.5,0.5,0.5),
+            position: new CANNON.Vec3(-1, 3, -3),
+            size: new CANNON.Vec3(3,0.02,0.3),
             friction:0.3
         });
-        this.createBoxPrimitive({
-            mass: 3,
-            position: new CANNON.Vec3(-2.5, 1, -2.5),
-            size: new CANNON.Vec3(0.3,0.3,0.3),
-            friction:0.3
-        });
-    
-        // this.addParallelSphere(5, new CANNON.Vec3(1.5, 2, 1.5), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(1.5, 2, -1.5), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, -1.5), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, 1.5), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(0, 2, 1.5), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(0, 2, -1.5), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(1.5, 2, 0), 0.3, 0.3);
-        // this.addParallelSphere(5, new CANNON.Vec3(-1.5, 2, 0), 0.3, 0.3);
     
         let scope = this;
 

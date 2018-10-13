@@ -11,8 +11,7 @@ class Default {
 }
 
 class FollowCharacter {
-    constructor(character, targetCharacter, stopDistance = 1.3) {
-        this.character = character;
+    constructor(targetCharacter, stopDistance = 1.3) {
         this.targetCharacter = targetCharacter;
         this.stopDistance = stopDistance;
     }
@@ -39,24 +38,31 @@ class FollowCharacter {
 }
 
 class Random {
-    constructor(character, randomFrequency = 100) {
-        this.character = character;
+    constructor(randomFrequency = 100) {
         this.randomFrequency = randomFrequency;
     }
 
     update(timeStep) {
     
         let rndInt = Math.floor(Math.random() * this.randomFrequency);
-    
+        let rndBool = Math.random() > 0.5 ? true : false;
+
         if(rndInt == 0) {
             this.character.setViewVector(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
-            this.character.setOrientationTarget(this.character.viewVector);
+            // this.character.setOrientationTarget(this.character.viewVector);
+
+            this.character.setControl('up', true);
+            this.character.charState.update(timeStep);
+            this.character.setControl('up', false);
         }
-    
-        if(rndInt == 1) {
-            let rndBool = Math.random() > 0.5 ? true : false;
+        else if(rndInt == 1) {
             this.character.setControl('up', rndBool);
-            this.character.setControl('run',rndBool);
+        }
+        else if(rndInt == 2) {
+            this.character.setControl('run', rndBool);
+        }
+        else if(rndInt == 3) {
+            this.character.setControl('jump', rndBool);
         }
     
         this.character.charState.update(timeStep);
