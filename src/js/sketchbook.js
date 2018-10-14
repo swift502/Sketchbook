@@ -3,6 +3,7 @@ export { Character } from './characters/Character';
 export { CharacterAI } from './characters/CharacterAI';
 export { CharacterStates } from './characters/CharacterStates';
 export { Controls } from './sketchbook/Controls';
+export { FBXLoader } from './lib/utils/FBXLoader';
 export { GameModes } from './sketchbook/GameModes';
 export { Shaders } from './lib/shaders/Shaders';
 export { Springs } from './simulation/Springs';

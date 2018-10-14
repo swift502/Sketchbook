@@ -19,9 +19,12 @@ let john = world.SpawnCharacter();
 LoadBoxmanCharacterModel(john);
 john.setBehaviour(new Sketchbook.CharacterAI.Random());
 
+
+
 function LoadBoxmanCharacterModel(character) {
     // Default model
-    world.loader.load('../../build/models/game_man/game_man.fbx', function (object) {
+    let fbxLoader = new Sketchbook.FBXLoader();
+    fbxLoader.load('../../build/models/game_man/game_man.fbx', function (object) {
 
         object.traverse( function ( child ) {
             if ( child.isMesh ) {
@@ -42,6 +45,8 @@ function LoadBoxmanCharacterModel(character) {
 }
 
 function LoadExampleWorld() {
+
+    let fbxLoader = new Sketchbook.FBXLoader();
     
     // Ground
     world.createBoxPrimitive({
@@ -79,7 +84,7 @@ function LoadExampleWorld() {
         friction:0.3
     });
 
-    world.loader.load('../../build/models/credits_sign/sign.fbx', function ( object ) {
+    fbxLoader.load('../../build/models/credits_sign/sign.fbx', function ( object ) {
 
         object.traverse( function ( child ) {
             

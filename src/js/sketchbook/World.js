@@ -8,7 +8,6 @@ import { Utilities as Utils } from './Utilities';
 import { Shaders } from '../lib/shaders/Shaders';
 
 import { Detector } from '../lib/utils/Detector';
-import { FBXLoader } from '../lib/utils/FBXLoader';
 import { Stats } from '../lib/utils/Stats';
 import { GUI } from '../lib/utils/dat.gui';
 
@@ -261,7 +260,6 @@ export class World {
         //Initialization
         this.cameraController = new CameraController(this.camera);
         this.gameMode = new GameModes.FreeCameraControls(this);
-        this.loader = new FBXLoader();
 
         this.Render(this);
     }
