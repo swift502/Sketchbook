@@ -24,7 +24,7 @@ john.setBehaviour(new Sketchbook.CharacterAI.Random());
 function LoadBoxmanCharacterModel(character) {
     // Default model
     let fbxLoader = new Sketchbook.FBXLoader();
-    fbxLoader.load('../../build/models/game_man/game_man.fbx', function (object) {
+    fbxLoader.load('./build/models/game_man/game_man.fbx', function (object) {
 
         object.traverse( function ( child ) {
             if ( child.isMesh ) {
@@ -33,7 +33,7 @@ function LoadBoxmanCharacterModel(character) {
             }
             if( child.name == 'game_man') {
                 child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../../build/models/game_man/game_man.png'),
+                    map: new THREE.TextureLoader().load('./build/models/game_man/game_man.png'),
                     skinning: true
                 });
             }
@@ -84,7 +84,7 @@ function LoadExampleWorld() {
         friction:0.3
     });
 
-    fbxLoader.load('../../build/models/credits_sign/sign.fbx', function ( object ) {
+    fbxLoader.load('./build/models/credits_sign/sign.fbx', function ( object ) {
 
         object.traverse( function ( child ) {
             
@@ -94,7 +94,7 @@ function LoadExampleWorld() {
             }
             if(child.name == 'grass') {
                 child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../../build/models/credits_sign/grass.png'),
+                    map: new THREE.TextureLoader().load('./build/models/credits_sign/grass.png'),
                     transparent: true,
                     depthWrite: false,
                     side: THREE.DoubleSide
@@ -103,19 +103,19 @@ function LoadExampleWorld() {
             }
             if(child.name == 'sign') {
                 child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../../build/models/credits_sign/sign.png')
+                    map: new THREE.TextureLoader().load('./build/models/credits_sign/sign.png')
                 });
             }
             if(child.name == 'sign_shadow') {
                 child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../../build/models/credits_sign/sign_shadow.png'),
+                    map: new THREE.TextureLoader().load('./build/models/credits_sign/sign_shadow.png'),
                     transparent: true,
                 });
                 child.renderOrder = -1;
             }
             if(child.name == 'credits') {
                 child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../../build/models/credits_sign/credits2.png'),
+                    map: new THREE.TextureLoader().load('./build/models/credits_sign/credits2.png'),
                     transparent: true
                 });
             }
@@ -138,7 +138,7 @@ function LoadExampleWorld() {
         object2.traverse( function ( child ) {
             if(child.name == 'credits') {
                 child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../../build/models/credits_sign/credits.png'),
+                    map: new THREE.TextureLoader().load('./build/models/credits_sign/credits.png'),
                     transparent: true
                 });
                 child.translateZ(-0.2);
