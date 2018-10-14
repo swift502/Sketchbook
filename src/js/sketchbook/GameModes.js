@@ -126,7 +126,7 @@ class CharacterControls {
     }
     
     init() {
-        this.sketchbook.cameraController.setRadius(2);
+        this.sketchbook.cameraController.setRadius(1.8);//
         this.sketchbook.dirLight.target = this.character;
     }
     

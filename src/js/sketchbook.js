@@ -7,6 +7,4 @@ export { GameModes } from './sketchbook/GameModes';
 export { Shaders } from './lib/shaders/Shaders';
 export { Springs } from './simulation/Springs';
 export { Utilities } from './sketchbook/Utilities';
-export { Vector2 } from './lib/core/three';
-export { Vector3 } from './lib/core/three';
 export { World } from './sketchbook/World';

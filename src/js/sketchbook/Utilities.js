@@ -94,9 +94,10 @@ export class Utilities {
             }
             // if(i==(N/4)) break; // N/4 is when the center segments are solved
         }
-    
+
+        geometry.rotateX(Math.PI/2);
+        geometry.computeVertexNormals();
         geometry.computeFaceNormals();
-        // geometry.computeVertexNormals();
     
         return geometry;
     }

@@ -12,6 +12,9 @@ import { FBXLoader } from '../lib/utils/FBXLoader';
 import { Stats } from '../lib/utils/Stats';
 import { GUI } from '../lib/utils/dat.gui';
 
+import '../../css/dat.gui.css';
+import '../../css/main.css';
+
 export class World {
 
     constructor() {
@@ -517,7 +520,7 @@ export class World {
         physicalCapsule.addShape(cylinderShape, new CANNON.Vec3( 0, 0, 0));
     
         let visualCapsule = new THREE.Mesh(
-            Utils.createCapsuleGeometry(options.radius, options.height, options.segments).rotateX(Math.PI/2),
+            Utils.createCapsuleGeometry(options.radius, options.height, options.segments),
             new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true} )
         );
         visualCapsule.visible = options.visible;
@@ -528,121 +531,6 @@ export class World {
         };
     
         return pair;
-    }
-
-    LoadDefaultWorld() {
-    
-        // Ground
-        this.createBoxPrimitive({
-            mass: 0,
-            position: new CANNON.Vec3(0, -1, 0),
-            size: new CANNON.Vec3(5,1,5),
-            friction:0.3
-        });
-    
-        // Stuff
-        this.createBoxPrimitive({
-            mass: 10,
-            position: new CANNON.Vec3(-4, 1, 0),
-            size: new CANNON.Vec3(1,0.5,4),
-            friction:0.3
-        });
-        this.createBoxPrimitive({
-            mass: 10,
-            position: new CANNON.Vec3(4, 2, 3),
-            size: new CANNON.Vec3(1,2,1),
-            friction:0.3
-        });
-
-        //planks 
-        this.createBoxPrimitive({
-            mass: 5,
-            position: new CANNON.Vec3(0, 5, 3),
-            size: new CANNON.Vec3(4,0.02,0.3),
-            friction:0.3
-        });
-        this.createBoxPrimitive({
-            mass: 5,
-            position: new CANNON.Vec3(-1, 3, -3),
-            size: new CANNON.Vec3(3,0.02,0.3),
-            friction:0.3
-        });
-    
-        let scope = this;
-
-        this.loader.load('resources/models/credits_sign/sign.fbx', function ( object ) {
-    
-            object.traverse( function ( child ) {
-                
-                if ( child.isMesh ) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-                if(child.name == 'grass') {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('resources/models/credits_sign/grass.png' ),
-                        transparent: true,
-                        depthWrite: false,
-                        side: THREE.DoubleSide
-                    });
-                    child.castShadow = false;
-                }
-                if(child.name == 'sign') {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('resources/models/credits_sign/sign.png' )
-                    });
-                }
-                if(child.name == 'sign_shadow') {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('resources/models/credits_sign/sign_shadow.png' ),
-                        transparent: true,
-                    });
-                    child.renderOrder = -1;
-                }
-                if(child.name == 'credits') {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('resources/models/credits_sign/credits2.png' ),
-                        transparent: true
-                    });
-                }
-            } );
-
-            object.translateZ(4.5);
-            object.translateX(-0.5);
-            object.rotateY(Math.PI/2);
-            scope.graphicsWorld.add( object );
-            scope.createBoxPrimitive({
-                mass: 0,
-                position: new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
-                size: new CANNON.Vec3(0.3, 0.45 ,0.1),
-                friction: 0.3,
-                visible: false
-            });
-    
-            let object2 = object.clone();
-            object2.scale.multiplyScalar(1.7);
-            object2.traverse( function ( child ) {
-                if(child.name == 'credits') {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('resources/models/credits_sign/credits.png' ),
-                        transparent: true
-                    });
-                    child.translateZ(-0.2);
-                }
-                if(child.name == 'sign') {
-                    child.translateZ(-0.2);
-                }
-            });
-            object2.translateZ(1);
-            scope.graphicsWorld.add(object2);
-            scope.createBoxPrimitive({
-                mass: 0,
-                position: new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
-                size: new CANNON.Vec3(0.4, 0.58 ,0.16),
-                friction: 0.3,
-                visible: false
-            });
-        });
     }
 }
 

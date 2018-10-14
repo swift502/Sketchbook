@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Character } from "./Character";
 import { Utilities as Utils } from '../sketchbook/Utilities';
-import { runInThisContext } from 'vm';
 
 //
 // Default state
@@ -57,17 +56,20 @@ class DefaultState {
     }
 
     animationEnded(timeStep) {
-        if(this.animationLength == undefined) {
-            console.log(this.constructor.name + 'Error: Set this.animationLength in state constructor!');
-            return false;
+        if(this.character.mixer != undefined) {
+            if(this.animationLength == undefined) {
+                console.error(this.constructor.name + 'Error: Set this.animationLength in state constructor!');
+                return false;
+            }
+            else {
+                return this.timer > this.animationLength - timeStep;
+            }
         }
-        else {
-            return this.timer > this.animationLength - timeStep;
-        }
+        else return true;
     }
 
     setAppropriateDropState() {
-        if(this.character.lastGroundImpactData.velocity.y < -8) {
+        if(this.character.lastGroundImpactData.velocity.y < -6) {
             this.character.setState(DropRolling);
         }
         else if(this.anyDirection()) {

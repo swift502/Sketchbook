@@ -16,56 +16,38 @@ export class Character extends THREE.Object3D {
 
         super();
 
-        // Save "this" for nested functions
-        const scope = this;
-    
         this.world = world;
 
         // Geometry
         this.height = 1;
         this.modelOffset = new THREE.Vector3();
 
+        // The visuals group is centered for easy character tilting
+        this.visuals = new THREE.Group();
+        this.add(this.visuals);
+
+        // Model container is used to reliably ground the character, as animation can alter the position of the model itself
+        this.modelContainer = new THREE.Group();
+        this.modelContainer.position.y = -this.height/2;
+        this.visuals.add(this.modelContainer);//
+
         // Default model
-        this.world.loader.load('resources/models/game_man/game_man.fbx', function (object) {
+        let capsuleGeometry = Utils.createCapsuleGeometry(this.height/4, this.height/2, 8);
 
-            object.traverse( function ( child ) {
-                if ( child.isMesh ) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-                if( child.name == 'game_man') {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('resources/models/game_man/game_man.png' ),
-                        skinning: true
-                    });
-                }
-            } );
+        let capsule = new THREE.Mesh(
+            capsuleGeometry,
+            new THREE.MeshLambertMaterial({ color: 0xffffff })
+        );
+        capsule.position.set(0, this.height/2, 0);
+        capsule.castShadow = true;
 
-            // Create visual groups
-            // The visual hierarchy goes:
-            // this->visuals->modelContainer->characterModel
+        // Assign model to character
+        this.characterModel = capsule;
+        // Attach model to model container
+        this.modelContainer.add(capsule);
 
-            // The visuals group is centered for easy character tilting
-            scope.visuals = new THREE.Group();
-            scope.add(scope.visuals);
-
-            // Model container is used to reliably ground the character, as animation can alter the position of the model itself
-            scope.modelContainer = new THREE.Group();
-            scope.modelContainer.position.y = -scope.height/2;
-            scope.visuals.add(scope.modelContainer);
-
-            // Assign model to character
-            scope.characterModel = object;
-            // Attach model to model container
-            scope.modelContainer.add(object);
-        
-            // Animation
-            scope.mixer = new THREE.AnimationMixer(object);
-
-            // scope.player.setModel(object);
-            scope.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-            scope.setState(CharacterStates.Idle);
-        } );
+        // Animation mixer - gets set when calling setModel()
+        this.mixer;
 
         // Movement
         this.acceleration = new THREE.Vector3();
@@ -88,7 +70,7 @@ export class Character extends THREE.Object3D {
         this.rotationSimulator = new Springs.RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
 
         // States
-        this.setState(CharacterStates.DefaultState);
+        this.setState(CharacterStates.Idle);
         this.viewVector = new THREE.Vector3();
 
         // Controls
@@ -234,6 +216,7 @@ export class Character extends THREE.Object3D {
         this.modelContainer.add(this.characterModel);
     
         this.mixer = new THREE.AnimationMixer(this.characterModel);
+        this.setState(CharacterStates.Idle);
     }
 
     setSimulatedVelocityInfluence(x, y = x, z = x) {
@@ -335,7 +318,7 @@ export class Character extends THREE.Object3D {
         if(options.SpringVelocity)  this.SpringMovement(timeStep);
         if(options.SpringRotation)  this.SpringRotation(timeStep, options.RotationMultiplier);
         if(options.rotateModel)     this.rotateModel();
-        if(options.updateAnimation) this.mixer.update(timeStep);
+        if(options.updateAnimation && this.mixer != undefined) this.mixer.update(timeStep);
         
         this.position.set(
             this.characterCapsule.physical.interpolatedPosition.x,
@@ -346,14 +329,16 @@ export class Character extends THREE.Object3D {
     
     setAnimation(clipName, fadeIn) {
         
-        let clips = this.characterModel.animations;
-        let clip = THREE.AnimationClip.findByName( clips, clipName );
-        let action = this.mixer.clipAction( clip );
-        this.mixer.stopAllAction();
-        action.fadeIn(fadeIn);
-        action.play();
-    
-        return action._clip.duration;
+        if(this.mixer != undefined) {
+            let clips = this.characterModel.animations;
+            let clip = THREE.AnimationClip.findByName( clips, clipName );
+            let action = this.mixer.clipAction( clip );
+            this.mixer.stopAllAction();
+            action.fadeIn(fadeIn);
+            action.play();
+        
+            return action._clip.duration;
+        }
     }
     
     SpringMovement(timeStep) {
@@ -416,7 +401,7 @@ export class Character extends THREE.Object3D {
     rotateModel() {
         this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
         // this.visuals.rotateX(this.acceleration.z * 3);
-        // this.visuals.rotateZ(-this.angularVelocity * 2.3);
+        this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());
         this.visuals.position.setY(this.visuals.position.y + Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
     }
     

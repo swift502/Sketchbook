@@ -7,7 +7,7 @@
 
 # Sketchbook
 
-Package providing a pre-made configuration of 3D rendering and physics in a web-browser, along with a collection 3D models and gameplay mechanics.
+Package providing a pre-made configuration of 3D rendering and physics in a web-browser featuring several conventional gameplay mechanics and example 3D models.
 
 Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js).
 
@@ -36,21 +36,26 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
     * Navmesh pathfinding
 
 
-## Example code
+## Usage
 
+Exctracted from */docs*.
+
+HTML imports
+```html
+<script src="three.min.js"></script>
+<script src="cannon.min.js"></script>   <!-- Only use provided build, official package is extremely outdated! -->
+<script src="sketchbook.min.js"></script>
+```
+JS
 ```javascript
 // Initialize sketchbook
 let world = new Sketchbook.World();
 
-// Load world geometry
-world.LoadDefaultWorld();
-
-// Spawn Player and take control of him
+// Spawn player
 let player = world.SpawnCharacter();
 player.Control();
 
-// Spawn Bob and make him follow player
+// Spawn Bob
 let bob = world.SpawnCharacter();
-bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(bob, player));
+bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
 ```
-

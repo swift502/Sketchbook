@@ -4,17 +4,38 @@ module.exports = {
     entry: {
         app: './src/js/sketchbook.js'
     },
-    resolve: {
-        alias: {
-            'three': path.resolve(__dirname, 'src/js/lib/core/three.js'),
-            'cannon': path.resolve(__dirname, 'src/js/lib/core/cannon.js'),
-            'lodash': path.resolve(__dirname, 'src/js/lib/utils/lodash')
-        }
+    externals: {
+        three: 'THREE',
+        cannon: 'CANNON'
     },
     output: {
         filename: 'sketchbook.min.js',
-        path: path.resolve(__dirname, 'docs/js'),
+        path: path.resolve(__dirname, 'build'),
         library: 'Sketchbook',
         libraryTarget: 'umd'
+    },
+    module: {
+        rules: [
+        {
+            test: /\.css$/,
+            use: [
+              'style-loader',
+              'css-loader'
+            ]
+        },
+        {
+            test: /\.(fbx|png)$/,
+            use: [
+                {
+                loader: 'file-loader',
+                options: {
+                    name: '[name].[ext]',
+                    outputPath: 'assets/',
+                    publicPath: '/build/'
+                }
+                }
+            ]
+          }
+      ]
     }
 };

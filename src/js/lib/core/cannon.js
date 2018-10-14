@@ -1,4 +1,4 @@
-// Sat, 14 Jul 2018 12:45:19 GMT
+// Sun, 14 Oct 2018 14:18:48 GMT
 
 /*
  * Copyright (c) 2015 cannon.js Authors
@@ -54,17 +54,17 @@ module.exports={
     }
   ],
   "devDependencies": {
-    "jshint": "latest",
-    "uglify-js": "latest",
-    "nodeunit": "^0.9.0",
-    "grunt": "~0.4.0",
+    "browserify": "*",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^2.1.4",
+    "grunt-contrib-concat": "~0.1.3",
     "grunt-contrib-jshint": "~0.1.1",
     "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-contrib-concat": "~0.1.3",
     "grunt-contrib-uglify": "^0.5.1",
-    "grunt-browserify": "^2.1.4",
     "grunt-contrib-yuidoc": "^0.5.2",
-    "browserify": "*"
+    "jshint": "latest",
+    "nodeunit": "^0.9.0",
+    "uglify-js": "latest"
   },
   "dependencies": {}
 }
@@ -14013,11 +14013,7 @@ var step_tmp1 = new Vec3();
  */
 World.prototype.step = function(dt, timeSinceLastCalled, maxSubSteps){
     maxSubSteps = maxSubSteps || 10;
-    
-    if (typeof timeSinceLastCalled === 'undefined') {
-        
-    }
-    // timeSinceLastCalled = timeSinceLastCalled || -1;
+    if (typeof timeSinceLastCalled === 'undefined') timeSinceLastCalled = -1;
 
     if(timeSinceLastCalled === -1){ // Fixed, simple stepping
 
@@ -14036,7 +14032,7 @@ World.prototype.step = function(dt, timeSinceLastCalled, maxSubSteps){
             this.accumulator -= dt;
             substeps++;
         }
-
+        // Get rid of excess simulation time
         this.accumulator %= dt;
 
         var t = this.accumulator / dt;
