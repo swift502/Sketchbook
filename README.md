@@ -1,5 +1,5 @@
 <p align="center">
-   <a href="https://swift502.github.io/Sketchbook"><img src="https://i.imgur.com/5J4OaUm.png"></a>
+   <a href="http://jblaha.art"><img src="https://i.imgur.com/5J4OaUm.png"></a>
    <br>
    Play it <a href="http://jblaha.art">here</a>!
 </p>
@@ -43,7 +43,7 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
 Simply import the library in your project, along with provided build of cannon.js and a three.js version of your choice, and you're ready to go.
 ```html
 <script src="three.min.js"></script>
-<script src="cannon.min.js"></script>   <!-- Only use provided build, official package is extremely outdated! -->
+<script src="cannon.min.js"></script> <!-- Only use provided build, official package is extremely outdated! -->
 <script src="sketchbook.min.js"></script>
 ```
-Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn more about using Sketchbook.
+Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn specifics about using Sketchbook.
