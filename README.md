@@ -1,13 +1,13 @@
 <p align="center">
    <a href="https://swift502.github.io/Sketchbook"><img src="https://i.imgur.com/5J4OaUm.png"></a>
    <br>
-   Play it here! <a href="https://swift502.github.io/Sketchbook">swift502.github.io/Sketchbook</a>
+   Play it <a href="http://jblaha.art">here</a>!
 </p>
 
 
 # Sketchbook
 
-Package providing a pre-made configuration of 3D rendering and physics in a web-browser featuring several conventional gameplay mechanics and example 3D models.
+Package providing a pre-made configuration of 3D rendering and physics in a web-browser featuring several conventional game mechanics and basic 3D models.
 
 Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js).
 
@@ -35,27 +35,15 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
     * Ragdoll physics
     * Navmesh pathfinding
 
+*All planned features can be found in the [project pages](https://github.com/swift502/Sketchbook/projects)*.
+
 
 ## Usage
 
-Exctracted from */docs*.
-
-HTML imports
+Simply import the library in your project, along with provided build of cannon.js and a three.js version of your choice, and you're ready to go.
 ```html
 <script src="three.min.js"></script>
 <script src="cannon.min.js"></script>   <!-- Only use provided build, official package is extremely outdated! -->
 <script src="sketchbook.min.js"></script>
 ```
-JS
-```javascript
-// Initialize sketchbook
-let world = new Sketchbook.World();
-
-// Spawn player
-let player = world.SpawnCharacter();
-player.Control();
-
-// Spawn Bob
-let bob = world.SpawnCharacter();
-bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
-```
+Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn more about using Sketchbook.

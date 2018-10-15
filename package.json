@@ -31,6 +31,8 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
-    "lodash": "^4.17.11"
+    "cannon": "^0.6.2",
+    "lodash": "^4.17.11",
+    "three": "^0.92.0"
   }
 }
