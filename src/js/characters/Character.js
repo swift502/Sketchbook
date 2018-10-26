@@ -48,6 +48,7 @@ export class Character extends THREE.Object3D {
 
         // Animation mixer - gets set when calling setModel()
         this.mixer;
+        this.animations = [];
 
         // Movement
         this.acceleration = new THREE.Vector3();
@@ -74,7 +75,7 @@ export class Character extends THREE.Object3D {
         this.viewVector = new THREE.Vector3();
 
         // Controls
-        this.behaviour = new CharacterAI.Default(this);
+        this.setBehaviour(new CharacterAI.Default());
         this.controls = {
             up:        new Controls.EventControl(),
             down:      new Controls.EventControl(),
@@ -209,6 +210,10 @@ export class Character extends THREE.Object3D {
         };
     }
 
+    setAnimations(animations) {
+        this.animations = animations;
+    }
+
     setModel(model) {
     
         this.modelContainer.remove(this.characterModel);
@@ -268,21 +273,25 @@ export class Character extends THREE.Object3D {
         // Get action and set it's parameters
         let action = this.controls[key];
     
-        action.value = value;
-    
-        // Set the 'just' attributes
-        if(value) action.justPressed = true;
-        else action.justReleased = true;
-    
-        // Tag control as last activated
-        this.controls.lastControl = action;
-    
-        // Tell player to handle states according to new input
-        this.charState.changeState();
-    
-        // Reset the 'just' attributes
-        action.justPressed = false;
-        action.justReleased = false;
+        if(action.value != value){
+
+            // Set value
+            action.value = value;
+        
+            // Set the 'just' attributes
+            if(value) action.justPressed = true;
+            else action.justReleased = true;
+        
+            // Tag control as last activated
+            this.controls.lastControl = action;
+        
+            // Tell player to handle states according to new input
+            this.charState.changeState();
+        
+            // Reset the 'just' attributes
+            action.justPressed = false;
+            action.justReleased = false;
+        }
     }
     
     Control() {
@@ -330,8 +339,7 @@ export class Character extends THREE.Object3D {
     setAnimation(clipName, fadeIn) {
         
         if(this.mixer != undefined) {
-            let clips = this.characterModel.animations;
-            let clip = THREE.AnimationClip.findByName( clips, clipName );
+            let clip = THREE.AnimationClip.findByName( this.animations, clipName );
             let action = this.mixer.clipAction( clip );
             this.mixer.stopAllAction();
             action.fadeIn(fadeIn);

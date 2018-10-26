@@ -8,53 +8,115 @@
 <body>
     <script src="../build/three.min.js"></script>
     <script src="../build/cannon.min.js"></script>
+    <!-- <script src="../build/dapao.js"></script> -->
     <script src="../build/sketchbook.min.js"></script>
     <script>
 
+        // Instantiate a loader
+        const gloader = new Sketchbook.GLTFLoader();
+        // const CANNON = DaPao;
+        
         // Initialize sketchbook
         let world = new Sketchbook.World();
-
+        world.cameraController.theta = 360;
+        world.cameraController.target.z = -3;
+        world.cameraController.target.y = 2;
+        
         // Load world geometry
         LoadExampleWorld();
-
+        
         // Spawn player
         let player = world.SpawnCharacter();
         LoadBoxmanCharacterModel(player);
         player.Control();
 
+        function spawnFollowers(number) {
+            for(let i = 0; i < number; i++) {
+                let char = world.SpawnCharacter();
+                LoadBoxmanCharacterModel(char);
+                char.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
+            }
+        }
+        
         // Spawn Bob
-        let bob = world.SpawnCharacter();
-        LoadBoxmanCharacterModel(bob);
-        bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
-
-        // Spawn John
-        let john = world.SpawnCharacter();
-        LoadBoxmanCharacterModel(john);
-        john.setBehaviour(new Sketchbook.CharacterAI.Random());
-
+        // let bob = world.SpawnCharacter();
+        // LoadBoxmanCharacterModel(bob);
+        // bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
+        
         function LoadBoxmanCharacterModel(character) {
 
-            let fbxLoader = new Sketchbook.FBXLoader();
+            // Optional: Provide a DRACOLoader instance to decode compressed mesh data
+            // THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
+            // loader.setDRACOLoader( new THREE.DRACOLoader() );
 
-            // Default model
-            fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {
-                object.traverse(function (child) {
-                    if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                    if (child.name == 'game_man') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),
-                            skinning: true
-                        });
-                    }
-                });
+            // Load a glTF resource
+            gloader.load(
+                // resource URL
+                '../build/models/game_man/game_man.glb',
+                // called when the resource is loaded
+                function ( gltf ) {
+                    
+                    gltf.scene.traverse(function (child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                        // if (child.name == 'Armature') {
+                        //     character.setModel(child);
+                        // }
+                        if (child.name == 'game_man') {
+                            child.material = new THREE.MeshLambertMaterial({
+                                map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),
+                                skinning: true
+                            });
+                        }
+                    });
 
-                character.setModel(object);
-                character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-            });
+                    character.setAnimations(gltf.animations);
+                    character.setModel(gltf.scene);
+                    character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+                },
+                // called while loading is progressing
+                function ( xhr ) {
+                    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+                },
+                // called when loading has errors
+                function ( error ) {
+                    console.error(error);
+                }
+            );
         }
+
+        // Spawn John
+        // let john = world.SpawnCharacter();
+        // LoadBoxmanCharacterModel(john);
+        // john.setBehaviour(new Sketchbook.CharacterAI.Random());
+
+        // function LoadBoxmanCharacterModel(character) {
+
+        //     let fbxLoader = new Sketchbook.FBXLoader();
+
+        //     // Default model
+        //     fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {
+        //         object.traverse(function (child) {
+        //             if (child.isMesh) {
+        //                 child.castShadow = true;
+        //                 child.receiveShadow = true;
+        //             }
+        //             if (child.name == 'game_man') {
+        //                 child.material = new THREE.MeshLambertMaterial({
+        //                     map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),
+        //                     skinning: true
+        //                 });
+        //             }
+        //         });
+
+        //         console.log(object);
+
+        //         character.setModel(object);
+        //         character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+        //     });
+        // }
 
         function LoadExampleWorld() {
 
@@ -69,18 +131,25 @@
             });
 
             // Stuff
-            world.createBoxPrimitive({
-                mass: 10,
-                position: new CANNON.Vec3(-4, 1, 0),
-                size: new CANNON.Vec3(1, 0.5, 4),
-                friction: 0.3
-            });
+            // world.createBoxPrimitive({
+            //     mass: 10,
+            //     position: new CANNON.Vec3(-4, 1, 0),
+            //     size: new CANNON.Vec3(1, 0.5, 4),
+            //     friction: 0.3
+            // });
             world.createBoxPrimitive({
                 mass: 10,
                 position: new CANNON.Vec3(4, 2, 3),
                 size: new CANNON.Vec3(1, 2, 1),
                 friction: 0.3
             });
+
+            // world.createSpherePrimitive({
+            //     mass: 10,
+            //     position: new CANNON.Vec3(4, 2, 3),
+            //     radius:2,
+            //     friction: 0.3
+            // });
 
             //planks 
             world.createBoxPrimitive({
@@ -89,12 +158,12 @@
                 size: new CANNON.Vec3(4, 0.02, 0.3),
                 friction: 0.3
             });
-            world.createBoxPrimitive({
-                mass: 5,
-                position: new CANNON.Vec3(-1, 3, -3),
-                size: new CANNON.Vec3(3, 0.02, 0.3),
-                friction: 0.3
-            });
+            // world.createBoxPrimitive({
+            //     mass: 5,
+            //     position: new CANNON.Vec3(-1, 3, -3),
+            //     size: new CANNON.Vec3(3, 0.02, 0.3),
+            //     friction: 0.3
+            // });
 
             fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
                 object.traverse(function (child) {

@@ -11,9 +11,6 @@ import { Detector } from '../lib/utils/Detector';
 import { Stats } from '../lib/utils/Stats';
 import { GUI } from '../lib/utils/dat.gui';
 
-import '../../css/dat.gui.css';
-import '../../css/main.css';
-
 export class World {
 
     constructor() {
@@ -406,9 +403,11 @@ export class World {
 
         let mat = new CANNON.Material();
         mat.friction = options.friction;
-    
+        mat.restitution = 0.3;
+
         let shape = new CANNON.Box(options.size);
         shape.material = mat;
+        
     
         // Add phys sphere
         let physBox = new CANNON.Body({

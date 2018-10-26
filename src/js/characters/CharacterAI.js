@@ -1,49 +1,67 @@
 import * as THREE from 'three';
 
-class Default {
-    constructor(character) {
-        this.character = character;
+class BaseAI {
+
+    update() {
+        if(this.character === undefined) {
+            console.error('AI needs a character to control');
+            return false;
+        }
     }
 
-    update(timeStep) {
+    updateCharacter(timeStep) {
         this.character.charState.update(timeStep);
     }
 }
 
-class FollowCharacter {
+class Default extends BaseAI {
+    update(timeStep) {
+        super.update();
+
+        this.updateCharacter(timeStep);
+    }
+}
+
+class FollowCharacter extends BaseAI {
     constructor(targetCharacter, stopDistance = 1.3) {
+        super();
         this.targetCharacter = targetCharacter;
         this.stopDistance = stopDistance;
     }
 
     update(timeStep) {
+        super.update();
 
         let viewVector = new THREE.Vector3().subVectors(this.targetCharacter.position, this.character.position);
         this.character.setViewVector(viewVector);
 
+        console.log(viewVector.length());
+
         // Follow character
         if (viewVector.length() > this.stopDistance) {
-            if (!this.character.controls.up.value) this.character.setControl('up', true);
+            this.character.setControl('up', true);
         }
         //Stand still
         else {
-            if (this.character.controls.up.value) this.character.setControl('up', false);
+            this.character.setControl('up', false);
 
             // Look at character
             this.character.setOrientationTarget(viewVector);
         }
 
-        this.character.charState.update(timeStep);
+        this.updateCharacter(timeStep);
     }
 }
 
-class Random {
+class Random extends BaseAI {
     constructor(randomFrequency = 100) {
+        super();
         this.randomFrequency = randomFrequency;
     }
 
     update(timeStep) {
-    
+        super.update();
+
         let rndInt = Math.floor(Math.random() * this.randomFrequency);
         let rndBool = Math.random() > 0.5 ? true : false;
 
@@ -65,7 +83,7 @@ class Random {
             this.character.setControl('jump', rndBool);
         }
     
-        this.character.charState.update(timeStep);
+        this.updateCharacter(timeStep);
     }
 }
 

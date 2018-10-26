@@ -33,6 +33,7 @@
   "dependencies": {
     "cannon": "^0.6.2",
     "lodash": "^4.17.11",
-    "three": "^0.92.0"
+    "three": "^0.92.0",
+    "three-gltf-loader": "^1.97.0"
   }
 }
