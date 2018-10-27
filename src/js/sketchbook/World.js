@@ -15,9 +15,6 @@ export class World {
 
     constructor() {
 
-        this.characters = [];
-        this.vehicles = [];
-
         const scope = this;
 
         //#region HTML
@@ -255,15 +252,17 @@ export class World {
         //#endregion
 
         //Initialization
+        this.characters = [];
+        this.vehicles = [];
         this.cameraController = new CameraController(this.camera);
         this.gameMode = new GameModes.FreeCameraControls(this);
 
-        this.Render(this);
+        this.render(this);
     }
     
     // Update
     // Handles all logic updates.
-    Update(timeStep) {
+    update(timeStep) {
     
         this.updatePhysics(timeStep);
     
@@ -282,11 +281,11 @@ export class World {
     }
     
     /**
-     * Render
      * Rendering loop with variable FPS limit.
-     * Calls the "Update" function before rendering.
+     * Calls the "update" function before rendering.
+     * @param {World} World 
      */
-    Render(World) {
+    render(World) {
     
         // Stats begin
         if (this.justRendered) {
@@ -295,7 +294,7 @@ export class World {
         }
     
         requestAnimationFrame(function() {
-            World.Render(World);
+            World.render(World);
         });
     
         // Measuring time and correcting for variable timeScale
@@ -303,7 +302,7 @@ export class World {
         let timeStep = this.delta * this.params.Time_Scale;
     
         // Logic
-        World.Update(timeStep);
+        World.update(timeStep);
     
         // Frame limiting
         this.sinceLastFrame += this.delta + this.clock.getDelta();
@@ -321,11 +320,7 @@ export class World {
         }
     }
     
-    /**
-     * Adds character to sketchbook
-     * @param {Character} character 
-     */
-    SpawnCharacter(options = []) {
+    spawnCharacter(options = []) {
 
         let defaults = {
             position: new THREE.Vector3()
@@ -357,7 +352,7 @@ export class World {
     updatePhysics(timeStep) {
         // Step the physics world
         this.physicsWorld.step(this.physicsFramerate, timeStep, this.physicsMaxPrediction);
-    
+
         // Sync physics/visuals
         this.parallelPairs.forEach(pair => {
     
@@ -390,7 +385,7 @@ export class World {
         });
     }
     
-    createBoxPrimitive(options = []) {
+    spawnBoxPrimitive(options = []) {
     
         let defaults = {
             mass: 1,
@@ -437,7 +432,7 @@ export class World {
         return pair;
     }
     
-    createSpherePrimitive(options = []) {
+    spawnSpherePrimitive(options = []) {
     
         let defaults = {
             mass: 1,
@@ -481,7 +476,7 @@ export class World {
         return pair;
     }
     
-    createCapsulePrimitive(options = []) {
+    spawnCapsulePrimitive(options = []) {
     
         let defaults = {
             mass: 1,

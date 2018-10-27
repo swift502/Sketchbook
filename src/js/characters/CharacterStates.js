@@ -81,21 +81,21 @@ class DefaultState {
     }
 
     setAppropriateStartWalkState() {
-        let range = Math.PI;
 
+        let range = Math.PI;
         let angle = Utils.getAngleBetweenVectors(this.character.orientation, this.character.getCameraRelativeMovementVector());
 
-        if(angle > range * 0.4) {
-            this.character.setState(StartWalkLeft);
-        }
-        else if(angle > range * 0.7) {
+        if(angle > range * 0.8) {
             this.character.setState(StartWalkBackLeft);
         }
-        else if(angle < -range * 0.4) {
-            this.character.setState(StartWalkRight);
-        }
-        else if(angle < -range * 0.7) {
+        else if(angle < -range * 0.8) {
             this.character.setState(StartWalkBackRight);
+        }
+        else if(angle > range * 0.3) {
+            this.character.setState(StartWalkLeft);
+        }
+        else if(angle < -range * 0.3) {
+            this.character.setState(StartWalkRight);
         }
         else {
             this.character.setState(StartWalkForward);
@@ -261,7 +261,7 @@ class Walk extends DefaultState {
     update(timeStep) {
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
     
         this.fallInAir();
@@ -309,7 +309,7 @@ class Sprint extends DefaultState {
 
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
     
         this.fallInAir();
@@ -356,7 +356,7 @@ class StartBaseState extends DefaultState {
             this.character.setState(Walk);
         }
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         
         //
         // Different velocity treating experiments
@@ -469,7 +469,7 @@ class StartWalkBackRight extends StartBaseState {
     constructor(character) {
 
         super(character);
-        this.animationLength = character.setAnimation('start_back_left', 0.1);
+        this.animationLength = character.setAnimation('start_back_right', 0.1);
     }
 }
 
@@ -545,7 +545,7 @@ class JumpIdle extends DefaultState {
 
         // Move in air
         if(this.alreadyJumped) {
-            this.character.setGlobalDirectionGoal();
+            this.character.setCameraRelativeOrientationTarget();
             this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
         }
         this.character.update(timeStep);
@@ -586,7 +586,7 @@ class JumpRunning extends DefaultState {
 
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
 
         // Move in air
         if(this.alreadyJumped) {
@@ -632,7 +632,7 @@ class Falling extends DefaultState {
 
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
 
         this.character.update(timeStep);
@@ -667,7 +667,7 @@ class DropIdle extends DefaultState {
 
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
     
         if(this.animationEnded(timeStep)) {
@@ -706,7 +706,7 @@ class DropRunning extends DefaultState {
 
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
     
         if(this.animationEnded(timeStep)) {
@@ -752,7 +752,7 @@ class DropRolling extends DefaultState {
 
         super.update(timeStep);
 
-        this.character.setGlobalDirectionGoal();
+        this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
     
         if(this.animationEnded(timeStep)) {
@@ -781,5 +781,6 @@ export let CharacterStates = {
     JumpRunning: JumpRunning,
     Falling: Falling,
     DropIdle: DropIdle,
-    DropRunning: DropRunning
+    DropRunning: DropRunning,
+    DropRolling: DropRolling
 };

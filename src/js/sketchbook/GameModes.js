@@ -15,7 +15,6 @@ class FreeCameraControls {
         this.movementSpeed = 0.06;
     
         this.init();
-        // sketchbook.cameraControls.update();
     
         // Keymap
         this.keymap = {
@@ -75,26 +74,22 @@ class FreeCameraControls {
         // Make light follow camera (for shadows)
         this.sketchbook.dirLight.position.set(this.camera.position.x + this.sketchbook.sun.x * 5, this.camera.position.y + this.sketchbook.sun.y * 5, this.camera.position.z + this.sketchbook.sun.z * 5);
     
+        // Lerp all controls
         for(let key in this.controls){
             let ctrl = this.controls[key];
             ctrl.floatValue = THREE.Math.lerp(ctrl.floatValue, +ctrl.value , 0.3);
         }
 
+        // Set fly speed
+        let speed = this.movementSpeed * (this.controls.fast.value ? 5 : 1);
+
+        let up      = new THREE.Vector3(  0,  1,  0 );
         let forward = new THREE.Vector3(  0,  0, -1 ).applyQuaternion(this.camera.quaternion);
-        let back    = new THREE.Vector3(  0,  0,  1 ).applyQuaternion(this.camera.quaternion);
-        let left    = new THREE.Vector3( -1,  0,  0 ).applyQuaternion(this.camera.quaternion);
         let right   = new THREE.Vector3(  1,  0,  0 ).applyQuaternion(this.camera.quaternion);
-        let up      = new THREE.Vector3(  0,  1,  0 ).applyQuaternion(this.camera.quaternion);
-        let down    = new THREE.Vector3(  0, -1,  0 ).applyQuaternion(this.camera.quaternion);
-        
-        let speed = this.movementSpeed * (this.controls.fast.value ? 5 : 1);//
-    
-        this.sketchbook.cameraController.target.add(forward.multiplyScalar(speed * this.controls.forward.floatValue));
-        this.sketchbook.cameraController.target.add(back.multiplyScalar(speed * this.controls.back.floatValue));
-        this.sketchbook.cameraController.target.add(left.multiplyScalar(speed * this.controls.left.floatValue));
-        this.sketchbook.cameraController.target.add(right.multiplyScalar(speed * this.controls.right.floatValue));
-        this.sketchbook.cameraController.target.add(up.multiplyScalar(speed * this.controls.up.floatValue));
-        this.sketchbook.cameraController.target.add(down.multiplyScalar(speed * this.controls.down.floatValue));
+
+        this.sketchbook.cameraController.target.add(forward.multiplyScalar(speed * (this.controls.forward.floatValue - this.controls.back.floatValue)));
+        this.sketchbook.cameraController.target.add(right.multiplyScalar(speed * (this.controls.right.floatValue - this.controls.left.floatValue)));
+        this.sketchbook.cameraController.target.add(up.multiplyScalar(speed * (this.controls.up.floatValue - this.controls.down.floatValue)));
     }
 }
 

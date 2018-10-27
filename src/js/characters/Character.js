@@ -92,7 +92,7 @@ export class Character extends THREE.Object3D {
 
         // Physics
         // Player Capsule
-        this.characterCapsule = world.createCapsulePrimitive({
+        this.characterCapsule = world.spawnCapsulePrimitive({
             mass: 1,
             position: new CANNON.Vec3(0, 0, 0),
             height: 0.5,
@@ -133,83 +133,9 @@ export class Character extends THREE.Object3D {
         this.raycastBox = new THREE.Mesh(boxGeo, boxMat);
         this.raycastBox.visible = false;
 
-        // Physics Pre/Post step event
+        // Physics pre/post step callback bindings
         this.characterCapsule.physical.preStep = this.physicsPreStep;
         this.characterCapsule.physical.postStep = this.physicsPostStep;
-    }
-
-    physicsPreStep() {
-
-        // Player ray casting
-        // Create ray
-        const start = new CANNON.Vec3(this.position.x, this.position.y, this.position.z);
-        const end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength, this.position.z);
-        // Raycast options
-        const rayCastOptions = {
-            collisionFilterMask: ~2 /* cast against everything except second collision group (player) */,
-            skipBackfaces: true     /* ignore back faces */
-        };
-        // Cast the ray
-        this.character.rayHasHit = this.character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
-        
-        // Jumping
-        if(this.character.wantsToJump && this.character.rayHasHit) {
-
-            // If initJumpSpeed is set
-            if(this.character.initJumpSpeed > -1) {
-                
-                // Flatten velocity
-                this.velocity.y = 0;
-                
-                // Velocity needs to be at least as much as initJumpSpeed
-                if(this.velocity.lengthSquared() < this.character.initJumpSpeed ** 2) {
-                    this.velocity.normalize();
-                    this.velocity.mult(this.character.initJumpSpeed, this.velocity);
-                }
-            }
-
-            // Add positive vertical velocity
-            this.velocity.y += 4;
-            //Move above ground
-            this.position.y += this.character.raySafeOffset;
-            // Set flag for postStep and character states
-            this.character.justJumped = true;
-        }
-        //Reset flag
-        this.character.wantsToJump = false;
-    }
-
-    physicsPostStep() {
-        
-        // Player ray casting
-        // Get velocities
-        let simulatedVelocity = new THREE.Vector3().copy(this.velocity);
-        let arcadeVelocity = new THREE.Vector3().copy(this.character.velocity).multiplyScalar(this.character.moveSpeed);
-        arcadeVelocity = Utils.appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
-
-        let newVelocity = new THREE.Vector3(
-            THREE.Math.lerp(arcadeVelocity.x, simulatedVelocity.x, this.character.simulatedVelocityInfluence.x),
-            THREE.Math.lerp(arcadeVelocity.y, simulatedVelocity.y, this.character.simulatedVelocityInfluence.y),
-            THREE.Math.lerp(arcadeVelocity.z, simulatedVelocity.z, this.character.simulatedVelocityInfluence.z),
-        );
-
-        // If just jumped, don't stick to ground
-        if(this.character.justJumped) this.character.justJumped = false;
-        else {
-            // If we're hitting the ground, stick to ground
-            if(this.character.rayHasHit) {
-                if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
-                this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
-                this.velocity.set(newVelocity.x, 0, newVelocity.z);
-            }
-            else {
-                // If we're in air
-                if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
-               
-                this.velocity.copy(newVelocity);
-                this.character.lastGroundImpactData.velocity.copy(this.velocity);
-            }
-        }
     }
 
     setAnimations(animations) {
@@ -296,7 +222,7 @@ export class Character extends THREE.Object3D {
         }
     }
     
-    Control() {
+    takeControl() {
         this.world.gameMode = new GameModes.CharacterControls(this.world, this);
     }
 
@@ -313,21 +239,20 @@ export class Character extends THREE.Object3D {
         this.setControl('tertiary', false);
     }
     
-    
     update(timeStep, options) {
     
         let defaults = {
-            SpringRotation: true,
-            RotationMultiplier: 1,
-            SpringVelocity: true,
+            springRotation: true,
+            rotationMultiplier: 1,
+            springVelocity: true,
             rotateModel:  true,
             updateAnimation: true
         };
         options = Utils.setDefaults(options, defaults);
 
         this.visuals.position.copy(this.modelOffset);
-        if(options.SpringVelocity)  this.SpringMovement(timeStep);
-        if(options.SpringRotation)  this.SpringRotation(timeStep, options.RotationMultiplier);
+        if(options.springVelocity)  this.springMovement(timeStep);
+        if(options.springRotation)  this.springRotation(timeStep, options.rotationMultiplier);
         if(options.rotateModel)     this.rotateModel();
         if(options.updateAnimation && this.mixer != undefined) this.mixer.update(timeStep);
         
@@ -351,7 +276,7 @@ export class Character extends THREE.Object3D {
         }
     }
     
-    SpringMovement(timeStep) {
+    springMovement(timeStep) {
     
         // Simulator
         this.velocitySimulator.target.copy(this.velocityTarget);
@@ -362,7 +287,7 @@ export class Character extends THREE.Object3D {
         this.acceleration.copy(this.velocitySimulator.velocity);
     }
     
-    SpringRotation(timeStep, RotationMultiplier) {
+    springRotation(timeStep, RotationMultiplier) {
     
         //Spring rotation
         //Figure out angle between current and target orientation
@@ -380,6 +305,7 @@ export class Character extends THREE.Object3D {
     }
 
     getLocalMovementDirection() {
+
         const positiveX = this.controls.right.value ? -1 : 0;
         const negativeX = this.controls.left.value  ?  1 : 0;
         const positiveZ = this.controls.up.value    ?  1 : 0;
@@ -396,7 +322,7 @@ export class Character extends THREE.Object3D {
         return Utils.appplyVectorMatrixXZ(flatViewVector, localDirection);
     }
 
-    setGlobalDirectionGoal() {
+    setCameraRelativeOrientationTarget() {
         
         let moveVector = this.getCameraRelativeMovementVector();
 
@@ -409,6 +335,7 @@ export class Character extends THREE.Object3D {
     }
     
     rotateModel() {
+
         this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
         // this.visuals.rotateX(this.acceleration.z * 3);
         this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());
@@ -416,7 +343,82 @@ export class Character extends THREE.Object3D {
     }
     
     jump(initJumpSpeed = -1) {
+        
         this.wantsToJump = true;
         this.initJumpSpeed = initJumpSpeed;
+    }
+
+    physicsPreStep() {
+
+        // Player ray casting
+        // Create ray
+        const start = new CANNON.Vec3(this.position.x, this.position.y, this.position.z);
+        const end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength, this.position.z);
+        // Raycast options
+        const rayCastOptions = {
+            collisionFilterMask: ~2 /* cast against everything except second collision group (player) */,
+            skipBackfaces: true     /* ignore back faces */
+        };
+        // Cast the ray
+        this.character.rayHasHit = this.character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
+        
+        // Jumping
+        if(this.character.wantsToJump && this.character.rayHasHit) {
+
+            // If initJumpSpeed is set
+            if(this.character.initJumpSpeed > -1) {
+                
+                // Flatten velocity
+                this.velocity.y = 0;
+                
+                // Velocity needs to be at least as much as initJumpSpeed
+                if(this.velocity.lengthSquared() < this.character.initJumpSpeed ** 2) {
+                    this.velocity.normalize();
+                    this.velocity.mult(this.character.initJumpSpeed, this.velocity);
+                }
+            }
+
+            // Add positive vertical velocity
+            this.velocity.y += 4;
+            //Move above ground
+            this.position.y += this.character.raySafeOffset;
+            // Set flag for postStep and character states
+            this.character.justJumped = true;
+        }
+        //Reset flag
+        this.character.wantsToJump = false;
+    }
+
+    physicsPostStep() {
+        
+        // Player ray casting
+        // Get velocities
+        let simulatedVelocity = new THREE.Vector3().copy(this.velocity);
+        let arcadeVelocity = new THREE.Vector3().copy(this.character.velocity).multiplyScalar(this.character.moveSpeed);
+        arcadeVelocity = Utils.appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
+
+        let newVelocity = new THREE.Vector3(
+            THREE.Math.lerp(arcadeVelocity.x, simulatedVelocity.x, this.character.simulatedVelocityInfluence.x),
+            THREE.Math.lerp(arcadeVelocity.y, simulatedVelocity.y, this.character.simulatedVelocityInfluence.y),
+            THREE.Math.lerp(arcadeVelocity.z, simulatedVelocity.z, this.character.simulatedVelocityInfluence.z),
+        );
+
+        // If just jumped, don't stick to ground
+        if(this.character.justJumped) this.character.justJumped = false;
+        else {
+            // If we're hitting the ground, stick to ground
+            if(this.character.rayHasHit) {
+                if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
+                this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
+                this.velocity.set(newVelocity.x, 0, newVelocity.z);
+            }
+            else {
+                // If we're in air
+                if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
+               
+                this.velocity.copy(newVelocity);
+                this.character.lastGroundImpactData.velocity.copy(this.velocity);
+            }
+        }
     }
 }

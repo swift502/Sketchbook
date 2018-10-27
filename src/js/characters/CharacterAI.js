@@ -4,7 +4,7 @@ class BaseAI {
 
     update() {
         if(this.character === undefined) {
-            console.error('AI needs a character to control');
+            console.error('Character is undefined.');
             return false;
         }
     }
@@ -67,7 +67,6 @@ class Random extends BaseAI {
 
         if(rndInt == 0) {
             this.character.setViewVector(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
-            // this.character.setOrientationTarget(this.character.viewVector);
 
             this.character.setControl('up', true);
             this.character.charState.update(timeStep);
