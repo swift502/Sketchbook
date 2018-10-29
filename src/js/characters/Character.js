@@ -150,6 +150,7 @@ export class Character extends THREE.Object3D {
     
         this.mixer = new THREE.AnimationMixer(this.characterModel);
         this.setState(CharacterStates.Idle);
+        this.charState.changeState();
     }
 
     setSimulatedVelocityInfluence(x, y = x, z = x) {
@@ -201,7 +202,7 @@ export class Character extends THREE.Object3D {
         // Get action and set it's parameters
         let action = this.controls[key];
     
-        if(action.value != value){
+        if(action.value !== value){
 
             // Set value
             action.value = value;

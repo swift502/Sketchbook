@@ -47,7 +47,7 @@ export class World {
 
         //#endregion
 
-        //#region THREE
+        //#region Graphics
 
         this.graphicsWorld = new THREE.Scene();
 
@@ -95,21 +95,22 @@ export class World {
         this.graphicsWorld.add(ambientLight);
 
         // Sun light with shadowmap
-        this.dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        this.dirLight.castShadow = true;
+        let dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        this.dirLight = dirLight;
+        dirLight.castShadow = true;
 
-        this.dirLight.shadow.mapSize.width = 1024;
-        this.dirLight.shadow.mapSize.height = 1024;
-        this.dirLight.shadow.camera.near = 0.5;
-        this.dirLight.shadow.camera.far = 8;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 8;
 
-        this.dirLight.shadow.camera.top = 5;
-        this.dirLight.shadow.camera.right = 5;
-        this.dirLight.shadow.camera.bottom = -5;
-        this.dirLight.shadow.camera.left = -5;
+        dirLight.shadow.camera.top = 5;
+        dirLight.shadow.camera.right = 5;
+        dirLight.shadow.camera.bottom = -5;
+        dirLight.shadow.camera.left = -5;
 
-        this.dirLight.shadow.camera;
-        this.graphicsWorld.add(this.dirLight);
+        dirLight.shadow.camera;
+        this.graphicsWorld.add(dirLight);
 
         // Helpers
         let helper = new THREE.GridHelper(10, 10, 0x000000, 0x000000);
@@ -119,14 +120,14 @@ export class World {
         this.graphicsWorld.add( helper );
         helper = new THREE.AxesHelper(2);
         // this.graphicsWorld.add( helper );
-        helper = new THREE.DirectionalLightHelper(this.dirLight, 3);
+        helper = new THREE.DirectionalLightHelper(dirLight, 3);
         // this.graphicsWorld.add( helper );
-        helper = new THREE.CameraHelper(this.dirLight.shadow.camera);
+        helper = new THREE.CameraHelper(dirLight.shadow.camera);
         // this.graphicsWorld.add( helper );
 
         //#endregion
 
-        //#region CANNON
+        //#region Physics
 
         this.physicsWorld = new CANNON.World();
         this.physicsWorld.gravity.set(0,-9.81,0);
@@ -134,15 +135,17 @@ export class World {
         this.physicsWorld.solver.iterations = 10;
 
         this.parallelPairs = [];
-        this.physicsFramerate = 1/60;
-        this.physicsMaxPrediction = 10;
+        this.physicsFrameRate = 60;
+        this.physicsFrameTime = 1/this.physicsFrameRate;
+        this.physicsMaxPrediction = this.physicsFrameRate;
 
         //#endregion
 
         //#region RenderLoop
 
         this.clock = new THREE.Clock();
-        this.delta = 0;
+        this.renderDelta = 0;
+        this.logicDelta = 0;
         this.sinceLastFrame = 0;
         this.justRendered = false;
 
@@ -242,10 +245,10 @@ export class World {
 
         shadowSwitch.onChange(function(enabled) {
             if(enabled) {
-                scope.dirLight.castShadow = true;
+                dirLight.castShadow = true;
             }
             else {
-                scope.dirLight.castShadow = false;
+                dirLight.castShadow = false;
             }
         });
 
@@ -256,7 +259,7 @@ export class World {
         this.vehicles = [];
         this.cameraController = new CameraController(this.camera);
         this.gameMode = new GameModes.FreeCameraControls(this);
-
+        
         this.render(this);
     }
     
@@ -281,11 +284,12 @@ export class World {
     }
     
     /**
-     * Rendering loop with variable FPS limit.
+     * Rendering loop.
+     * Implements custom fps limit and frame-skipping
      * Calls the "update" function before rendering.
-     * @param {World} World 
+     * @param {World} world 
      */
-    render(World) {
+    render(world) {
     
         // Stats begin
         if (this.justRendered) {
@@ -294,19 +298,24 @@ export class World {
         }
     
         requestAnimationFrame(function() {
-            World.render(World);
+            world.render(world);
         });
     
-        // Measuring time and correcting for variable timeScale
-        this.delta = this.clock.getDelta();
-        let timeStep = this.delta * this.params.Time_Scale;
-    
+        // Measuring render time
+        this.renderDelta = this.clock.getDelta();
+
+        // Getting timeStep
+        let timeStep = (this.renderDelta + this.logicDelta) * this.params.Time_Scale;
+
         // Logic
-        World.update(timeStep);
+        world.update(timeStep);
+
+        // Measuring logic time
+        this.logicDelta = this.clock.getDelta();
     
         // Frame limiting
-        this.sinceLastFrame += this.delta + this.clock.getDelta();
         let interval = 1 / this.params.FPS_Limit;
+        this.sinceLastFrame += this.renderDelta + this.logicDelta;
         if (this.sinceLastFrame > interval) {
             this.sinceLastFrame %= interval;
     
@@ -351,7 +360,7 @@ export class World {
     
     updatePhysics(timeStep) {
         // Step the physics world
-        this.physicsWorld.step(this.physicsFramerate, timeStep, this.physicsMaxPrediction);
+        this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
 
         // Sync physics/visuals
         this.parallelPairs.forEach(pair => {
@@ -475,7 +484,7 @@ export class World {
         this.parallelPairs.push(pair);
         return pair;
     }
-    
+
     spawnCapsulePrimitive(options = []) {
     
         let defaults = {

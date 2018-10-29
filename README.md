@@ -16,7 +16,8 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
 * World
     * Three.js scene
     * Cannon.js physics
-    * Variable, FPS independent time scale
+    * Variable timescale
+    * Frame skipping
     * FXAA anti-aliasing
     * Custom damped-spring simulation
 * Characters

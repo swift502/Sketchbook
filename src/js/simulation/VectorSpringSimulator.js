@@ -32,8 +32,6 @@ export class VectorSpringSimulator extends SimulatorBase {
      */
     simulate(timeStep) {
         
-        if(timeStep == undefined) console.log('Pass the timeStep!');
-
         // Generate new frames
         this.generateFrames(timeStep);
 

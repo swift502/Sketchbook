@@ -35,8 +35,6 @@ export class RelativeSpringSimulator extends SimulatorBase {
      */
     simulate(timeStep) {
         
-        if(timeStep == undefined) console.log('Pass the timeStep!');
-
         this.generateFrames(timeStep);
         
         //SpringR lerping

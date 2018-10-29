@@ -17,7 +17,6 @@ class BaseAI {
 class Default extends BaseAI {
     update(timeStep) {
         super.update();
-
         this.updateCharacter(timeStep);
     }
 }
@@ -31,11 +30,9 @@ class FollowCharacter extends BaseAI {
 
     update(timeStep) {
         super.update();
-
+        
         let viewVector = new THREE.Vector3().subVectors(this.targetCharacter.position, this.character.position);
         this.character.setViewVector(viewVector);
-
-        console.log(viewVector.length());
 
         // Follow character
         if (viewVector.length() > this.stopDistance) {

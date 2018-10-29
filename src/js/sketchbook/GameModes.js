@@ -18,23 +18,23 @@ class FreeCameraControls {
     
         // Keymap
         this.keymap = {
-            'w':      { action: 'forward'  },
-            's':      { action: 'back'     },
-            'a':      { action: 'left'     },
-            'd':      { action: 'right'    },
-            'e':      { action: 'up'       },
-            'q':      { action: 'down'     },
-            'shift':  { action: 'fast'     }
+            'w':     { action: 'forward'  },
+            's':     { action: 'back'     },
+            'a':     { action: 'left'     },
+            'd':     { action: 'right'    },
+            'e':     { action: 'up'       },
+            'q':     { action: 'down'     },
+            'shift': { action: 'fast'     }
         };
     
         this.controls = {
-            forward:   new Controls.LerpControl(),
-            left:      new Controls.LerpControl(),
-            right:     new Controls.LerpControl(),
-            up:        new Controls.LerpControl(),
-            back:      new Controls.LerpControl(),
-            down:      new Controls.LerpControl(),
-            fast:      new Controls.LerpControl()
+            forward: new Controls.LerpControl(),
+            left:    new Controls.LerpControl(),
+            right:   new Controls.LerpControl(),
+            up:      new Controls.LerpControl(),
+            back:    new Controls.LerpControl(),
+            down:    new Controls.LerpControl(),
+            fast:    new Controls.LerpControl()
         };
     }
     
@@ -72,7 +72,11 @@ class FreeCameraControls {
     update() {
         
         // Make light follow camera (for shadows)
-        this.sketchbook.dirLight.position.set(this.camera.position.x + this.sketchbook.sun.x * 5, this.camera.position.y + this.sketchbook.sun.y * 5, this.camera.position.z + this.sketchbook.sun.z * 5);
+        this.sketchbook.dirLight.position.set(
+            this.camera.position.x + this.sketchbook.sun.x * 5,
+            this.camera.position.y + this.sketchbook.sun.y * 5,
+            this.camera.position.z + this.sketchbook.sun.z * 5
+        );
     
         // Lerp all controls
         for(let key in this.controls){
@@ -83,9 +87,9 @@ class FreeCameraControls {
         // Set fly speed
         let speed = this.movementSpeed * (this.controls.fast.value ? 5 : 1);
 
-        let up      = new THREE.Vector3(  0,  1,  0 );
-        let forward = new THREE.Vector3(  0,  0, -1 ).applyQuaternion(this.camera.quaternion);
-        let right   = new THREE.Vector3(  1,  0,  0 ).applyQuaternion(this.camera.quaternion);
+        let up = new THREE.Vector3(0, 1, 0);
+        let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
+        let right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
 
         this.sketchbook.cameraController.target.add(forward.multiplyScalar(speed * (this.controls.forward.floatValue - this.controls.back.floatValue)));
         this.sketchbook.cameraController.target.add(right.multiplyScalar(speed * (this.controls.right.floatValue - this.controls.left.floatValue)));
@@ -121,7 +125,7 @@ class CharacterControls {
     }
     
     init() {
-        this.sketchbook.cameraController.setRadius(1.8);//
+        this.sketchbook.cameraController.setRadius(1.8);
         this.sketchbook.dirLight.target = this.character;
     }
     
@@ -153,14 +157,16 @@ class CharacterControls {
         this.character.viewVector = new THREE.Vector3().subVectors(this.character.position, this.sketchbook.camera.position);
         
         // Make light follow player (for shadows)
-        this.sketchbook.dirLight.position.set(this.character.position.x + this.sketchbook.sun.x * 5, this.character.position.y + this.sketchbook.sun.y * 5, this.character.position.z + this.sketchbook.sun.z * 5);
+        this.sketchbook.dirLight.position.set(
+            this.character.position.x + this.sketchbook.sun.x * 5,
+            this.character.position.y + this.sketchbook.sun.y * 5,
+            this.character.position.z + this.sketchbook.sun.z * 5);
         
         // Position camera
-        this.sketchbook.cameraController.target.copy(
-            new THREE.Vector3(
-                this.character.position.x,
-                this.character.position.y + this.character.height / 1.7,
-                this.character.position.z)
+        this.sketchbook.cameraController.target.set(
+            this.character.position.x,
+            this.character.position.y + this.character.height / 1.7,
+            this.character.position.z
         );
     }
 }

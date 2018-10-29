@@ -32,8 +32,6 @@ export class SpringSimulator extends SimulatorBase {
      */
     simulate(timeStep) {
         
-        if(timeStep == undefined) console.log('Pass the timeStep!');
-
         this.generateFrames(timeStep);
         
         // Return values interpolated between cached frames
