@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import _ from 'lodash';
+import { Utils } from 'cannon';
 
 export class Utilities {
 
@@ -115,8 +116,21 @@ export class Utilities {
      */
     static appplyVectorMatrixXZ(a, b) {
         return new THREE.Vector3(
-            (a.x * b.z + a.z * b.x) / 2, 0,
+            (a.x * b.z + a.z * b.x) / 2,
+            0,
             (a.z * b.z + -a.x * b.x) / 2
+        );
+    }
+
+    static round(number, decimals = 0) {
+        return Math.round(number * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    }
+
+    static roundVector(vector, decimals = 0) {
+        return new THREE.Vector3(
+            this.round(vector.x, decimals),
+            this.round(vector.y, decimals),
+            this.round(vector.z, decimals),
         );
     }
 

@@ -116,8 +116,8 @@ export class Character extends THREE.Object3D {
         // Ray casting
         this.rayResult = new CANNON.RaycastResult();
         this.rayHasHit = false;
-        this.rayCastLength = 0.63;
-        this.raySafeOffset = 0.03;
+        this.rayCastLength = 0.61;
+        this.raySafeOffset = 0.01;
         this.wantsToJump = false;
         this.justJumped = false;
         this.initJumpSpeed = -1;
@@ -267,7 +267,12 @@ export class Character extends THREE.Object3D {
     setAnimation(clipName, fadeIn) {
         
         if(this.mixer != undefined) {
-            let clip = THREE.AnimationClip.findByName( this.animations, clipName );
+            //gltf
+            // let clip = THREE.AnimationClip.findByName( this.animations, clipName );
+
+            let clips = this.characterModel.animations;
+            let clip = THREE.AnimationClip.findByName( clips, clipName );
+
             let action = this.mixer.clipAction( clip );
             this.mixer.stopAllAction();
             action.fadeIn(fadeIn);
@@ -363,6 +368,14 @@ export class Character extends THREE.Object3D {
         // Cast the ray
         this.character.rayHasHit = this.character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult); 
         
+        if(this.character.rayHasHit) {
+            if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
+            this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
+        }
+        else {
+            if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
+        }
+
         // Jumping
         if(this.character.wantsToJump && this.character.rayHasHit) {
 
@@ -395,7 +408,9 @@ export class Character extends THREE.Object3D {
         // Player ray casting
         // Get velocities
         let simulatedVelocity = new THREE.Vector3().copy(this.velocity);
+        // Take local velocity
         let arcadeVelocity = new THREE.Vector3().copy(this.character.velocity).multiplyScalar(this.character.moveSpeed);
+        // Turn local into global
         arcadeVelocity = Utils.appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
 
         let newVelocity = new THREE.Vector3(
@@ -409,14 +424,25 @@ export class Character extends THREE.Object3D {
         else {
             // If we're hitting the ground, stick to ground
             if(this.character.rayHasHit) {
-                if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
-                this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
-                this.velocity.set(newVelocity.x, 0, newVelocity.z);
+
+                //Flatten velocity
+                newVelocity.y = 0;
+
+                // Get axis on which we'll rotate the raycast hit normal
+                let rotateAxis = new THREE.Vector3().copy(this.character.orientation).applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
+                
+                // Get raycast hit normal
+                let directionVector = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld);
+                // Point it in the right direction
+                directionVector.applyAxisAngle(rotateAxis, Math.PI/2);
+                // Multiply with new velocity's length
+                directionVector.multiplyScalar(newVelocity.length());
+
+                // this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
+                this.velocity.copy(directionVector);
             }
             else {
                 // If we're in air
-                if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
-               
                 this.velocity.copy(newVelocity);
                 this.character.lastGroundImpactData.velocity.copy(this.velocity);
             }

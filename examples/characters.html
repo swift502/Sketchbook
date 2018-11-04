@@ -27,7 +27,8 @@
         
         // Spawn player
         let player = world.spawnCharacter();
-        LoadBoxmanCharacterModel(player);
+        // LoadBoxmanCharacterModel(player);
+        LoadFBX(player);
         player.takeControl();
 
         function spawnFollowers(number) {
@@ -43,7 +44,7 @@
         // LoadBoxmanCharacterModel(bob);
         // bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
         
-        function LoadBoxmanCharacterModel(character) {
+        function LoadGLB(character) {
 
             // Optional: Provide a DRACOLoader instance to decode compressed mesh data
             // THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
@@ -82,6 +83,28 @@
                     console.error(error);
                 }
             );
+        }
+
+        function LoadFBX(character) {	
+            let fbxLoader = new Sketchbook.FBXLoader();	
+            // Default model	
+            fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
+                object.traverse(function (child) {	
+                    if (child.isMesh) {	
+                        child.castShadow = true;	
+                        child.receiveShadow = true;	
+                    }	
+                    if (child.name == 'game_man') {	
+                        child.material = new THREE.MeshLambertMaterial({	
+                            map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
+                            skinning: true	
+                        });	
+                    }	
+                });	
+                 console.log(object);	
+                 character.setModel(object);	
+                character.setModelOffset(new THREE.Vector3(0, -0.1, 0));	
+            });	
         }
 
         // Spawn John
