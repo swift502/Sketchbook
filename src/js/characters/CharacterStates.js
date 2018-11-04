@@ -69,7 +69,7 @@ class DefaultState {
     }
 
     setAppropriateDropState() {
-        if(this.character.lastGroundImpactData.velocity.y < -6) {
+        if(this.character.groundImpactData.velocity.y < -6) {
             this.character.setState(DropRolling);
         }
         else if(this.anyDirection()) {

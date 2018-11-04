@@ -119,9 +119,8 @@ export class Character extends THREE.Object3D {
         this.rayCastLength = 0.61;
         this.raySafeOffset = 0.01;
         this.wantsToJump = false;
-        this.justJumped = false;
         this.initJumpSpeed = -1;
-        this.lastGroundImpactData = {
+        this.groundImpactData = {
             velocity: new CANNON.Vec3()
         };
 
@@ -177,14 +176,16 @@ export class Character extends THREE.Object3D {
         this.characterCapsule.physical.position = new CANNON.Vec3(x, y, z);
     }
     
-    setArcadeVelocity(velZ, velX = 0) {
+    setArcadeVelocity(velZ, velX = 0, velY = 0) {
         this.velocity.z = velZ;
         this.velocity.x = velX;
+        this.velocity.y = velY;
     }
     
-    setArcadeVelocityTarget(velZ, velX = 0) {
+    setArcadeVelocityTarget(velZ, velX = 0, velY = 0) {
         this.velocityTarget.z = velZ;
         this.velocityTarget.x = velX;
+        this.velocityTarget.y = velY;
     }
     
     setOrientationTarget(vector) {
@@ -375,32 +376,6 @@ export class Character extends THREE.Object3D {
         else {
             if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
         }
-
-        // Jumping
-        if(this.character.wantsToJump && this.character.rayHasHit) {
-
-            // If initJumpSpeed is set
-            if(this.character.initJumpSpeed > -1) {
-                
-                // Flatten velocity
-                this.velocity.y = 0;
-                
-                // Velocity needs to be at least as much as initJumpSpeed
-                if(this.velocity.lengthSquared() < this.character.initJumpSpeed ** 2) {
-                    this.velocity.normalize();
-                    this.velocity.mult(this.character.initJumpSpeed, this.velocity);
-                }
-            }
-
-            // Add positive vertical velocity
-            this.velocity.y += 4;
-            //Move above ground
-            this.position.y += this.character.raySafeOffset;
-            // Set flag for postStep and character states
-            this.character.justJumped = true;
-        }
-        //Reset flag
-        this.character.wantsToJump = false;
     }
 
     physicsPostStep() {
@@ -419,33 +394,53 @@ export class Character extends THREE.Object3D {
             THREE.Math.lerp(arcadeVelocity.z, simulatedVelocity.z, this.character.simulatedVelocityInfluence.z),
         );
 
-        // If just jumped, don't stick to ground
-        if(this.character.justJumped) this.character.justJumped = false;
+        // If we're hitting the ground, stick to ground
+        if(this.character.rayHasHit) {
+
+            //Flatten velocity
+            newVelocity.y = 0;
+
+            // Get axis on which we'll rotate the raycast hit normal
+            let rotateAxis = new THREE.Vector3().copy(this.character.orientation).applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
+            
+            // Get raycast hit normal
+            let directionVector = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld);
+            // Point it in the right direction
+            directionVector.applyAxisAngle(rotateAxis, Math.PI/2);
+            // Multiply with new velocity's length
+            directionVector.multiplyScalar(newVelocity.length());
+
+            // Apply velocity
+            this.velocity.copy(directionVector);
+        }
         else {
-            // If we're hitting the ground, stick to ground
-            if(this.character.rayHasHit) {
+            // If we're in air
+            this.velocity.copy(newVelocity);
+            this.character.groundImpactData.velocity.copy(this.velocity);
+        }
 
-                //Flatten velocity
-                newVelocity.y = 0;
+        // Jumping
+        if(this.character.wantsToJump) {
 
-                // Get axis on which we'll rotate the raycast hit normal
-                let rotateAxis = new THREE.Vector3().copy(this.character.orientation).applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
+            // If initJumpSpeed is set
+            if(this.character.initJumpSpeed > -1) {
                 
-                // Get raycast hit normal
-                let directionVector = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld);
-                // Point it in the right direction
-                directionVector.applyAxisAngle(rotateAxis, Math.PI/2);
-                // Multiply with new velocity's length
-                directionVector.multiplyScalar(newVelocity.length());
+                // Flatten velocity
+                this.velocity.y = 0;
+                
+                // Velocity needs to be at least as much as initJumpSpeed
+                if(this.velocity.lengthSquared() < this.character.initJumpSpeed ** 2) {
+                    this.velocity.normalize();
+                    this.velocity.mult(this.character.initJumpSpeed, this.velocity);
+                }
+            }
 
-                // this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
-                this.velocity.copy(directionVector);
-            }
-            else {
-                // If we're in air
-                this.velocity.copy(newVelocity);
-                this.character.lastGroundImpactData.velocity.copy(this.velocity);
-            }
+            // Add positive vertical velocity
+            this.velocity.y += 4;
+            //Move above ground by 1x safe offset value
+            this.position.y += this.character.raySafeOffset * 2;
+            //Reset flag
+            this.character.wantsToJump = false;
         }
     }
 }

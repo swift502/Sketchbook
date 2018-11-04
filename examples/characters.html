@@ -7,14 +7,14 @@
 
 <body>
     <script src="../build/three.min.js"></script>
-    <script src="../build/cannon.min.js"></script>
-    <!-- <script src="../build/dapao.js"></script> -->
+    <!-- <script src="../build/cannon.min.js"></script> -->
+    <script src="../build/dapao.js"></script>
     <script src="../build/sketchbook.min.js"></script>
     <script>
 
         // Instantiate a loader
         const gloader = new Sketchbook.GLTFLoader();
-        // const CANNON = DaPao;
+        const CANNON = DaPao;
         
         // Initialize sketchbook
         let world = new Sketchbook.World();
@@ -27,8 +27,16 @@
         
         // Spawn player
         let player = world.spawnCharacter();
-        // LoadBoxmanCharacterModel(player);
         LoadFBX(player);
+        // LoadFBXCharacterModel(player).then(function(gltf) {
+        //     // player.setModel(model);	
+        //     // player.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+            
+        //     player.setAnimations(gltf.animations);
+        //     player.setModel(gltf.scene);
+        //     player.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+
+        // });
         player.takeControl();
 
         function spawnFollowers(number) {
@@ -44,67 +52,29 @@
         // LoadBoxmanCharacterModel(bob);
         // bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
         
-        function LoadGLB(character) {
-
-            // Optional: Provide a DRACOLoader instance to decode compressed mesh data
-            // THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
-            // loader.setDRACOLoader( new THREE.DRACOLoader() );
-
-            // Load a glTF resource
-            gloader.load(
-                // resource URL
-                '../build/models/game_man/game_man.glb',
-                // called when the resource is loaded
-                function ( gltf ) {
-                    
-                    gltf.scene.traverse(function (child) {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                        }
-                        if (child.name == 'game_man') {
-                            child.material = new THREE.MeshLambertMaterial({
-                                map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),
-                                skinning: true
-                            });
-                        }
-                    });
-
-                    character.setAnimations(gltf.animations);
-                    character.setModel(gltf.scene);
-                    character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-                },
-                // called while loading is progressing
-                function ( xhr ) {
-                    // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-                },
-                // called when loading has errors
-                function ( error ) {
-                    console.error(error);
-                }
-            );
-        }
-
         function LoadFBX(character) {	
-            let fbxLoader = new Sketchbook.FBXLoader();	
-            // Default model	
-            fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
-                object.traverse(function (child) {	
-                    if (child.isMesh) {	
-                        child.castShadow = true;	
-                        child.receiveShadow = true;	
-                    }	
-                    if (child.name == 'game_man') {	
-                        child.material = new THREE.MeshLambertMaterial({	
-                            map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
-                            skinning: true	
-                        });	
-                    }	
+
+                let fbxLoader = new Sketchbook.FBXLoader();	
+                // Default model	
+                fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
+
+                    object.traverse(function (child) {	
+                        if (child.isMesh) {	
+                            child.castShadow = true;	
+                            child.receiveShadow = true;	
+                        }	
+                        if (child.name == 'game_man') {	
+                            child.material = new THREE.MeshLambertMaterial({	
+                                map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
+                                skinning: true	
+                            });	
+                        }	
+                    });	
+                    //  console.log(object);	
+                    character.setModel(object);	
+                    character.setModelOffset(new THREE.Vector3(0, -0.1, 0));	
+                    
                 });	
-                 console.log(object);	
-                 character.setModel(object);	
-                character.setModelOffset(new THREE.Vector3(0, -0.1, 0));	
-            });	
         }
 
         // Spawn John
@@ -139,78 +109,175 @@
                 friction: 0.3
             });
 
-            fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
-                object.traverse(function (child) {
-                    if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                    if (child.name == 'grass') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
-                            transparent: true,
-                            depthWrite: false,
-                            side: THREE.DoubleSide
-                        });
-                        child.castShadow = false;
-                    }
-                    if (child.name == 'sign') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
-                        });
-                    }
-                    if (child.name == 'sign_shadow') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
-                            transparent: true,
-                        });
-                        child.renderOrder = -1;
-                    }
-                    if (child.name == 'credits') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
-                            transparent: true
-                        });
-                    }
-                });
+            // fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
+            //     object.traverse(function (child) {
+            //         if (child.isMesh) {
+            //             child.castShadow = true;
+            //             child.receiveShadow = true;
+            //         }
+            //         if (child.name == 'grass') {
+            //             child.material = new THREE.MeshLambertMaterial({
+            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
+            //                 transparent: true,
+            //                 depthWrite: false,
+            //                 side: THREE.DoubleSide
+            //             });
+            //             child.castShadow = false;
+            //         }
+            //         if (child.name == 'sign') {
+            //             child.material = new THREE.MeshLambertMaterial({
+            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
+            //             });
+            //         }
+            //         if (child.name == 'sign_shadow') {
+            //             child.material = new THREE.MeshLambertMaterial({
+            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
+            //                 transparent: true,
+            //             });
+            //             child.renderOrder = -1;
+            //         }
+            //         if (child.name == 'credits') {
+            //             child.material = new THREE.MeshLambertMaterial({
+            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
+            //                 transparent: true
+            //             });
+            //         }
+            //     });
 
-                object.translateZ(4.5);
-                object.translateX(-0.5);
-                object.rotateY(Math.PI / 2);
-                world.graphicsWorld.add(object);
-                world.spawnBoxPrimitive({
-                    mass: 0,
-                    position: new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
-                    size: new CANNON.Vec3(0.3, 0.45, 0.1),
-                    friction: 0.3,
-                    visible: false
-                });
+            //     object.translateZ(4.5);
+            //     object.translateX(-0.5);
+            //     object.rotateY(Math.PI / 2);
+            //     world.graphicsWorld.add(object);
+            //     world.spawnBoxPrimitive({
+            //         mass: 0,
+            //         position: new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
+            //         size: new CANNON.Vec3(0.3, 0.45, 0.1),
+            //         friction: 0.3,
+            //         visible: false
+            //     });
 
-                let object2 = object.clone();
-                object2.scale.multiplyScalar(1.7);
-                object2.traverse(function (child) {
-                    if (child.name == 'credits') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
-                            transparent: true
-                        });
-                        child.translateZ(-0.2);
-                    }
-                    if (child.name == 'sign') {
-                        child.translateZ(-0.2);
-                    }
-                });
+            //     let object2 = object.clone();
+            //     object2.scale.multiplyScalar(1.7);
+            //     object2.traverse(function (child) {
+            //         if (child.name == 'credits') {
+            //             child.material = new THREE.MeshLambertMaterial({
+            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
+            //                 transparent: true
+            //             });
+            //             child.translateZ(-0.2);
+            //         }
+            //         if (child.name == 'sign') {
+            //             child.translateZ(-0.2);
+            //         }
+            //     });
 
-                object2.translateZ(1);
-                world.graphicsWorld.add(object2);
-                world.spawnBoxPrimitive({
-                    mass: 0,
-                    position: new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
-                    size: new CANNON.Vec3(0.4, 0.58, 0.16),
-                    friction: 0.3,
-                    visible: false
-                });
-            });
+            //     object2.translateZ(1);
+            //     world.graphicsWorld.add(object2);
+            //     world.spawnBoxPrimitive({
+            //         mass: 0,
+            //         position: new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
+            //         size: new CANNON.Vec3(0.4, 0.58, 0.16),
+            //         friction: 0.3,
+            //         visible: false
+            //     });
+            // });
+
+            // async loading attempts
+
+            // function LoadGLB(character) {
+
+        //     // Optional: Provide a DRACOLoader instance to decode compressed mesh data
+        //     // THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
+        //     // loader.setDRACOLoader( new THREE.DRACOLoader() );
+
+        //     // Load a glTF resource
+        //     gloader.load(
+        //         // resource URL
+        //         '../build/models/game_man/game_man.glb',
+        //         // called when the resource is loaded
+        //         function ( gltf ) {
+                    
+        //             gltf.scene.traverse(function (child) {
+        //                 if (child.isMesh) {
+        //                     child.castShadow = true;
+        //                     child.receiveShadow = true;
+        //                 }
+        //                 if (child.name == 'game_man') {
+        //                     child.material = new THREE.MeshLambertMaterial({
+        //                         map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),
+        //                         skinning: true
+        //                     });
+        //                 }
+        //             });
+
+        //             character.setAnimations(gltf.animations);
+        //             character.setModel(gltf.scene);
+        //             character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+        //         },
+        //         // called while loading is progressing
+        //         function ( xhr ) {
+        //             // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        //         },
+        //         // called when loading has errors
+        //         function ( error ) {
+        //             console.error(error);
+        //         }
+        //     );
+        // }
+
+        // async function LoadFBXCharacterModel(character) {
+        //     return new Promise(AsnycLoadGLB);
+
+        //     // model.traverse(configureMaterials);
+        // }
+        
+        // async function AsnycLoadGLB(resolve, reject) {
+
+        //     // Load a glTF resource
+        //     gloader.load(
+        //         // resource URL
+        //         '../build/models/game_man/game_man.glb',
+        //         // called when the resource is loaded
+        //         (gltf) => resolve(gltf),
+        //         // called while loading is progressing
+        //         function ( xhr ) {
+        //             // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        //         },
+        //         // called when loading has errors
+        //         function ( error ) {
+        //             console.error(error);
+        //         }
+        //     );
+        // }
+
+        // async function configureMaterials(child){
+        //     if (child.isMesh) {	
+        //         child.castShadow = true;	
+        //         child.receiveShadow = true;	
+        //     }	
+        //     if (child.name == 'game_man') {	
+
+        //         const texturemap = await new Promise(loadFBXTexture);
+                
+        //         child.material = new THREE.MeshLambertMaterial({	
+        //             map: texturemap,	
+        //             skinning: true	
+        //         });	
+        //     }	
+        // }
+
+        // function loadFBXModel(resolve, reject){
+        //     const fbxLoader = new Sketchbook.FBXLoader();	
+        //     const dummyPath = '../build/models/game_man/game_man.fbx';
+        //     fbxLoader.load(dummyPath, (dummy) => resolve(dummy));
+        // }
+
+        // //helper function to load in the texture
+        // function loadFBXTexture(resolve, reject){
+        //     const textureLoader = new THREE.TextureLoader();
+        //     const texturePath   = '../build/models/game_man/game_man.png';
+        //     textureLoader.load(texturePath, (object) => resolve(object));
+        // }
         }
     </script>
 </body>
