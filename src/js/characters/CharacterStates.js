@@ -712,8 +712,6 @@ class DropRunning extends DefaultState {
         if(this.animationEnded(timeStep)) {
             this.character.setState(Walk);
         }
-    
-        this.fallInAir();
     }
 
     changeState() {
