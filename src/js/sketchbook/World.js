@@ -407,7 +407,7 @@ export class World {
 
         let mat = new CANNON.Material();
         mat.friction = options.friction;
-        mat.restitution = 0.3;
+        // mat.restitution = 0.7;
 
         let shape = new CANNON.Box(options.size);
         shape.material = mat;
