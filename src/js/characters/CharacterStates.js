@@ -83,7 +83,7 @@ class DefaultState {
     setAppropriateStartWalkState() {
 
         let range = Math.PI;
-        let angle = Utils.getAngleBetweenVectors(this.character.orientation, this.character.getCameraRelativeMovementVector());
+        let angle = Utils.getSignedAngleBetweenVectors(this.character.orientation, this.character.getCameraRelativeMovementVector());
 
         if(angle > range * 0.8) {
             this.character.setState(StartWalkBackLeft);
@@ -390,7 +390,7 @@ class StartBaseState extends DefaultState {
         if(this.noDirection()) {
             if(this.timer < 0.1) {
 
-                let angle = Utils.getAngleBetweenVectors(this.character.orientation, this.character.orientationTarget);
+                let angle = Utils.getSignedAngleBetweenVectors(this.character.orientation, this.character.orientationTarget);
                 
                 if(angle > Math.PI * 0.4) {
                     this.character.setState(IdleRotateLeft);

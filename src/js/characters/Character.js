@@ -9,32 +9,12 @@ import { CharacterAI } from './CharacterAI';
 import { CharacterStates } from './CharacterStates';
 import { GameModes } from '../sketchbook/GameModes';
 
-// raycast debugging
-// let boxSize = 0.1;
-// let normgeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-// let normmaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
-// let normline = new THREE.Mesh( normgeometry, normmaterial );
-// let dirgeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-// let dirmaterial = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
-// let dirline = new THREE.Mesh( dirgeometry, dirmaterial );
-// let crossgeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-// let crossmaterial = new THREE.MeshLambertMaterial( { color: 0xffdd00 } );
-// let crossline = new THREE.Mesh( crossgeometry, crossmaterial );
-// let origeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-// let orimaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-// let oriline = new THREE.Mesh( origeometry, orimaterial );
-
 //Character class
 export class Character extends THREE.Object3D {
     
     constructor(world) {
 
         super();
-
-        // world.graphicsWorld.add(normline);
-        // world.graphicsWorld.add(dirline);
-        // world.graphicsWorld.add(crossline);
-        // world.graphicsWorld.add(oriline);
 
         this.world = world;
 
@@ -318,7 +298,7 @@ export class Character extends THREE.Object3D {
     
         //Spring rotation
         //Figure out angle between current and target orientation
-        let angle = Utils.getAngleBetweenVectors(this.orientation, this.orientationTarget);
+        let angle = Utils.getSignedAngleBetweenVectors(this.orientation, this.orientationTarget);
 
         // Simulator
         this.rotationSimulator.target = angle * RotationMultiplier;
@@ -419,28 +399,25 @@ export class Character extends THREE.Object3D {
         // If we're hitting the ground, stick to ground
         if(this.character.rayHasHit) {
 
+            
             //Flatten velocity
             newVelocity.y = 0;
-
-            // Get axis on which we'll rotate the raycast hit normal
-            // let rotateAxis = new THREE.Vector3().copy(this.character.orientation).applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
-            let rotateAxis = new THREE.Vector3().crossVectors(this.character.rayResult.hitNormalWorld, this.character.orientation);
-            rotateAxis.normalize();
             
-            // Get raycast hit normal
-            let directionVector = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld);
-            // Point it in the right direction
-            directionVector.applyAxisAngle(rotateAxis, Math.PI/2);
-            // Multiply with new velocity's length
-            directionVector.multiplyScalar(newVelocity.length());
+            // Get slope angle
+            let angle = Utils.getAngleBetweenVectors(new THREE.Vector3(0, 1, 0), this.character.rayResult.hitNormalWorld);
+            let flatNormalizedHitNormal = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld).setY(0).normalize();
+            let factor = this.character.orientation.dot(flatNormalizedHitNormal);
+            
+            // Get rotation axis
+            let rotateAxis = new THREE.Vector3(this.character.orientation.z, 0, -this.character.orientation.x);
 
+            // Get new velocity
+            let directionVector = this.character.orientation.clone();
+            directionVector.applyAxisAngle(rotateAxis, angle * factor);
+            directionVector.multiplyScalar(newVelocity.length());
+            
             // Apply velocity
             this.velocity.copy(directionVector);
-
-            // dirline.position.copy(new THREE.Vector3().addVectors(this.character.rayResult.hitPointWorld, directionVector.clone().normalize().multiplyScalar(0.5)));
-            // normline.position.copy(new THREE.Vector3().addVectors(this.character.rayResult.hitPointWorld, new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld).multiplyScalar(0.5)));
-            // crossline.position.copy(new THREE.Vector3().addVectors(this.character.rayResult.hitPointWorld, rotateAxis.clone().multiplyScalar(0.5)));
-            // oriline.position.copy(new THREE.Vector3().addVectors(this.character.rayResult.hitPointWorld, this.character.orientation.clone().multiplyScalar(0.5)));
         }
         else {
             // If we're in air

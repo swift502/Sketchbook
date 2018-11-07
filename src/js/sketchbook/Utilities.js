@@ -139,7 +139,7 @@ export class Utilities {
      * @param {THREE.Vector3} v1 
      * @param {THREE.Vector3} v2 
      */
-    static getAngleBetweenVectors(v1, v2, normal = new THREE.Vector3(0, 1, 0), dot_treshold = 0.0005) {
+    static getAngleBetweenVectors(v1, v2, dot_treshold = 0.0005) {
 
         let angle;
         let dot = v1.dot(v2);
@@ -157,17 +157,31 @@ export class Utilities {
                 // Get angle difference in radians
                 angle = Math.acos(dot);
             }   
-
-            // Get vector pointing up or down
-            let cross = new THREE.Vector3().crossVectors(v1, v2);
-            // Compare cross with normal to find out direction
-            if (normal.dot(cross) < 0) {
-                angle = -angle;
-            }
         }
 
         return angle;
     }
+
+    /**
+     * Finds an angle between two vectors with a sign relative to normal vector
+     * @param {THREE.Vector3} v1 
+     * @param {THREE.Vector3} v2 
+     * @param {THREE.Vector3} normal Normal vector of the plane created by v1 and v2, independent of the order of v1 and v2
+     */
+    static getSignedAngleBetweenVectors(v1, v2, normal = new THREE.Vector3(0, 1, 0), dot_treshold = 0.0005) {
+        
+        let angle = this.getAngleBetweenVectors(v1, v2, dot_treshold);
+
+        // Get vector pointing up or down
+        let cross = new THREE.Vector3().crossVectors(v1, v2);
+        // Compare cross with normal to find out direction
+        if (normal.dot(cross) < 0) {
+            angle = -angle;
+        }
+
+        return angle;
+    }
+
     //#endregion
 
     //#region Miscellaneous
