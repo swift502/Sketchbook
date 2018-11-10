@@ -21,24 +21,25 @@ export class CameraController
     {
         this.sensitivity = new THREE.Vector2(sensitivityX, sensitivityY);
     }
-    
+
     setRadius(value)
     {
-        this.radius = Math.max( 0.001, value );
+        this.radius = Math.max(0.001, value);
     }
 
-    move(deltaX, deltaY) {
+    move(deltaX, deltaY)
+    {
         this.theta -= deltaX * this.sensitivity.x;
         this.theta %= 720;
         this.phi += deltaY * this.sensitivity.y;
-        this.phi = Math.min( 170, Math.max( -170, this.phi ) );
+        this.phi = Math.min(170, Math.max(-170, this.phi));
     }
 
     update()
     {
-        this.camera.position.x = this.target.x + this.radius * Math.sin( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
-        this.camera.position.y = this.target.y + this.radius * Math.sin( this.phi * Math.PI / 360 );
-        this.camera.position.z = this.target.z + this.radius * Math.cos( this.theta * Math.PI / 360 ) * Math.cos( this.phi * Math.PI / 360 );
+        this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
+        this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 360);
+        this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
         this.camera.updateMatrix();
         this.camera.lookAt(this.target);
     }

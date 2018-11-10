@@ -32,7 +32,8 @@ export class InputManager
 
     }
 
-    setPointerLock(enabled) {
+    setPointerLock(enabled)
+    {
         this.pointerLock = enabled;
     }
 

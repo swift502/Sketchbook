@@ -1,6 +1,8 @@
 
-export class Item extends Object {
-    constructor() {
+export class Item extends Object
+{
+    constructor()
+    {
         super();
         this.isItem = true;
     }

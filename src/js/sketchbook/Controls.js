@@ -1,13 +1,17 @@
-class EventControl {
-    constructor() {
+class EventControl
+{
+    constructor()
+    {
         this.value = false;
         this.justPressed = false;
         this.justReleased = false;
     }
 }
 
-class LerpControl {
-    constructor() {
+class LerpControl
+{
+    constructor()
+    {
         this.value = false;
         this.floatValue = 0;
     }

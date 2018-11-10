@@ -5,13 +5,13 @@ import { Utilities as Utils } from '../sketchbook/Utilities';
 //
 // Default state
 //
-class DefaultState {
-
+class DefaultState
+{
     /**
      * @param {Character} character 
      */
-    constructor(character) {
-
+    constructor(character)
+    {
         this.character = character;
 
         this.character.velocitySimulator.damping = this.character.defaultVelocitySimulatorDamping;
@@ -26,79 +26,99 @@ class DefaultState {
         this.timer = 0;
     }
 
-    update(timeStep) {
+    update(timeStep)
+    {
         this.timer += timeStep;
     }
 
-    changeState() {}
+    changeState() { }
 
-    noDirection() {
+    noDirection()
+    {
         return !this.character.controls.up.value && !this.character.controls.down.value && !this.character.controls.left.value && !this.character.controls.right.value;
     }
 
-    anyDirection() {
+    anyDirection()
+    {
         return this.character.controls.up.value || this.character.controls.down.value || this.character.controls.left.value || this.character.controls.right.value;
     }
 
-    justPressed(control) {
+    justPressed(control)
+    {
         return this.character.controls.lastControl == control && control.justPressed;
     }
 
-    isPressed(control) {
+    isPressed(control)
+    {
         return control.value;
     }
 
-    justReleased(control) {
+    justReleased(control)
+    {
         return this.character.controls.lastControl == control && control.justReleased;
     }
 
-    fallInAir() {
-        if(!this.character.rayHasHit) this.character.setState(Falling);
+    fallInAir()
+    {
+        if (!this.character.rayHasHit) this.character.setState(Falling);
     }
 
-    animationEnded(timeStep) {
-        if(this.character.mixer != undefined) {
-            if(this.animationLength == undefined) {
+    animationEnded(timeStep)
+    {
+        if (this.character.mixer != undefined)
+        {
+            if (this.animationLength == undefined)
+            {
                 console.error(this.constructor.name + 'Error: Set this.animationLength in state constructor!');
                 return false;
             }
-            else {
+            else
+            {
                 return this.timer > this.animationLength - timeStep;
             }
         }
         else return true;
     }
 
-    setAppropriateDropState() {
-        if(this.character.groundImpactData.velocity.y < -6) {
+    setAppropriateDropState()
+    {
+        if (this.character.groundImpactData.velocity.y < -6)
+        {
             this.character.setState(DropRolling);
         }
-        else if(this.anyDirection()) {
+        else if (this.anyDirection())
+        {
             this.character.setState(DropRunning);
         }
-        else {
+        else
+        {
             this.character.setState(DropIdle);
         }
     }
 
-    setAppropriateStartWalkState() {
-
+    setAppropriateStartWalkState()
+    {
         let range = Math.PI;
         let angle = Utils.getSignedAngleBetweenVectors(this.character.orientation, this.character.getCameraRelativeMovementVector());
 
-        if(angle > range * 0.8) {
+        if (angle > range * 0.8)
+        {
             this.character.setState(StartWalkBackLeft);
         }
-        else if(angle < -range * 0.8) {
+        else if (angle < -range * 0.8)
+        {
             this.character.setState(StartWalkBackRight);
         }
-        else if(angle > range * 0.3) {
+        else if (angle > range * 0.3)
+        {
             this.character.setState(StartWalkLeft);
         }
-        else if(angle < -range * 0.3) {
+        else if (angle < -range * 0.3)
+        {
             this.character.setState(StartWalkRight);
         }
-        else {
+        else
+        {
             this.character.setState(StartWalkForward);
         }
     }
@@ -107,38 +127,42 @@ class DefaultState {
 //
 // Idle
 //
-class Idle extends DefaultState {
-
-    constructor(character) {
-
+class Idle extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.velocitySimulator.damping = 0.6;
         this.character.velocitySimulator.mass = 10;
-        
+
         this.character.setArcadeVelocityTarget(0);
         this.character.setAnimation('idle', 0.3);
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
-    
+
         this.character.update(timeStep);
-    
+
         this.fallInAir();
     }
-    changeState() {
-
-        if(this.justPressed(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpIdle);
         }
-    
-        if(this.anyDirection()) {
-            if(this.character.velocity.length() > 0.5) {
+
+        if (this.anyDirection())
+        {
+            if (this.character.velocity.length() > 0.5)
+            {
                 this.character.setState(Walk);
             }
-            else {
+            else
+            {
                 this.setAppropriateStartWalkState();
             }
         }
@@ -148,10 +172,10 @@ class Idle extends DefaultState {
 //
 // Idle
 //
-class IdleRotateRight extends DefaultState {
-
-    constructor(character) {
-
+class IdleRotateRight extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.rotationSimulator.mass = 30;
@@ -159,34 +183,39 @@ class IdleRotateRight extends DefaultState {
 
         this.character.velocitySimulator.damping = 0.6;
         this.character.velocitySimulator.mass = 10;
-        
+
         this.character.setArcadeVelocityTarget(0);
         this.animationLength = this.character.setAnimation('rotate_right', 0.1);
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
-    
-        if(this.animationEnded(timeStep)) {
+
+        if (this.animationEnded(timeStep))
+        {
             this.character.setState(Idle);
         }
 
         this.character.update(timeStep);
-    
+
         this.fallInAir();
     }
-    changeState() {
-
-        if(this.justPressed(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpIdle);
         }
-    
-        if(this.anyDirection()) {
-            if(this.character.velocity.length() > 0.5) {
+
+        if (this.anyDirection())
+        {
+            if (this.character.velocity.length() > 0.5)
+            {
                 this.character.setState(Walk);
             }
-            else {
+            else
+            {
                 this.setAppropriateStartWalkState();
             }
         }
@@ -196,10 +225,10 @@ class IdleRotateRight extends DefaultState {
 //
 // Idle
 //
-class IdleRotateLeft extends DefaultState {
-
-    constructor(character) {
-
+class IdleRotateLeft extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.rotationSimulator.mass = 30;
@@ -207,35 +236,40 @@ class IdleRotateLeft extends DefaultState {
 
         this.character.velocitySimulator.damping = 0.6;
         this.character.velocitySimulator.mass = 10;
-        
+
         this.character.setArcadeVelocityTarget(0);
         this.animationLength = this.character.setAnimation('rotate_left', 0.1);
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
-    
+
         this.character.update(timeStep);
 
-        if(this.animationEnded(timeStep)) {
+        if (this.animationEnded(timeStep))
+        {
             this.character.setState(Idle);
         }
-    
+
         this.fallInAir();
     }
 
-    changeState() {
-
-        if(this.justPressed(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpIdle);
         }
-    
-        if(this.anyDirection()) {
-            if(this.character.velocity.length() > 0.5) {
+
+        if (this.anyDirection())
+        {
+            if (this.character.velocity.length() > 0.5)
+            {
                 this.character.setState(Walk);
             }
-            else {
+            else
+            {
                 this.setAppropriateStartWalkState();
             }
         }
@@ -245,44 +279,51 @@ class IdleRotateLeft extends DefaultState {
 //
 // Walk
 //
-class Walk extends DefaultState {
-
-    constructor(character) {
-
+class Walk extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.setArcadeVelocityTarget(0.8);
         this.character.setAnimation('run', 0.1);
 
-        if(this.noDirection()) {
+        if (this.noDirection())
+        {
             this.character.setState(EndWalk);
         }
     }
 
-    update(timeStep) {
+    update(timeStep)
+    {
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
-    
+
         this.fallInAir();
-    
-        if(this.isPressed(this.character.controls.run)) {
+
+        if (this.isPressed(this.character.controls.run))
+        {
             this.character.setState(Sprint);
         }
     }
 
-    changeState() {
-
-        if(this.justPressed(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpRunning);
         }
-    
-        if(this.noDirection()) {
-            if(this.character.velocity.length() > 1) {
+
+        if (this.noDirection())
+        {
+            if (this.character.velocity.length() > 1)
+            {
                 this.character.setState(EndWalk);
             }
-            else {
+            else
+            {
                 this.character.setState(Idle);
             }
         }
@@ -292,41 +333,44 @@ class Walk extends DefaultState {
 //
 // Sprint
 //
-class Sprint extends DefaultState {
-
-    constructor(character) {
-
+class Sprint extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.velocitySimulator.mass = 10;
         this.character.rotationSimulator.damping = 0.8;
         this.character.rotationSimulator.mass = 50;
-        
+
         this.character.setArcadeVelocityTarget(1.4);
         this.character.setAnimation('sprint', 0.3);
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
-    
+
         this.fallInAir();
     }
 
-    changeState() {
-
-        if(this.justReleased(this.character.controls.run)) {
+    changeState()
+    {
+        if (this.justReleased(this.character.controls.run))
+        {
             this.character.setState(Walk);
         }
 
-        if(this.justPressed(this.character.controls.jump)) {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpRunning);
         }
 
-        if(this.noDirection()) {
+        if (this.noDirection())
+        {
             this.character.setState(EndWalk);
         }
     }
@@ -335,10 +379,10 @@ class Sprint extends DefaultState {
 //
 // Base for start states
 //
-class StartBaseState extends DefaultState {
-
-    constructor(character) {
-
+class StartBaseState extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.rotationSimulator.mass = 20;
@@ -349,16 +393,17 @@ class StartBaseState extends DefaultState {
         // this.character.velocitySimulator.mass = 1;
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
 
-        if(this.animationEnded(timeStep)) {
+        if (this.animationEnded(timeStep))
+        {
             this.character.setState(Walk);
         }
 
         this.character.setCameraRelativeOrientationTarget();
-        
+
         //
         // Different velocity treating experiments
         //
@@ -375,40 +420,47 @@ class StartBaseState extends DefaultState {
         // directionVector.normalize();
 
         // this.character.setArcadeVelocity(directionVector.z * 0.8, directionVector.x * 0.8);
-        
-    
+
+
         this.character.update(timeStep);
-    
+
         this.fallInAir();
     }
 
-    changeState() {
-
-        if(this.justPressed(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpRunning);
         }
-    
-        if(this.noDirection()) {
-            if(this.timer < 0.1) {
 
+        if (this.noDirection())
+        {
+            if (this.timer < 0.1)
+            {
                 let angle = Utils.getSignedAngleBetweenVectors(this.character.orientation, this.character.orientationTarget);
-                
-                if(angle > Math.PI * 0.4) {
+
+                if (angle > Math.PI * 0.4)
+                {
                     this.character.setState(IdleRotateLeft);
                 }
-                else if(angle < -Math.PI * 0.4) {
+                else if (angle < -Math.PI * 0.4)
+                {
                     this.character.setState(IdleRotateRight);
                 }
-                else {
+                else
+                {
                     this.character.setState(Idle);
                 }
             }
-            else {
+            else
+            {
                 this.character.setState(Idle);
             }
         }
-    
-        if(this.justPressed(this.character.controls.run)) {
+
+        if (this.justPressed(this.character.controls.run))
+        {
             this.character.setState(Sprint);
         }
     }
@@ -417,10 +469,10 @@ class StartBaseState extends DefaultState {
 //
 // Start Walk Forward
 //
-class StartWalkForward extends StartBaseState {
-
-    constructor(character) {
-
+class StartWalkForward extends StartBaseState
+{
+    constructor(character)
+    {
         super(character);
         this.animationLength = character.setAnimation('start_forward', 0.1);
     }
@@ -429,10 +481,10 @@ class StartWalkForward extends StartBaseState {
 //
 // Start Walk Left
 //
-class StartWalkLeft extends StartBaseState {
-
-    constructor(character) {
-
+class StartWalkLeft extends StartBaseState
+{
+    constructor(character)
+    {
         super(character);
         this.animationLength = character.setAnimation('start_left', 0.1);
     }
@@ -441,10 +493,10 @@ class StartWalkLeft extends StartBaseState {
 //
 // Start Walk Left
 //
-class StartWalkRight extends StartBaseState {
-
-    constructor(character) {
-
+class StartWalkRight extends StartBaseState
+{
+    constructor(character)
+    {
         super(character);
         this.animationLength = character.setAnimation('start_right', 0.1);
     }
@@ -453,10 +505,10 @@ class StartWalkRight extends StartBaseState {
 //
 // Start Walk Left
 //
-class StartWalkBackLeft extends StartBaseState {
-
-    constructor(character) {
-
+class StartWalkBackLeft extends StartBaseState
+{
+    constructor(character)
+    {
         super(character);
         this.animationLength = character.setAnimation('start_back_left', 0.1);
     }
@@ -465,10 +517,10 @@ class StartWalkBackLeft extends StartBaseState {
 //
 // Start Walk Left
 //
-class StartWalkBackRight extends StartBaseState {
-
-    constructor(character) {
-
+class StartWalkBackRight extends StartBaseState
+{
+    constructor(character)
+    {
         super(character);
         this.animationLength = character.setAnimation('start_back_right', 0.1);
     }
@@ -477,44 +529,51 @@ class StartWalkBackRight extends StartBaseState {
 //
 // End Walk
 //
-class EndWalk extends DefaultState {
-
-    constructor(character) {
-
+class EndWalk extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.setArcadeVelocityTarget(0);
         this.animationLength = character.setAnimation('stop', 0.1);
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
 
-        if(this.animationEnded(timeStep)) {
-    
+        if (this.animationEnded(timeStep))
+        {
+
             this.character.setState(Idle);
         }
-        
+
         this.character.update(timeStep);
         this.fallInAir();
     }
 
-    changeState() {
-
-        if(this.justPressed(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpIdle);
         }
-    
-        if(this.anyDirection()) {
-            if(this.isPressed(this.character.controls.run)) {
+
+        if (this.anyDirection())
+        {
+            if (this.isPressed(this.character.controls.run))
+            {
                 this.character.setState(Sprint);
             }
-            else {
-                if(this.character.velocity.length() > 0.5) {
+            else
+            {
+                if (this.character.velocity.length() > 0.5)
+                {
                     this.character.setState(Walk);
                 }
-                else {
+                else
+                {
                     this.setAppropriateStartWalkState();
                 }
             }
@@ -525,14 +584,12 @@ class EndWalk extends DefaultState {
 //
 // Jump Idle
 //
-class JumpIdle extends DefaultState {
-
-    constructor(character) {
-
+class JumpIdle extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
-        // this.character.velocitySimulator.damping = 0.5;
-        // this.character.velocitySimulator.mass = 1;
         this.character.velocitySimulator.mass = 50;
 
         this.character.setArcadeVelocityTarget(0);
@@ -540,19 +597,21 @@ class JumpIdle extends DefaultState {
         this.alreadyJumped = false;
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
 
         // Move in air
-        if(this.alreadyJumped) {
+        if (this.alreadyJumped)
+        {
             this.character.setCameraRelativeOrientationTarget();
             this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
         }
         this.character.update(timeStep);
 
         //Physically jump
-        if(this.timer > 0.2 && !this.alreadyJumped) {
+        if (this.timer > 0.2 && !this.alreadyJumped)
+        {
             this.character.jump();
             this.alreadyJumped = true;
 
@@ -560,10 +619,12 @@ class JumpIdle extends DefaultState {
             this.character.rotationSimulator.damping = 0.3;
             this.character.setArcadeVelocityInfluence(0.3, 0, 0.3);
         }
-        else if(this.timer > 0.3 && this.character.rayHasHit) {
+        else if (this.timer > 0.3 && this.character.rayHasHit)
+        {
             this.setAppropriateDropState();
         }
-        else if(this.timer > this.animationLength - timeStep) {
+        else if (this.timer > this.animationLength - timeStep)
+        {
             this.character.setState(Falling);
         }
     }
@@ -572,10 +633,10 @@ class JumpIdle extends DefaultState {
 //
 // Jump Running
 //
-class JumpRunning extends DefaultState {
-
-    constructor(character) {
-
+class JumpRunning extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.velocitySimulator.mass = 100;
@@ -583,31 +644,35 @@ class JumpRunning extends DefaultState {
         this.alreadyJumped = false;
     }
 
-    update(timeStep) {
-
+    update(timeStep)
+    {
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
 
         // Move in air
-        if(this.alreadyJumped) {
+        if (this.alreadyJumped)
+        {
             this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
         }
         this.character.update(timeStep);
 
         //Physically jump
-        if(this.timer > 0.14 && !this.alreadyJumped) {
+        if (this.timer > 0.14 && !this.alreadyJumped)
+        {
             this.character.jump(4);
             this.alreadyJumped = true;
-            
+
             this.character.rotationSimulator.damping = 0.3;
             this.character.arcadeVelocityIsAdditive = true;
             this.character.setArcadeVelocityInfluence(0.05, 0, 0.05);
         }
-        else if(this.timer > 0.24 && this.character.rayHasHit) {
+        else if (this.timer > 0.24 && this.character.rayHasHit)
+        {
             this.setAppropriateDropState();
         }
-        else if(this.timer > this.animationLength - timeStep) {
+        else if (this.timer > this.animationLength - timeStep)
+        {
             this.character.setState(Falling);
         }
     }
@@ -616,10 +681,10 @@ class JumpRunning extends DefaultState {
 //
 // Falling
 //
-class Falling extends DefaultState {
-
-    constructor(character) {
-
+class Falling extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.velocitySimulator.mass = 100;
@@ -627,11 +692,12 @@ class Falling extends DefaultState {
 
         this.character.arcadeVelocityIsAdditive = true;
         this.character.setArcadeVelocityInfluence(0.05, 0, 0.05);
-    
+
         this.character.setAnimation('falling', 0.3);
     }
 
-    update(timeStep) {
+    update(timeStep)
+    {
 
         super.update(timeStep);
 
@@ -640,7 +706,8 @@ class Falling extends DefaultState {
 
         this.character.update(timeStep);
 
-        if(this.character.rayHasHit) {
+        if (this.character.rayHasHit)
+        {
             this.setAppropriateDropState();
         }
     }
@@ -649,10 +716,10 @@ class Falling extends DefaultState {
 //
 // Drop Idle
 //
-class DropIdle extends DefaultState {
-
-    constructor(character) {
-
+class DropIdle extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.velocitySimulator.damping = 0.5;
@@ -660,33 +727,39 @@ class DropIdle extends DefaultState {
 
         this.character.setArcadeVelocityTarget(0);
         this.animationLength = this.character.setAnimation('drop_idle', 0.1);
-        
-        if(this.anyDirection()) {
+
+        if (this.anyDirection())
+        {
             this.character.setState(StartWalkForward);
         }
     }
 
-    update(timeStep) {
+    update(timeStep)
+    {
 
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
-    
-        if(this.animationEnded(timeStep)) {
+
+        if (this.animationEnded(timeStep))
+        {
             this.character.setState(Idle);
         }
-    
+
         this.fallInAir();
     }
 
-    changeState() {
+    changeState()
+    {
 
-        if(this.justPressed(this.character.controls.jump)) {
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpIdle);
         }
 
-        if(this.anyDirection()) {
+        if (this.anyDirection())
+        {
             this.character.setState(StartWalkForward);
         }
     }
@@ -695,39 +768,43 @@ class DropIdle extends DefaultState {
 //
 // Drop Running
 //
-class DropRunning extends DefaultState {
-
-    constructor(character) {
-
+class DropRunning extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.setArcadeVelocityTarget(0.8);
         this.animationLength = this.character.setAnimation('drop_running', 0.1);
     }
-    
-    update(timeStep) {
 
+    update(timeStep)
+    {
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
-    
-        if(this.animationEnded(timeStep)) {
+
+        if (this.animationEnded(timeStep))
+        {
             this.character.setState(Walk);
         }
     }
 
-    changeState() {
-
-        if(this.noDirection(this.character.controls.jump)) {
+    changeState()
+    {
+        if (this.noDirection(this.character.controls.jump))
+        {
             this.character.setState(EndWalk);
         }
-    
-        if(this.anyDirection() && this.justPressed(this.character.controls.run)) {
+
+        if (this.anyDirection() && this.justPressed(this.character.controls.run))
+        {
             this.character.setState(Sprint);
         }
-    
-        if(this.justPressed(this.character.controls.jump)) {
+
+        if (this.justPressed(this.character.controls.jump))
+        {
             this.character.setState(JumpRunning);
         }
     }
@@ -736,31 +813,34 @@ class DropRunning extends DefaultState {
 //
 // Drop Running
 //
-class DropRolling extends DefaultState {
-
-    constructor(character) {
-
+class DropRolling extends DefaultState
+{
+    constructor(character)
+    {
         super(character);
 
         this.character.velocitySimulator.mass = 1;
         this.character.velocitySimulator.damping = 0.6;
 
         this.character.setArcadeVelocityTarget(0.8);
-        this.animationLength = this.character.setAnimation('drop_running_roll', 0.03    );
+        this.animationLength = this.character.setAnimation('drop_running_roll', 0.03);
     }
-    
-    update(timeStep) {
 
+    update(timeStep)
+    {
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
         this.character.update(timeStep);
-    
-        if(this.animationEnded(timeStep)) {
-            if(this.anyDirection()) {
+
+        if (this.animationEnded(timeStep))
+        {
+            if (this.anyDirection())
+            {
                 this.character.setState(Walk);
             }
-            else {
+            else
+            {
                 this.character.setState(EndWalk);
             }
         }
