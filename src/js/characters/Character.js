@@ -8,15 +8,17 @@ import { Controls } from '../sketchbook/Controls';
 import { CharacterAI } from './CharacterAI';
 import { CharacterStates } from './CharacterStates';
 import { GameModes } from '../sketchbook/GameModes';
+import { ObjectPhysics } from '../objects/ObjectPhysics';
+import { Object } from '../objects/Object';
 
 //Character class
 export class Character extends THREE.Object3D {
     
-    constructor(world) {
+    constructor() {
 
         super();
 
-        this.world = world;
+        this.isCharacter = true;
 
         // Geometry
         this.height = 1;
@@ -53,7 +55,8 @@ export class Character extends THREE.Object3D {
         // Movement
         this.acceleration = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
-        this.simulatedVelocityInfluence = new THREE.Vector3();
+        this.arcadeVelocityInfluence = new THREE.Vector3();
+        this.arcadeVelocityIsAdditive = false;
         this.velocityTarget = new THREE.Vector3();
         // Velocity spring simulator
         this.defaultVelocitySimulatorDamping = 0.8;
@@ -92,31 +95,31 @@ export class Character extends THREE.Object3D {
 
         // Physics
         // Player Capsule
-        this.characterCapsule = world.spawnCapsulePrimitive({
+        let capsuleShape = new ObjectPhysics.Capsule({
             mass: 1,
             position: new CANNON.Vec3(0, 0, 0),
             height: 0.5,
             radius: 0.25,
             segments: 8,
-            friction: 0,
-            visible: false
+            friction: 0
         });
-        this.characterCapsule.visual.visible = false;
+        this.characterCapsule = new Object();
+        this.characterCapsule.setPhysics(capsuleShape);
 
         // Pass reference to character for callbacks
-        this.characterCapsule.physical.character = this;
+        this.characterCapsule.shape.character = this;
 
         // Move character to different collision group for raycasting
-        this.characterCapsule.physical.collisionFilterGroup = 2;
+        this.characterCapsule.shape.collisionFilterGroup = 2;
 
         // Disable character rotation
-        this.characterCapsule.physical.fixedRotation = true;
-        this.characterCapsule.physical.updateMassProperties();
+        this.characterCapsule.shape.fixedRotation = true;
+        this.characterCapsule.shape.updateMassProperties();
 
         // Ray casting
         this.rayResult = new CANNON.RaycastResult();
         this.rayHasHit = false;
-        this.rayCastLength = 0.61;
+        this.rayCastLength = 0.60;
         this.raySafeOffset = 0.01;
         this.wantsToJump = false;
         this.initJumpSpeed = -1;
@@ -133,8 +136,8 @@ export class Character extends THREE.Object3D {
         this.raycastBox.visible = false;
 
         // Physics pre/post step callback bindings
-        this.characterCapsule.physical.preStep = this.physicsPreStep;
-        this.characterCapsule.physical.postStep = this.physicsPostStep;
+        this.characterCapsule.shape.preStep = this.physicsPreStep;
+        this.characterCapsule.shape.postStep = this.physicsPostStep;
     }
 
     setAnimations(animations) {
@@ -152,8 +155,8 @@ export class Character extends THREE.Object3D {
         this.charState.changeState();
     }
 
-    setSimulatedVelocityInfluence(x, y = x, z = x) {
-        this.simulatedVelocityInfluence.set(x, y, z);
+    setArcadeVelocityInfluence(x, y = x, z = x) {
+        this.arcadeVelocityInfluence.set(x, y, z);
     }
     
     setModelOffset(offset) {
@@ -173,7 +176,7 @@ export class Character extends THREE.Object3D {
     }
     
     setPosition(x, y, z) {
-        this.characterCapsule.physical.position = new CANNON.Vec3(x, y, z);
+        this.characterCapsule.shape.position = new CANNON.Vec3(x, y, z);
     }
     
     setArcadeVelocity(velZ, velX = 0, velY = 0) {
@@ -259,9 +262,9 @@ export class Character extends THREE.Object3D {
         if(options.updateAnimation && this.mixer != undefined) this.mixer.update(timeStep);
         
         this.position.set(
-            this.characterCapsule.physical.interpolatedPosition.x,
-            this.characterCapsule.physical.interpolatedPosition.y - this.height/2,
-            this.characterCapsule.physical.interpolatedPosition.z
+            this.characterCapsule.shape.interpolatedPosition.x,
+            this.characterCapsule.shape.interpolatedPosition.y - this.height/2,
+            this.characterCapsule.shape.interpolatedPosition.z
         );
     }
     
@@ -360,7 +363,7 @@ export class Character extends THREE.Object3D {
         // Player ray casting
         // Create ray
         const start = new CANNON.Vec3(this.position.x, this.position.y, this.position.z);
-        const end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength, this.position.z);
+        const end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength - this.character.raySafeOffset, this.position.z);
         // Raycast options
         const rayCastOptions = {
             collisionFilterMask: ~2 /* cast against everything except second collision group (player) */,
@@ -371,14 +374,12 @@ export class Character extends THREE.Object3D {
         
         if(this.character.rayHasHit) {
             if(this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
-            this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength - this.character.raySafeOffset;
+            this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength;
         }
         else {
-            if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength, this.position.z);
+            if(this.character.raycastBox.visible) this.character.raycastBox.position.set(this.position.x, this.position.y  - this.character.rayCastLength - this.character.raySafeOffset, this.position.z);
         }
     }
-
-    
 
     physicsPostStep() {
         
@@ -390,34 +391,46 @@ export class Character extends THREE.Object3D {
         // Turn local into global
         arcadeVelocity = Utils.appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
 
-        let newVelocity = new THREE.Vector3(
-            THREE.Math.lerp(arcadeVelocity.x, simulatedVelocity.x, this.character.simulatedVelocityInfluence.x),
-            THREE.Math.lerp(arcadeVelocity.y, simulatedVelocity.y, this.character.simulatedVelocityInfluence.y),
-            THREE.Math.lerp(arcadeVelocity.z, simulatedVelocity.z, this.character.simulatedVelocityInfluence.z),
-        );
+        let newVelocity = new THREE.Vector3();
+
+        // Additive velocity mode
+        if(this.character.arcadeVelocityIsAdditive) {
+            
+            newVelocity.copy(simulatedVelocity);
+
+            let globalVelocityTarget = Utils.appplyVectorMatrixXZ(this.character.orientation, this.character.velocityTarget);
+            let add = new THREE.Vector3().copy(arcadeVelocity).multiply(this.character.arcadeVelocityInfluence);
+
+            if(Math.abs(simulatedVelocity.x) < Math.abs(globalVelocityTarget.x * this.character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.x, arcadeVelocity.x)) { newVelocity.x += add.x; }
+            if(Math.abs(simulatedVelocity.y) < Math.abs(globalVelocityTarget.y * this.character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.y, arcadeVelocity.y)) { newVelocity.y += add.y; }
+            if(Math.abs(simulatedVelocity.z) < Math.abs(globalVelocityTarget.z * this.character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.z, arcadeVelocity.z)) { newVelocity.z += add.z; }
+        }
+        else {
+            newVelocity = new THREE.Vector3(
+                THREE.Math.lerp(simulatedVelocity.x, arcadeVelocity.x, this.character.arcadeVelocityInfluence.x),
+                THREE.Math.lerp(simulatedVelocity.y, arcadeVelocity.y, this.character.arcadeVelocityInfluence.y),
+                THREE.Math.lerp(simulatedVelocity.z, arcadeVelocity.z, this.character.arcadeVelocityInfluence.z),
+            );
+        }
 
         // If we're hitting the ground, stick to ground
         if(this.character.rayHasHit) {
 
-            
             //Flatten velocity
             newVelocity.y = 0;
             
-            // Get slope angle
-            let angle = Utils.getAngleBetweenVectors(new THREE.Vector3(0, 1, 0), this.character.rayResult.hitNormalWorld);
-            let flatNormalizedHitNormal = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld).setY(0).normalize();
-            let factor = this.character.orientation.dot(flatNormalizedHitNormal);
-            
-            // Get rotation axis
-            let rotateAxis = new THREE.Vector3(this.character.orientation.z, 0, -this.character.orientation.x);
+            // Measure the normal vector offset from direct "up" vector
+            // and transform it into a matrix
+            let up = new THREE.Vector3(0, 1, 0);
+            let normal = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld);
+            let q = new THREE.Quaternion().setFromUnitVectors(up, normal);
+            let m = new THREE.Matrix4().makeRotationFromQuaternion(q);
 
-            // Get new velocity
-            let directionVector = this.character.orientation.clone();
-            directionVector.applyAxisAngle(rotateAxis, angle * factor);
-            directionVector.multiplyScalar(newVelocity.length());
-            
+            // Rotate the velocity vector
+            newVelocity.applyMatrix4(m);
+
             // Apply velocity
-            this.velocity.copy(directionVector);
+            this.velocity.copy(newVelocity);
         }
         else {
             // If we're in air
@@ -441,7 +454,7 @@ export class Character extends THREE.Object3D {
                 }
             }
 
-            // Add positive vertical velocity
+            // Add positive vertical velocity 
             this.velocity.y += 4;
             //Move above ground by 1x safe offset value
             this.position.y += this.character.raySafeOffset * 2;

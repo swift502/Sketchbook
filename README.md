@@ -7,7 +7,7 @@
 
 # Sketchbook
 
-Package providing a pre-made configuration of 3D rendering and physics in a web-browser featuring several conventional game mechanics and basic 3D models.
+3D rendering and physics library for game projects for the web-browser, featuring a few conventional gameplay mechanics and basic 3D models.
 
 Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js).
 
@@ -23,7 +23,7 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
 * Characters
     * Third-person camera
     * Raycast character controller with capsule collisions
-    * Flexible state based animation system
+    * General state system
     * Character AI
 
 #### Not yet implemented
@@ -47,4 +47,7 @@ Simply import the library in your project, along with provided build of cannon.j
 <script src="cannon.min.js"></script> <!-- Only use provided build, official package is extremely outdated! -->
 <script src="sketchbook.min.js"></script>
 ```
+
+NPM package coming soon...
+
 Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn specifics about using Sketchbook.

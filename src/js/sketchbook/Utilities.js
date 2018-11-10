@@ -117,7 +117,7 @@ export class Utilities {
     static appplyVectorMatrixXZ(a, b) {
         return new THREE.Vector3(
             (a.x * b.z + a.z * b.x) / 2,
-            0,
+            b.y,
             (a.z * b.z + -a.x * b.x) / 2
         );
     }
@@ -180,6 +180,14 @@ export class Utilities {
         }
 
         return angle;
+    }
+
+    static haveSameSigns(n1, n2) {
+        return (n1 < 0) == (n2 < 0);
+    }
+
+    static haveDifferentSigns(n1, n2) {
+        return (n1 < 0) != (n2 < 0);
     }
 
     //#endregion

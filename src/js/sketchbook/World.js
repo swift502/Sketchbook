@@ -10,6 +10,7 @@ import { Shaders } from '../lib/shaders/Shaders';
 import { Detector } from '../lib/utils/Detector';
 import { Stats } from '../lib/utils/Stats';
 import { GUI } from '../lib/utils/dat.gui';
+import _ from 'lodash';
 
 export class World {
 
@@ -207,7 +208,7 @@ export class World {
             Time_Scale: 1,
             Shadows: true,
             FXAA: false,
-            Draw_Capsules: false,
+            Draw_Physics: false,
             RayCast_Debug: false
         };
         this.params = params;
@@ -220,7 +221,7 @@ export class World {
         graphics_folder.add(params, 'FXAA');
 
         let debug_folder = gui.addFolder('Debug');
-        let dc = debug_folder.add(params, 'Draw_Capsules');
+        let dp = debug_folder.add(params, 'Draw_Physics');
         let rcd = debug_folder.add(params, 'RayCast_Debug');
 
         gui.open();
@@ -229,10 +230,12 @@ export class World {
             this.timeScaleTarget = value;
         });
 
-        dc.onChange(function(enabled) {
-            scope.characters.forEach(char => {
-                if(enabled) char.characterCapsule.visual.visible = true;
-                else        char.characterCapsule.visual.visible = false;
+        dp.onChange(function(enabled) {
+            scope.objects.forEach(obj => {
+                if(obj.shapeModel != undefined) {
+                    if(enabled) obj.shapeModel.visible = true;
+                    else        obj.shapeModel.visible = false;
+                }
             });
         });
 
@@ -255,6 +258,7 @@ export class World {
         //#endregion
 
         //Initialization
+        this.objects = [];
         this.characters = [];
         this.vehicles = [];
         this.cameraController = new CameraController(this.camera);
@@ -273,6 +277,10 @@ export class World {
             char.behaviour.update(timeStep);
             char.updateMatrixWorld();
         });
+
+        this.objects.forEach(obj => {
+            obj.update(timeStep);
+        });
     
         this.gameMode.update(timeStep);
     
@@ -281,6 +289,44 @@ export class World {
     
         // Lerp timescale parameter
         this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
+    }
+
+    updatePhysics(timeStep) {
+        // Step the physics world
+        this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
+
+        // Sync physics/visuals
+        this.objects.forEach(obj => {
+    
+            if(obj.shape != undefined) {
+                if(obj.shape.position.y < -1) {	
+                    obj.shape.position.y = 10;
+                }
+        
+                if(obj.shape.position.y > 10) {	
+                    obj.shape.position.y = -1;
+                }
+        
+                if(obj.shape.position.x > 5) {	
+                    obj.shape.position.x = -5;
+                }
+        
+                if(obj.shape.position.x < -5) {	
+                    obj.shape.position.x = 5;
+                }
+        
+                if(obj.shape.position.z > 5) {	
+                    obj.shape.position.z = -5;
+                }
+        
+                if(obj.shape.position.z < -5) {	
+                    obj.shape.position.z = 5;
+                }
+        
+                obj.position.copy(obj.shape.interpolatedPosition);
+                obj.quaternion.copy(obj.shape.interpolatedQuaternion);
+            }
+        });
     }
     
     /**
@@ -328,210 +374,79 @@ export class World {
             this.justRendered = true;
         }
     }
-    
-    spawnCharacter(options = []) {
 
-        let defaults = {
-            position: new THREE.Vector3()
-        };
-        options = Utils.setDefaults(options, defaults);
-    
-        let character = new Character(this);
-        character.setPosition(options.position.x, options.position.y, options.position.z);
+    add(object) {
+        if(object.isObject) {
+            this.objects.push(object);
 
-        // Register character
-        this.characters.push(character);
-        
-        // Register physics
-        this.physicsWorld.addBody(character.characterCapsule.physical);
-        
-        // Register capsule visuals
-        this.graphicsWorld.add(character.characterCapsule.visual);
-        this.graphicsWorld.add(character.raycastBox);
-    
-        // Register for synchronization
-        this.parallelPairs.push(character.characterCapsule);
-    
-        // Add to graphicsWorld
-        this.graphicsWorld.add(character);
-
-        return character;
-    }
-    
-    updatePhysics(timeStep) {
-        // Step the physics world
-        this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
-
-        // Sync physics/visuals
-        this.parallelPairs.forEach(pair => {
-    
-            if(pair.physical.position.y < -1) {	
-                pair.physical.position.y = 10;
+            if(object.shape != undefined) {
+                this.physicsWorld.addBody(object.shape);
             }
-    
-            if(pair.physical.position.y > 10) {	
-                pair.physical.position.y = -1;
-            }
-    
-            if(pair.physical.position.x > 5) {	
-                pair.physical.position.x = -5;
-            }
-    
-            if(pair.physical.position.x < -5) {	
-                pair.physical.position.x = 5;
-            }
-    
-            if(pair.physical.position.z > 5) {	
-                pair.physical.position.z = -5;
-            }
-    
-            if(pair.physical.position.z < -5) {	
-                pair.physical.position.z = 5;
-            }
-    
-            pair.visual.position.copy(pair.physical.interpolatedPosition);
-            pair.visual.quaternion.copy(pair.physical.interpolatedQuaternion);
-        });
-    }
-    
-    spawnBoxPrimitive(options = []) {
-    
-        let defaults = {
-            mass: 1,
-            position: new CANNON.Vec3(),
-            size: new CANNON.Vec3(0.3, 0.3, 0.3),
-            friction: 0.3,
-            visible: true
-        };
-        options = Utils.setDefaults(options, defaults);
 
-        let mat = new CANNON.Material();
-        mat.friction = options.friction;
-        // mat.restitution = 0.7;
+            if(object.shapeModel != undefined) {
+                this.graphicsWorld.add(object.shapeModel);
+            }
 
-        let shape = new CANNON.Box(options.size);
-        shape.material = mat;
-        
-    
-        // Add phys sphere
-        let physBox = new CANNON.Body({
-            mass: options.mass,
-            position: options.position,
-            shape: shape
-        });
-    
-        physBox.material = mat;
-        this.physicsWorld.addBody(physBox);
-        
-        // Add visual box
-        let geometry = new THREE.BoxGeometry( options.size.x*2, options.size.y*2, options.size.z*2 );
-        let material = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
-        let visualBox = new THREE.Mesh( geometry, material );
-        visualBox.castShadow = true;
-        visualBox.receiveShadow = true;
-        visualBox.visible = options.visible;
-        this.graphicsWorld.add( visualBox );
-    
-        let pair = {
-            physical: physBox,
-            visual: visualBox
-        };
-      
-        this.parallelPairs.push(pair);
-        return pair;
-    }
-    
-    spawnSpherePrimitive(options = []) {
-    
-        let defaults = {
-            mass: 1,
-            position: new CANNON.Vec3(),
-            radius:  0.3,
-            friction: 0.3,
-            visible: true
-        };
-        options = Utils.setDefaults(options, defaults);
+            if(object.model != undefined) {
+                this.graphicsWorld.add(object.model);
+            }
+        }
+        else if(object.isCharacter) {
 
-        let mat = new CANNON.Material();
-        mat.friction = options.friction;
-    
-        let shape = new CANNON.Sphere(options.radius);
-        shape.material = mat;
-    
-        // Add phys sphere
-        let physSphere = new CANNON.Body({
-            mass: options.mass, // kg
-            position: options.position, // m
-            shape: shape
-        });
-        physSphere.material = mat;
-        this.physicsWorld.addBody(physSphere);
-        
-        // Add visual sphere
-        let geometry2 = new THREE.SphereGeometry(options.radius);
-        let material2 = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
-        let visualSphere = new THREE.Mesh( geometry2, material2 );
-        visualSphere.castShadow = true;
-        visualSphere.receiveShadow = true;
-        visualSphere.visible = options.visible;
-        this.graphicsWorld.add( visualSphere );
-    
-        let pair = {
-            physical: physSphere,
-            visual: visualSphere
-        };
-    
-        this.parallelPairs.push(pair);
-        return pair;
+            const character = object;
+
+            // Set world
+            character.world = this;
+
+            // Register character
+            this.characters.push(character);
+                    
+            // Register physics
+            this.physicsWorld.addBody(character.characterCapsule.shape);
+
+            // Raycast debug
+            this.graphicsWorld.add(character.raycastBox);
+
+            // Register characters physical capsule object
+            this.objects.push(character.characterCapsule);
+
+            // Add to graphicsWorld
+            this.graphicsWorld.add(character);
+            this.graphicsWorld.add(character.characterCapsule.shapeModel);
+
+            return character;
+        }
+        else {
+            console.error('Object type not supported: ' + object);
+        }
     }
 
-    spawnCapsulePrimitive(options = []) {
-    
-        let defaults = {
-            mass: 1,
-            position: new CANNON.Vec3(),
-            height: 0.5,
-            radius:  0.3,
-            segments: 8,
-            friction: 0.3,
-            visible: true
-        };
-        options = Utils.setDefaults(options, defaults);
+    remove(object) {
+        if(object.isCharacter) {
 
-        let mat = new CANNON.Material();
-        mat.friction = options.friction;
-    
-        let physicalCapsule = new CANNON.Body({
-            mass: options.mass,
-            position: options.position
-        });
+            const character = object;
+
+            // Remove from characters
+            _.pull(this.characters, character);
         
-        // Compound shape
-        let sphereShape = new CANNON.Sphere(options.radius);
-        let cylinderShape = new CANNON.Cylinder(options.radius, options.radius, options.height / 2, options.segments);
-        cylinderShape.transformAllPoints(new CANNON.Vec3(), new CANNON.Quaternion(0.707,0,0,0.707));
-    
-        // Materials
-        physicalCapsule.material = mat;
-        sphereShape.material = mat;
-        cylinderShape.material = mat;
-    
-        physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, options.height / 2, 0));
-        physicalCapsule.addShape(sphereShape, new CANNON.Vec3( 0, -options.height / 2, 0));
-        physicalCapsule.addShape(cylinderShape, new CANNON.Vec3( 0, 0, 0));
-    
-        let visualCapsule = new THREE.Mesh(
-            Utils.createCapsuleGeometry(options.radius, options.height, options.segments),
-            new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: true} )
-        );
-        visualCapsule.visible = options.visible;
-    
-        let pair = {
-            physical: physicalCapsule,
-            visual: visualCapsule
-        };
-    
-        return pair;
+            // Remove physics
+            this.physicsWorld.removeBody(character.characterCapsule.physical);
+
+            // Remove visuals
+            this.graphicsWorld.remove(character.characterCapsule.visual);
+            this.graphicsWorld.remove(character.raycastBox);
+
+            // Register for synchronization
+            _.pull(this.parallelPairs, character.characterCapsule);
+
+            // Add to graphicsWorld
+            this.graphicsWorld.remove(character);
+
+            return character;
+        }
+        else {
+            console.error('Object type not supported: ' + object);
+        }
     }
 }
 

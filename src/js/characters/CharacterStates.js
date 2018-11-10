@@ -20,7 +20,8 @@ class DefaultState {
         this.character.rotationSimulator.damping = this.character.defaultRotationSimulatorDamping;
         this.character.rotationSimulator.mass = this.character.defaultRotationSimulatorMass;
 
-        this.character.setSimulatedVelocityInfluence(0, 1, 0);
+        this.character.arcadeVelocityIsAdditive = false;
+        this.character.setArcadeVelocityInfluence(1, 0, 1);
 
         this.timer = 0;
     }
@@ -252,7 +253,7 @@ class Walk extends DefaultState {
 
         this.character.setArcadeVelocityTarget(0.8);
         this.character.setAnimation('run', 0.1);
-    
+
         if(this.noDirection()) {
             this.character.setState(EndWalk);
         }
@@ -557,7 +558,7 @@ class JumpIdle extends DefaultState {
 
             this.character.velocitySimulator.mass = 100;
             this.character.rotationSimulator.damping = 0.3;
-            this.character.setSimulatedVelocityInfluence(0.7, 1, 0.7);
+            this.character.setArcadeVelocityInfluence(0.3, 0, 0.3);
         }
         else if(this.timer > 0.3 && this.character.rayHasHit) {
             this.setAppropriateDropState();
@@ -593,14 +594,15 @@ class JumpRunning extends DefaultState {
             this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
         }
         this.character.update(timeStep);
-    
+
         //Physically jump
         if(this.timer > 0.14 && !this.alreadyJumped) {
             this.character.jump(4);
             this.alreadyJumped = true;
             
             this.character.rotationSimulator.damping = 0.3;
-            this.character.setSimulatedVelocityInfluence(0.98, 1, 0.98);
+            this.character.arcadeVelocityIsAdditive = true;
+            this.character.setArcadeVelocityInfluence(0.05, 0, 0.05);
         }
         else if(this.timer > 0.24 && this.character.rayHasHit) {
             this.setAppropriateDropState();
@@ -623,7 +625,8 @@ class Falling extends DefaultState {
         this.character.velocitySimulator.mass = 100;
         this.character.rotationSimulator.damping = 0.3;
 
-        this.character.setSimulatedVelocityInfluence(0.98, 1, 0.98);
+        this.character.arcadeVelocityIsAdditive = true;
+        this.character.setArcadeVelocityInfluence(0.05, 0, 0.05);
     
         this.character.setAnimation('falling', 0.3);
     }
