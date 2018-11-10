@@ -11,6 +11,7 @@ import { Detector } from '../lib/utils/Detector';
 import { Stats } from '../lib/utils/Stats';
 import { GUI } from '../lib/utils/dat.gui';
 import _ from 'lodash';
+import { InputManager } from './InputManager';
 
 export class World {
 
@@ -30,7 +31,6 @@ export class World {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
-        // Global variables
 
         // Auto window resize
         function onWindowResize() {
@@ -119,12 +119,6 @@ export class World {
         helper.material.opacity = 0.2;
         helper.material.transparent = true;
         this.graphicsWorld.add( helper );
-        helper = new THREE.AxesHelper(2);
-        // this.graphicsWorld.add( helper );
-        helper = new THREE.DirectionalLightHelper(dirLight, 3);
-        // this.graphicsWorld.add( helper );
-        helper = new THREE.CameraHelper(dirLight.shadow.camera);
-        // this.graphicsWorld.add( helper );
 
         //#endregion
 
@@ -152,58 +146,12 @@ export class World {
 
         //#endregion
 
-        //#region Input
-
-        // Input
-        // Event listeners
-        document.addEventListener("keydown", keyDown, false);
-        document.addEventListener("keyup", keyUp, false);
-        document.addEventListener("mousedown", mouseDown, false);
-        document.addEventListener("mouseup", mouseUp, false);
-        document.addEventListener("wheel", mouseWheel, false);
-
-        // Event handlers
-        function keyDown(event) {
-            if(typeof scope.gameMode !== 'undefined')
-                scope.gameMode.handleKey(event, event.key, true);
-        }
-        function keyUp(event) {
-            if(typeof scope.gameMode !== 'undefined')
-                scope.gameMode.handleKey(event, event.key, false);
-        }
-        function mouseDown(event) {
-            if(typeof scope.gameMode !== 'undefined')
-                scope.gameMode.handleKey(event, 'mouse' + event.button, true);
-        }
-        function mouseUp(event) {
-            if(typeof scope.gameMode !== 'undefined')
-                scope.gameMode.handleKey(event, 'mouse' + event.button, false);
-        }
-
-        // Changing time scale with scroll wheel
-        this.timeScaleBottomLimit = 0.003;
-        this.timeScaleChangeSpeed = 1.3;
-        this.timeScaleTarget = 1;
-        function mouseWheel(event) {
-
-            if(event.deltaY > 0) {
-                scope.timeScaleTarget /= scope.timeScaleChangeSpeed;
-                if(scope.timeScaleTarget < scope.timeScaleBottomLimit) scope.timeScaleTarget = 0;
-            }
-            else {
-                scope.timeScaleTarget *= scope.timeScaleChangeSpeed;
-                if(scope.timeScaleTarget < scope.timeScaleBottomLimit) scope.timeScaleTarget = scope.timeScaleBottomLimit;
-                scope.timeScaleTarget = Math.min(scope.timeScaleTarget, 1);
-                if(scope.params.Time_Scale > 0.9) scope.params.Time_Scale *= scope.timeScaleChangeSpeed;
-            }
-        }
-
-        //#endregion
-        
         //#region ParamGUI
         
         // Variables
         let params = {
+            Pointer_Lock: false,
+            Mouse_Sensitivity: 0.4,
             FPS_Limit: 60,
             Time_Scale: 1,
             Shadows: true,
@@ -213,7 +161,13 @@ export class World {
         };
         this.params = params;
 
+        // Changing time scale with scroll wheel
+        this.timeScaleTarget = 1;
+
         let gui = new GUI();
+        let input_folder = gui.addFolder('Input');
+        let pl = input_folder.add(params, 'Pointer_Lock');
+        let ms = input_folder.add(params, 'Mouse_Sensitivity', 0, 1);
         let graphics_folder = gui.addFolder('Rendering');
         graphics_folder.add(params, 'FPS_Limit', 0, 60);
         let timeController = graphics_folder.add(params, 'Time_Scale', 0, 1).listen();
@@ -227,7 +181,15 @@ export class World {
         gui.open();
         
         timeController.onChange(function(value) {
-            this.timeScaleTarget = value;
+            scope.timeScaleTarget = value;
+        });
+
+        ms.onChange(function(value) {
+            scope.cameraController.setSensitivity(value, value * 0.8);
+        });
+
+        pl.onChange(function(enabled) {
+            scope.inputManager.setPointerLock(enabled);
         });
 
         dp.onChange(function(enabled) {
@@ -261,7 +223,8 @@ export class World {
         this.objects = [];
         this.characters = [];
         this.vehicles = [];
-        this.cameraController = new CameraController(this.camera);
+        this.cameraController = new CameraController(this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.8);
+        this.inputManager = new InputManager(this, this.renderer.domElement);
         this.gameMode = new GameModes.FreeCameraControls(this);
         
         this.render(this);
@@ -273,15 +236,18 @@ export class World {
     
         this.updatePhysics(timeStep);
     
+        // Objects
+        this.objects.forEach(obj => {
+            obj.update(timeStep);
+        });
+
+        // Characters
         this.characters.forEach(char => {
             char.behaviour.update(timeStep);
             char.updateMatrixWorld();
         });
 
-        this.objects.forEach(obj => {
-            obj.update(timeStep);
-        });
-    
+        // Gamemode
         this.gameMode.update(timeStep);
     
         // Rotate and position camera according to cameraTarget and angles

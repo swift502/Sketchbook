@@ -1,17 +1,48 @@
 import * as THREE from 'three';
 import { Controls } from './Controls';
 
+class GameModeBase
+{
+    constructor(world) {
+        this.world = world;
+    }
+    init() {}
+    update() {}
+
+    handleAction(event, action, value) {}
+    handleScroll(event, value)
+    {
+        // Changing time scale with scroll wheel
+        const timeScaleBottomLimit = 0.003;
+        const timeScaleChangeSpeed = 1.3;
+
+        if(value > 0) {
+            this.world.timeScaleTarget /= timeScaleChangeSpeed;
+            if(this.world.timeScaleTarget < timeScaleBottomLimit) this.world.timeScaleTarget = 0;
+        }
+        else {
+            this.world.timeScaleTarget *= timeScaleChangeSpeed;
+            if(this.world.timeScaleTarget < timeScaleBottomLimit) this.world.timeScaleTarget = timeScaleBottomLimit;
+            this.world.timeScaleTarget = Math.min(this.world.timeScaleTarget, 1);
+            if(this.world.params.Time_Scale > 0.9) this.world.params.Time_Scale *= timeScaleChangeSpeed;
+        }
+    }
+    handleMouseMove(event, deltaX, deltaY) {}
+}
+
 /**
  * Free camera game mode.
  * @param {Character} character Character to control 
  */
 
-class FreeCameraControls {
+class FreeCameraControls extends GameModeBase{
 
-    constructor(sketchbook) {
-        this.sketchbook = sketchbook;
-        this.camera = sketchbook.camera;
-        this.previousGameMode = sketchbook.gameMode;
+    constructor(world) {
+
+        super(world);
+
+        this.camera = world.camera;
+        this.previousGameMode = world.gameMode;
         this.movementSpeed = 0.06;
     
         this.init();
@@ -39,48 +70,53 @@ class FreeCameraControls {
     }
     
     init() {
-        this.sketchbook.cameraController.target.copy(this.sketchbook.camera.position);
-        this.sketchbook.cameraController.setRadius(0);
-        this.sketchbook.dirLight.target = this.camera;
+        this.world.cameraController.target.copy(this.world.camera.position);
+        this.world.cameraController.setRadius(0);
+        this.world.dirLight.target = this.camera;
     }
     
     /**
      * Handles game actions based on supplied inputs.
      * @param {*} event Keyboard or mouse event
-     * @param {char} key Key or button pressed
+     * @param {char} action Key or button pressed
      * @param {boolean} value Value to be assigned to action
      */
-    handleKey(event, key, value) {
+    handleAction(event, action, value) {
     
         // Shift modifier fix
-        key = key.toLowerCase();
+        action = action.toLowerCase();
     
         // Turn off free cam
-        if(this.previousGameMode != undefined && key == 'c' && value == true && event.shiftKey == true) {
-            this.sketchbook.gameMode = this.previousGameMode;
-            this.sketchbook.gameMode.init();
+        if(this.previousGameMode != undefined && action == 'c' && value == true && event.shiftKey == true) {
+            this.world.gameMode = this.previousGameMode;
+            this.world.gameMode.init();
         }
-        // Is key bound to action
-        else if (key in this.keymap) {
+        // Is action bound to action
+        else if (action in this.keymap) {
     
-            // Get action and set it's parameters
-            let action = this.controls[this.keymap[key].action];
-            action.value = value;
+            // Get control and set it's parameters
+            let control = this.controls[this.keymap[action].action];
+            control.value = value;
         }
+    }
+
+    handleMouseMove(event, deltaX, deltaY)
+    {
+        this.world.cameraController.move(deltaX, deltaY);
     }
     
     update() {
         
         // Make light follow camera (for shadows)
-        this.sketchbook.dirLight.position.set(
-            this.camera.position.x + this.sketchbook.sun.x * 5,
-            this.camera.position.y + this.sketchbook.sun.y * 5,
-            this.camera.position.z + this.sketchbook.sun.z * 5
+        this.world.dirLight.position.set(
+            this.camera.position.x + this.world.sun.x * 5,
+            this.camera.position.y + this.world.sun.y * 5,
+            this.camera.position.z + this.world.sun.z * 5
         );
     
         // Lerp all controls
-        for(let key in this.controls){
-            let ctrl = this.controls[key];
+        for(let action in this.controls){
+            let ctrl = this.controls[action];
             ctrl.floatValue = THREE.Math.lerp(ctrl.floatValue, +ctrl.value , 0.3);
         }
 
@@ -91,9 +127,9 @@ class FreeCameraControls {
         let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
         let right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
 
-        this.sketchbook.cameraController.target.add(forward.multiplyScalar(speed * (this.controls.forward.floatValue - this.controls.back.floatValue)));
-        this.sketchbook.cameraController.target.add(right.multiplyScalar(speed * (this.controls.right.floatValue - this.controls.left.floatValue)));
-        this.sketchbook.cameraController.target.add(up.multiplyScalar(speed * (this.controls.up.floatValue - this.controls.down.floatValue)));
+        this.world.cameraController.target.add(forward.multiplyScalar(speed * (this.controls.forward.floatValue - this.controls.back.floatValue)));
+        this.world.cameraController.target.add(right.multiplyScalar(speed * (this.controls.right.floatValue - this.controls.left.floatValue)));
+        this.world.cameraController.target.add(up.multiplyScalar(speed * (this.controls.up.floatValue - this.controls.down.floatValue)));
     }
 }
 
@@ -101,10 +137,12 @@ class FreeCameraControls {
  * Character controls game mode. Allows player to control a character.
  * @param {Character} character Character to control 
  */
-class CharacterControls {
+class CharacterControls extends GameModeBase {
 
-    constructor(sketchbook, character) {
-        this.sketchbook = sketchbook;
+    constructor(world, character) {
+
+        super(world);
+
         this.character = character;
     
         this.init();
@@ -125,45 +163,50 @@ class CharacterControls {
     }
     
     init() {
-        this.sketchbook.cameraController.setRadius(1.8);
-        this.sketchbook.dirLight.target = this.character;
+        this.world.cameraController.setRadius(1.8);
+        this.world.dirLight.target = this.character;
     }
     
     /**
      * Handles game actions based on supplied inputs.
      * @param {*} event Keyboard or mouse event
-     * @param {char} key Key or button pressed
+     * @param {char} action Key or button pressed
      * @param {boolean} value Value to be assigned to action
      */
-    handleKey(event, key, value) {
+    handleAction(event, action, value) {
     
         // Shift modifier fix
-        key = key.toLowerCase();
+        action = action.toLowerCase();
     
         //Free cam
-        if(key == 'c' && value == true && event.shiftKey == true) {
+        if(action == 'c' && value == true && event.shiftKey == true) {
             this.character.resetControls();
-            this.sketchbook.gameMode = new FreeCameraControls(this.sketchbook, this);
+            this.world.gameMode = new FreeCameraControls(this.world, this);
         }
-        // Is key bound to action
-        if (key in this.keymap) {
-            this.character.setControl(this.keymap[key].action, value);
+        // Is action bound to action
+        if (action in this.keymap) {
+            this.character.setControl(this.keymap[action].action, value);
         }
+    }
+    
+    handleMouseMove(event, deltaX, deltaY)
+    {
+        this.world.cameraController.move(deltaX, deltaY);
     }
     
     update() {
     
         // Look in camera's direction
-        this.character.viewVector = new THREE.Vector3().subVectors(this.character.position, this.sketchbook.camera.position);
+        this.character.viewVector = new THREE.Vector3().subVectors(this.character.position, this.world.camera.position);
         
         // Make light follow player (for shadows)
-        this.sketchbook.dirLight.position.set(
-            this.character.position.x + this.sketchbook.sun.x * 5,
-            this.character.position.y + this.sketchbook.sun.y * 5,
-            this.character.position.z + this.sketchbook.sun.z * 5);
+        this.world.dirLight.position.set(
+            this.character.position.x + this.world.sun.x * 5,
+            this.character.position.y + this.world.sun.y * 5,
+            this.character.position.z + this.world.sun.z * 5);
         
         // Position camera
-        this.sketchbook.cameraController.target.set(
+        this.world.cameraController.target.set(
             this.character.position.x,
             this.character.position.y + this.character.height / 1.7,
             this.character.position.z

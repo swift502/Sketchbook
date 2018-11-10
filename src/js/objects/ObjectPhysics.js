@@ -154,7 +154,7 @@ class Capsule {
         options = Utils.setDefaults(options, defaults);
 
         let material = new THREE.MeshLambertMaterial( { color: 0xcccccc, wireframe: options.wireframe} );
-        let geometry =  Utils.createCapsuleGeometry(this.options.radius, this.options.height, this.options.segments)
+        let geometry =  Utils.createCapsuleGeometry(this.options.radius, this.options.height, this.options.segments);
         let visualCapsule = new THREE.Mesh(geometry, material);
         visualCapsule.visible = options.visible;
         if(!options.wireframe) {
