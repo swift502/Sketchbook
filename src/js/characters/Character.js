@@ -14,14 +14,20 @@ import { Object } from '../objects/Object';
 //Character class
 export class Character extends THREE.Object3D
 {
-    constructor()
+    constructor(options)
     {
+        let defaults = {
+            position: new THREE.Vector3(),
+            height: 1
+        };
+        options = Utils.setDefaults(options, defaults);
+
         super();
 
         this.isCharacter = true;
 
         // Geometry
-        this.height = 1;
+        this.height = options.height;
         this.modelOffset = new THREE.Vector3();
 
         // The visuals group is centered for easy character tilting
@@ -97,7 +103,7 @@ export class Character extends THREE.Object3D
         // Player Capsule
         let capsulePhysics = new ObjectPhysics.Capsule({
             mass: 1,
-            position: new CANNON.Vec3(0, 0, 0),
+            position: new CANNON.Vec3().copy(options.position),
             height: 0.5,
             radius: 0.25,
             segments: 8,

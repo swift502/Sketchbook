@@ -8,7 +8,7 @@ class Sphere
     constructor(options)
     {
         let defaults = {
-            mass: 1,
+            mass: 0,
             position: new CANNON.Vec3(),
             radius: 0.3,
             friction: 0.3
@@ -62,7 +62,7 @@ class Box
     constructor(options)
     {
         let defaults = {
-            mass: 1,
+            mass: 0,
             position: new CANNON.Vec3(),
             size: new CANNON.Vec3(0.3, 0.3, 0.3),
             friction: 0.3
@@ -118,7 +118,7 @@ class Capsule
     constructor(options)
     {
         let defaults = {
-            mass: 1,
+            mass: 0,
             position: new CANNON.Vec3(),
             height: 0.5,
             radius: 0.3,
@@ -180,7 +180,7 @@ class Convex
         this.mesh = mesh.clone();
 
         let defaults = {
-            mass: 1,
+            mass: 0,
             position: mesh.position,
             friction: 0.3
         };
@@ -191,12 +191,20 @@ class Convex
         mat.friction = options.friction;
         // mat.restitution = 0.7;
 
-        // if(this.mesh.geometry.isBufferGeometry)
-        // {
-        //     this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
-        // }
+        if(this.mesh.geometry.isBufferGeometry)
+        {
+            this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+        }
 
-        let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
+        let cannonPoints = this.mesh.geometry.vertices.map(function(v) {
+            return new CANNON.Vec3( v.x, v.y, v.z );
+        });
+        
+        let cannonFaces = this.mesh.geometry.faces.map(function(f) {
+            return [f.a, f.b, f.c];
+        });
+
+        let shape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
         shape.material = mat;
 
         // Add phys sphere
@@ -241,7 +249,7 @@ class TriMesh
         this.mesh = mesh.clone();
 
         let defaults = {
-            mass: 1,
+            mass: 0,
             position: mesh.position,
             friction: 0.3
         };

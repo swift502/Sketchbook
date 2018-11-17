@@ -8,13 +8,19 @@
 </head>
 
 <body>
-    <div id="controls-menu" class="controls-card">
-        <div class="controls-ctrl"><span class="key">w</span><span class="key">a</span><span class="key">s</span><span class="key">d</span><span class="ctrl-desc"></span>movement</span></div>
-        <div class="controls-ctrl"><span class="key">shift</span><span class="ctrl-desc">sprint</span></div>
-        <div class="controls-ctrl"><span class="key">space</span><span class="ctrl-desc"></span>jump</span></div>
-        <div class="controls-ctrl"><span class="key">shift</span>&nbsp;+&nbsp;<span class="key">c</span><span class="ctrl-desc"></span>free camera</span></div>
-        <div class="controls-ctrl"><img src="../src/graphics/ui/lmb.png" class="mouse"/><span class="ctrl-desc"></span>look around</span></div>
-        <div class="controls-ctrl"><img src="../src/graphics/ui/mmb.png" class="mouse"/><span class="ctrl-desc"></span>change time scale</span></div>
+
+    <div id="loader">
+        Loading...
+    </div>
+
+    <div id="controls-menu" class="controls-card" style="display: none">
+        <div class="controls-ctrl"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span><span class="ctrl-desc"></span>movement</span></div>
+        <div class="controls-ctrl"><span class="key">Shift</span><span class="ctrl-desc">sprint</span></div>
+        <div class="controls-ctrl"><span class="key">Space</span><span class="ctrl-desc"></span>jump</span></div>
+        <div class="controls-ctrl"><span class="key">F</span><span class="ctrl-desc"></span>spawn a ball</span></div>
+        <div class="controls-ctrl"><span class="key">T</span><span class="ctrl-desc"></span>toggle slow motion</span></div>
+        <div class="controls-ctrl"><span class="key">V</span><span class="ctrl-desc"></span>change view distance</span></div>
+        <div class="controls-ctrl"><span class="key">Shift</span>&nbsp;+&nbsp;<span class="key">C</span><span class="ctrl-desc"></span>free camera</span></div>
     </div>
     
     <script src="../build/three.min.js"></script>
@@ -23,76 +29,96 @@
     <script>
         const SB = Sketchbook;
 
+        //
+        // Initialize
+        //
+
         // Instantiate loaders
         const fbxLoader = new SB.FBXLoader();
         const gltfLoader = new SB.GLTFLoader();
-        // const threeToCannon = SB.threeToCannon;
 
         // Initialize sketchbook
         let world = new SB.World();
+
+        // Hide ui for loading
+        document.getElementsByClassName('dg ac')[0].style.display = 'none';
+        document.getElementsByClassName('statsBox')[0].style.display = 'none';
+
+        // Setup camera
         world.cameraController.theta = 360;
         world.cameraController.target.z = -3;
         world.cameraController.target.y = 2;
 
-        // const object = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10));
-        // const shape = threeToCannon(object, {type: threeToCannon.Type.HULL});
-        
         // Load world geometry
         LoadExampleWorld(world);
 
+        //
+        // Load characters
+        //
+
         // Spawn player
-        let player = new SB.Character();
-        LoadFBX(player);
+        let player = new SB.Character({
+            position: new THREE.Vector3(1.13, 3, -2.2)
+        });
+        LoadBoxmanModel(player);
         world.add(player);
         player.takeControl();
 
-        function LoadFBX(character) {	
-
-                // Default model	
-                fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
-                    object.traverse(function (child) {	
-                        if (child.isMesh) {	
-                            child.castShadow = true;	
-                            child.receiveShadow = true;	
-                        }	
-                        if (child.name == 'game_man') {	
-                            child.material = new THREE.MeshLambertMaterial({	
-                                map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
-                                skinning: true	
-                            });	
-                        }	
-                    });	
-                    //  console.log(object);	
-                    character.setModel(object);	
-                    character.setModelOffset(new THREE.Vector3(0, -0.1, 0));	
-                    
-                });	
-        }
+        // Make player look at the camera
+        player.setOrientationTarget(new THREE.Vector3(0, 0, -1));
+        player.orientation = new THREE.Vector3(0, 0, -1);
 
         // Spawn John
-        // let john = world.SpawnCharacter();
-        // LoadBoxmanCharacterModel(john);
-        // john.setBehaviour(new Sketchbook.CharacterAI.Random());
+        let john = new SB.Character({
+            position: new THREE.Vector3(5, 2, 1)
+        });
+        LoadBoxmanModel(john);
+        john.setBehaviour(new Sketchbook.CharacterAI.Random());
+        world.add(john);
+
+        // Spawn Bob
+        let bob = new SB.Character({
+            position: new THREE.Vector3(-5, 2, 3)
+        });
+        LoadBoxmanModel(bob);
+        bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
+        world.add(bob);
+
+        //
+        // Functions
+        //
+
+        function LoadBoxmanModel(character) {	
+            fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
+                object.traverse(function (child) {	
+                    if (child.isMesh) {	
+                        child.castShadow = true;	
+                        child.receiveShadow = true;	
+                    }	
+                    if (child.name == 'game_man') {	
+                        child.material = new THREE.MeshLambertMaterial({	
+                            map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
+                            skinning: true	
+                        });	
+                    }	
+                });	
+                character.setModel(object);	
+                character.setModelOffset(new THREE.Vector3(0, -0.1, 0));	
+
+                // Hide loader, display ui
+                document.getElementsByClassName('dg ac')[0].style.display = 'block';
+                document.getElementsByClassName('statsBox')[0].style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('controls-menu').style.display = 'block';
+            });	
+        }
 
         function LoadExampleWorld(world) {
 
-            // Ground
-            // let groundShape = new SB.ObjectPhysics.Box ({
-            //     mass: 0,
-            //     position: new CANNON.Vec3(0, -1, 0),
-            //     size: new CANNON.Vec3(20, 1, 20),
-            //     friction: 0.3
-            // });
-            // let ground = new SB.Object();
-            // ground.setPhysics(groundShape);
-            // ground.setModelFromPhysicsShape();
-            // world.add(ground);
-
+            //World
             gltfLoader.load('../build/models/test_world/scene.glb', function (object)
             {
                 world.graphicsWorld.add(object.scene);
-
-                console.log(object.scene);
 
                 object.scene.traverse(function(obj) {
                         if(obj.userData.mass !== undefined) {
@@ -124,7 +150,8 @@
 
                             if(obj.userData.physics == 'convex') {
 
-                                let mass = obj.userData.mass || 0;
+                                let mass = obj.userData.mass;
+                                if(mass === undefined) mass = 0;
 
                                 let phys = new SB.ObjectPhysics.Convex(obj, {
                                     mass: mass
@@ -153,80 +180,75 @@
                 });
             });
 
-            // fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
-            //     object.traverse(function (child) {
-            //         if (child.isMesh) {
-            //             child.castShadow = true;
-            //             child.receiveShadow = true;
-            //         }
-            //         if (child.name == 'grass') {
-            //             child.material = new THREE.MeshLambertMaterial({
-            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
-            //                 transparent: true,
-            //                 depthWrite: false,
-            //                 side: THREE.DoubleSide
-            //             });
-            //             child.castShadow = false;
-            //         }
-            //         if (child.name == 'sign') {
-            //             child.material = new THREE.MeshLambertMaterial({
-            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
-            //             });
-            //         }
-            //         if (child.name == 'sign_shadow') {
-            //             child.material = new THREE.MeshLambertMaterial({
-            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
-            //                 transparent: true,
-            //             });
-            //             child.renderOrder = -1;
-            //         }
-            //         if (child.name == 'credits') {
-            //             child.material = new THREE.MeshLambertMaterial({
-            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
-            //                 transparent: true
-            //             });
-            //         }
-            //     });
+            // Signs
+            fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
+                object.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                    if (child.name == 'grass') {
+                        child.material = new THREE.MeshLambertMaterial({
+                            map: new THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
+                            transparent: true,
+                            depthWrite: false,
+                            side: THREE.DoubleSide
+                        });
+                        child.castShadow = false;
+                    }
+                    if (child.name == 'sign') {
+                        child.material = new THREE.MeshLambertMaterial({
+                            map: new THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
+                        });
+                    }
+                    if (child.name == 'sign_shadow') {
+                        child.material = new THREE.MeshLambertMaterial({
+                            map: new THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
+                            transparent: true,
+                        });
+                        child.renderOrder = -1;
+                    }
+                    if (child.name == 'credits') {
+                        child.material = new THREE.MeshLambertMaterial({
+                            map: new THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
+                            transparent: true
+                        });
+                    }
+                });
 
-            //     object.translateZ(4.5);
-            //     object.translateX(-0.5);
-            //     object.rotateY(Math.PI / 2);
-            //     world.graphicsWorld.add(object);
-            //     world.spawnBoxPrimitive({
-            //         mass: 0,
-            //         position: new CANNON.Vec3(object.position.x, object.position.y + 0.45, object.position.z),
-            //         size: new CANNON.Vec3(0.3, 0.45, 0.1),
-            //         friction: 0.3,
-            //         visible: false
-            //     });
+                object.translateY(-0.45);
+                object.rotateY(Math.PI / 2);
+                let phys1 = new SB.ObjectPhysics.Box({
+                    position: new CANNON.Vec3(-3, 0.45, 10),
+                    size: new CANNON.Vec3(0.3, 0.45, 0.1),
+                    friction: 0.3,
+                });
+                world.add(new SB.Object(new THREE.Object3D().add(object), phys1));
 
-            //     let object2 = object.clone();
-            //     object2.scale.multiplyScalar(1.7);
-            //     object2.traverse(function (child) {
-            //         if (child.name == 'credits') {
-            //             child.material = new THREE.MeshLambertMaterial({
-            //                 map: new THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
-            //                 transparent: true
-            //             });
-            //             child.translateZ(-0.2);
-            //         }
-            //         if (child.name == 'sign') {
-            //             child.translateZ(-0.2);
-            //         }
-            //     });
+                let object2 = object.clone();
+                object2.scale.multiplyScalar(1.7);
+                object2.traverse(function (child) {
+                    if (child.name == 'credits') {
+                        child.material = new THREE.MeshLambertMaterial({
+                            map: new THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
+                            transparent: true
+                        });
+                        child.translateZ(-0.2);
+                    }
+                    if (child.name == 'sign') {
+                        child.translateZ(-0.2);
+                    }
+                });
 
-            //     object2.translateZ(1);
-            //     world.graphicsWorld.add(object2);
-            //     world.spawnBoxPrimitive({
-            //         mass: 0,
-            //         position: new CANNON.Vec3(object2.position.x, object2.position.y + 0.58, object2.position.z),
-            //         size: new CANNON.Vec3(0.4, 0.58, 0.16),
-            //         friction: 0.3,
-            //         visible: false
-            //     });
-            // });
+                object2.translateY(-0.13);
+                let phys2 = new SB.ObjectPhysics.Box({
+                    position: new CANNON.Vec3(-2, 0.58, 10),
+                    size: new CANNON.Vec3(0.4, 0.58, 0.16),
+                    friction: 0.3
+                });
+                world.add(new SB.Object(new THREE.Object3D().add(object2), phys2));
+            });
         }
     </script>
 </body>
-
 </html>

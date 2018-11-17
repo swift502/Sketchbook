@@ -30,6 +30,7 @@ export class World
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
+        this.renderer.domElement.id = 'canvas';
 
         // Auto window resize
         function onWindowResize()
@@ -85,9 +86,9 @@ export class World
 
         // Sun helper
         this.sun = new THREE.Vector3();
-        this.sun.x = 1;
+        this.sun.x = -1;
         this.sun.y = 1;
-        this.sun.z = 1;
+        this.sun.z = -1;
         sky.material.uniforms.sunPosition.value.copy(this.sun);
 
         // Lighting
@@ -101,23 +102,16 @@ export class World
 
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 20;
+        dirLight.shadow.camera.near = 1;
+        dirLight.shadow.camera.far = 50;
 
-        dirLight.shadow.camera.top = 20;
-        dirLight.shadow.camera.right = 20;
-        dirLight.shadow.camera.bottom = -20;
-        dirLight.shadow.camera.left = -20;
+        dirLight.shadow.camera.top = 15;
+        dirLight.shadow.camera.right = 15;
+        dirLight.shadow.camera.bottom = -15;
+        dirLight.shadow.camera.left = -15;
 
         dirLight.shadow.camera;
         this.graphicsWorld.add(dirLight);
-
-        // Helpers
-        let helper = new THREE.GridHelper(10, 10, 0x000000, 0x000000);
-        helper.position.set(0, 0.01, 0);
-        helper.material.opacity = 0.2;
-        helper.material.transparent = true;
-        this.graphicsWorld.add(helper);
 
         //#endregion
 
@@ -149,7 +143,7 @@ export class World
 
         // Variables
         let params = {
-            Pointer_Lock: false,
+            Pointer_Lock: true,
             Mouse_Sensitivity: 0.3,
             FPS_Limit: 60,
             Time_Scale: 1,
@@ -224,10 +218,12 @@ export class World
 
         // Changing time scale with scroll wheel
         this.timeScaleTarget = 1;
+        this.cameraDistanceTarget = 1.6;
 
         //#endregion
 
         //Initialization
+        this.balls = [];
         this.objects = [];
         this.characters = [];
         this.vehicles = [];
@@ -265,10 +261,11 @@ export class World
 
         this.gameMode.update(timeStep);
 
-        // Lerp timescale parameter
+        // Lerp parameters
         this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
+        this.cameraController.radius = THREE.Math.lerp(this.cameraController.radius, this.cameraDistanceTarget, 0.1);
 
-        // Rotate and position camera according to cameraTarget and angles
+        // Rotate and position camera
         this.cameraController.update();
     }
 
@@ -284,39 +281,14 @@ export class World
             {
                 if (obj.physics.physical.position.y < -5)
                 {
-                    obj.physics.physical.position.x = 0;
+                    obj.physics.physical.position.x = 1.13;
                     obj.physics.physical.position.y = 5;
-                    obj.physics.physical.position.z = 0;
+                    obj.physics.physical.position.z = -2.2;
 
-                    obj.physics.physical.interpolatedPosition.x = 0;
+                    obj.physics.physical.interpolatedPosition.x = 1.13;
                     obj.physics.physical.interpolatedPosition.y = 5;
-                    obj.physics.physical.interpolatedPosition.z = 0;
+                    obj.physics.physical.interpolatedPosition.z = -2.2;
                 }
-
-                // if (obj.physics.physical.position.y > 10)
-                // {
-                //     obj.physics.physical.position.y = -5;
-                // }
-
-                // if (obj.physics.physical.position.x > 5)
-                // {
-                //     obj.physics.physical.position.x = -5;
-                // }
-
-                // if (obj.physics.physical.position.x < -5)
-                // {
-                //     obj.physics.physical.position.x = 5;
-                // }
-
-                // if (obj.physics.physical.position.z > 5)
-                // {
-                //     obj.physics.physical.position.z = -5;
-                // }
-
-                // if (obj.physics.physical.position.z < -5)
-                // {
-                //     obj.physics.physical.position.z = 5;
-                // }
 
                 obj.position.copy(obj.physics.physical.interpolatedPosition);
                 obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);

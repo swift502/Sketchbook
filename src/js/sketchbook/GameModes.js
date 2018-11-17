@@ -1,13 +1,31 @@
 import * as THREE from 'three';
+import * as CANNON from'cannon';
 import { Controls } from './Controls';
 import _ from 'lodash';
+import { Object } from '../objects/Object';
+import { ObjectPhysics } from '../objects/ObjectPhysics';
 
 class GameModeBase
 {
     init() { }
     update() { }
 
-    handleAction(event, action, value) { }
+    handleAction(event, key, value)
+    {
+        key = key.toLowerCase();
+
+        if(key == 't' && value == true) 
+        {
+            if(this.world.timeScaleTarget < 0.5)
+            {
+                this.world.timeScaleTarget = 1;
+            }
+            else 
+            {
+                this.world.timeScaleTarget = 0.3;
+            }
+        }
+    }
     handleScroll(event, value) { }
     handleMouseMove(event, deltaX, deltaY) { }
 
@@ -84,6 +102,7 @@ class FreeCameraControls extends GameModeBase
 
         this.world.cameraController.target.copy(this.world.camera.position);
         this.world.cameraController.setRadius(0);
+        this.world.cameraDistanceTarget = 0.001;
         this.world.dirLight.target = this.world.camera;
     }
 
@@ -95,8 +114,31 @@ class FreeCameraControls extends GameModeBase
      */
     handleAction(event, key, value)
     {
+        super.handleAction(event, key, value);
+
         // Shift modifier fix
         key = key.toLowerCase();
+
+        if(key == 'f' && value == true) 
+        {
+            let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.world.camera.quaternion);
+            let ball = new Object();
+            ball.setPhysics(new ObjectPhysics.Sphere({
+                mass: 1,
+                radius: 0.3,
+                position: new CANNON.Vec3().copy(this.world.camera.position).vadd(forward)
+            }));
+            ball.setModelFromPhysicsShape();
+            this.world.add(ball);
+
+            this.world.balls.push(ball);
+
+            if(this.world.balls.length > 10)
+            {
+                this.world.remove(this.world.balls[0]);
+                _.pull(this.world.balls, this.world.balls[0]);
+            }
+        }
 
         // Turn off free cam
         if (this.previousGameMode !== undefined && key == 'c' && value == true && event.shiftKey == true)
@@ -128,9 +170,9 @@ class FreeCameraControls extends GameModeBase
     {
         // Make light follow camera (for shadows)
         this.world.dirLight.position.set(
-            this.world.camera.position.x + this.world.sun.x * 5,
-            this.world.camera.position.y + this.world.sun.y * 5,
-            this.world.camera.position.z + this.world.sun.z * 5
+            this.world.camera.position.x + this.world.sun.x * 15,
+            this.world.camera.position.y + this.world.sun.y * 15,
+            this.world.camera.position.z + this.world.sun.z * 15
         );
 
         // Lerp all controls
@@ -185,6 +227,7 @@ class CharacterControls extends GameModeBase
         this.checkIfWorldIsSet();
 
         this.world.cameraController.setRadius(1.8);
+        this.world.cameraDistanceTarget = 1.8;
         this.world.dirLight.target = this.character;
     }
 
@@ -196,6 +239,44 @@ class CharacterControls extends GameModeBase
      */
     handleAction(event, key, value)
     {
+        super.handleAction(event, key, value);
+
+        if(key == 'v' && value == true)
+        {
+            if(this.world.cameraDistanceTarget > 1.8)
+            {
+                this.world.cameraDistanceTarget = 1.1;
+            }
+            else if(this.world.cameraDistanceTarget > 1.3)
+            {
+                this.world.cameraDistanceTarget = 2.1;
+            }
+            else if(this.world.cameraDistanceTarget > 0)
+            {
+                this.world.cameraDistanceTarget = 1.6;
+            }
+        }
+        else if(key == 'f' && value == true) 
+        {
+            let forward = new THREE.Vector3().copy(this.character.orientation);
+            let ball = new Object();
+            ball.setPhysics(new ObjectPhysics.Sphere({
+                mass: 1,
+                radius: 0.3,
+                position: new CANNON.Vec3().copy(this.character.position).vadd(forward)
+            }));
+            ball.setModelFromPhysicsShape();
+            this.world.add(ball);
+
+            this.world.balls.push(ball);
+
+            if(this.world.balls.length > 10)
+            {
+                this.world.remove(this.world.balls[0]);
+                _.pull(this.world.balls, this.world.balls[0]);
+            }
+        }
+
         // Shift modifier fix
         key = key.toLowerCase();
 
@@ -235,9 +316,9 @@ class CharacterControls extends GameModeBase
 
             // Make light follow player (for shadows)
             this.world.dirLight.position.set(
-                this.character.position.x + this.world.sun.x * 5,
-                this.character.position.y + this.world.sun.y * 5,
-                this.character.position.z + this.world.sun.z * 5);
+                this.character.position.x + this.world.sun.x * 15,
+                this.character.position.y + this.world.sun.y * 15,
+                this.character.position.z + this.world.sun.z * 15);
 
             // Position camera
             this.world.cameraController.target.set(

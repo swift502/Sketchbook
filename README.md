@@ -7,7 +7,7 @@
 
 # Sketchbook
 
-3D rendering and physics library for game projects for the web-browser, featuring a few conventional gameplay mechanics and basic 3D models.
+3D rendering and physics library for game projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
 
 Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js).
 
@@ -32,14 +32,28 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
     * Cars
     * Airplanes
     * Helicopters
-* Characters
-    * Ragdoll physics
-    * Navmesh pathfinding
 
 *All planned features can be found in the [project pages](https://github.com/swift502/Sketchbook/projects)*.
 
 
 ## Usage
+
+This creates a fullscreen canvas, initializes the physics and rendering, adds a character and lets you control him.
+
+```js
+let world = new Sketchbook.World();
+
+let player = new Sketchbook.Character({
+    position: new THREE.Vector3(1.13, 3, -2.2),
+});
+LoadCharacterModel(player);
+world.add(player);
+player.takeControl();
+```
+
+Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn specifics about using Sketchbook.
+
+## Installation
 
 Simply import the library in your project, along with provided build of cannon.js and a three.js version of your choice, and you're ready to go.
 ```html
@@ -47,7 +61,3 @@ Simply import the library in your project, along with provided build of cannon.j
 <script src="cannon.min.js"></script> <!-- Only use provided build, official package is extremely outdated! -->
 <script src="sketchbook.min.js"></script>
 ```
-
-NPM package coming soon...
-
-Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn specifics about using Sketchbook.

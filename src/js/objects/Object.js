@@ -2,14 +2,14 @@ import * as THREE from 'three';
 
 export class Object extends THREE.Object3D
 {
-    constructor()
+    constructor(model, physics)
     {
         super();
 
         this.isObject = true;
 
-        this.model = undefined;
-        this.physics = undefined;
+        this.model = model;
+        this.physics = physics;
     }
 
     update(timeStep)
