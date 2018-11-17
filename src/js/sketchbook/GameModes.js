@@ -1,23 +1,31 @@
 import * as THREE from 'three';
 import { Controls } from './Controls';
+import _ from 'lodash';
 
 class GameModeBase
 {
-    constructor(world)
-    {
-        this.world = world;
-    }
     init() { }
     update() { }
 
     handleAction(event, action, value) { }
-    handleScroll(event, value)
+    handleScroll(event, value) { }
+    handleMouseMove(event, deltaX, deltaY) { }
+
+    checkIfWorldIsSet()
     {
+        if(this.world === undefined)
+        {
+            console.error('Calling gameMode init() without having specified gameMode\'s world first: ' + this);
+        }
+    }
+
+    scrollTheTimeScale(scrollAmount) {
+
         // Changing time scale with scroll wheel
         const timeScaleBottomLimit = 0.003;
         const timeScaleChangeSpeed = 1.3;
-
-        if (value > 0)
+    
+        if (scrollAmount > 0)
         {
             this.world.timeScaleTarget /= timeScaleChangeSpeed;
             if (this.world.timeScaleTarget < timeScaleBottomLimit) this.world.timeScaleTarget = 0;
@@ -30,7 +38,6 @@ class GameModeBase
             if (this.world.params.Time_Scale > 0.9) this.world.params.Time_Scale *= timeScaleChangeSpeed;
         }
     }
-    handleMouseMove(event, deltaX, deltaY) { }
 }
 
 /**
@@ -40,15 +47,14 @@ class GameModeBase
 
 class FreeCameraControls extends GameModeBase
 {
-    constructor(world)
+    constructor(previousGameMode = undefined)
     {
-        super(world);
+        super();
 
-        this.camera = world.camera;
-        this.previousGameMode = world.gameMode;
+        // Remember previous game mode to return to when pressing shift + C
+        this.previousGameMode = previousGameMode;
+        
         this.movementSpeed = 0.06;
-
-        this.init();
 
         // Keymap
         this.keymap = {
@@ -74,36 +80,43 @@ class FreeCameraControls extends GameModeBase
 
     init()
     {
+        this.checkIfWorldIsSet();
+
         this.world.cameraController.target.copy(this.world.camera.position);
         this.world.cameraController.setRadius(0);
-        this.world.dirLight.target = this.camera;
+        this.world.dirLight.target = this.world.camera;
     }
 
     /**
-     * Handles game actions based on supplied inputs.
+     * Handles game keys based on supplied inputs.
      * @param {*} event Keyboard or mouse event
-     * @param {char} action Key or button pressed
+     * @param {char} key Key or button pressed
      * @param {boolean} value Value to be assigned to action
      */
-    handleAction(event, action, value)
+    handleAction(event, key, value)
     {
         // Shift modifier fix
-        action = action.toLowerCase();
+        key = key.toLowerCase();
 
         // Turn off free cam
-        if (this.previousGameMode != undefined && action == 'c' && value == true && event.shiftKey == true)
+        if (this.previousGameMode !== undefined && key == 'c' && value == true && event.shiftKey == true)
         {
             this.world.gameMode = this.previousGameMode;
             this.world.gameMode.init();
         }
-        // Is action bound to action
-        else if (action in this.keymap)
+        // Is key bound to action
+        else if (key in this.keymap)
         {
 
             // Get control and set it's parameters
-            let control = this.controls[this.keymap[action].action];
+            let control = this.controls[this.keymap[key].action];
             control.value = value;
         }
+    }
+
+    handleScroll(event, value)
+    {
+        this.scrollTheTimeScale(value);
     }
 
     handleMouseMove(event, deltaX, deltaY)
@@ -115,15 +128,15 @@ class FreeCameraControls extends GameModeBase
     {
         // Make light follow camera (for shadows)
         this.world.dirLight.position.set(
-            this.camera.position.x + this.world.sun.x * 5,
-            this.camera.position.y + this.world.sun.y * 5,
-            this.camera.position.z + this.world.sun.z * 5
+            this.world.camera.position.x + this.world.sun.x * 5,
+            this.world.camera.position.y + this.world.sun.y * 5,
+            this.world.camera.position.z + this.world.sun.z * 5
         );
 
         // Lerp all controls
-        for (let action in this.controls)
+        for (let key in this.controls)
         {
-            let ctrl = this.controls[action];
+            let ctrl = this.controls[key];
             ctrl.floatValue = THREE.Math.lerp(ctrl.floatValue, +ctrl.value, 0.3);
         }
 
@@ -131,8 +144,8 @@ class FreeCameraControls extends GameModeBase
         let speed = this.movementSpeed * (this.controls.fast.value ? 5 : 1);
 
         let up = new THREE.Vector3(0, 1, 0);
-        let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
-        let right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
+        let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.world.camera.quaternion);
+        let right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.world.camera.quaternion);
 
         this.world.cameraController.target.add(forward.multiplyScalar(speed * (this.controls.forward.floatValue - this.controls.back.floatValue)));
         this.world.cameraController.target.add(right.multiplyScalar(speed * (this.controls.right.floatValue - this.controls.left.floatValue)));
@@ -146,13 +159,11 @@ class FreeCameraControls extends GameModeBase
  */
 class CharacterControls extends GameModeBase
 {
-    constructor(world, character)
+    constructor(character)
     {
-        super(world);
+        super();
 
         this.character = character;
-
-        this.init();
 
         // Keymap
         this.keymap = {
@@ -171,32 +182,39 @@ class CharacterControls extends GameModeBase
 
     init()
     {
+        this.checkIfWorldIsSet();
+
         this.world.cameraController.setRadius(1.8);
         this.world.dirLight.target = this.character;
     }
 
     /**
-     * Handles game actions based on supplied inputs.
+     * Handles game keys based on supplied inputs.
      * @param {*} event Keyboard or mouse event
-     * @param {char} action Key or button pressed
+     * @param {char} key Key or button pressed
      * @param {boolean} value Value to be assigned to action
      */
-    handleAction(event, action, value)
+    handleAction(event, key, value)
     {
         // Shift modifier fix
-        action = action.toLowerCase();
+        key = key.toLowerCase();
 
         //Free cam
-        if (action == 'c' && value == true && event.shiftKey == true)
+        if (key == 'c' && value == true && event.shiftKey == true)
         {
             this.character.resetControls();
-            this.world.gameMode = new FreeCameraControls(this.world, this);
+            this.world.setGameMode(new FreeCameraControls(this));
         }
-        // Is action bound to action
-        if (action in this.keymap)
+        // Is key bound to action
+        if (key in this.keymap)
         {
-            this.character.setControl(this.keymap[action].action, value);
+            this.character.setControl(this.keymap[key].action, value);
         }
+    }
+
+    handleScroll(event, value)
+    {
+        this.scrollTheTimeScale(value);
     }
 
     handleMouseMove(event, deltaX, deltaY)
@@ -206,21 +224,28 @@ class CharacterControls extends GameModeBase
 
     update()
     {
-        // Look in camera's direction
-        this.character.viewVector = new THREE.Vector3().subVectors(this.character.position, this.world.camera.position);
+        if(!_.includes(this.world.characters, this.character))
+        {
+            this.world.setGameMode(new FreeCameraControls());
+        }
+        else
+        {
+            // Look in camera's direction
+            this.character.viewVector = new THREE.Vector3().subVectors(this.character.position, this.world.camera.position);
 
-        // Make light follow player (for shadows)
-        this.world.dirLight.position.set(
-            this.character.position.x + this.world.sun.x * 5,
-            this.character.position.y + this.world.sun.y * 5,
-            this.character.position.z + this.world.sun.z * 5);
+            // Make light follow player (for shadows)
+            this.world.dirLight.position.set(
+                this.character.position.x + this.world.sun.x * 5,
+                this.character.position.y + this.world.sun.y * 5,
+                this.character.position.z + this.world.sun.z * 5);
 
-        // Position camera
-        this.world.cameraController.target.set(
-            this.character.position.x,
-            this.character.position.y + this.character.height / 1.7,
-            this.character.position.z
-        );
+            // Position camera
+            this.world.cameraController.target.set(
+                this.character.position.x,
+                this.character.position.y + this.character.height / 1.7,
+                this.character.position.z
+            );
+        }
     }
 }
 

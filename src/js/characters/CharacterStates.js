@@ -2,6 +2,16 @@ import * as THREE from 'three';
 import { Character } from "./Character";
 import { Utilities as Utils } from '../sketchbook/Utilities';
 
+
+/**
+ * Character states are a general way to control how characters behave.
+ * They have a complete control of what happens to the character.
+ * They're a low-level layer in between the high-level character AI and the
+ * characters themselves. States should independent and not rely on anything
+ * other than the character and it's properties. Any state should in theory
+ * be able to start functioning at any point time.
+ */
+
 //
 // Default state
 //
@@ -88,7 +98,17 @@ class DefaultState
         }
         else if (this.anyDirection())
         {
-            this.character.setState(DropRunning);
+            if(this.character.groundImpactData.velocity.y < -2) {
+                this.character.setState(DropRunning);
+            }
+            else {
+                if(this.isPressed(this.character.controls.run)) {
+                    this.character.setState(Sprint);
+                }
+                else {
+                    this.character.setState(Walk);
+                }
+            }
         }
         else
         {

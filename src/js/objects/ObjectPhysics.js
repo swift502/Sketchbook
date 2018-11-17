@@ -1,6 +1,7 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import { Utilities as Utils } from '../sketchbook/Utilities';
+import { threeToCannon } from '../lib/utils/three-pathfinding';
 
 class Sphere
 {
@@ -137,17 +138,14 @@ class Capsule
 
         // Compound shape
         let sphereShape = new CANNON.Sphere(options.radius);
-        let cylinderShape = new CANNON.Cylinder(options.radius, options.radius, options.height / 2, options.segments);
-        cylinderShape.transformAllPoints(new CANNON.Vec3(), new CANNON.Quaternion(0.707, 0, 0, 0.707));
 
         // Materials
         physicalCapsule.material = mat;
         sphereShape.material = mat;
-        cylinderShape.material = mat;
 
+        physicalCapsule.addShape(sphereShape, new CANNON.Vec3(0, 0, 0));
         physicalCapsule.addShape(sphereShape, new CANNON.Vec3(0, options.height / 2, 0));
         physicalCapsule.addShape(sphereShape, new CANNON.Vec3(0, -options.height / 2, 0));
-        physicalCapsule.addShape(cylinderShape, new CANNON.Vec3(0, 0, 0));
 
         this.physical = physicalCapsule;
         this.visual = this.getVisualModel({ visible: false, wireframe: true });
@@ -175,8 +173,132 @@ class Capsule
     }
 }
 
+class Convex
+{
+    constructor(mesh, options)
+    {
+        this.mesh = mesh.clone();
+
+        let defaults = {
+            mass: 1,
+            position: mesh.position,
+            friction: 0.3
+        };
+        options = Utils.setDefaults(options, defaults);
+        this.options = options;
+
+        let mat = new CANNON.Material();
+        mat.friction = options.friction;
+        // mat.restitution = 0.7;
+
+        // if(this.mesh.geometry.isBufferGeometry)
+        // {
+        //     this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+        // }
+
+        let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
+        shape.material = mat;
+
+        // Add phys sphere
+        let physBox = new CANNON.Body({
+            mass: options.mass,
+            position: options.position,
+            shape: shape
+        });
+
+        physBox.material = mat;
+
+        this.physical = physBox;
+        this.visual = this.getVisualModel({ visible: false, wireframe: true });
+    }
+
+    getVisualModel(options)
+    {
+        let defaults = {
+            visible: true,
+            wireframe: true
+        };
+        options = Utils.setDefaults(options, defaults);
+
+        let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
+        let visualBox = this.mesh.clone();
+        visualBox.material = material;
+        visualBox.visible = options.visible;
+        if (!options.wireframe)
+        {
+            visualBox.castShadow = true;
+            visualBox.receiveShadow = true;
+        }
+
+        return visualBox;
+    }
+}
+
+class TriMesh
+{
+    constructor(mesh, options)
+    {
+        this.mesh = mesh.clone();
+
+        let defaults = {
+            mass: 1,
+            position: mesh.position,
+            friction: 0.3
+        };
+        options = Utils.setDefaults(options, defaults);
+        this.options = options;
+
+        let mat = new CANNON.Material();
+        mat.friction = options.friction;
+        // mat.restitution = 0.7;
+
+        if(this.mesh.geometry.isBufferGeometry)
+        {
+            this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+        }
+
+        let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
+        shape.material = mat;
+
+        // Add phys sphere
+        let physBox = new CANNON.Body({
+            mass: options.mass,
+            position: options.position,
+            shape: shape
+        });
+
+        physBox.material = mat;
+
+        this.physical = physBox;
+        this.visual = this.getVisualModel({ visible: false, wireframe: true });
+    }
+
+    getVisualModel(options)
+    {
+        let defaults = {
+            visible: true,
+            wireframe: true
+        };
+        options = Utils.setDefaults(options, defaults);
+
+        let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
+        let visualBox = this.mesh.clone();
+        visualBox.material = material;
+        visualBox.visible = options.visible;
+        if (!options.wireframe)
+        {
+            visualBox.castShadow = true;
+            visualBox.receiveShadow = true;
+        }
+
+        return visualBox;
+    }
+}
+
 export let ObjectPhysics = {
     Sphere: Sphere,
     Box: Box,
-    Capsule: Capsule
+    Capsule: Capsule,
+    Convex: Convex,
+    TriMesh: TriMesh
 };

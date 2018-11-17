@@ -85,31 +85,29 @@ export class World
 
         // Sun helper
         this.sun = new THREE.Vector3();
-        let theta = Math.PI * (-0.3);
-        let phi = 2 * Math.PI * (-0.25);
-        this.sun.x = Math.cos(phi);
-        this.sun.y = Math.sin(phi) * Math.sin(theta);
-        this.sun.z = Math.sin(phi) * Math.cos(theta);
+        this.sun.x = 1;
+        this.sun.y = 1;
+        this.sun.z = 1;
         sky.material.uniforms.sunPosition.value.copy(this.sun);
 
         // Lighting
-        let ambientLight = new THREE.AmbientLight(0x888888); // soft white light
+        let ambientLight = new THREE.AmbientLight(0xaaaaaa); // soft white light
         this.graphicsWorld.add(ambientLight);
 
         // Sun light with shadowmap
-        let dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        let dirLight = new THREE.DirectionalLight(0xffffff, 0.4);
         this.dirLight = dirLight;
         dirLight.castShadow = true;
 
-        dirLight.shadow.mapSize.width = 1024;
-        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
         dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 8;
+        dirLight.shadow.camera.far = 20;
 
-        dirLight.shadow.camera.top = 5;
-        dirLight.shadow.camera.right = 5;
-        dirLight.shadow.camera.bottom = -5;
-        dirLight.shadow.camera.left = -5;
+        dirLight.shadow.camera.top = 20;
+        dirLight.shadow.camera.right = 20;
+        dirLight.shadow.camera.bottom = -20;
+        dirLight.shadow.camera.left = -20;
 
         dirLight.shadow.camera;
         this.graphicsWorld.add(dirLight);
@@ -205,10 +203,10 @@ export class World
             {
                 scope.objects.forEach(obj =>
                 {
-                    if (obj.shapeModel != undefined)
+                    if (obj.physics.visual != undefined)
                     {
-                        if (enabled) obj.shapeModel.visible = true;
-                        else obj.shapeModel.visible = false;
+                        if (enabled) obj.physics.visual.visible = true;
+                        else obj.physics.visual.visible = false;
                     }
                 });
             });
@@ -235,9 +233,15 @@ export class World
         this.vehicles = [];
         this.cameraController = new CameraController(this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.7);
         this.inputManager = new InputManager(this, this.renderer.domElement);
-        this.gameMode = new GameModes.FreeCameraControls(this);
+        this.setGameMode(new GameModes.FreeCameraControls());
 
         this.render(this);
+    }
+
+    setGameMode(gameMode) {
+        gameMode.world = this;
+        this.gameMode = gameMode;
+        gameMode.init();
     }
 
     // Update
@@ -251,7 +255,7 @@ export class World
         {
             obj.update(timeStep);
         });
-
+                    
         // Characters
         this.characters.forEach(char =>
         {
@@ -259,14 +263,13 @@ export class World
             char.updateMatrixWorld();
         });
 
-        // Gamemode
         this.gameMode.update(timeStep);
-
-        // Rotate and position camera according to cameraTarget and angles
-        this.cameraController.update();
 
         // Lerp timescale parameter
         this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
+
+        // Rotate and position camera according to cameraTarget and angles
+        this.cameraController.update();
     }
 
     updatePhysics(timeStep)
@@ -277,40 +280,46 @@ export class World
         // Sync physics/visuals
         this.objects.forEach(obj =>
         {
-            if (obj.shape != undefined)
+            if (obj.physics.physical != undefined)
             {
-                if (obj.shape.position.y < -1)
+                if (obj.physics.physical.position.y < -5)
                 {
-                    obj.shape.position.y = 10;
+                    obj.physics.physical.position.x = 0;
+                    obj.physics.physical.position.y = 5;
+                    obj.physics.physical.position.z = 0;
+
+                    obj.physics.physical.interpolatedPosition.x = 0;
+                    obj.physics.physical.interpolatedPosition.y = 5;
+                    obj.physics.physical.interpolatedPosition.z = 0;
                 }
 
-                if (obj.shape.position.y > 10)
-                {
-                    obj.shape.position.y = -1;
-                }
+                // if (obj.physics.physical.position.y > 10)
+                // {
+                //     obj.physics.physical.position.y = -5;
+                // }
 
-                if (obj.shape.position.x > 5)
-                {
-                    obj.shape.position.x = -5;
-                }
+                // if (obj.physics.physical.position.x > 5)
+                // {
+                //     obj.physics.physical.position.x = -5;
+                // }
 
-                if (obj.shape.position.x < -5)
-                {
-                    obj.shape.position.x = 5;
-                }
+                // if (obj.physics.physical.position.x < -5)
+                // {
+                //     obj.physics.physical.position.x = 5;
+                // }
 
-                if (obj.shape.position.z > 5)
-                {
-                    obj.shape.position.z = -5;
-                }
+                // if (obj.physics.physical.position.z > 5)
+                // {
+                //     obj.physics.physical.position.z = -5;
+                // }
 
-                if (obj.shape.position.z < -5)
-                {
-                    obj.shape.position.z = 5;
-                }
+                // if (obj.physics.physical.position.z < -5)
+                // {
+                //     obj.physics.physical.position.z = 5;
+                // }
 
-                obj.position.copy(obj.shape.interpolatedPosition);
-                obj.quaternion.copy(obj.shape.interpolatedQuaternion);
+                obj.position.copy(obj.physics.physical.interpolatedPosition);
+                obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
             }
         });
     }
@@ -368,21 +377,28 @@ export class World
     {
         if (object.isObject)
         {
-            this.objects.push(object);
-
-            if (object.shape != undefined)
+            if(_.includes(this.objects, object))
             {
-                this.physicsWorld.addBody(object.shape);
+                console.warn('Adding object to a world in which it already exists.');
             }
-
-            if (object.shapeModel != undefined)
+            else 
             {
-                this.graphicsWorld.add(object.shapeModel);
-            }
+                this.objects.push(object);
 
-            if (object.model != undefined)
-            {
-                this.graphicsWorld.add(object.model);
+                if (object.physics.physical !== undefined)
+                {
+                    this.physicsWorld.addBody(object.physics.physical);
+                }
+
+                if (object.physics.visual !== undefined)
+                {
+                    this.graphicsWorld.add(object.physics.visual);
+                }
+
+                if (object.model !== undefined)
+                {
+                    this.graphicsWorld.add(object.model);
+                }
             }
         }
         else if (object.isCharacter)
@@ -390,26 +406,31 @@ export class World
 
             const character = object;
 
-            // Set world
-            character.world = this;
+            if(_.includes(this.characters, character))
+            {
+                console.warn('Adding character to a world in which it already exists.');
+            }
+            else
+            {
+                // Set world
+                character.world = this;
 
-            // Register character
-            this.characters.push(character);
+                // Register character
+                this.characters.push(character);
 
-            // Register physics
-            this.physicsWorld.addBody(character.characterCapsule.shape);
+                // Register physics
+                this.physicsWorld.addBody(character.characterCapsule.physics.physical);
 
-            // Raycast debug
-            this.graphicsWorld.add(character.raycastBox);
+                // Add to graphicsWorld
+                this.graphicsWorld.add(character);
+                this.graphicsWorld.add(character.characterCapsule.physics.visual);
+                this.graphicsWorld.add(character.raycastBox);
 
-            // Register characters physical capsule object
-            this.objects.push(character.characterCapsule);
+                // Register characters physical capsule object
+                this.objects.push(character.characterCapsule);
 
-            // Add to graphicsWorld
-            this.graphicsWorld.add(character);
-            this.graphicsWorld.add(character.characterCapsule.shapeModel);
-
-            return character;
+                return character;
+            }
         }
         else
         {
@@ -419,28 +440,60 @@ export class World
 
     remove(object)
     {
-        if (object.isCharacter)
+        if (object.isObject)
         {
+            if(!_.includes(this.objects, object))
+            {
+                console.warn('Removing object from a world in which it isn\'t present.');
+            }
+            else 
+            {
+                _.pull(this.objects, object);
 
+                if (object.physics.physical !== undefined)
+                {
+                    this.physicsWorld.removeBody(object.physics.physical);
+                }
+
+                if (object.physics.visual !== undefined)
+                {
+                    this.graphicsWorld.remove(object.physics.visual);
+                }
+
+                if (object.model !== undefined)
+                {
+                    this.graphicsWorld.remove(object.model);
+                }
+            }
+        }
+        else if (object.isCharacter)
+        {
             const character = object;
 
-            // Remove from characters
-            _.pull(this.characters, character);
+            if(!_.includes(this.characters, character))
+            {
+                console.warn('Removing character from a world in which it isn\'t present.');
+            }
+            else
+            {
+                character.world = undefined;
 
-            // Remove physics
-            this.physicsWorld.removeBody(character.characterCapsule.physical);
+                // Remove from characters
+                _.pull(this.characters, character);
 
-            // Remove visuals
-            this.graphicsWorld.remove(character.characterCapsule.visual);
-            this.graphicsWorld.remove(character.raycastBox);
+                // Remove physics
+                this.physicsWorld.removeBody(character.characterCapsule.physics.physical);
 
-            // Register for synchronization
-            _.pull(this.parallelPairs, character.characterCapsule);
+                // Remove visuals
+                this.graphicsWorld.remove(character);
+                this.graphicsWorld.remove(character.characterCapsule.physics.visual);
+                this.graphicsWorld.remove(character.raycastBox);
 
-            // Add to graphicsWorld
-            this.graphicsWorld.remove(character);
+                // Remove capsule object
+                _.pull(this.objects, character.characterCapsule);
 
-            return character;
+                return character;
+            }
         }
         else
         {

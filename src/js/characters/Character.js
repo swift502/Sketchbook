@@ -95,7 +95,7 @@ export class Character extends THREE.Object3D
 
         // Physics
         // Player Capsule
-        let capsuleShape = new ObjectPhysics.Capsule({
+        let capsulePhysics = new ObjectPhysics.Capsule({
             mass: 1,
             position: new CANNON.Vec3(0, 0, 0),
             height: 0.5,
@@ -104,17 +104,17 @@ export class Character extends THREE.Object3D
             friction: 0
         });
         this.characterCapsule = new Object();
-        this.characterCapsule.setPhysics(capsuleShape);
+        this.characterCapsule.setPhysics(capsulePhysics);
 
         // Pass reference to character for callbacks
-        this.characterCapsule.shape.character = this;
+        this.characterCapsule.physics.physical.character = this;
 
         // Move character to different collision group for raycasting
-        this.characterCapsule.shape.collisionFilterGroup = 2;
+        this.characterCapsule.physics.physical.collisionFilterGroup = 2;
 
         // Disable character rotation
-        this.characterCapsule.shape.fixedRotation = true;
-        this.characterCapsule.shape.updateMassProperties();
+        this.characterCapsule.physics.physical.fixedRotation = true;
+        this.characterCapsule.physics.physical.updateMassProperties();
 
         // Ray casting
         this.rayResult = new CANNON.RaycastResult();
@@ -136,8 +136,8 @@ export class Character extends THREE.Object3D
         this.raycastBox.visible = false;
 
         // Physics pre/post step callback bindings
-        this.characterCapsule.shape.preStep = this.physicsPreStep;
-        this.characterCapsule.shape.postStep = this.physicsPostStep;
+        this.characterCapsule.physics.physical.preStep = this.physicsPreStep;
+        this.characterCapsule.physics.physical.postStep = this.physicsPostStep;
     }
 
     setAnimations(animations)
@@ -182,7 +182,7 @@ export class Character extends THREE.Object3D
 
     setPosition(x, y, z)
     {
-        this.characterCapsule.shape.position = new CANNON.Vec3(x, y, z);
+        this.characterCapsule.physics.physical.position = new CANNON.Vec3(x, y, z);
     }
 
     setArcadeVelocity(velZ, velX = 0, velY = 0)
@@ -239,7 +239,14 @@ export class Character extends THREE.Object3D
 
     takeControl()
     {
-        this.world.gameMode = new GameModes.CharacterControls(this.world, this);
+        if(this.world !== undefined)
+        {
+            this.world.setGameMode(new GameModes.CharacterControls(this));
+        }
+        else
+        {
+            console.warn('Attempting to take control of a character that doesn\'t belong to a world.');
+        }
     }
 
     resetControls()
@@ -274,9 +281,9 @@ export class Character extends THREE.Object3D
         if (options.updateAnimation && this.mixer != undefined) this.mixer.update(timeStep);
 
         this.position.set(
-            this.characterCapsule.shape.interpolatedPosition.x,
-            this.characterCapsule.shape.interpolatedPosition.y - this.height / 2,
-            this.characterCapsule.shape.interpolatedPosition.z
+            this.characterCapsule.physics.physical.interpolatedPosition.x,
+            this.characterCapsule.physics.physical.interpolatedPosition.y - this.height / 2,
+            this.characterCapsule.physics.physical.interpolatedPosition.z
         );
     }
 
@@ -364,7 +371,7 @@ export class Character extends THREE.Object3D
         this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
         // this.visuals.rotateX(this.acceleration.z * 3);
         this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());
-        this.visuals.position.setY(this.visuals.position.y + Math.cos(Math.abs(this.angularVelocity * 2.3)) / 2);
+        this.visuals.position.setY(this.visuals.position.y + (Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2));
     }
 
     jump(initJumpSpeed = -1)

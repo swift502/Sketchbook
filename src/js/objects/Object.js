@@ -10,16 +10,14 @@ export class Object extends THREE.Object3D
 
         this.model = undefined;
         this.physics = undefined;
-        this.shape = undefined;
-        this.shapeModel = undefined;
     }
 
     update(timeStep)
     {
-        if (this.shapeModel != undefined)
+        if (this.physics.visual != undefined)
         {
-            this.shapeModel.position.copy(this.position);
-            this.shapeModel.quaternion.copy(this.quaternion);
+            this.physics.visual.position.copy(this.position);
+            this.physics.visual.quaternion.copy(this.quaternion);
         }
 
         if (this.model != undefined)
@@ -42,7 +40,5 @@ export class Object extends THREE.Object3D
     setPhysics(physics)
     {
         this.physics = physics;
-        this.shape = physics.physical;
-        this.shapeModel = physics.visual;
     }
 }

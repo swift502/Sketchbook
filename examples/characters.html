@@ -3,54 +3,53 @@
 
 <head>
     <title>Sketchbook - Characters</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 </head>
 
 <body>
+    <div id="controls-menu" class="controls-card">
+        <div class="controls-ctrl"><span class="key">w</span><span class="key">a</span><span class="key">s</span><span class="key">d</span><span class="ctrl-desc"></span>movement</span></div>
+        <div class="controls-ctrl"><span class="key">shift</span><span class="ctrl-desc">sprint</span></div>
+        <div class="controls-ctrl"><span class="key">space</span><span class="ctrl-desc"></span>jump</span></div>
+        <div class="controls-ctrl"><span class="key">shift</span>&nbsp;+&nbsp;<span class="key">c</span><span class="ctrl-desc"></span>free camera</span></div>
+        <div class="controls-ctrl"><img src="../src/graphics/ui/lmb.png" class="mouse"/><span class="ctrl-desc"></span>look around</span></div>
+        <div class="controls-ctrl"><img src="../src/graphics/ui/mmb.png" class="mouse"/><span class="ctrl-desc"></span>change time scale</span></div>
+    </div>
+    
     <script src="../build/three.min.js"></script>
     <script src="../build/cannon.min.js"></script>
     <script src="../build/sketchbook.min.js"></script>
     <script>
-
         const SB = Sketchbook;
 
-        // Instantiate a loader
-        const gloader = new SB.GLTFLoader();
-        
+        // Instantiate loaders
+        const fbxLoader = new SB.FBXLoader();
+        const gltfLoader = new SB.GLTFLoader();
+        // const threeToCannon = SB.threeToCannon;
+
         // Initialize sketchbook
         let world = new SB.World();
         world.cameraController.theta = 360;
         world.cameraController.target.z = -3;
         world.cameraController.target.y = 2;
+
+        // const object = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10));
+        // const shape = threeToCannon(object, {type: threeToCannon.Type.HULL});
         
         // Load world geometry
         LoadExampleWorld(world);
-        
+
         // Spawn player
         let player = new SB.Character();
-        world.add(player);
         LoadFBX(player);
-
+        world.add(player);
         player.takeControl();
 
-        // function spawnFollowers(number) {
-        //     for(let i = 0; i < number; i++) {
-        //         let char = world.spawnCharacter();
-        //         LoadBoxmanCharacterModel(char);
-        //         char.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));//
-        //     }
-        // }
-        
-        // Spawn Bob
-        // let bob = world.SpawnCharacter();
-        // LoadBoxmanCharacterModel(bob);
-        // bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
-        
         function LoadFBX(character) {	
 
-                let fbxLoader = new SB.FBXLoader();	
                 // Default model	
                 fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
-
                     object.traverse(function (child) {	
                         if (child.isMesh) {	
                             child.castShadow = true;	
@@ -77,44 +76,82 @@
 
         function LoadExampleWorld(world) {
 
-            let fbxLoader = new SB.FBXLoader();
-
             // Ground
-            let groundShape = new SB.ObjectPhysics.Box ({
-                mass: 0,
-                position: new CANNON.Vec3(0, -1, 0),
-                size: new CANNON.Vec3(5, 1, 5),
-                friction: 0.3
+            // let groundShape = new SB.ObjectPhysics.Box ({
+            //     mass: 0,
+            //     position: new CANNON.Vec3(0, -1, 0),
+            //     size: new CANNON.Vec3(20, 1, 20),
+            //     friction: 0.3
+            // });
+            // let ground = new SB.Object();
+            // ground.setPhysics(groundShape);
+            // ground.setModelFromPhysicsShape();
+            // world.add(ground);
+
+            gltfLoader.load('../build/models/test_world/scene.glb', function (object)
+            {
+                world.graphicsWorld.add(object.scene);
+
+                console.log(object.scene);
+
+                object.scene.traverse(function(obj) {
+                        if(obj.userData.mass !== undefined) {
+                            obj.visible = false;
+                        }
+                        else
+                        {
+                            if(obj.userData.visible === 'true') {
+
+                                let mapOverride = undefined;
+                                if(obj.userData.map !== undefined) {
+                                    mapOverride = new THREE.TextureLoader().load('../build/models/test_world/' + obj.userData.map);
+                                }
+                                else {
+                                    mapOverride = obj.material.map;
+                                }
+
+                                obj.material = new THREE.MeshLambertMaterial({	
+                                        map: mapOverride
+                                    });	
+                                obj.castShadow = true;
+                                obj.receiveShadow = true;
+                                // world.graphicsWorld.add(obj);
+                            }
+                            else if(obj.userData.visible === 'false')
+                            {
+                                obj.visible = false;
+                            }
+
+                            if(obj.userData.physics == 'convex') {
+
+                                let mass = obj.userData.mass || 0;
+
+                                let phys = new SB.ObjectPhysics.Convex(obj, {
+                                    mass: mass
+                                });
+
+                                let SBobj = new SB.Object();
+                                SBobj.setPhysics(phys);
+
+                                world.add(SBobj);
+                            }
+
+                            if(obj.userData.physics == 'trimesh') {
+
+                                let mass = obj.userData.mass || 0;
+
+                                let phys = new SB.ObjectPhysics.TriMesh(obj, {
+                                    mass: mass
+                                });
+
+                                let SBobj = new SB.Object();
+                                SBobj.setPhysics(phys);
+
+                                world.add(SBobj);
+                            }
+                        }
+                });
             });
-            let ground = new SB.Object();
-            ground.setPhysics(groundShape);
-            ground.setModelFromPhysicsShape();
-            world.add(ground);
-
-            // Stuff
-            // world.spawnBoxPrimitive({
-            //     mass: 10,
-            //     position: new CANNON.Vec3(4, 2, 3),
-            //     size: new CANNON.Vec3(1, 1, 1),
-            //     friction: 0.3
-            // });
-
-            // world.spawnBoxPrimitive({
-            //     mass: 5,
-            //     position: new CANNON.Vec3(0, 5, 3),
-            //     size: new CANNON.Vec3(4, 0.02, 4),
-            //     friction: 0.3
-            // });
-
-
-            // for (let i = 0; i < 40; i++) {
-            //     world.spawnBoxPrimitive({
-            //         mass: 5,
-            //         position: new CANNON.Vec3(3, i/4, -3),
-            //         size: new CANNON.Vec3(0.1, 0.1, 0.1),
-            //         friction: 0.3
-            //     });
-            // }
 
             // fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
             //     object.traverse(function (child) {
@@ -188,113 +225,6 @@
             //         visible: false
             //     });
             // });
-
-            // async loading attempts
-
-        // LoadFBXCharacterModel(player).then(function(gltf) {
-        //     // player.setModel(model);	
-        //     // player.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-            
-        //     player.setAnimations(gltf.animations);
-        //     player.setModel(gltf.scene);
-        //     player.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-
-        // });
-
-            // function LoadGLB(character) {
-
-        //     // Optional: Provide a DRACOLoader instance to decode compressed mesh data
-        //     // THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
-        //     // loader.setDRACOLoader( new THREE.DRACOLoader() );
-
-        //     // Load a glTF resource
-        //     gloader.load(
-        //         // resource URL
-        //         '../build/models/game_man/game_man.glb',
-        //         // called when the resource is loaded
-        //         function ( gltf ) {
-                    
-        //             gltf.scene.traverse(function (child) {
-        //                 if (child.isMesh) {
-        //                     child.castShadow = true;
-        //                     child.receiveShadow = true;
-        //                 }
-        //                 if (child.name == 'game_man') {
-        //                     child.material = new THREE.MeshLambertMaterial({
-        //                         map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),
-        //                         skinning: true
-        //                     });
-        //                 }
-        //             });
-
-        //             character.setAnimations(gltf.animations);
-        //             character.setModel(gltf.scene);
-        //             character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-        //         },
-        //         // called while loading is progressing
-        //         function ( xhr ) {
-        //             // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-        //         },
-        //         // called when loading has errors
-        //         function ( error ) {
-        //             console.error(error);
-        //         }
-        //     );
-        // }
-
-        // async function LoadFBXCharacterModel(character) {
-        //     return new Promise(AsnycLoadGLB);
-
-        //     // model.traverse(configureMaterials);
-        // }
-        
-        // async function AsnycLoadGLB(resolve, reject) {
-
-        //     // Load a glTF resource
-        //     gloader.load(
-        //         // resource URL
-        //         '../build/models/game_man/game_man.glb',
-        //         // called when the resource is loaded
-        //         (gltf) => resolve(gltf),
-        //         // called while loading is progressing
-        //         function ( xhr ) {
-        //             // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-        //         },
-        //         // called when loading has errors
-        //         function ( error ) {
-        //             console.error(error);
-        //         }
-        //     );
-        // }
-
-        // async function configureMaterials(child){
-        //     if (child.isMesh) {	
-        //         child.castShadow = true;	
-        //         child.receiveShadow = true;	
-        //     }	
-        //     if (child.name == 'game_man') {	
-
-        //         const texturemap = await new Promise(loadFBXTexture);
-                
-        //         child.material = new THREE.MeshLambertMaterial({	
-        //             map: texturemap,	
-        //             skinning: true	
-        //         });	
-        //     }	
-        // }
-
-        // function loadFBXModel(resolve, reject){
-        //     const fbxLoader = new Sketchbook.FBXLoader();	
-        //     const dummyPath = '../build/models/game_man/game_man.fbx';
-        //     fbxLoader.load(dummyPath, (dummy) => resolve(dummy));
-        // }
-
-        // //helper function to load in the texture
-        // function loadFBXTexture(resolve, reject){
-        //     const textureLoader = new THREE.TextureLoader();
-        //     const texturePath   = '../build/models/game_man/game_man.png';
-        //     textureLoader.load(texturePath, (object) => resolve(object));
-        // }
         }
     </script>
 </body>

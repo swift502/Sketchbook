@@ -18,3 +18,4 @@ export { World } from './sketchbook/World';
 
 export { FBXLoader } from './lib/utils/FBXLoader';
 export { default as GLTFLoader } from 'three-gltf-loader';
+// export { threeToCannon } from '../js/lib/utils/three-pathfinding';
