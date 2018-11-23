@@ -12,8 +12,6 @@ class GameModeBase
 
     handleAction(event, key, value)
     {
-        key = key.toLowerCase();
-
         if(key == 't' && value == true) 
         {
             if(this.world.timeScaleTarget < 0.5)
@@ -114,10 +112,10 @@ class FreeCameraControls extends GameModeBase
      */
     handleAction(event, key, value)
     {
-        super.handleAction(event, key, value);
-
         // Shift modifier fix
         key = key.toLowerCase();
+
+        super.handleAction(event, key, value);
 
         if(key == 'f' && value == true) 
         {
@@ -239,6 +237,9 @@ class CharacterControls extends GameModeBase
      */
     handleAction(event, key, value)
     {
+        // Shift modifier fix
+        key = key.toLowerCase();
+
         super.handleAction(event, key, value);
 
         if(key == 'v' && value == true)
@@ -276,9 +277,6 @@ class CharacterControls extends GameModeBase
                 _.pull(this.world.balls, this.world.balls[0]);
             }
         }
-
-        // Shift modifier fix
-        key = key.toLowerCase();
 
         //Free cam
         if (key == 'c' && value == true && event.shiftKey == true)

@@ -234,7 +234,8 @@ export class World
         this.render(this);
     }
 
-    setGameMode(gameMode) {
+    setGameMode(gameMode)
+    {
         gameMode.world = this;
         this.gameMode = gameMode;
         gameMode.init();
@@ -298,8 +299,8 @@ export class World
 
     /**
      * Rendering loop.
-     * Implements custom fps limit and frame-skipping
-     * Calls the "update" function before rendering.
+     * Implements fps limiter and frame-skipping
+     * Calls world's "update" function before rendering.
      * @param {World} world 
      */
     render(world)
@@ -375,7 +376,6 @@ export class World
         }
         else if (object.isCharacter)
         {
-
             const character = object;
 
             if(_.includes(this.characters, character))

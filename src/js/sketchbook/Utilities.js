@@ -125,9 +125,9 @@ export class Utilities
     static appplyVectorMatrixXZ(a, b)
     {
         return new THREE.Vector3(
-            (a.x * b.z + a.z * b.x) / 2,
+            (a.x * b.z + a.z * b.x),
             b.y,
-            (a.z * b.z + -a.x * b.x) / 2
+            (a.z * b.z + -a.x * b.x)
         );
     }
 

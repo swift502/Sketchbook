@@ -16,15 +16,17 @@ export class Character extends THREE.Object3D
 {
     constructor(options)
     {
+        super();
+
         let defaults = {
             position: new THREE.Vector3(),
             height: 1
         };
         options = Utils.setDefaults(options, defaults);
 
-        super();
-
         this.isCharacter = true;
+
+        //#region Graphics
 
         // Geometry
         this.height = options.height;
@@ -58,6 +60,10 @@ export class Character extends THREE.Object3D
         this.mixer;
         this.animations = [];
 
+        //#endregion
+
+        //#region Movement
+
         // Movement
         this.acceleration = new THREE.Vector3();
         this.velocity = new THREE.Vector3();
@@ -68,7 +74,7 @@ export class Character extends THREE.Object3D
         this.defaultVelocitySimulatorDamping = 0.8;
         this.defaultVelocitySimulatorMass = 50;
         this.velocitySimulator = new Springs.VectorSpringSimulator(60, this.defaultVelocitySimulatorMass, this.defaultVelocitySimulatorDamping);
-        this.moveSpeed = 8;
+        this.moveSpeed = 4;
 
         // Rotation
         this.angularVelocity = 0;
@@ -78,6 +84,10 @@ export class Character extends THREE.Object3D
         this.defaultRotationSimulatorDamping = 0.5;
         this.defaultRotationSimulatorMass = 10;
         this.rotationSimulator = new Springs.RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
+
+        //#endregion
+
+        //#region Input
 
         // States
         this.setState(CharacterStates.Idle);
@@ -98,6 +108,10 @@ export class Character extends THREE.Object3D
             tertiary: new Controls.EventControl(),
             lastControl: new Controls.EventControl()
         };
+
+        //#endregion
+
+        //#region Physics
 
         // Physics
         // Player Capsule
@@ -126,7 +140,7 @@ export class Character extends THREE.Object3D
         this.rayResult = new CANNON.RaycastResult();
         this.rayHasHit = false;
         this.rayCastLength = 0.60;
-        this.raySafeOffset = 0.01;
+        this.raySafeOffset = 0.03;
         this.wantsToJump = false;
         this.initJumpSpeed = -1;
         this.groundImpactData = {
@@ -144,6 +158,8 @@ export class Character extends THREE.Object3D
         // Physics pre/post step callback bindings
         this.characterCapsule.physics.physical.preStep = this.physicsPreStep;
         this.characterCapsule.physics.physical.postStep = this.physicsPostStep;
+
+        //#endregion
     }
 
     setAnimations(animations)
@@ -223,7 +239,6 @@ export class Character extends THREE.Object3D
 
         if (action.value !== value)
         {
-
             // Set value
             action.value = value;
 
@@ -337,7 +352,6 @@ export class Character extends THREE.Object3D
         // Updating values
         this.orientation.applyAxisAngle(new THREE.Vector3(0, 1, 0), rot);
         this.angularVelocity = this.rotationSimulator.velocity;
-
     }
 
     getLocalMovementDirection()
@@ -347,13 +361,13 @@ export class Character extends THREE.Object3D
         const positiveZ = this.controls.up.value ? 1 : 0;
         const negativeZ = this.controls.down.value ? -1 : 0;
 
-        return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ);
+        return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ).normalize();
     }
 
     getCameraRelativeMovementVector()
     {
         const localDirection = this.getLocalMovementDirection();
-        const flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z);
+        const flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z).normalize();
 
         return Utils.appplyVectorMatrixXZ(flatViewVector, localDirection);
     }
@@ -375,7 +389,6 @@ export class Character extends THREE.Object3D
     rotateModel()
     {
         this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
-        // this.visuals.rotateX(this.acceleration.z * 3);
         this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());
         this.visuals.position.setY(this.visuals.position.y + (Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2));
     }
@@ -400,10 +413,10 @@ export class Character extends THREE.Object3D
         // Cast the ray
         this.character.rayHasHit = this.character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult);
 
+        // Raycast debug
         if (this.character.rayHasHit)
         {
             if (this.character.raycastBox.visible) this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
-            this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength;
         }
         else
         {
@@ -413,9 +426,9 @@ export class Character extends THREE.Object3D
 
     physicsPostStep()
     {
-        // Player ray casting
         // Get velocities
         let simulatedVelocity = new THREE.Vector3().copy(this.velocity);
+
         // Take local velocity
         let arcadeVelocity = new THREE.Vector3().copy(this.character.velocity).multiplyScalar(this.character.moveSpeed);
         // Turn local into global
@@ -426,7 +439,6 @@ export class Character extends THREE.Object3D
         // Additive velocity mode
         if (this.character.arcadeVelocityIsAdditive)
         {
-
             newVelocity.copy(simulatedVelocity);
 
             let globalVelocityTarget = Utils.appplyVectorMatrixXZ(this.character.orientation, this.character.velocityTarget);
@@ -448,7 +460,6 @@ export class Character extends THREE.Object3D
         // If we're hitting the ground, stick to ground
         if (this.character.rayHasHit)
         {
-
             //Flatten velocity
             newVelocity.y = 0;
 
@@ -462,24 +473,28 @@ export class Character extends THREE.Object3D
             // Rotate the velocity vector
             newVelocity.applyMatrix4(m);
 
+            // Compensate for gravity
+            newVelocity.y -= this.world.gravity.y / this.character.world.physicsFrameRate;
+
             // Apply velocity
             this.velocity.copy(newVelocity);
+            // Ground character
+            this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength + (newVelocity.y / this.character.world.physicsFrameRate);
         }
         else
         {
             // If we're in air
             this.velocity.copy(newVelocity);
+            // Save last in-air information
             this.character.groundImpactData.velocity.copy(this.velocity);
         }
 
         // Jumping
         if (this.character.wantsToJump)
         {
-
             // If initJumpSpeed is set
             if (this.character.initJumpSpeed > -1)
             {
-
                 // Flatten velocity
                 this.velocity.y = 0;
 
@@ -493,7 +508,7 @@ export class Character extends THREE.Object3D
 
             // Add positive vertical velocity 
             this.velocity.y += 4;
-            //Move above ground by 1x safe offset value
+            //Move above ground by 2x safe offset value
             this.position.y += this.character.raySafeOffset * 2;
             //Reset flag
             this.character.wantsToJump = false;

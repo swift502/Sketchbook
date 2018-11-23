@@ -3,12 +3,11 @@
 
 <head>
     <title>Sketchbook - Characters</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Cutive+Mono" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Averia+Sans+Libre:300,400,700" rel="stylesheet">
 </head>
 
 <body>
-
     <div id="loader">
         Loading...
     </div>
@@ -69,20 +68,20 @@
         player.orientation = new THREE.Vector3(0, 0, -1);
 
         // Spawn John
-        let john = new SB.Character({
-            position: new THREE.Vector3(5, 2, 1)
-        });
-        LoadBoxmanModel(john);
-        john.setBehaviour(new Sketchbook.CharacterAI.Random());
-        world.add(john);
+        // let john = new SB.Character({
+        //     position: new THREE.Vector3(5, 2, 1)
+        // });
+        // LoadBoxmanModel(john);
+        // john.setBehaviour(new Sketchbook.CharacterAI.Random());
+        // world.add(john);
 
         // Spawn Bob
-        let bob = new SB.Character({
-            position: new THREE.Vector3(-5, 2, 3)
-        });
-        LoadBoxmanModel(bob);
-        bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
-        world.add(bob);
+        // let bob = new SB.Character({
+        //     position: new THREE.Vector3(-5, 2, 3)
+        // });
+        // LoadBoxmanModel(bob);
+        // bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
+        // world.add(bob);
 
         //
         // Functions

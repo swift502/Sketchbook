@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-
 /**
  * Character AI classes are high-level controllers for characters.
  * They should only interact with characters just as a real person

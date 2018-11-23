@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 export class SimulatorBase
 {
-
     constructor(fps)
     {
         this.frameTime = 1 / fps;
