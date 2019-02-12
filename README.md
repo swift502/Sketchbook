@@ -7,7 +7,9 @@
 
 # Sketchbook
 
-3D rendering and physics library for game projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
+3D rendering and physics library for game-like projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
+
+It's called Sketchbook because I'm sketching in all the gameplay mechanics I've known for years and always speculated on how I would go about creating them from scratch. Mostly it's just my little playground which I'm happy to share with people.
 
 Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js).
 
@@ -61,3 +63,11 @@ Simply import the library in your project, along with provided build of cannon.j
 <script src="cannon.min.js"></script> <!-- Only use provided build, official package is extremely outdated! -->
 <script src="sketchbook.min.js"></script>
 ```
+
+A NPM package and @types are on the way, which should make this a whole lot easier.
+
+## Contributing
+
+Please do!
+
+I appreciate all help, be it suggestions, issues or even pull requests. Just make sure to create PRs on the [dev branch](https://github.com/swift502/Sketchbook/tree/dev), which is the most up to date one. 
