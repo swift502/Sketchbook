@@ -12,7 +12,9 @@ class GameModeBase
 
     handleAction(event, key, value)
     {
-        if(key == 't' && value == true) 
+        key = event.keyCode;
+
+        if(key == '84' && value == true) 
         {
             if(this.world.timeScaleTarget < 0.5)
             {
@@ -74,13 +76,13 @@ class FreeCameraControls extends GameModeBase
 
         // Keymap
         this.keymap = {
-            'w': { action: 'forward' },
-            's': { action: 'back' },
-            'a': { action: 'left' },
-            'd': { action: 'right' },
-            'e': { action: 'up' },
-            'q': { action: 'down' },
-            'shift': { action: 'fast' }
+            '87': { action: 'forward' },
+            '83': { action: 'back' },
+            '65': { action: 'left' },
+            '68': { action: 'right' },
+            '69': { action: 'up' },
+            '81': { action: 'down' },
+            '16': { action: 'fast' }
         };
 
         this.controls = {
@@ -112,12 +114,12 @@ class FreeCameraControls extends GameModeBase
      */
     handleAction(event, key, value)
     {
-        // Shift modifier fix
-        key = key.toLowerCase();
-
         super.handleAction(event, key, value);
 
-        if(key == 'f' && value == true) 
+        // Shift modifier fix
+        key = event.keyCode;
+
+        if(key == '70' && value == true) 
         {
             let forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.world.camera.quaternion);
             let ball = new Object();
@@ -139,7 +141,7 @@ class FreeCameraControls extends GameModeBase
         }
 
         // Turn off free cam
-        if (this.previousGameMode !== undefined && key == 'c' && value == true && event.shiftKey == true)
+        if (this.previousGameMode !== undefined && key == '67' && value == true && event.shiftKey == true)
         {
             this.world.gameMode = this.previousGameMode;
             this.world.gameMode.init();
@@ -207,16 +209,16 @@ class CharacterControls extends GameModeBase
 
         // Keymap
         this.keymap = {
-            'w': { action: 'up' },
-            's': { action: 'down' },
-            'a': { action: 'left' },
-            'd': { action: 'right' },
-            'shift': { action: 'run' },
-            ' ': { action: 'jump' },
-            'e': { action: 'use' },
-            'mouse0': { action: 'primary' },
-            'mouse2': { action: 'secondary' },
-            'mouse1': { action: 'tertiary' }
+            '87': { action: 'up' },
+            '83': { action: 'down' },
+            '65': { action: 'left' },
+            '68': { action: 'right' },
+            '13': { action: 'run' },
+            '32': { action: 'jump' },
+            '69': { action: 'use' },
+            '1': { action: 'primary' },
+            '2': { action: 'secondary' },
+            '3': { action: 'tertiary' }
         };
     }
 
@@ -237,27 +239,24 @@ class CharacterControls extends GameModeBase
      */
     handleAction(event, key, value)
     {
-        // Shift modifier fix
-        key = key.toLowerCase();
-
         super.handleAction(event, key, value);
 
-        if(key == 'v' && value == true)
+        if(key == '86' && value == true)
         {
-            if(this.world.cameraDistanceTarget > 1.6)
+            if(this.world.cameraDistanceTarget > 1.8)
             {
-                this.world.cameraDistanceTarget = 1.3;
+                this.world.cameraDistanceTarget = 1.1;
             }
             else if(this.world.cameraDistanceTarget > 1.3)
             {
-                this.world.cameraDistanceTarget = 2.0;
+                this.world.cameraDistanceTarget = 2.1;
             }
             else if(this.world.cameraDistanceTarget > 0)
             {
                 this.world.cameraDistanceTarget = 1.6;
             }
         }
-        else if(key == 'f' && value == true) 
+        else if(key == '70' && value == true) 
         {
             let forward = new THREE.Vector3().copy(this.character.orientation);
             let ball = new Object();
@@ -278,8 +277,12 @@ class CharacterControls extends GameModeBase
             }
         }
 
+        // Shift modifier fix
+        key = event.keyCode;
+        let mouseKey = event.which;
+
         //Free cam
-        if (key == 'c' && value == true && event.shiftKey == true)
+        if (key == '67' && value == true && event.shiftKey == true)
         {
             this.character.resetControls();
             this.world.setGameMode(new FreeCameraControls(this));
@@ -288,6 +291,11 @@ class CharacterControls extends GameModeBase
         if (key in this.keymap)
         {
             this.character.setControl(this.keymap[key].action, value);
+        }
+        // Mouse which
+        if (mouseKey in this.keymap)
+        {
+            this.character.setControl(this.keymap[mouseKey].action, value);
         }
     }
 
