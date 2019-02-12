@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 import { CameraController } from './CameraController';
-import { GameModes } from './GameModes';
+import { GameModes } from '../gameModes/GameModes';
 import { Utilities as Utils } from './Utilities';
 import { Shaders } from '../lib/shaders/Shaders';
 

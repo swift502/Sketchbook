@@ -104,7 +104,7 @@ export class InputManager
     {
         if (this.world.gameMode !== undefined)
         {
-            this.world.gameMode.handleAction(event, event.key, true);
+            this.world.gameMode.handleAction(event, event.keyCode, true);
         }
     }
 
@@ -112,7 +112,7 @@ export class InputManager
     {
         if (this.world.gameMode !== undefined)
         {
-            this.world.gameMode.handleAction(event, event.key, false);
+            this.world.gameMode.handleAction(event, event.keyCode, false);
         }
     }
 

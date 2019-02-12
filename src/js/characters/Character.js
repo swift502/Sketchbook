@@ -7,7 +7,7 @@ import { Springs } from '../simulation/Springs';
 import { Controls } from '../sketchbook/Controls';
 import { CharacterAI } from './CharacterAI';
 import { CharacterStates } from './CharacterStates';
-import { GameModes } from '../sketchbook/GameModes';
+import { GameModes } from '../gameModes/GameModes';
 import { ObjectPhysics } from '../objects/ObjectPhysics';
 import { Object } from '../objects/Object';
 

@@ -6,7 +6,7 @@ export { Character } from './characters/Character';
 export { CharacterAI } from './characters/CharacterAI';
 export { CharacterStates } from './characters/CharacterStates';
 export { Controls } from './sketchbook/Controls';
-export { GameModes } from './sketchbook/GameModes';
+export { GameModes } from './gameModes/GameModes';
 export { InputManager } from './sketchbook/InputManager';
 export { Item } from './objects/Item';
 export { Object } from './objects/Object';
