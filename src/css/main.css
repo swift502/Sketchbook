@@ -12,13 +12,26 @@ body {
 
 .statsBox {
     position: fixed;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-    top: 0;
-    left: 0;
-    margin: 10px;
-    cursor: pointer;
+    top: 15px;
+    height: 48px;
+    right: 15px;
     opacity: 0.9;
-    z-index: 10000
+    z-index: 10000;
+    cursor: cell;
+}
+
+.statsBox,
+.dg.ac .dg.main.a .dg .title {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dg.ac {
+    top: 48px;
+    user-select: none;
+}
+
+.dg.ac .close-button.close-bottom {
+    display: none;
 }
 
 html, body {
@@ -40,13 +53,17 @@ body {
     position: absolute;
     border-radius: 3px;
     text-shadow: 1px 1px 0px #000, 0px 1px 2px #000c;
+    background: #0000;
     overflow: hidden;
-    bottom: 0;
     top: 80px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     margin: 10px;
     font-family: 'Averia Sans Libre', cursive;
     user-select: none;
     pointer-events: none;
+    transition: all 0.3s ease;
 }
 
 .controls-title {

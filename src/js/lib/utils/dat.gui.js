@@ -1945,17 +1945,17 @@
                 setWidth(_this, params.width);
             }
         }
-        this.__resizeHandler = function () {
-            _this.onResizeDebounced();
-        };
-        dom.bind(window, 'resize', this.__resizeHandler);
-        dom.bind(this.__ul, 'webkitTransitionEnd', this.__resizeHandler);
-        dom.bind(this.__ul, 'transitionend', this.__resizeHandler);
-        dom.bind(this.__ul, 'oTransitionEnd', this.__resizeHandler);
-        this.onResize();
-        if (params.resizable) {
-            addResizeHandle(this);
-        }
+        // this.__resizeHandler = function () {
+        //     _this.onResizeDebounced();
+        // };
+        // dom.bind(window, 'resize', this.__resizeHandler);
+        // dom.bind(this.__ul, 'webkitTransitionEnd', this.__resizeHandler);
+        // dom.bind(this.__ul, 'transitionend', this.__resizeHandler);
+        // dom.bind(this.__ul, 'oTransitionEnd', this.__resizeHandler);
+        // this.onResize();
+        // if (params.resizable) {
+        //     addResizeHandle(this);
+        // }
         saveToLocalStorage = function saveToLocalStorage() {
             if (SUPPORTS_LOCAL_STORAGE && localStorage.getItem(getLocalStorageHash(_this, 'isLocal')) === 'true') {
                 localStorage.setItem(getLocalStorageHash(_this, 'gui'), JSON.stringify(_this.getSaveObject()));
@@ -1990,7 +1990,7 @@
     GUI.CLASS_CLOSE_TOP = 'close-top';
     GUI.CLASS_CLOSE_BOTTOM = 'close-bottom';
     GUI.CLASS_DRAG = 'drag';
-    GUI.DEFAULT_WIDTH = 245;
+    GUI.DEFAULT_WIDTH = 240;
     GUI.TEXT_CLOSED = 'Close Controls';
     GUI.TEXT_OPEN = 'Open Controls';
     GUI._keydownHandler = function (e) {

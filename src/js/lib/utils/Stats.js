@@ -10,12 +10,12 @@ export var Stats = function () {
 
     var container = document.createElement('div');
     container.classList.add('statsBox');
-    container.addEventListener('click', function (event) {
+    // container.addEventListener('click', function (event) {
 
-        event.preventDefault();
-        showPanel(++mode % container.children.length);
+    //     event.preventDefault();
+    //     showPanel(++mode % container.children.length);
 
-    }, false);
+    // }, false);
 
     function addPanel(panel) {
 
@@ -28,8 +28,8 @@ export var Stats = function () {
 
         for (var i = 0; i < container.children.length; i++) {
 
-            container.children[i].style.display = i === id ? 'block' : 'none';
-
+            // container.children[i].style.display = i === id ? 'block' : 'none';
+            container.children[i].style.display = 'inline-block';
         }
 
         mode = id;

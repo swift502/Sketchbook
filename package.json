@@ -1,7 +1,17 @@
 {
   "name": "Sketchbook",
-  "version": "1.0.0",
-  "description": "A test ground for various custom 3D features. Built with [three.js](https://github.com/mrdoob/three.js).",
+  "version": "0.2.0",
+  "description": "GTA-style gameplay library.",
+  "keywords": [
+    "3d",
+    "threejs",
+    "cannonjs",
+    "game",
+    "engine",
+    "characters",
+    "vehicles",
+    "physics"
+  ],
   "main": "index.html",
   "scripts": {
     "watch": "webpack --config webpack.dev.js --watch",

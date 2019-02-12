@@ -244,13 +244,13 @@ class CharacterControls extends GameModeBase
 
         if(key == 'v' && value == true)
         {
-            if(this.world.cameraDistanceTarget > 1.8)
+            if(this.world.cameraDistanceTarget > 1.6)
             {
-                this.world.cameraDistanceTarget = 1.1;
+                this.world.cameraDistanceTarget = 1.3;
             }
             else if(this.world.cameraDistanceTarget > 1.3)
             {
-                this.world.cameraDistanceTarget = 2.1;
+                this.world.cameraDistanceTarget = 2.0;
             }
             else if(this.world.cameraDistanceTarget > 0)
             {
