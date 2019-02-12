@@ -7,7 +7,7 @@
 
 # Sketchbook
 
-3D rendering and physics library for game-like projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
+3D rendering and physics library for game-like projects on the web, featuring a few conventional gameplay mechanics and basic 3D models. **Currently not production-ready. Until 1.0 is released, anything can break at any point and I can't guarantee backwards compatibility.**
 
 It's called Sketchbook because I'm sketching in all the gameplay mechanics I've known for years and always speculated on how I would go about creating them from scratch. Mostly it's just my little playground which I'm happy to share with people.
 
