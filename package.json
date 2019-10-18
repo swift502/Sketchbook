@@ -1,7 +1,7 @@
 {
-  "name": "Sketchbook",
-  "version": "0.2.0",
-  "description": "GTA-style gameplay library.",
+  "name": "sketchbook",
+  "version": "0.2.2",
+  "description": "WebGL 3D game library",
   "keywords": [
     "3d",
     "threejs",
@@ -12,7 +12,7 @@
     "vehicles",
     "physics"
   ],
-  "main": "index.html",
+  "main": "build/sketchbook.min.js",
   "scripts": {
     "watch": "webpack --config webpack.dev.js --watch",
     "build": "webpack --config webpack.prod.js"
@@ -28,23 +28,23 @@
   },
   "homepage": "https://github.com/swift502/sketchbook#readme",
   "devDependencies": {
-    "@types/cannon": "^0.1.3",
-    "@types/dat.gui": "^0.6.0",
+    "@types/cannon": "^0.1.4",
+    "@types/dat.gui": "^0.7.5",
     "@types/stats": "^0.16.30",
-    "@types/three": "^0.91.3",
-    "css-loader": "^1.0.0",
-    "eslint": "^5.5.0",
-    "file-loader": "^2.0.0",
-    "style-loader": "^0.23.1",
-    "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0",
-    "webpack-merge": "^4.1.4"
+    "@types/three": "^0.103.2",
+    "css-loader": "^3.2.0",
+    "eslint": "^6.5.1",
+    "file-loader": "^4.2.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "cannon": "^0.6.2",
-    "lodash": "^4.17.11",
-    "three": "^0.92.0",
-    "three-gltf-loader": "^1.97.0",
+    "lodash": "^4.17.15",
+    "three": "^0.109.0",
+    "three-gltf-loader": "^1.109.0",
     "three-to-cannon": "^2.0.0"
   }
 }
