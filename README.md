@@ -7,7 +7,7 @@
 
 # Sketchbook
 
-**! Work in progress ! - Package probably doesn't work yet. I'm figuring out how to publish properly. Thanks for understanding.**
+Not in active development.
 
 3D rendering and physics library for game-like projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
 
