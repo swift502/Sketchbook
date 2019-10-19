@@ -1,5 +1,8 @@
-import { CharacterStateBase } from './CharacterStateBase';
-import {Falling} from './Falling';
+import
+{
+    CharacterStateBase,
+    Falling
+} from './_stateLibrary';
 
 export class JumpRunning extends CharacterStateBase
 {

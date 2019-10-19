@@ -1,4 +1,7 @@
-import { CharacterStateBase } from './CharacterStateBase';
+import
+{
+    CharacterStateBase
+} from './_stateLibrary';
 
 export class Falling extends CharacterStateBase
 {

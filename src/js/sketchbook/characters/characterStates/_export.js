@@ -7,38 +7,48 @@
  * functioning at any point time without any input parameters.
  */
 
-import {Idle} from './Idle';
-import {Walk} from './Walk';
-import {Sprint} from './Sprint';
-import {Falling} from './Falling';
-import {DropIdle} from './DropIdle';
-import {DropRolling} from './DropRolling';
-import {DropRunning} from './DropRunning';
-import {StartWalkBackLeft} from './StartWalkBackLeft';
-import {StartWalkBackRight} from './StartWalkBackRight';
-import {StartWalkLeft} from './StartWalkLeft';
-import {StartWalkRight} from './StartWalkRight';
-import {StartWalkForward} from './StartWalkForward';
-import {EndWalk} from './EndWalk';
-import {JumpIdle} from './JumpIdle';
-import {JumpRunning} from './JumpRunning';
-import {CharacterStateBase} from './CharacterStateBase';
+import
+{
+    CharacterStateBase,
+    DropIdle,
+    DropRolling,
+    DropRunning,
+    EndWalk,
+    Falling,
+    Idle,
+    IdleRotateLeft,
+    IdleRotateRight,
+    JumpIdle,
+    JumpRunning,
+    Sprint,
+    StartWalkBase,
+    StartWalkBackLeft,
+    StartWalkBackRight,
+    StartWalkForward,
+    StartWalkLeft,
+    StartWalkRight,
+    Walk
+} from './_stateLibrary';
+
 
 export let CharacterStates = {
-    Idle: Idle,
-    Walk: Walk,
-    Sprint: Sprint,
-    StartWalkForward: StartWalkForward,
-    StartWalkLeft: StartWalkLeft,
-    StartWalkBackLeft: StartWalkBackLeft,
-    StartWalkRight: StartWalkRight,
-    StartWalkBackRight: StartWalkBackRight,
+    CharacterStateBase: CharacterStateBase,
+    DropIdle: DropIdle,
+    DropRolling: DropRolling,
+    DropRunning: DropRunning,
     EndWalk: EndWalk,
+    Falling: Falling,
+    Idle: Idle,
+    IdleRotateLeft: IdleRotateLeft,
+    IdleRotateRight: IdleRotateRight,
     JumpIdle: JumpIdle,
     JumpRunning: JumpRunning,
-    Falling: Falling,
-    DropIdle: DropIdle,
-    DropRunning: DropRunning,
-    DropRolling: DropRolling,
-    CharacterStateBase: CharacterStateBase
+    Sprint: Sprint,
+    StartWalkBase: StartWalkBase,
+    StartWalkBackLeft: StartWalkBackLeft,
+    StartWalkBackRight: StartWalkBackRight,
+    StartWalkForward: StartWalkForward,
+    StartWalkLeft: StartWalkLeft,
+    StartWalkRight: StartWalkRight,
+    Walk: Walk
 };

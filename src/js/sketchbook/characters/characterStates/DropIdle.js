@@ -1,7 +1,10 @@
-import { CharacterStateBase } from './CharacterStateBase';
-import {StartWalkForward} from './StartWalkForward';
-import {Idle} from './Idle';
-import {JumpIdle} from './JumpIdle';
+import
+{
+    CharacterStateBase,
+    Idle,
+    JumpIdle,
+    StartWalkForward
+} from './_stateLibrary';
 
 export class DropIdle extends CharacterStateBase
 {

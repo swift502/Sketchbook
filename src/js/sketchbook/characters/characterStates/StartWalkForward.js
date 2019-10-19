@@ -1,4 +1,4 @@
-import {StartWalkBase} from './StartWalkBase';
+import {StartWalkBase} from './_stateLibrary';
 
 export class StartWalkForward extends StartWalkBase
 {

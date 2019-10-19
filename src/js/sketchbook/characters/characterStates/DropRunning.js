@@ -1,8 +1,11 @@
-import { CharacterStateBase } from './CharacterStateBase';
-import {Walk} from './Walk';
-import {EndWalk} from './EndWalk';
-import {Sprint} from './Sprint';
-import {JumpRunning} from './JumpRunning';
+import
+{
+    CharacterStateBase,
+    Walk,
+    EndWalk,
+    Sprint,
+    JumpRunning
+} from './_stateLibrary';
 
 export class DropRunning extends CharacterStateBase
 {

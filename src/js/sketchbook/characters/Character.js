@@ -94,7 +94,7 @@ export class Character extends THREE.Object3D
         this.viewVector = new THREE.Vector3();
 
         // Controls
-        this.setBehaviour(new CharacterAI.Default());
+        this.setBehaviour(new CharacterAI.Idle());
         this.controls = {
             up: new Controls.EventControl(),
             down: new Controls.EventControl(),

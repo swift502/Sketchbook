@@ -1,11 +1,14 @@
 import { Utilities as Utils } from '../../core/Utilities';
-import {CharacterStateBase} from './CharacterStateBase';
-import {Idle} from './Idle';
-import {JumpRunning} from './JumpRunning';
-import {IdleRotateLeft} from './IdleRotateLeft';
-import {IdleRotateRight} from './IdleRotateRight';
-import {Sprint} from './Sprint';
-import {Walk} from './Walk';
+import
+{
+    CharacterStateBase,
+    Idle,
+    JumpRunning,
+    IdleRotateLeft,
+    IdleRotateRight,
+    Sprint,
+    Walk
+} from './_stateLibrary';
 
 export class StartWalkBase extends CharacterStateBase
 {

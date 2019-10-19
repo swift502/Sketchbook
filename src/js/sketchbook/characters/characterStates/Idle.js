@@ -1,6 +1,9 @@
-import { CharacterStateBase } from './CharacterStateBase';
-import {JumpIdle} from './JumpIdle';
-import {Walk} from './Walk';
+import
+{
+    CharacterStateBase,
+    JumpIdle,
+    Walk
+} from './_stateLibrary';
 
 export class Idle extends CharacterStateBase
 {

@@ -1,6 +1,9 @@
-import { CharacterStateBase } from './CharacterStateBase';
-import {Walk} from './Walk';
-import {EndWalk} from './EndWalk';
+import
+{
+    CharacterStateBase,
+    Walk,
+    EndWalk
+} from './_stateLibrary';
 
 export class DropRolling extends CharacterStateBase
 {
