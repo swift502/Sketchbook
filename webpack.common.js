@@ -16,7 +16,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-          cannon: path.resolve(__dirname, 'src/js/lib/cannon.js/build/cannon.min.js'),
+          cannon: path.resolve(__dirname, 'src/js/lib/cannon/cannon.min.js')
         }
       },
     module: {

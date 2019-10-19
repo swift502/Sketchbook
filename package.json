@@ -16,7 +16,7 @@
   "scripts": {
     "watch": "webpack --config webpack.dev.js --watch",
     "build": "webpack --config webpack.prod.js",
-    "start dev server": "webpack-dev-server"
+    "start:devserver": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
