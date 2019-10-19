@@ -15,7 +15,8 @@
   "main": "build/sketchbook.min.js",
   "scripts": {
     "watch": "webpack --config webpack.dev.js --watch",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "start:dev": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/swift502/sketchbook/issues"
   },
-  "homepage": "https://github.com/swift502/sketchbook#readme",
+  "homepage": "https://github.com/swift502/sketchbook",
   "devDependencies": {
     "@types/cannon": "^0.1.4",
     "@types/dat.gui": "^0.7.5",
@@ -38,7 +39,8 @@
     "style-loader": "^1.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "webpack-dev-server": "^3.8.2"
   },
   "dependencies": {
     "cannon": "^0.6.2",

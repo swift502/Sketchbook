@@ -272,6 +272,8 @@ export class World
 
     updatePhysics(timeStep)
     {
+        
+
         // Step the physics world
         this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
 

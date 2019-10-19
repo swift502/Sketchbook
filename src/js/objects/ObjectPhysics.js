@@ -1,7 +1,7 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import { Utilities as Utils } from '../sketchbook/Utilities';
-import { threeToCannon } from '../lib/utils/three-pathfinding';
+// import { threeToCannon } from '../lib/utils/three-pathfinding';
 
 class Sphere
 {
@@ -265,14 +265,14 @@ class TriMesh
             this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
         }
 
-        let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
-        shape.material = mat;
+        // let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
+        // shape.material = mat;
 
         // Add phys sphere
         let physBox = new CANNON.Body({
             mass: options.mass,
             position: options.position,
-            shape: shape
+            shape: undefined // todo reimplment threeToCannon
         });
 
         physBox.material = mat;
