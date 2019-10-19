@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        app: './src/js/sketchbook.js'
+        app: './src/js/sketchbook/sketchbook.js'
     },
     // externals: {
     //     three: 'THREE',
