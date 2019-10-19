@@ -7,48 +7,5 @@
  * functioning at any point time without any input parameters.
  */
 
-import
-{
-    CharacterStateBase,
-    DropIdle,
-    DropRolling,
-    DropRunning,
-    EndWalk,
-    Falling,
-    Idle,
-    IdleRotateLeft,
-    IdleRotateRight,
-    JumpIdle,
-    JumpRunning,
-    Sprint,
-    StartWalkBase,
-    StartWalkBackLeft,
-    StartWalkBackRight,
-    StartWalkForward,
-    StartWalkLeft,
-    StartWalkRight,
-    Walk
-} from './_stateLibrary';
-
-
-export let CharacterStates = {
-    CharacterStateBase: CharacterStateBase,
-    DropIdle: DropIdle,
-    DropRolling: DropRolling,
-    DropRunning: DropRunning,
-    EndWalk: EndWalk,
-    Falling: Falling,
-    Idle: Idle,
-    IdleRotateLeft: IdleRotateLeft,
-    IdleRotateRight: IdleRotateRight,
-    JumpIdle: JumpIdle,
-    JumpRunning: JumpRunning,
-    Sprint: Sprint,
-    StartWalkBase: StartWalkBase,
-    StartWalkBackLeft: StartWalkBackLeft,
-    StartWalkBackRight: StartWalkBackRight,
-    StartWalkForward: StartWalkForward,
-    StartWalkLeft: StartWalkLeft,
-    StartWalkRight: StartWalkRight,
-    Walk: Walk
-};
+import * as library from './_stateLibrary';
+export let CharacterStates = library;
