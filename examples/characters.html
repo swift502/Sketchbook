@@ -60,19 +60,19 @@
 
         // Spawn player
         let player = new SB.Character({
-            position: new THREE.Vector3(1.13, 3, -2.2)
+            position: new SB.THREE.Vector3(1.13, 3, -2.2)
         });
         LoadBoxmanModel(player);
         world.add(player);
         player.takeControl();
 
         // Make player look at the camera
-        player.setOrientationTarget(new THREE.Vector3(0, 0, -1));
-        player.orientation = new THREE.Vector3(0, 0, -1);
+        player.setOrientationTarget(new SB.THREE.Vector3(0, 0, -1));
+        player.orientation = new SB.THREE.Vector3(0, 0, -1);
 
         // Spawn John
         let john = new SB.Character({
-            position: new THREE.Vector3(5, 2, 1)
+            position: new SB.THREE.Vector3(5, 2, 1)
         });
         LoadBoxmanModel(john);
         john.setBehaviour(new Sketchbook.CharacterAI.Random());
@@ -80,7 +80,7 @@
 
         // Spawn Bob
         let bob = new SB.Character({
-            position: new THREE.Vector3(-5, 2, 3)
+            position: new SB.THREE.Vector3(-5, 2, 3)
         });
         LoadBoxmanModel(bob);
         bob.setBehaviour(new Sketchbook.CharacterAI.FollowCharacter(player));
@@ -98,14 +98,14 @@
                         child.receiveShadow = true;	
                     }	
                     if (child.name == 'game_man') {	
-                        child.material = new THREE.MeshLambertMaterial({	
-                            map: new THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
+                        child.material = new SB.THREE.MeshLambertMaterial({	
+                            map: new SB.THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
                             skinning: true	
                         });	
                     }	
                 });	
                 character.setModel(object);	
-                character.setModelOffset(new THREE.Vector3(0, -0.1, 0));	
+                character.setModelOffset(new SB.THREE.Vector3(0, -0.1, 0));	
 
                 // Hide loader, display ui
                 document.getElementsByClassName('dg ac')[0].style.display = 'block';
@@ -133,13 +133,13 @@
 
                                 let mapOverride = undefined;
                                 if(obj.userData.map !== undefined) {
-                                    mapOverride = new THREE.TextureLoader().load('../build/models/test_world/' + obj.userData.map);
+                                    mapOverride = new SB.THREE.TextureLoader().load('../build/models/test_world/' + obj.userData.map);
                                 }
                                 else {
                                     mapOverride = obj.material.map;
                                 }
 
-                                obj.material = new THREE.MeshLambertMaterial({	
+                                obj.material = new SB.THREE.MeshLambertMaterial({	
                                         map: mapOverride
                                     });	
                                 obj.castShadow = true;
@@ -186,34 +186,35 @@
             // Signs
             fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
                 object.traverse(function (child) {
+                    
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
                     }
                     if (child.name == 'grass') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
+                        child.material = new SB.THREE.MeshLambertMaterial({
+                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
                             transparent: true,
                             depthWrite: false,
-                            side: THREE.DoubleSide
+                            side: SB.THREE.DoubleSide
                         });
                         child.castShadow = false;
                     }
                     if (child.name == 'sign') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
+                        child.material = new SB.THREE.MeshLambertMaterial({
+                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
                         });
                     }
                     if (child.name == 'sign_shadow') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
+                        child.material = new SB.THREE.MeshLambertMaterial({
+                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
                             transparent: true,
                         });
                         child.renderOrder = -1;
                     }
                     if (child.name == 'credits') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
+                        child.material = new SB.THREE.MeshLambertMaterial({
+                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
                             transparent: true
                         });
                     }
@@ -222,18 +223,18 @@
                 object.translateY(-0.45);
                 object.rotateY(Math.PI / 2);
                 let phys1 = new SB.ObjectPhysics.Box({
-                    position: new CANNON.Vec3(-3, 0.45, 10),
-                    size: new CANNON.Vec3(0.3, 0.45, 0.1),
+                    position: new SB.THREE.Vector3(-3, 0.45, 10),
+                    size: new SB.THREE.Vector3(0.3, 0.45, 0.1),
                     friction: 0.3,
                 });
-                world.add(new SB.Object(new THREE.Object3D().add(object), phys1));
 
+                world.add(new SB.Object(new SB.THREE.Object3D().add(object), phys1));
                 let object2 = object.clone();
                 object2.scale.multiplyScalar(1.7);
                 object2.traverse(function (child) {
                     if (child.name == 'credits') {
-                        child.material = new THREE.MeshLambertMaterial({
-                            map: new THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
+                        child.material = new SB.THREE.MeshLambertMaterial({
+                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
                             transparent: true
                         });
                         child.translateZ(-0.2);
@@ -242,14 +243,14 @@
                         child.translateZ(-0.2);
                     }
                 });
-
+                
                 object2.translateY(-0.13);
                 let phys2 = new SB.ObjectPhysics.Box({
-                    position: new CANNON.Vec3(-2, 0.58, 10),
-                    size: new CANNON.Vec3(0.4, 0.58, 0.16),
+                    position: new SB.THREE.Vector3(-2, 0.58, 10),
+                    size: new SB.THREE.Vector3(0.4, 0.58, 0.16),
                     friction: 0.3
                 });
-                world.add(new SB.Object(new THREE.Object3D().add(object2), phys2));
+                world.add(new SB.Object(new SB.THREE.Object3D().add(object2), phys2));
             });
         }
     </script>

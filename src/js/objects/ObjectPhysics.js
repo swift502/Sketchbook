@@ -70,6 +70,8 @@ class Box
         options = Utils.setDefaults(options, defaults);
         this.options = options;
 
+        options.size = new CANNON.Vec3(options.size.x, options.size.y, options.size.z);
+
         let mat = new CANNON.Material();
         mat.friction = options.friction;
         // mat.restitution = 0.7;
@@ -77,14 +79,13 @@ class Box
         let shape = new CANNON.Box(options.size);
         shape.material = mat;
 
-
         // Add phys sphere
         let physBox = new CANNON.Body({
             mass: options.mass,
             position: options.position,
             shape: shape
         });
-
+        
         physBox.material = mat;
 
         this.physical = physBox;

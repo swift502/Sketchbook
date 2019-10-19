@@ -16,5 +16,8 @@ export { Springs } from './simulation/Springs';
 export { Utilities } from './sketchbook/Utilities';
 export { World } from './sketchbook/World';
 
+import * as _THREE from 'three';
+export let THREE = _THREE;
+
 export { FBXLoader } from './lib/utils/FBXLoader';
 export { default as GLTFLoader } from 'three-gltf-loader';

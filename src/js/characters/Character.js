@@ -388,7 +388,7 @@ export class Character extends THREE.Object3D
 
     rotateModel()
     {
-        this.visuals.lookAt(this.orientation.x, this.visuals.position.y, this.orientation.z);
+        this.visuals.lookAt(this.position.x + this.orientation.x, this.position.y + this.visuals.position.y, this.position.z + this.orientation.z);
         this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());
         this.visuals.position.setY(this.visuals.position.y + (Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2));
     }
