@@ -14,6 +14,11 @@ module.exports = {
         library: 'Sketchbook',
         libraryTarget: 'umd'
     },
+    resolve: {
+        alias: {
+          cannon: path.resolve(__dirname, 'src/js/lib/cannon.js/build/cannon.min.js'),
+        }
+      },
     module: {
         rules: [
         {

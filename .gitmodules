@@ -1,0 +1,3 @@
+[submodule "src/js/lib/cannon.js"]
+	path = src/js/lib/cannon.js
+	url = https://github.com/swift502/cannon.js
