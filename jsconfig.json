@@ -1,9 +1,5 @@
 {
     "include": [
-        "src/js/**/*"
-    ],
-
-    "exclude": [
-        "src/js/lib/**/*"
+        "./src/js/sketchbook/**/*"
     ]
 }

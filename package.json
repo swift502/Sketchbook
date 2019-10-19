@@ -16,7 +16,7 @@
   "scripts": {
     "watch": "webpack --config webpack.dev.js --watch",
     "build": "webpack --config webpack.prod.js",
-    "devserver": "webpack-dev-server"
+    "devserver": "webpack-dev-server --config webpack.common.js"
   },
   "repository": {
     "type": "git",
@@ -39,8 +39,8 @@
     "style-loader": "^1.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
-    "webpack-merge": "^4.2.2",
-    "webpack-dev-server": "^3.8.2"
+    "webpack-dev-server": "^3.8.2",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "cannon": "^0.6.2",
