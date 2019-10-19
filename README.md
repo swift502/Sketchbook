@@ -7,7 +7,7 @@
 
 # Sketchbook
 
-Not in active development.
+NPM package functionality is a heavy work in progress. Not production ready as of now.
 
 3D rendering and physics library for game-like projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
 

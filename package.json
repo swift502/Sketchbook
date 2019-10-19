@@ -1,7 +1,7 @@
 {
   "name": "sketchbook",
-  "version": "0.2.2",
-  "description": "WebGL 3D game library",
+  "version": "0.2.3",
+  "description": "Three.js and Cannon.js sandbox",
   "keywords": [
     "3d",
     "threejs",
