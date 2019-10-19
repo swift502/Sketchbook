@@ -1,10 +1,10 @@
 import
 {
     CharacterStateBase,
-    Walk,
     EndWalk,
+    JumpRunning,
     Sprint,
-    JumpRunning
+    Walk
 } from './_stateLibrary';
 
 export class DropRunning extends CharacterStateBase

@@ -3,9 +3,9 @@ import
 {
     CharacterStateBase,
     Idle,
-    JumpRunning,
     IdleRotateLeft,
     IdleRotateRight,
+    JumpRunning,
     Sprint,
     Walk
 } from './_stateLibrary';

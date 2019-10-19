@@ -1,17 +1,17 @@
 import { Utilities as Utils } from '../../core/Utilities';
 import
 {
-    Walk,
-    Sprint,
-    Falling,
     DropIdle,
     DropRolling,
     DropRunning,
+    Falling,
+    Sprint,
     StartWalkBackLeft,
     StartWalkBackRight,
+    StartWalkForward,
     StartWalkLeft,
     StartWalkRight,
-    StartWalkForward
+    Walk
 } from './_stateLibrary';
 
 export class CharacterStateBase
