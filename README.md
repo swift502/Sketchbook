@@ -7,13 +7,7 @@
 
 # Sketchbook
 
-NPM package functionality is a heavy work in progress. Not production ready as of now.
-
-3D rendering and physics library for game-like projects on the web, featuring a few conventional gameplay mechanics and basic 3D models.
-
-It's called Sketchbook because I'm sketching in all the gameplay mechanics I've known for years and always speculated on how I would go about creating them from scratch. Mostly it's just my little playground which I'm happy to share with people.
-
-Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js).
+Simple third-person game engine built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js). Mostly it's just my little playground focused on exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
 
 ## Features
 
@@ -37,39 +31,51 @@ Built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://
     * Airplanes
     * Helicopters
 
-*All planned features can be found in the [project pages](https://github.com/swift502/Sketchbook/projects)*.
+All planned features can be found in [projects](https://github.com/swift502/Sketchbook/projects).
 
+## Installation
+
+Use NPM:
+```shell
+npm install sketchbook --save
+```
+```js
+import * as Sketchbook from 'sketchbook'
+```
+
+Or download the [latest release](https://github.com/swift502/Sketchbook/releases) and import directly:
+```html
+<script src="sketchbook.min.js"></script>
+```
 
 ## Usage
 
-This creates a fullscreen canvas, initializes the physics and rendering, adds a character and lets you control him.
+This snippet turns a blank page into a playable character demo.
 
 ```js
-let world = new Sketchbook.World();
+// Initialize rendering and a canvas element
+const world = new Sketchbook.World();
 
-let player = new Sketchbook.Character({
-    position: new THREE.Vector3(1.13, 3, -2.2),
-});
-LoadCharacterModel(player);
+// Create player
+let player = new Sketchbook.Character();
 world.add(player);
 player.takeControl();
 ```
 
-Check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples) to learn specifics about using Sketchbook.
-
-## Installation
-
-Simply import the library in your project, along with provided build of cannon.js and a three.js version of your choice, and you're ready to go.
-```html
-<script src="three.min.js"></script>
-<script src="cannon.min.js"></script> <!-- Only use provided build, official package is extremely outdated! -->
-<script src="sketchbook.min.js"></script>
-```
-
-A NPM package and @types are on the way, which should make this a whole lot easier.
+More complex examples are found in the [Sketches](https://github.com/swift502/Sketches) repository.
 
 ## Contributing
 
-Please do!
+I appreciate all help, be it suggestions, issues or even pull requests.
 
-I appreciate all help, be it suggestions, issues or even pull requests. Just make sure to create PRs on the [dev branch](https://github.com/swift502/Sketchbook/tree/dev), which is the most up to date one. 
+1. Clone the repository
+2. Switch to the `dev` branch
+3. Run `npm install`
+4. Stick to existing code style
+5. Contribute!
+
+Use the npm scripts defined in `package.json` to test your changes:
+* `npm run devserver` - start a local server
+* `npm run watch` - build in dev mode and watch changes
+* `npm run build` - build in production mode 
+
