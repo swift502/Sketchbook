@@ -16,8 +16,8 @@ export { Simulation } from './simulation/_export';
 export { Utilities } from './core/Utilities';
 export { World } from './core/World';
 
-import * as _THREE from 'three';
-export let THREE = _THREE;
+import * as THREEImport from 'three';
+export let THREE = THREEImport;
 
 export { FBXLoader } from '../lib/utils/FBXLoader';
 export { default as GLTFLoader } from 'three-gltf-loader';

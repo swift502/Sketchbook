@@ -349,66 +349,15 @@ export class World
 
     add(object)
     {
-        if (object.isObject)
-        {
-            if(_.includes(this.objects, object))
-            {
-                console.warn('Adding object to a world in which it already exists.');
-            }
-            else 
-            {
-                this.objects.push(object);
-
-                if (object.physics.physical !== undefined)
-                {
-                    this.physicsWorld.addBody(object.physics.physical);
-                }
-
-                if (object.physics.visual !== undefined)
-                {
-                    this.graphicsWorld.add(object.physics.visual);
-                }
-
-                if (object.model !== undefined)
-                {
-                    this.graphicsWorld.add(object.model);
-                }
-            }
-        }
-        else if (object.isCharacter)
-        {
-            const character = object;
-
-            if(_.includes(this.characters, character))
-            {
-                console.warn('Adding character to a world in which it already exists.');
-            }
-            else
-            {
-                // Set world
-                character.world = this;
-
-                // Register character
-                this.characters.push(character);
-
-                // Register physics
-                this.physicsWorld.addBody(character.characterCapsule.physics.physical);
-
-                // Add to graphicsWorld
-                this.graphicsWorld.add(character);
-                this.graphicsWorld.add(character.characterCapsule.physics.visual);
-                this.graphicsWorld.add(character.raycastBox);
-
-                // Register characters physical capsule object
-                this.objects.push(character.characterCapsule);
-
-                return character;
-            }
+        if(typeof object.addToWorld === 'function') {
+            object.addToWorld(this);
         }
         else
         {
             console.error('Object type not supported: ' + object);
         }
+
+        return object;
     }
 
     remove(object)

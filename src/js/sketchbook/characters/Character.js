@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
+import _ from 'lodash';
 
 import { Utilities as Utils } from '../core/Utilities';
 import { Simulation } from '../simulation/_export';
@@ -512,6 +513,32 @@ export class Character extends THREE.Object3D
             this.position.y += this.character.raySafeOffset * 2;
             //Reset flag
             this.character.wantsToJump = false;
+        }
+    }
+
+    addToWorld(world) {
+        if(_.includes(world.characters, this))
+        {
+            console.warn('Adding character to a world in which it already exists.');
+        }
+        else
+        {
+            // Set world
+            this.world = world;
+
+            // Register character
+            world.characters.push(this);
+
+            // Register physics
+            world.physicsWorld.addBody(this.characterCapsule.physics.physical);
+
+            // Add to graphicsWorld
+            world.graphicsWorld.add(this);
+            world.graphicsWorld.add(this.characterCapsule.physics.visual);
+            world.graphicsWorld.add(this.raycastBox);
+
+            // Register characters physical capsule object
+            world.objects.push(this.characterCapsule);
         }
     }
 }
