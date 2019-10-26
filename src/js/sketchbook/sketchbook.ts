@@ -2,12 +2,43 @@ import "../../css/dat.gui.css";
 import "../../css/main.css";
 import * as THREEImport from "three";
 
+import { CharacterControls } from './game_modes/CharacterControls';
+import { FreeCameraControls } from './game_modes/FreeCameraControls';
+export const GameModes = {
+    CharacterControls,
+    FreeCameraControls,
+};
+
+import { AIBase } from './characters/character_ai/AIBase';
+import { FollowCharacter } from './characters/character_ai/FollowCharacter';
+import { NoBehaviour } from './characters/character_ai/NoBehaviour';
+import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
+export const CharacterAI = {
+    AIBase,
+    FollowCharacter,
+    NoBehaviour,
+    RandomBehaviour,
+};
+
+import { BoxPhysics } from './objects/object_physics/BoxPhysics';
+import { CapsulePhysics } from './objects/object_physics/CapsulePhysics';
+import { ConvexPhysics } from './objects/object_physics/ConvexPhysics';
+import { SpherePhysics } from './objects/object_physics/SpherePhysics';
+import { TrimeshPhysics } from './objects/object_physics/TrimeshPhysics';
+export const ObjectPhysics = {
+    BoxPhysics,
+    CapsulePhysics,
+    ConvexPhysics,
+    SpherePhysics,
+    TrimeshPhysics,
+};
+
+import * as statesLibrary from './characters/character_states/_stateLibrary';
+export const CharacterStates = statesLibrary;
+
 export { Character } from "./characters/Character";
-export { CharacterAI } from "./characters/character_ai/_export";
 export { Controls } from "./core/Controls";
-export { GameModes } from "./game_modes/_export";
 export { SBObject } from "./objects/Object";
-export { ObjectPhysics } from "./objects/object_physics/_export";
 export { World } from "./core/World";
 
 export let THREE = THREEImport;

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { AIBase } from './AIBase';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
 
-export class Random extends AIBase implements ICharacterAI
+export class RandomBehaviour extends AIBase implements ICharacterAI
 {
     private randomFrequency: number;
 

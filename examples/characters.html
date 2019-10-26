@@ -73,7 +73,7 @@
             position: new SB.THREE.Vector3(5, 2, 1)
         });
         LoadBoxmanModel(john);
-        john.setBehaviour(new Sketchbook.CharacterAI.Random());
+        john.setBehaviour(new Sketchbook.CharacterAI.RandomBehaviour());
         world.add(john);
 
         // Spawn Bob
@@ -154,7 +154,7 @@
                                 let mass = obj.userData.mass;
                                 if(mass === undefined) mass = 0;
 
-                                let phys = new SB.ObjectPhysics.Convex(obj, {
+                                let phys = new SB.ObjectPhysics.ConvexPhysics(obj, {
                                     mass: mass
                                 });
 
@@ -168,7 +168,7 @@
 
                                 let mass = obj.userData.mass || 0;
 
-                                let phys = new SB.ObjectPhysics.TriMesh(obj, {
+                                let phys = new SB.ObjectPhysics.TrimeshPhysics(obj, {
                                     mass: mass
                                 });
 
@@ -220,7 +220,7 @@
 
                 object.translateY(-0.45);
                 object.rotateY(Math.PI / 2);
-                let phys1 = new SB.ObjectPhysics.Box({
+                let phys1 = new SB.ObjectPhysics.BoxPhysics({
                     position: new SB.THREE.Vector3(-3, 0.45, 10),
                     size: new SB.THREE.Vector3(0.3, 0.45, 0.1),
                     friction: 0.3,
@@ -243,7 +243,7 @@
                 });
                 
                 object2.translateY(-0.13);
-                let phys2 = new SB.ObjectPhysics.Box({
+                let phys2 = new SB.ObjectPhysics.BoxPhysics({
                     position: new SB.THREE.Vector3(-2, 0.58, 10),
                     size: new SB.THREE.Vector3(0.4, 0.58, 0.16),
                     friction: 0.3

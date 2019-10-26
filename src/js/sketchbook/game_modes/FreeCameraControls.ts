@@ -4,7 +4,7 @@ import { GameModesBase } from './GameModesBase';
 import { Controls } from '../core/Controls';
 import * as _ from 'lodash';
 import { SBObject } from '../objects/Object';
-import { ObjectPhysics } from '../objects/object_physics/_export';
+import { SpherePhysics } from '../objects/object_physics/SpherePhysics';
 
 /**
  * Free camera game mode.
@@ -78,7 +78,7 @@ export class FreeCameraControls extends GameModesBase
             let forward_three = new THREE.Vector3(0, 0, -1).applyQuaternion(this.world.camera.quaternion);
             let forward = new CANNON.Vec3(forward_three.x, forward_three.y, forward_three.z);
             let ball = new SBObject();
-            ball.setPhysics(new ObjectPhysics.Sphere({
+            ball.setPhysics(new SpherePhysics({
                 mass: 1,
                 radius: 0.3,
                 position: new CANNON.Vec3().copy(this.world.camera.position).vadd(forward)

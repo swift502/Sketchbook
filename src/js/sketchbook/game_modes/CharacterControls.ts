@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import * as CANNON from'cannon';
-import { GameModes } from './_export';
 import { GameModesBase } from './GameModesBase';
 import * as _ from 'lodash';
 import { SBObject } from '../objects/Object';
-import { ObjectPhysics } from '../objects/object_physics/_export';
+import { FreeCameraControls } from './FreeCameraControls';
+import { SpherePhysics } from '../objects/object_physics/SpherePhysics';
 
 /**
  * Character controls game mode. Allows player to control a character.
@@ -79,7 +79,7 @@ export class CharacterControls extends GameModesBase
             let forward_three = new THREE.Vector3().copy(this.character.orientation);
             let forward = new CANNON.Vec3(forward_three.x, forward_three.y, forward_three.z);
             let ball = new SBObject();
-            ball.setPhysics(new ObjectPhysics.Sphere({
+            ball.setPhysics(new SpherePhysics({
                 mass: 1,
                 radius: 0.3,
                 position: new CANNON.Vec3().copy(this.character.position).vadd(forward),
@@ -100,7 +100,7 @@ export class CharacterControls extends GameModesBase
         if (key == '67' && value == true && event.shiftKey == true)
         {
             this.character.resetControls();
-            this.world.setGameMode(new GameModes.FreeCameraControls(this));
+            this.world.setGameMode(new FreeCameraControls(this));
         }
         // Is key bound to action
         if (key in this.keymap)
@@ -123,7 +123,7 @@ export class CharacterControls extends GameModesBase
     {
         if(!_.includes(this.world.characters, this.character))
         {
-            this.world.setGameMode(new GameModes.FreeCameraControls());
+            this.world.setGameMode(new FreeCameraControls());
         }
         else
         {

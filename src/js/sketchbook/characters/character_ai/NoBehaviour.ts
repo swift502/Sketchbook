@@ -1,6 +1,6 @@
 import { AIBase } from './AIBase';
 
-export class Idle extends AIBase
+export class NoBehaviour extends AIBase
 {
     public update(timeStep: number): void
     {

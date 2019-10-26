@@ -5,13 +5,13 @@ import * as _ from 'lodash';
 import * as Utils from '../core/Utilities';
 
 import { Controls } from '../core/Controls';
-import { CharacterAI } from './character_ai/_export';
-import { CharacterStates } from './character_states/_export';
-import { GameModes } from '../game_modes/_export';
-import { ObjectPhysics } from '../objects/object_physics/_export';
 import { SBObject } from '../objects/Object';
 import { VectorSpringSimulator } from '../simulation/VectorSpringSimulator';
 import { RelativeSpringSimulator } from '../simulation/RelativeSpringSimulator';
+import { CharacterControls } from '../game_modes/CharacterControls';
+import { NoBehaviour } from './character_ai/NoBehaviour';
+import { Idle } from './character_states/Idle';
+import { CapsulePhysics } from '../objects/object_physics/CapsulePhysics';
 
 export class Character extends THREE.Object3D
 {
@@ -130,11 +130,11 @@ export class Character extends THREE.Object3D
         //#region Input
 
         // States
-        this.setState(CharacterStates.Idle);
+        this.setState(Idle);
         this.viewVector = new THREE.Vector3();
 
         // Controls
-        this.setBehaviour(new CharacterAI.Idle());
+        this.setBehaviour(new NoBehaviour());
         this.controls = {
             up: new Controls.EventControl(),
             down: new Controls.EventControl(),
@@ -155,7 +155,7 @@ export class Character extends THREE.Object3D
 
         // Physics
         // Player Capsule
-        let capsulePhysics = new ObjectPhysics.Capsule({
+        let capsulePhysics = new CapsulePhysics({
             mass: 1,
             position: new CANNON.Vec3().copy(options.position),
             height: 0.5,
@@ -214,7 +214,7 @@ export class Character extends THREE.Object3D
         this.modelContainer.add(this.characterModel);
 
         this.mixer = new THREE.AnimationMixer(this.characterModel);
-        this.setState(CharacterStates.Idle);
+        this.setState(Idle);
         this.charState.changeState();
     }
 
@@ -302,7 +302,7 @@ export class Character extends THREE.Object3D
     {
         if(this.world !== undefined)
         {
-            this.world.setGameMode(new GameModes.CharacterControls(this));
+            this.world.setGameMode(new CharacterControls(this));
         }
         else
         {

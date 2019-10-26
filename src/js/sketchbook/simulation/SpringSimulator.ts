@@ -38,6 +38,7 @@ export class SpringSimulator extends SimulatorBase
      */
     public simulate(timeStep: number): void
     {
+        // Generate new frames
         this.generateFrames(timeStep);
 
         // Return values interpolated between cached frames

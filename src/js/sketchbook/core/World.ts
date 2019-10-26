@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 import { CameraController } from './CameraController';
-import { GameModes } from '../game_modes/_export';
 import { Shaders } from '../../lib/shaders/Shaders';
 import * as Sky from 'three-sky';
 
@@ -11,6 +10,7 @@ import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
 import * as _ from 'lodash';
 import { InputManager } from './InputManager';
+import { FreeCameraControls } from '../game_modes/FreeCameraControls';
 
 export class World
 {
@@ -260,7 +260,7 @@ export class World
         this.vehicles = [];
         this.cameraController = new CameraController(this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.7);
         this.inputManager = new InputManager(this, this.renderer.domElement);
-        this.setGameMode(new GameModes.FreeCameraControls());
+        this.setGameMode(new FreeCameraControls());
 
         this.render(this);
     }
