@@ -405,7 +405,7 @@ export class Character extends THREE.Object3D
         return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ).normalize();
     }
 
-    getCameraRelativeMovementVector()
+    public getCameraRelativeMovementVector()
     {
         const localDirection = this.getLocalMovementDirection();
         const flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z).normalize();
@@ -413,7 +413,7 @@ export class Character extends THREE.Object3D
         return Utils.appplyVectorMatrixXZ(flatViewVector, localDirection);
     }
 
-    setCameraRelativeOrientationTarget()
+    public setCameraRelativeOrientationTarget()
     {
         let moveVector = this.getCameraRelativeMovementVector();
 
@@ -427,7 +427,7 @@ export class Character extends THREE.Object3D
         }
     }
 
-    rotateModel()
+    public rotateModel()
     {
         this.visuals.lookAt(this.position.x + this.orientation.x, this.position.y + this.visuals.position.y, this.position.z + this.orientation.z);
         this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());

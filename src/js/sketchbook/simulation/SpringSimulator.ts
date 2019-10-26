@@ -1,35 +1,33 @@
 import * as THREE from 'three';
 import { SimulatorBase, spring } from './SimulatorBase';
+import { SimulationFrame } from './SimulationFrame';
 
 export class SpringSimulator extends SimulatorBase
 {
-    position: number;
-    velocity: number;
-    target: number;
-    mass: any;
-    damping: any;
+    public position: number;
+    public velocity: number;
+    public target: number;
+    public cache: SimulationFrame[];
     
-    constructor(fps, mass, damping, startPosition = 0, startVelocity = 0)
+    constructor(fps: number, mass: number, damping: number, startPosition: number = 0, startVelocity: number = 0)
     {
         // Construct base
-        super(fps);
+        super(fps, mass, damping);
 
         // Simulated values
-        this.position = 0;
-        this.velocity = 0;
+        this.position = startPosition;
+        this.velocity = startVelocity;
 
         // Simulation parameters
         this.target = 0;
-        this.mass = mass;
-        this.damping = damping;
 
         // Initialize cache by pushing two frames
+        this.cache = []; // At least two frames
         for (let i = 0; i < 2; i++)
         {
-            this.cache.push({
-                position: startPosition,
-                velocity: startVelocity
-            });
+            this.cache.push(
+                new SimulationFrame(startPosition, startVelocity),
+            );
         }
     }
 
@@ -37,7 +35,7 @@ export class SpringSimulator extends SimulatorBase
      * Advances the simulation by given time step
      * @param {number} timeStep 
      */
-    simulate(timeStep)
+    public simulate(timeStep: number): void
     {
         this.generateFrames(timeStep);
 
@@ -49,7 +47,7 @@ export class SpringSimulator extends SimulatorBase
     /**
      * Gets another simulation frame
      */
-    getFrame(isLastFrame)
+    public getFrame(isLastFrame: boolean): SimulationFrame
     {
         return spring(this.lastFrame().position, this.target, this.lastFrame().velocity, this.mass, this.damping);
     }

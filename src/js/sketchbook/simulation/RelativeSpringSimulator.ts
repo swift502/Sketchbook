@@ -1,38 +1,37 @@
 import * as THREE from 'three';
 import { SimulatorBase, spring } from './SimulatorBase';
+import { SimulationFrame } from './SimulationFrame';
 
 export class RelativeSpringSimulator extends SimulatorBase
 {
-    position: number;
-    velocity: number;
-    target: number;
-    mass: any;
-    damping: any;
-    lastLerp: number;
+    public position: number;
+    public velocity: number;
+    public target: number;
+    public lastLerp: number;
+    public cache: SimulationFrame[];
 
-    constructor(fps, mass, damping, startPosition = 0, startVelocity = 0)
+    constructor(fps: number, mass: number, damping: number, startPosition: number = 0, startVelocity: number = 0)
     {
-        //Construct base
-        super(fps);
+        // Construct base
+        super(fps, mass, damping);
 
         // Simulated values
-        this.position = 0;
-        this.velocity = 0;
+        this.position = startPosition;
+        this.velocity = startVelocity;
 
         // Simulation parameters
         this.target = 0;
-        this.mass = mass;
-        this.damping = damping;
 
         // Last lerped position for relative output
         this.lastLerp = 0;
 
         // Initialize cache by pushing two frames
+        this.cache = []; // At least two frames
         for (let i = 0; i < 2; i++)
         {
             this.cache.push({
                 position: startPosition,
-                velocity: startVelocity
+                velocity: startVelocity,
             });
         }
     }
@@ -41,11 +40,11 @@ export class RelativeSpringSimulator extends SimulatorBase
      * Advances the simulation by given time step
      * @param {number} timeStep 
      */
-    simulate(timeStep)
+    public simulate(timeStep: number): void
     {
         this.generateFrames(timeStep);
 
-        //SpringR lerping
+        // SpringR lerping
         // Lerp from 0 to next frame
         let lerp = THREE.Math.lerp(0, this.cache[1].position, this.offset / this.frameTime);
 
@@ -59,7 +58,7 @@ export class RelativeSpringSimulator extends SimulatorBase
     /**
      * Gets another simulation frame
      */
-    getFrame(isLastFrame)
+    public getFrame(isLastFrame: boolean): SimulationFrame
     {
         let newFrame = Object.assign({}, this.lastFrame());
 

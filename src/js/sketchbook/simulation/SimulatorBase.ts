@@ -1,24 +1,28 @@
 import * as THREE from 'three';
+import { SimulationFrame } from './SimulationFrame';
 
 export class SimulatorBase
 {
-    frameTime: number;
-    offset: number;
-    cache: any[];
+    public mass: any;
+    public damping: any;
+    public frameTime: number;
+    public offset: number;
+    public cache: any[];
     
-    constructor(fps)
+    constructor(fps: number, mass: number, damping: number)
     {
+        this.mass = mass;
+        this.damping = damping;
         this.frameTime = 1 / fps;
-        this.offset = 0; // 0 - frameTime
-        this.cache = []; // At least two frames
+        this.offset = 0;
     }
 
-    setFPS(value)
+    public setFPS(value: number): void
     {
         this.frameTime = 1 / value;
     }
 
-    lastFrame()
+    public lastFrame(): any
     {
         return this.cache[this.cache.length - 1];
     }
@@ -27,7 +31,7 @@ export class SimulatorBase
      * Generates frames between last simulation call and the current one
      * @param {timeStep} timeStep 
      */
-    generateFrames(timeStep)
+    public generateFrames(timeStep: number): void
     {
         // Update cache
         // Find out how many frames needs to be generated
@@ -40,18 +44,19 @@ export class SimulatorBase
         {
             for (let i = 0; i < framesToGenerate; i++)
             {
-                this.cache.push(this.getFrame(i + 1 == framesToGenerate));
+                this.cache.push(this.getFrame(i + 1 === framesToGenerate));
             }
             this.cache = this.cache.slice(-2);
         }
     }
-    getFrame(arg0: boolean): any
+
+    public getFrame(isLastFrame: boolean): any
     {
         throw new Error("Method not implemented.");
     }
 }
 
-export function spring(source, dest, velocity, mass, damping)
+export function spring(source, dest, velocity, mass, damping): SimulationFrame
 {
     let acceleration = dest - source;
     acceleration /= mass;
@@ -60,10 +65,10 @@ export function spring(source, dest, velocity, mass, damping)
 
     let position = source += velocity;
 
-    return { position: position, velocity: velocity };
+    return new SimulationFrame(position, velocity);
 }
 
-export function springV(source, dest, velocity, mass, damping)
+export function springV(source, dest, velocity, mass, damping): void
 {
     let acceleration = new THREE.Vector3().subVectors(dest, source);
     acceleration.divideScalar(mass);

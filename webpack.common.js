@@ -4,10 +4,6 @@ module.exports = {
     entry: {
         app: './src/js/sketchbook/sketchbook.ts'
     },
-    // externals: {
-    //     three: 'THREE',
-    //     cannon: 'CANNON'
-    // },
     output: {
         filename: 'sketchbook.min.js',
         path: path.resolve(__dirname, 'build'),

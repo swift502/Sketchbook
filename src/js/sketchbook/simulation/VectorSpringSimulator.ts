@@ -1,35 +1,33 @@
 import * as THREE from 'three';
 import { SimulatorBase, springV } from './SimulatorBase';
+import { SimulationFrameVector } from './SimulationFrameVector';
 
 export class VectorSpringSimulator extends SimulatorBase
 {
-    position: THREE.Vector3;
-    velocity: THREE.Vector3;
-    target: THREE.Vector3;
-    mass: any;
-    damping: any;
+    public position: THREE.Vector3;
+    public velocity: THREE.Vector3;
+    public target: THREE.Vector3;
+    public cache: SimulationFrameVector[];
     
-    constructor(fps, mass, damping, startPosition = new THREE.Vector3(), startVelocity = new THREE.Vector3())
+    constructor(fps: number, mass: number, damping: number, startPosition = new THREE.Vector3(), startVelocity = new THREE.Vector3())
     {
-        //Construct base
-        super(fps);
+        // Construct base
+        super(fps, mass, damping);
 
         // Simulated values
-        this.position = new THREE.Vector3();
-        this.velocity = new THREE.Vector3();
+        this.position = startPosition;
+        this.velocity = startVelocity;
 
         // Simulation parameters
         this.target = new THREE.Vector3();
-        this.mass = mass;
-        this.damping = damping;
 
         // Initialize cache by pushing two frames
+        this.cache = []; // At least two frames
         for (let i = 0; i < 2; i++)
         {
-            this.cache.push({
-                position: startPosition,
-                velocity: startVelocity
-            });
+            this.cache.push(
+                new SimulationFrameVector(startPosition, startVelocity),
+            );
         }
     }
 
@@ -37,7 +35,7 @@ export class VectorSpringSimulator extends SimulatorBase
      * Advances the simulation by given time step
      * @param {number} timeStep 
      */
-    simulate(timeStep)
+    public simulate(timeStep: number): void
     {
         // Generate new frames
         this.generateFrames(timeStep);
@@ -50,15 +48,14 @@ export class VectorSpringSimulator extends SimulatorBase
     /**
      * Gets another simulation frame
      */
-    getFrame(isLastFrame)
+    public getFrame(isLastFrame: boolean): SimulationFrameVector
     {
         // Deep clone data from previous frame
-        let newSpring = {
-            position: this.lastFrame().position.clone(),
-            velocity: this.lastFrame().velocity.clone()
-        };
+        let newSpring = new SimulationFrameVector(this.lastFrame().position.clone(), this.lastFrame().velocity.clone());
+        
         // Calculate new Spring
         springV(newSpring.position, this.target, newSpring.velocity, this.mass, this.damping);
+
         // Return new Spring
         return newSpring;
     }

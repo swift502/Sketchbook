@@ -7,9 +7,3 @@ export default {
     SpringSimulator,
     VectorSpringSimulator,
 };
-
-// export class Simulation {
-//     public SpringSimulator: SpringSimulator = SpringSimulator;
-//     public VectorSpringSimulator = VectorSpringSimulator;
-//     public RelativeSpringSimulator = RelativeSpringSimulator;
-// }
