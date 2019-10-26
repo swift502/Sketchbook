@@ -4,6 +4,7 @@ import * as CANNON from 'cannon';
 import { CameraController } from './CameraController';
 import { GameModes } from '../game_modes/_export';
 import { Shaders } from '../../lib/shaders/Shaders';
+import * as Sky from 'three-sky';
 
 import { Detector } from '../../lib/utils/Detector';
 import { Stats } from '../../lib/utils/Stats';
@@ -13,33 +14,33 @@ import { InputManager } from './InputManager';
 
 export class World
 {
-    renderer: THREE.WebGLRenderer;
-    camera: any;
-    composer: any;
-    stats: any;
-    graphicsWorld: THREE.Scene;
-    sun: THREE.Vector3;
-    dirLight: THREE.DirectionalLight;
-    physicsWorld: CANNON.World;
-    parallelPairs: any[];
-    physicsFrameRate: number;
-    physicsFrameTime: number;
-    physicsMaxPrediction: any;
-    clock: THREE.Clock;
-    renderDelta: number;
-    logicDelta: number;
-    sinceLastFrame: number;
-    justRendered: boolean;
-    params: { Pointer_Lock: boolean; Mouse_Sensitivity: number; FPS_Limit: number; Time_Scale: number; Shadows: boolean; FXAA: boolean; Draw_Physics: boolean; RayCast_Debug: boolean; };
-    inputManager: any;
-    cameraController: any;
-    timeScaleTarget: any;
-    objects: any;
-    characters: any;
-    cameraDistanceTarget: number;
-    balls: any[];
-    vehicles: any[];
-    gameMode: any;
+    public renderer: THREE.WebGLRenderer;
+    public camera: any;
+    public composer: any;
+    public stats: any;
+    public graphicsWorld: THREE.Scene;
+    public sun: THREE.Vector3;
+    public dirLight: THREE.DirectionalLight;
+    public physicsWorld: CANNON.World;
+    public parallelPairs: any[];
+    public physicsFrameRate: number;
+    public physicsFrameTime: number;
+    public physicsMaxPrediction: any;
+    public clock: THREE.Clock;
+    public renderDelta: number;
+    public logicDelta: number;
+    public sinceLastFrame: number;
+    public justRendered: boolean;
+    public params: { Pointer_Lock: boolean; Mouse_Sensitivity: number; FPS_Limit: number; Time_Scale: number; Shadows: boolean; FXAA: boolean; Draw_Physics: boolean; RayCast_Debug: boolean; };
+    public inputManager: any;
+    public cameraController: any;
+    public timeScaleTarget: any;
+    public objects: any;
+    public characters: any;
+    public cameraDistanceTarget: number;
+    public balls: any[];
+    public vehicles: any[];
+    public gameMode: any;
 
     constructor()
     {
@@ -48,7 +49,10 @@ export class World
         //#region HTML
 
         // WebGL not supported
-        if (!Detector.webgl) Detector.addGetWebGLMessage();
+        if (!Detector.webgl)
+        {
+            Detector.addGetWebGLMessage();
+        }
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer();
@@ -60,7 +64,7 @@ export class World
         this.renderer.domElement.id = 'canvas';
 
         // Auto window resize
-        function onWindowResize()
+        function onWindowResize(): void
         {
             scope.camera.aspect = window.innerWidth / window.innerHeight;
             scope.camera.updateProjectionMatrix();
@@ -107,9 +111,9 @@ export class World
         this.composer.addPass(effectFXAA);
 
         // Sky
-        let sky = new Shaders.Sky();
+        let sky = new Sky();
         sky['scale'].setScalar(100);
-        // this.graphicsWorld.add(sky);
+        this.graphicsWorld.add(sky);
 
         // Sun helper
         this.sun = new THREE.Vector3();

@@ -6,7 +6,7 @@ import { ClearMaskPass } from './MaskPass';
 import { MaskPass } from './MaskPass';
 import { RenderPass } from './RenderPass';
 import { ShaderPass } from './ShaderPass';
-import { Sky } from './Sky';
+// import { Sky } from './Sky';
 
 export let Shaders = {
     CopyShader: CopyShader,
@@ -17,5 +17,5 @@ export let Shaders = {
     MaskPass: MaskPass,
     RenderPass: RenderPass,
     ShaderPass: ShaderPass,
-    Sky: Sky
+    // Sky: Sky
 };

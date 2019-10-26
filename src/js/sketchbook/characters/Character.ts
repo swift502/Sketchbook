@@ -47,7 +47,7 @@ export class Character extends THREE.Object3D
     public raySafeOffset: number;
     public wantsToJump: boolean;
     public initJumpSpeed: number;
-    public groundImpactData: { velocity: CANNON.Vec3; };
+    public groundImpactData: any;
     public raycastBox: THREE.Mesh;
     public charState: any;
     public behaviour: any;
@@ -184,7 +184,7 @@ export class Character extends THREE.Object3D
         this.wantsToJump = false;
         this.initJumpSpeed = -1;
         this.groundImpactData = {
-            velocity: new CANNON.Vec3()
+            velocity: new THREE.Vector3()
         };
 
         // Ray cast debug
@@ -355,16 +355,16 @@ export class Character extends THREE.Object3D
             //gltf
             // let clip = THREE.AnimationClip.findByName( this.animations, clipName );
 
-            // let clips = this.characterModel.animations;
-            // let clip = THREE.AnimationClip.findByName(clips, clipName);
+            let clips = this.characterModel['animations'];
+            let clip = THREE.AnimationClip.findByName(clips, clipName);
 
-            // let action = this.mixer.clipAction(clip);
-            // this.mixer.stopAllAction();
-            // action.fadeIn(fadeIn);
-            // action.play();
+            let action = this.mixer.clipAction(clip);
+            this.mixer.stopAllAction();
+            action.fadeIn(fadeIn);
+            action.play();
 
-            // return action._clip.duration;
-            return 0;
+            return action._clip.duration;
+            // return 0;
         }
     }
 
@@ -540,10 +540,10 @@ export class Character extends THREE.Object3D
                 this.velocity.y = 0;
 
                 // Velocity needs to be at least as much as initJumpSpeed
-                if (this.velocity.lengthSq() < this.character.initJumpSpeed ** 2)
+                if (this.velocity['lengthSquared']() < this.character.initJumpSpeed ** 2)
                 {
                     this.velocity.normalize();
-                    this.velocity.multiply(this.character.initJumpSpeed);
+                    this.velocity['mult'](this.character.initJumpSpeed, this.velocity);
                 }
             }
 
