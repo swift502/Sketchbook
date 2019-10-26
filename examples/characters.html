@@ -158,7 +158,7 @@
                                     mass: mass
                                 });
 
-                                let SBobj = new SB.Object();
+                                let SBobj = new SB.SBObject();
                                 SBobj.setPhysics(phys);
 
                                 world.add(SBobj);
@@ -172,7 +172,7 @@
                                     mass: mass
                                 });
 
-                                let SBobj = new SB.Object();
+                                let SBobj = new SB.SBObject();
                                 SBobj.setPhysics(phys);
 
                                 world.add(SBobj);
@@ -226,7 +226,7 @@
                     friction: 0.3,
                 });
 
-                world.add(new SB.Object(new SB.THREE.Object3D().add(object), phys1));
+                world.add(new SB.SBObject(new SB.THREE.Object3D().add(object), phys1));
                 let object2 = object.clone();
                 object2.scale.multiplyScalar(1.7);
                 object2.traverse(function (child) {
@@ -248,7 +248,7 @@
                     size: new SB.THREE.Vector3(0.4, 0.58, 0.16),
                     friction: 0.3
                 });
-                world.add(new SB.Object(new SB.THREE.Object3D().add(object2), phys2));
+                world.add(new SB.SBObject(new SB.THREE.Object3D().add(object2), phys2));
             });
         }
     </script>

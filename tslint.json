@@ -1,0 +1,29 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "one-line": false,
+        "no-console": false,
+        "quotemark": false,
+        "prefer-const": false,
+        "eofline": false,
+        "max-line-length": false,
+        "no-trailing-whitespace": false,
+        "ordered-imports": false,
+        "import-spacing": false,
+        "typedef": [
+            true,
+            "call-signature",
+            "property-declaration"
+          ]
+    },
+    "linterOptions": {
+        "exclude": [
+            "build"
+        ]
+    },
+    "rulesDirectory": []
+}
