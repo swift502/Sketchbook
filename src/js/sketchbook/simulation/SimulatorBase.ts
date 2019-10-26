@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import { SimulationFrame } from './SimulationFrame';
 
-export class SimulatorBase
+export abstract class SimulatorBase
 {
     public mass: any;
     public damping: any;
     public frameTime: number;
     public offset: number;
-    public cache: any[];
+    public abstract cache: any[];
     
     constructor(fps: number, mass: number, damping: number)
     {
@@ -50,29 +50,6 @@ export class SimulatorBase
         }
     }
 
-    public getFrame(isLastFrame: boolean): any
-    {
-        throw new Error("Method not implemented.");
-    }
-}
-
-export function spring(source, dest, velocity, mass, damping): SimulationFrame
-{
-    let acceleration = dest - source;
-    acceleration /= mass;
-    velocity += acceleration;
-    velocity *= damping;
-
-    let position = source += velocity;
-
-    return new SimulationFrame(position, velocity);
-}
-
-export function springV(source, dest, velocity, mass, damping): void
-{
-    let acceleration = new THREE.Vector3().subVectors(dest, source);
-    acceleration.divideScalar(mass);
-    velocity.add(acceleration);
-    velocity.multiplyScalar(damping);
-    source.add(velocity);
+    public abstract getFrame(isLastFrame: boolean): any;
+    public abstract simulate(timeStep: number): void;
 }

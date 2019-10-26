@@ -1,4 +1,4 @@
-import { Utilities as Utils } from '../../core/Utilities';
+import * as Utils from '../../core/Utilities';
 import {
     DropIdle,
     DropRolling,

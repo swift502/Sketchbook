@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { SimulatorBase, spring } from './SimulatorBase';
+import { SimulatorBase } from './SimulatorBase';
 import { SimulationFrame } from './SimulationFrame';
+import { spring } from '../core/Utilities';
 
 export class RelativeSpringSimulator extends SimulatorBase
 {

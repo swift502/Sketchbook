@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 
-import { Utilities as Utils } from '../core/Utilities';
+import * as Utils from '../core/Utilities';
 
 import { Controls } from '../core/Controls';
 import { CharacterAI } from './character_ai/_export';
