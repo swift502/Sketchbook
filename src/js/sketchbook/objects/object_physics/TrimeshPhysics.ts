@@ -1,13 +1,14 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
+import { IPhysicsType } from '../../interfaces/IPhysicsType';
 
-export class TrimeshPhysics
+export class TrimeshPhysics implements IPhysicsType
 {
-    mesh: any;
-    options: any;
-    physical: CANNON.Body;
-    visual: any;
+    public mesh: any;
+    public options: any;
+    public physical: CANNON.Body;
+    public visual: any;
 
     constructor(mesh, options)
     {
@@ -25,7 +26,7 @@ export class TrimeshPhysics
         mat.friction = options.friction;
         // mat.restitution = 0.7;
 
-        if(this.mesh.geometry.isBufferGeometry)
+        if (this.mesh.geometry.isBufferGeometry)
         {
             this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
         }
@@ -46,7 +47,7 @@ export class TrimeshPhysics
         this.visual = this.getVisualModel({ visible: false, wireframe: true });
     }
 
-    public getVisualModel(options)
+    public getVisualModel(options): THREE.Mesh
     {
         let defaults = {
             visible: true,

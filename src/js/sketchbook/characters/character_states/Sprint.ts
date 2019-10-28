@@ -19,6 +19,11 @@ export class Sprint extends CharacterStateBase
 
         this.character.setArcadeVelocityTarget(1.4);
         this.character.setAnimation('sprint', 0.1);
+
+        if (!this.isPressed(this.character.actions.run))
+        {
+            this.character.setState(Walk);
+        }
     }
 
     public update(timeStep: number): void
@@ -30,12 +35,12 @@ export class Sprint extends CharacterStateBase
 
     public onInputChange(): void
     {
-        if (this.justReleased(this.character.controls.run))
+        if (this.justReleased(this.character.actions.run))
         {
             this.character.setState(Walk);
         }
 
-        if (this.justPressed(this.character.controls.jump))
+        if (this.justPressed(this.character.actions.jump))
         {
             this.character.setState(JumpRunning);
         }

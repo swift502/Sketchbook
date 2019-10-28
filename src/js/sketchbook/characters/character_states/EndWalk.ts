@@ -34,14 +34,14 @@ export class EndWalk extends CharacterStateBase implements ICharacterState
 
     public onInputChange(): void
     {
-        if (this.justPressed(this.character.controls.jump))
+        if (this.justPressed(this.character.actions.jump))
         {
             this.character.setState(JumpIdle);
         }
 
         if (this.anyDirection())
         {
-            if (this.isPressed(this.character.controls.run))
+            if (this.isPressed(this.character.actions.run))
             {
                 this.character.setState(Sprint);
             }

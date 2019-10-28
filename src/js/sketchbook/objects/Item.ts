@@ -1,12 +1,13 @@
 
 import * as Utils from '../core/Utilities';
+import { SBObject } from './SBObject';
 
-export class Item extends Object
+export class Item extends SBObject
 {
     public isItem: boolean;
     public health: any;
 
-    constructor(options)
+    constructor(options: {})
     {
         super();
 
@@ -16,6 +17,6 @@ export class Item extends Object
         options = Utils.setDefaults(options, defaults);
         
         this.isItem = true;
-        this.health = options.health;
+        this.health = options['health'];
     }
 }

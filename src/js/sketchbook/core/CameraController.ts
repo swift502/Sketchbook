@@ -12,7 +12,7 @@ export class CameraController
     public onMouseDownTheta: any;
     public onMouseDownPhi: any;
     
-    constructor(camera: THREE.Camera, sensitivityX = 1, sensitivityY = sensitivityX)
+    constructor(camera: THREE.Camera, sensitivityX: number = 1, sensitivityY: number = sensitivityX)
     {
         this.camera = camera;
         this.target = new THREE.Vector3();

@@ -1,13 +1,14 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
+import { IPhysicsType } from '../../interfaces/IPhysicsType';
 
-export class ConvexPhysics
+export class ConvexPhysics implements IPhysicsType
 {
-    mesh: any;
-    options: any;
-    physical: CANNON.Body;
-    visual: any;
+    public mesh: any;
+    public options: any;
+    public physical: CANNON.Body;
+    public visual: any;
 
     constructor(mesh, options)
     {
@@ -25,16 +26,16 @@ export class ConvexPhysics
         mat.friction = options.friction;
         // mat.restitution = 0.7;
 
-        if(this.mesh.geometry.isBufferGeometry)
+        if (this.mesh.geometry.isBufferGeometry)
         {
             this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
         }
 
-        let cannonPoints = this.mesh.geometry.vertices.map(function(v) {
+        let cannonPoints = this.mesh.geometry.vertices.map((v) => {
             return new CANNON.Vec3( v.x, v.y, v.z );
         });
         
-        let cannonFaces = this.mesh.geometry.faces.map(function(f) {
+        let cannonFaces = this.mesh.geometry.faces.map((f) => {
             return [f.a, f.b, f.c];
         });
 
@@ -45,7 +46,7 @@ export class ConvexPhysics
         let physBox = new CANNON.Body({
             mass: options.mass,
             position: options.position,
-            shape: shape
+            shape
         });
 
         physBox.material = mat;
@@ -54,7 +55,7 @@ export class ConvexPhysics
         this.visual = this.getVisualModel({ visible: false, wireframe: true });
     }
 
-    public getVisualModel(options)
+    public getVisualModel(options): THREE.Mesh
     {
         let defaults = {
             visible: true,

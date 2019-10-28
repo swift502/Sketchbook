@@ -2,7 +2,11 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 import { CameraController } from './CameraController';
-import { Shaders } from '../../lib/shaders/Shaders';
+import { FXAAShader } from '../../lib/shaders/FXAAShader';
+import EffectComposer, {
+    RenderPass,
+    ShaderPass,
+} from '@johh/three-effectcomposer';
 import * as Sky from 'three-sky';
 
 import { Detector } from '../../lib/utils/Detector';
@@ -11,13 +15,16 @@ import * as GUI from '../../lib/utils/dat.gui';
 import * as _ from 'lodash';
 import { InputManager } from './InputManager';
 import { FreeCameraControls } from '../game_modes/FreeCameraControls';
+import { SBObject } from '../objects/SBObject';
+import { IGameMode } from '../interfaces/IGameMode';
+import { Character } from '../characters/Character';
 
 export class World
 {
     public renderer: THREE.WebGLRenderer;
-    public camera: any;
-    public composer: any;
-    public stats: any;
+    public camera: THREE.Camera;
+    public composer: EffectComposer;
+    public stats: Stats;
     public graphicsWorld: THREE.Scene;
     public sun: THREE.Vector3;
     public dirLight: THREE.DirectionalLight;
@@ -25,22 +32,22 @@ export class World
     public parallelPairs: any[];
     public physicsFrameRate: number;
     public physicsFrameTime: number;
-    public physicsMaxPrediction: any;
+    public physicsMaxPrediction: number;
     public clock: THREE.Clock;
     public renderDelta: number;
     public logicDelta: number;
     public sinceLastFrame: number;
     public justRendered: boolean;
     public params: { Pointer_Lock: boolean; Mouse_Sensitivity: number; FPS_Limit: number; Time_Scale: number; Shadows: boolean; FXAA: boolean; Draw_Physics: boolean; RayCast_Debug: boolean; };
-    public inputManager: any;
-    public cameraController: any;
-    public timeScaleTarget: any;
-    public objects: any;
-    public characters: any;
+    public inputManager: InputManager;
+    public cameraController: CameraController;
+    public timeScaleTarget: number;
+    public objects: SBObject[];
+    public characters: Character[];
     public cameraDistanceTarget: number;
     public balls: any[];
     public vehicles: any[];
-    public gameMode: any;
+    public gameMode: IGameMode;
 
     constructor()
     {
@@ -66,10 +73,10 @@ export class World
         // Auto window resize
         function onWindowResize(): void
         {
-            scope.camera.aspect = window.innerWidth / window.innerHeight;
-            scope.camera.updateProjectionMatrix();
+            scope.camera['aspect'] = window.innerWidth / window.innerHeight;
+            scope.camera['updateProjectionMatrix']();
             scope.renderer.setSize(window.innerWidth, window.innerHeight);
-            effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
+            effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
             scope.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
         }
         window.addEventListener('resize', onWindowResize, false);
@@ -90,29 +97,19 @@ export class World
         // Camera
         this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 120);
 
-        // Scene render pass
-        let renderScene = new Shaders.RenderPass(this.graphicsWorld, this.camera);
-
-        // DPR for FXAA
-        let dpr = 1;
-        if (window.devicePixelRatio !== undefined)
-        {
-            dpr = window.devicePixelRatio;
-        }
         // FXAA
-        let effectFXAA = new Shaders.ShaderPass(Shaders.FXAAShader);
-        effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
-        effectFXAA['renderToScreen'] = true;
+        let effectFXAA = new ShaderPass(FXAAShader);
+        let dpr = (window.devicePixelRatio !== undefined) ? window.devicePixelRatio : 1;
+        effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
 
-        // Composer
-        this.composer = new Shaders.EffectComposer(this.renderer);
-        this.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
-        this.composer.addPass(renderScene);
+        // Setup composer
+        this.composer = new EffectComposer(this.renderer);
+        this.composer.addPass(new RenderPass(this.graphicsWorld, this.camera));
         this.composer.addPass(effectFXAA);
-
+        
         // Sky
         let sky = new Sky();
-        sky['scale'].setScalar(100);
+        sky.scale.setScalar(100);
         this.graphicsWorld.add(sky);
 
         // Sun helper
@@ -120,7 +117,7 @@ export class World
         this.sun.x = -1;
         this.sun.y = 1;
         this.sun.z = -1;
-        sky['material'].uniforms.sunPosition.value.copy(this.sun);
+        sky.material.uniforms.sunPosition.value.copy(this.sun);
 
         // Lighting
         let ambientLight = new THREE.AmbientLight(0xaaaaaa); // soft white light
@@ -141,7 +138,6 @@ export class World
         dirLight.shadow.camera.bottom = -15;
         dirLight.shadow.camera.left = -15;
 
-        dirLight.shadow.camera;
         this.graphicsWorld.add(dirLight);
 
         //#endregion
@@ -179,7 +175,7 @@ export class World
             FPS_Limit: 60,
             Time_Scale: 1,
             Shadows: true,
-            FXAA: false,
+            FXAA: true,
             Draw_Physics: false,
             RayCast_Debug: false
         };
@@ -187,28 +183,28 @@ export class World
 
         let gui = new GUI.GUI();
         // Input
-        let input_folder = gui.addFolder('Input');
-        input_folder.add(params, 'Pointer_Lock')
-            .onChange(function (enabled)
+        let inputFolder = gui.addFolder('Input');
+        inputFolder.add(params, 'Pointer_Lock')
+            .onChange((enabled) =>
             {
                 scope.inputManager.setPointerLock(enabled);
             });
-        input_folder.add(params, 'Mouse_Sensitivity', 0, 1)
-            .onChange(function (value)
+        inputFolder.add(params, 'Mouse_Sensitivity', 0, 1)
+            .onChange((value) =>
             {
                 scope.cameraController.setSensitivity(value, value * 0.8);
             });
 
         // Graphics
-        let graphics_folder = gui.addFolder('Rendering');
-        graphics_folder.add(params, 'FPS_Limit', 0, 60);
-        graphics_folder.add(params, 'Time_Scale', 0, 1).listen()
-            .onChange(function (value)
+        let graphicsFolder = gui.addFolder('Rendering');
+        graphicsFolder.add(params, 'FPS_Limit', 0, 60);
+        graphicsFolder.add(params, 'Time_Scale', 0, 1).listen()
+            .onChange((value) =>
             {
                 scope.timeScaleTarget = value;
             });
-        graphics_folder.add(params, 'Shadows')
-            .onChange(function (enabled)
+        graphicsFolder.add(params, 'Shadows')
+            .onChange((enabled) =>
             {
                 if (enabled)
                 {
@@ -219,26 +215,26 @@ export class World
                     dirLight.castShadow = false;
                 }
             });
-        graphics_folder.add(params, 'FXAA');
+        graphicsFolder.add(params, 'FXAA');
 
         // Debug
-        let debug_folder = gui.addFolder('Debug');
-        debug_folder.add(params, 'Draw_Physics')
-            .onChange(function (enabled)
+        let debugFolder = gui.addFolder('Debug');
+        debugFolder.add(params, 'Draw_Physics')
+            .onChange((enabled) =>
             {
-                scope.objects.forEach(obj =>
+                scope.objects.forEach((obj) =>
                 {
-                    if (obj.physics.visual != undefined)
+                    if (obj.physics.visual !== undefined)
                     {
                         if (enabled) obj.physics.visual.visible = true;
                         else obj.physics.visual.visible = false;
                     }
                 });
             });
-        debug_folder.add(params, 'RayCast_Debug')
-            .onChange(function (enabled)
+        debugFolder.add(params, 'RayCast_Debug')
+            .onChange((enabled) =>
             {
-                scope.characters.forEach(char =>
+                scope.characters.forEach((char) =>
                 {
                     if (enabled) char.raycastBox.visible = true;
                     else char.raycastBox.visible = false;
@@ -265,7 +261,7 @@ export class World
         this.render(this);
     }
 
-    setGameMode(gameMode)
+    public setGameMode(gameMode: IGameMode): void
     {
         gameMode.world = this;
         this.gameMode = gameMode;
@@ -274,18 +270,18 @@ export class World
 
     // Update
     // Handles all logic updates.
-    update(timeStep)
+    public update(timeStep: number): void
     {
         this.updatePhysics(timeStep);
 
         // Objects
-        this.objects.forEach(obj =>
+        this.objects.forEach((obj) =>
         {
             obj.update(timeStep);
         });
                     
         // Characters
-        this.characters.forEach(char =>
+        this.characters.forEach((char) =>
         {
             char.update(timeStep);
             char.updateMatrixWorld();
@@ -301,15 +297,15 @@ export class World
         this.cameraController.update();
     }
 
-    updatePhysics(timeStep)
+    public updatePhysics(timeStep: number): void
     {
         // Step the physics world
         this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
 
         // Sync physics/visuals
-        this.objects.forEach(obj =>
+        this.objects.forEach((obj) =>
         {
-            if (obj.physics.physical != undefined)
+            if (obj.physics.physical !== undefined)
             {
                 if (obj.physics.physical.position.y < -5)
                 {
@@ -334,7 +330,7 @@ export class World
      * Calls world's "update" function before rendering.
      * @param {World} world 
      */
-    render(world)
+    public render(world: World): void
     {
         // Stats begin
         if (this.justRendered)
@@ -343,7 +339,7 @@ export class World
             this.stats.begin();
         }
 
-        requestAnimationFrame(function ()
+        requestAnimationFrame(() =>
         {
             world.render(world);
         });
@@ -377,80 +373,27 @@ export class World
         }
     }
 
-    add(object)
+    public add(object: any): void
     {
-        if(typeof object.addToWorld === 'function') {
+        if (typeof object.addToWorld === 'function')
+        {
             object.addToWorld(this);
         }
         else
         {
-            console.error('Object type not supported: ' + object);
+            console.error('Object type not supported: ' + (typeof object));
         }
-
-        return object;
     }
 
-    remove(object)
+    public remove(object: any): void
     {
-        if (object.isObject)
+        if (typeof object.removeFromWorld === 'function')
         {
-            if(!_.includes(this.objects, object))
-            {
-                console.warn('Removing object from a world in which it isn\'t present.');
-            }
-            else 
-            {
-                _.pull(this.objects, object);
-
-                if (object.physics.physical !== undefined)
-                {
-                    this.physicsWorld.remove(object.physics.physical);
-                }
-
-                if (object.physics.visual !== undefined)
-                {
-                    this.graphicsWorld.remove(object.physics.visual);
-                }
-
-                if (object.model !== undefined)
-                {
-                    this.graphicsWorld.remove(object.model);
-                }
-            }
-        }
-        else if (object.isCharacter)
-        {
-            const character = object;
-
-            if(!_.includes(this.characters, character))
-            {
-                console.warn('Removing character from a world in which it isn\'t present.');
-            }
-            else
-            {
-                character.world = undefined;
-
-                // Remove from characters
-                _.pull(this.characters, character);
-
-                // Remove physics
-                this.physicsWorld.remove(character.characterCapsule.physics.physical);
-
-                // Remove visuals
-                this.graphicsWorld.remove(character);
-                this.graphicsWorld.remove(character.characterCapsule.physics.visual);
-                this.graphicsWorld.remove(character.raycastBox);
-
-                // Remove capsule object
-                _.pull(this.objects, character.characterCapsule);
-
-                return character;
-            }
+            object.removeFromWorld(this);
         }
         else
         {
-            console.error('Object type not supported: ' + object);
+            console.error('Object type not supported: ' + (typeof object));
         }
     }
 }
-

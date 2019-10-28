@@ -3,9 +3,10 @@ import * as CANNON from 'cannon';
 import { GameModesBase } from './GameModesBase';
 import { InputController } from '../core/InputController';
 import * as _ from 'lodash';
-import { SBObject } from '../objects/Object';
+import { SBObject } from '../objects/SBObject';
 import { SpherePhysics } from '../objects/object_physics/SpherePhysics';
 import { IGameMode } from '../interfaces/IGameMode';
+import { World } from '../core/World';
 
 /**
  * Free camera game mode.
@@ -18,7 +19,7 @@ export class FreeCameraControls extends GameModesBase implements IGameMode
     public movementSpeed: number;
     public keymap: any;
     public controls: any;
-    public world: any;
+    public world: World;
 
     public upVelocity: number = 0;
     public forwardVelocity: number = 0;
@@ -83,7 +84,7 @@ export class FreeCameraControls extends GameModesBase implements IGameMode
             ball.setPhysics(new SpherePhysics({
                 mass: 1,
                 radius: 0.3,
-                position: new CANNON.Vec3().copy(this.world.camera.position).vadd(forward)
+                position: new CANNON.Vec3(this.world.camera.position.x, this.world.camera.position.y, this.world.camera.position.z).vadd(forward)
             }));
             ball.setModelFromPhysicsShape();
             this.world.add(ball);
@@ -113,17 +114,17 @@ export class FreeCameraControls extends GameModesBase implements IGameMode
         }
     }
 
-    public handleScroll(event, value): void
+    public handleScroll(event: WheelEvent, value: number): void
     {
         this.scrollTheTimeScale(value);
     }
 
-    public handleMouseMove(event, deltaX: number, deltaY: number): void
+    public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
     {
         this.world.cameraController.move(deltaX, deltaY);
     }
 
-    public update(): void
+    public update(timeStep: number): void
     {
         // Make light follow camera (for shadows)
         this.world.dirLight.position.set(

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../simulation/SimulationFrame';
 
-export function createCapsuleGeometry(radius = 1, height = 2, N = 32): THREE.Geometry
+export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
 {
     const geometry = new THREE.Geometry();
     const TWOPI = Math.PI * 2;
@@ -118,7 +118,7 @@ export function createCapsuleGeometry(radius = 1, height = 2, N = 32): THREE.Geo
  * @param {Vector3} a Vector to construct 2D matrix from
  * @param {Vector3} b Vector to apply basis to
  */
-export function appplyVectorMatrixXZ(a, b): THREE.Vector3
+export function appplyVectorMatrixXZ(a: THREE.Vector3, b: THREE.Vector3): THREE.Vector3
 {
     return new THREE.Vector3(
         (a.x * b.z + a.z * b.x),
@@ -176,7 +176,7 @@ export function getAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, dot
 /**
  * Finds an angle between two vectors with a sign relative to normal vector
  */
-export function getSignedAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, normal = new THREE.Vector3(0, 1, 0), dotTreshold: number = 0.0005): number
+export function getSignedAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, normal: THREE.Vector3 = new THREE.Vector3(0, 1, 0), dotTreshold: number = 0.0005): number
 {
     let angle = this.getAngleBetweenVectors(v1, v2, dotTreshold);
 

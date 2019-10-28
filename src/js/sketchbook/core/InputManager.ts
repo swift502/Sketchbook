@@ -15,7 +15,7 @@ export class InputManager
     public boundOnKeyDown: (evt: any) => void;
     public boundOnKeyUp: (evt: any) => void;
     
-    constructor(world: World, domElement)
+    constructor(world: World, domElement: HTMLElement)
     {
         this.world = world;
         this.domElement = domElement || document.body;
@@ -127,7 +127,6 @@ export class InputManager
     {
         if (this.world.gameMode !== undefined)
         {
-            console.log(event);
             this.world.gameMode.handleKey(event, event.code, false);
         }
     }

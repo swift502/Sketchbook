@@ -25,7 +25,7 @@ export class StartWalkBase extends CharacterStateBase
         // this.character.velocitySimulator.mass = 1;
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
 
@@ -58,7 +58,7 @@ export class StartWalkBase extends CharacterStateBase
 
     public onInputChange(): void
     {
-        if (this.justPressed(this.character.controls.jump))
+        if (this.justPressed(this.character.actions.jump))
         {
             this.character.setState(JumpRunning);
         }
@@ -88,7 +88,7 @@ export class StartWalkBase extends CharacterStateBase
             }
         }
 
-        if (this.justPressed(this.character.controls.run))
+        if (this.justPressed(this.character.actions.run))
         {
             this.character.setState(Sprint);
         }

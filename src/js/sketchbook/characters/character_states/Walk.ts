@@ -21,7 +21,7 @@ export class Walk extends CharacterStateBase
         {
             this.character.setState(EndWalk);
         }
-        if (this.isPressed(this.character.controls.run))
+        if (this.isPressed(this.character.actions.run))
         {
             this.character.setState(Sprint);
         }
@@ -38,12 +38,12 @@ export class Walk extends CharacterStateBase
 
     public onInputChange(): void
     {
-        if (this.justPressed(this.character.controls.run))
+        if (this.justPressed(this.character.actions.run))
         {
             this.character.setState(Sprint);
         }
 
-        if (this.justPressed(this.character.controls.jump))
+        if (this.justPressed(this.character.actions.jump))
         {
             this.character.setState(JumpRunning);
         }

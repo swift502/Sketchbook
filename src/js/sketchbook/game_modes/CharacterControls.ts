@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { GameModesBase } from './GameModesBase';
 import * as _ from 'lodash';
-import { SBObject } from '../objects/Object';
+import { SBObject } from '../objects/SBObject';
 import { FreeCameraControls } from './FreeCameraControls';
 import { SpherePhysics } from '../objects/object_physics/SpherePhysics';
 import { IGameMode } from '../interfaces/IGameMode';
@@ -14,7 +14,7 @@ import { Character } from '../characters/Character';
  */
 export class CharacterControls extends GameModesBase implements IGameMode
 {
-    public character: any;
+    public character: Character;
     public keymap: any;
 
     constructor(character: Character)
@@ -74,12 +74,12 @@ export class CharacterControls extends GameModesBase implements IGameMode
         }
         else if (code === 'KeyF' && pressed === true) 
         {
-            let forward = new CANNON.Vec3().copy(this.character.orientation);
+            let forward = new CANNON.Vec3(this.character.orientation.x, this.character.orientation.y, this.character.orientation.z);
             let ball = new SBObject();
             ball.setPhysics(new SpherePhysics({
                 mass: 1,
                 radius: 0.3,
-                position: new CANNON.Vec3().copy(this.character.position).vadd(forward),
+                position: new CANNON.Vec3(this.character.position.x, this.character.position.y, this.character.position.z).vadd(forward),
             }));
             ball.setModelFromPhysicsShape();
             this.world.add(ball);
@@ -102,7 +102,7 @@ export class CharacterControls extends GameModesBase implements IGameMode
         // Is key bound to action
         if (code in this.keymap)
         {
-            this.character.setControl(this.keymap[code].action, pressed);
+            this.character.triggerCharacterAction(this.keymap[code].action, pressed);
         }
     }
 
@@ -116,7 +116,7 @@ export class CharacterControls extends GameModesBase implements IGameMode
         this.world.cameraController.move(deltaX, deltaY);
     }
 
-    public update(): void
+    public update(timeStep: number): void
     {
         if (!_.includes(this.world.characters, this.character))
         {

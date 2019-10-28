@@ -34,7 +34,7 @@ export const CharacterStates = statesLibrary;
 
 export { Character } from "./characters/Character";
 export { InputController } from "./core/InputController";
-export { SBObject } from "./objects/Object";
+export { SBObject } from "./objects/SBObject";
 export { World } from "./core/World";
 
 export let THREE = THREEImport;

@@ -1,12 +1,13 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
+import { IPhysicsType } from '../../interfaces/IPhysicsType';
 
-export class BoxPhysics
+export class BoxPhysics implements IPhysicsType
 {
-    options: any;
-    physical: CANNON.Body;
-    visual: THREE.Mesh;
+    public options: any;
+    public physical: CANNON.Body;
+    public visual: THREE.Mesh;
     
     constructor(options)
     {
@@ -32,7 +33,7 @@ export class BoxPhysics
         let physBox = new CANNON.Body({
             mass: options.mass,
             position: options.position,
-            shape: shape
+            shape
         });
         
         physBox.material = mat;
@@ -41,7 +42,7 @@ export class BoxPhysics
         this.visual = this.getVisualModel({ visible: false, wireframe: true });
     }
 
-    public getVisualModel(options)
+    public getVisualModel(options): THREE.Mesh
     {
         let defaults = {
             visible: true,

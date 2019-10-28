@@ -21,7 +21,12 @@
         "typedef": [
             true,
             "call-signature",
-            "property-declaration"
+            "parameter",
+            "property-declaration",
+            "variable-declaration-ignore-function",
+            "member-variable-declaration",
+            "object-destructuring",
+            "array-destructuring"
           ]
     },
     "linterOptions": {

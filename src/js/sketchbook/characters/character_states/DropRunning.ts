@@ -38,12 +38,12 @@ export class DropRunning extends CharacterStateBase implements ICharacterState
             this.character.setState(EndWalk);
         }
 
-        if (this.anyDirection() && this.justPressed(this.character.controls.run))
+        if (this.anyDirection() && this.justPressed(this.character.actions.run))
         {
             this.character.setState(Sprint);
         }
 
-        if (this.justPressed(this.character.controls.jump))
+        if (this.justPressed(this.character.actions.jump))
         {
             this.character.setState(JumpRunning);
         }

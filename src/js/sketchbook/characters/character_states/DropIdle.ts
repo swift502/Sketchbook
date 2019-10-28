@@ -39,7 +39,7 @@ export class DropIdle extends CharacterStateBase implements ICharacterState
     public onInputChange(): void
     {
 
-        if (this.justPressed(this.character.controls.jump))
+        if (this.justPressed(this.character.actions.jump))
         {
             this.character.setState(JumpIdle);
         }

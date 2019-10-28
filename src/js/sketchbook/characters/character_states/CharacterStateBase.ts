@@ -14,6 +14,7 @@ import {
 } from './_stateLibrary';
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
+import { InputController } from '../../core/InputController';
 
 export abstract class CharacterStateBase implements ICharacterState
 {
@@ -48,27 +49,27 @@ export abstract class CharacterStateBase implements ICharacterState
 
     public noDirection(): boolean
     {
-        return !this.character.controls.up.value && !this.character.controls.down.value && !this.character.controls.left.value && !this.character.controls.right.value;
+        return !this.character.actions.up.value && !this.character.actions.down.value && !this.character.actions.left.value && !this.character.actions.right.value;
     }
 
     public anyDirection(): boolean
     {
-        return this.character.controls.up.value || this.character.controls.down.value || this.character.controls.left.value || this.character.controls.right.value;
+        return this.character.actions.up.value || this.character.actions.down.value || this.character.actions.left.value || this.character.actions.right.value;
     }
 
-    public justPressed(control): boolean
+    public justPressed(key: InputController): boolean
     {
-        return this.character.controls.lastControl === control && control.justPressed;
+        return this.character.actions.lastControl === key && key.justPressed;
     }
 
-    public isPressed(control): boolean
+    public isPressed(key: InputController): boolean
     {
-        return control.value;
+        return key.value;
     }
 
-    public justReleased(control): boolean
+    public justReleased(key: InputController): boolean
     {
-        return this.character.controls.lastControl === control && control.justReleased;
+        return this.character.actions.lastControl === key && key.justReleased;
     }
 
     public fallInAir(): void
@@ -76,7 +77,7 @@ export abstract class CharacterStateBase implements ICharacterState
         if (!this.character.rayHasHit) { this.character.setState(Falling); }
     }
 
-    public animationEnded(timeStep): boolean
+    public animationEnded(timeStep: number): boolean
     {
         if (this.character.mixer !== undefined)
         {
@@ -107,7 +108,7 @@ export abstract class CharacterStateBase implements ICharacterState
             }
             else
             {
-                if (this.isPressed(this.character.controls.run))
+                if (this.isPressed(this.character.actions.run))
                 {
                     this.character.setState(Sprint);
                 }

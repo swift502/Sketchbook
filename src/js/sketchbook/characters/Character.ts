@@ -5,12 +5,15 @@ import * as _ from 'lodash';
 import * as Utils from '../core/Utilities';
 
 import { InputController } from '../core/InputController';
-import { SBObject } from '../objects/Object';
+import { SBObject } from '../objects/SBObject';
 import { VectorSpringSimulator } from '../simulation/VectorSpringSimulator';
 import { RelativeSpringSimulator } from '../simulation/RelativeSpringSimulator';
 import { CharacterControls } from '../game_modes/CharacterControls';
 import { Idle } from './character_states/Idle';
 import { CapsulePhysics } from '../objects/object_physics/CapsulePhysics';
+import { ICharacterState } from '../interfaces/ICharacterState';
+import { ICharacterAI } from '../interfaces/ICharacterAI';
+import { World } from '../core/World';
 
 export class Character extends THREE.Object3D
 {
@@ -41,7 +44,7 @@ export class Character extends THREE.Object3D
     public defaultRotationSimulatorMass: number = 10;
     public rotationSimulator: RelativeSpringSimulator;
     public viewVector: THREE.Vector3;
-    public controls: any;
+    public actions: any;
     public characterCapsule: SBObject;
 
     // Ray casting
@@ -59,7 +62,7 @@ export class Character extends THREE.Object3D
     public world: any;
     public character: any;
     
-    constructor(options)
+    constructor(options: {})
     {
         super();
 
@@ -70,7 +73,7 @@ export class Character extends THREE.Object3D
         options = Utils.setDefaults(options, defaults);
 
         // Geometry
-        this.height = options.height;
+        this.height = options['height'];
         this.modelOffset = new THREE.Vector3();
 
         // The visuals group is centered for easy character tilting
@@ -105,7 +108,7 @@ export class Character extends THREE.Object3D
         this.viewVector = new THREE.Vector3();
 
         // Controls
-        this.controls = {
+        this.actions = {
             up: new InputController(),
             down: new InputController(),
             left: new InputController(),
@@ -123,7 +126,7 @@ export class Character extends THREE.Object3D
         // Player Capsule
         let capsulePhysics = new CapsulePhysics({
             mass: 1,
-            position: new CANNON.Vec3().copy(options.position),
+            position: new CANNON.Vec3().copy(options['position']),
             height: 0.5,
             radius: 0.25,
             segments: 8,
@@ -155,12 +158,12 @@ export class Character extends THREE.Object3D
         this.characterCapsule.physics.physical.postStep = this.physicsPostStep;
     }
 
-    public setAnimations(animations): void
+    public setAnimations(animations: []): void
     {
         this.animations = animations;
     }
 
-    public setModel(model): void
+    public setModel(model: THREE.Mesh): void
     {
         this.modelContainer.remove(this.characterModel);
         this.characterModel = model;
@@ -171,17 +174,17 @@ export class Character extends THREE.Object3D
         this.charState.onInputChange();
     }
 
-    public setArcadeVelocityInfluence(x, y = x, z = x): void
+    public setArcadeVelocityInfluence(x: number, y: number = x, z: number = x): void
     {
         this.arcadeVelocityInfluence.set(x, y, z);
     }
 
-    public setModelOffset(offset): void
+    public setModelOffset(offset: THREE.Vector3): void
     {
         this.modelOffset.copy(offset);
     }
 
-    public setViewVector(vector): void
+    public setViewVector(vector: THREE.Vector3): void
     {
         this.viewVector.copy(vector).normalize();
     }
@@ -190,45 +193,45 @@ export class Character extends THREE.Object3D
      * Set state to the player. Pass state class (function) name.
      * @param {function} State 
      */
-    public setState(State): void
+    public setState(State: any): void
     {
         this.charState = new State(this);
     }
 
-    public setPosition(x, y, z): void
+    public setPosition(x: number, y: number, z: number): void
     {
         this.characterCapsule.physics.physical.position = new CANNON.Vec3(x, y, z);
     }
 
-    public setArcadeVelocity(velZ, velX = 0, velY = 0): void
+    public setArcadeVelocity(velZ: number, velX: number = 0, velY: number = 0): void
     {
         this.velocity.z = velZ;
         this.velocity.x = velX;
         this.velocity.y = velY;
     }
 
-    public setArcadeVelocityTarget(velZ, velX = 0, velY = 0): void
+    public setArcadeVelocityTarget(velZ: number, velX: number = 0, velY: number = 0): void
     {
         this.velocityTarget.z = velZ;
         this.velocityTarget.x = velX;
         this.velocityTarget.y = velY;
     }
 
-    public setOrientationTarget(vector): void
+    public setOrientationTarget(vector: THREE.Vector3): void
     {
         this.orientationTarget.copy(vector).setY(0).normalize();
     }
 
-    public setBehaviour(behaviour): void
+    public setBehaviour(behaviour: ICharacterAI): void
     {
         behaviour.character = this;
         this.behaviour = behaviour;
     }
 
-    public setControl(key, value): void
+    public triggerCharacterAction(actionName: string, value: boolean): void
     {
         // Get action and set it's parameters
-        let action = this.controls[key];
+        let action = this.actions[actionName];
 
         if (action.value !== value)
         {
@@ -240,7 +243,7 @@ export class Character extends THREE.Object3D
             else action.justReleased = true;
 
             // Tag control as last activated
-            this.controls.lastControl = action;
+            this.actions.lastControl = action;
 
             // Tell player to handle states according to new input
             this.charState.onInputChange();
@@ -265,19 +268,19 @@ export class Character extends THREE.Object3D
 
     public resetControls(): void
     {
-        this.setControl('up', false);
-        this.setControl('down', false);
-        this.setControl('left', false);
-        this.setControl('right', false);
-        this.setControl('run', false);
-        this.setControl('jump', false);
-        this.setControl('use', false);
-        this.setControl('primary', false);
-        this.setControl('secondary', false);
-        this.setControl('tertiary', false);
+        this.triggerCharacterAction('up', false);
+        this.triggerCharacterAction('down', false);
+        this.triggerCharacterAction('left', false);
+        this.triggerCharacterAction('right', false);
+        this.triggerCharacterAction('run', false);
+        this.triggerCharacterAction('jump', false);
+        this.triggerCharacterAction('use', false);
+        this.triggerCharacterAction('primary', false);
+        this.triggerCharacterAction('secondary', false);
+        this.triggerCharacterAction('tertiary', false);
     }
 
-    public update(timeStep, options = {}): void
+    public update(timeStep: number, options: {} = {}): void
     {
         let defaults = {
             rotateModel: true,
@@ -309,7 +312,7 @@ export class Character extends THREE.Object3D
         );
     }
 
-    public setAnimation(clipName, fadeIn): void
+    public setAnimation(clipName: string, fadeIn: number): void
     {
         if (this.mixer !== undefined)
         {
@@ -329,7 +332,7 @@ export class Character extends THREE.Object3D
         }
     }
 
-    public springMovement(timeStep): void
+    public springMovement(timeStep: number): void
     {
         // Simulator
         this.velocitySimulator.target.copy(this.velocityTarget);
@@ -340,7 +343,7 @@ export class Character extends THREE.Object3D
         this.acceleration.copy(this.velocitySimulator.velocity);
     }
 
-    public springRotation(timeStep, RotationMultiplier): void
+    public springRotation(timeStep: number, RotationMultiplier: number): void
     {
         // Spring rotation
         // Figure out angle between current and target orientation
@@ -358,10 +361,10 @@ export class Character extends THREE.Object3D
 
     public getLocalMovementDirection(): THREE.Vector3
     {
-        const positiveX = this.controls.right.value ? -1 : 0;
-        const negativeX = this.controls.left.value ? 1 : 0;
-        const positiveZ = this.controls.up.value ? 1 : 0;
-        const negativeZ = this.controls.down.value ? -1 : 0;
+        const positiveX = this.actions.right.value ? -1 : 0;
+        const negativeX = this.actions.left.value ? 1 : 0;
+        const positiveZ = this.actions.up.value ? 1 : 0;
+        const negativeZ = this.actions.down.value ? -1 : 0;
 
         return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ).normalize();
     }
@@ -395,12 +398,16 @@ export class Character extends THREE.Object3D
         this.visuals.position.setY(this.visuals.position.y + (Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2));
     }
 
-    public jump(initJumpSpeed = -1): void
+    public jump(initJumpSpeed: number = -1): void
     {
         this.wantsToJump = true;
         this.initJumpSpeed = initJumpSpeed;
     }
 
+    /**
+     * Gets called with the call() function by the CANNON.Body caller
+     * "this" in this functions actually refers to CANNON.Body
+     */
     public physicsPreStep(): void
     {
         // Player ray casting
@@ -430,6 +437,10 @@ export class Character extends THREE.Object3D
         }
     }
 
+    /**
+     * Gets called with the call() function by the CANNON.Body caller
+     * "this" in this functions actually refers to CANNON.Body
+     */
     public physicsPostStep(): void
     {
         // Get velocities
@@ -521,7 +532,7 @@ export class Character extends THREE.Object3D
         }
     }
 
-    public addToWorld(world): void
+    public addToWorld(world: World): void
     {
         if (_.includes(world.characters, this))
         {
@@ -545,6 +556,32 @@ export class Character extends THREE.Object3D
 
             // Register characters physical capsule object
             world.objects.push(this.characterCapsule);
+        }
+    }
+
+    public removeFromWorld(world: World): void
+    {
+        if (!_.includes(world.characters, this))
+        {
+            console.warn('Removing character from a world in which it isn\'t present.');
+        }
+        else
+        {
+            this.world = undefined;
+
+            // Remove from characters
+            _.pull(world.characters, this);
+
+            // Remove physics
+            world.physicsWorld.remove(this.characterCapsule.physics.physical);
+
+            // Remove visuals
+            world.graphicsWorld.remove(this);
+            world.graphicsWorld.remove(this.characterCapsule.physics.visual);
+            world.graphicsWorld.remove(this.raycastBox);
+
+            // Remove capsule object
+            _.pull(world.objects, this.characterCapsule);
         }
     }
 }
