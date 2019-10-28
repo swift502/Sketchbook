@@ -2,12 +2,8 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        app: './src/js/sketchbook/sketchbook.js'
+        app: './src/js/sketchbook/sketchbook.ts'
     },
-    // externals: {
-    //     three: 'THREE',
-    //     cannon: 'CANNON'
-    // },
     output: {
         filename: 'sketchbook.min.js',
         path: path.resolve(__dirname, 'build'),
@@ -17,16 +13,22 @@ module.exports = {
     resolve: {
         alias: {
           cannon: path.resolve(__dirname, './src/js/lib/cannon/cannon.min.js')
-        }
+        },
+        extensions: [ '.tsx', '.ts', '.js' ],
       },
     module: {
         rules: [
         {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+        },
+        {
             test: /\.css$/,
             use: [
               'style-loader',
-              'css-loader'
-            ]
+              'css-loader',
+            ],
         },
         {
             test: /\.(fbx|png)$/,
@@ -39,7 +41,7 @@ module.exports = {
                     publicPath: '/build/'
                 }
                 }
-            ]
+            ],
           }
       ]
     },
