@@ -1,11 +1,14 @@
 import * as THREE from 'three';
-import { AIBase } from './AIBase';
+import { Character } from '../Character';
+import { ICharacterAI } from '../../interfaces/ICharacterAI';
+import { CharacterAIBase } from './CharacterAIBase';
 
-export class FollowCharacter extends AIBase
+export class FollowCharacter extends CharacterAIBase implements ICharacterAI
 {
+    private targetCharacter: Character;
     private stopDistance: number;
 
-    constructor(targetCharacter, stopDistance = 1.3)
+    constructor(targetCharacter: Character, stopDistance: number = 1.3)
     {
         super();
         this.targetCharacter = targetCharacter;
@@ -14,8 +17,6 @@ export class FollowCharacter extends AIBase
 
     public update(timeStep: number): void
     {
-        super.update(timeStep);
-
         let viewVector = new THREE.Vector3().subVectors(this.targetCharacter.position, this.character.position);
         this.character.setViewVector(viewVector);
 
@@ -32,7 +33,5 @@ export class FollowCharacter extends AIBase
             // Look at character
             this.character.setOrientationTarget(viewVector);
         }
-
-        this.updateCharacter(timeStep);
     }
 }

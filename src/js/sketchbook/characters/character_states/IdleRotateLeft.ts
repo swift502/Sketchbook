@@ -6,10 +6,11 @@ import
     Walk,
 } from './_stateLibrary';
 import { ICharacterState } from '../../interfaces/ICharacterState';
+import { Character } from '../Character';
 
 export class IdleRotateLeft extends CharacterStateBase implements ICharacterState
 {
-    constructor(character)
+    constructor(character: Character)
     {
         super(character);
 
@@ -23,11 +24,9 @@ export class IdleRotateLeft extends CharacterStateBase implements ICharacterStat
         this.animationLength = this.character.setAnimation('rotate_left', 0.1);
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
-
-        this.character.update(timeStep);
 
         if (this.animationEnded(timeStep))
         {
@@ -37,7 +36,7 @@ export class IdleRotateLeft extends CharacterStateBase implements ICharacterStat
         this.fallInAir();
     }
 
-    public changeState(): void
+    public onInputChange(): void
     {
         if (this.justPressed(this.character.controls.jump))
         {

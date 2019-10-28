@@ -1,17 +1,14 @@
+import { World } from "../core/World";
 
-export class GameModesBase
+export abstract class GameModesBase
 {
-    world: any;
-    init() { }
-    update() { }
-
-    handleAction(event, key, value)
+    public world: World;
+    
+    public timescaleSwitch(code: string, pressed: boolean): void
     {
-        key = event.keyCode;
-
-        if(key == '84' && value == true) 
+        if (code === 'KeyT' && pressed === true) 
         {
-            if(this.world.timeScaleTarget < 0.5)
+            if (this.world.timeScaleTarget < 0.5)
             {
                 this.world.timeScaleTarget = 1;
             }
@@ -21,18 +18,17 @@ export class GameModesBase
             }
         }
     }
-    handleScroll(event, value) { }
-    handleMouseMove(event, deltaX, deltaY) { }
 
-    checkIfWorldIsSet()
+    public checkIfWorldIsSet(): void
     {
-        if(this.world === undefined)
+        if (this.world === undefined)
         {
             console.error('Calling gameMode init() without having specified gameMode\'s world first: ' + this);
         }
     }
 
-    scrollTheTimeScale(scrollAmount) {
+    public scrollTheTimeScale(scrollAmount: number): void
+    {
 
         // Changing time scale with scroll wheel
         const timeScaleBottomLimit = 0.003;

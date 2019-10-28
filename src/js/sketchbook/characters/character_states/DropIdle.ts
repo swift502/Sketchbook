@@ -25,22 +25,18 @@ export class DropIdle extends CharacterStateBase implements ICharacterState
         }
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
-
         this.character.setCameraRelativeOrientationTarget();
-        this.character.update(timeStep);
-
         if (this.animationEnded(timeStep))
         {
             this.character.setState(Idle);
         }
-
         this.fallInAir();
     }
 
-    public changeState(): void
+    public onInputChange(): void
     {
 
         if (this.justPressed(this.character.controls.jump))

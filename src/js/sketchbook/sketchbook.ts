@@ -9,14 +9,10 @@ export const GameModes = {
     FreeCameraControls,
 };
 
-import { AIBase } from './characters/character_ai/AIBase';
 import { FollowCharacter } from './characters/character_ai/FollowCharacter';
-import { NoBehaviour } from './characters/character_ai/NoBehaviour';
 import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
 export const CharacterAI = {
-    AIBase,
     FollowCharacter,
-    NoBehaviour,
     RandomBehaviour,
 };
 
@@ -37,7 +33,7 @@ import * as statesLibrary from './characters/character_states/_stateLibrary';
 export const CharacterStates = statesLibrary;
 
 export { Character } from "./characters/Character";
-export { Controls } from "./core/Controls";
+export { InputController } from "./core/InputController";
 export { SBObject } from "./objects/Object";
 export { World } from "./core/World";
 

@@ -5,10 +5,11 @@ import
     JumpRunning,
     Walk,
 } from './_stateLibrary';
+import { Character } from '../Character';
 
 export class Sprint extends CharacterStateBase
 {
-    constructor(character)
+    constructor(character: Character)
     {
         super(character);
 
@@ -20,17 +21,14 @@ export class Sprint extends CharacterStateBase
         this.character.setAnimation('sprint', 0.1);
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
-
         this.character.setCameraRelativeOrientationTarget();
-        this.character.update(timeStep);
-
         this.fallInAir();
     }
 
-    public changeState(): void
+    public onInputChange(): void
     {
         if (this.justReleased(this.character.controls.run))
         {

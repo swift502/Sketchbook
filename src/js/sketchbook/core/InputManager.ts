@@ -1,19 +1,21 @@
+import { World } from "./World";
+
 export class InputManager
 {
-    world: any;
-    domElement: any;
-    pointerLock: any;
-    isLocked: boolean;
-    boundOnMouseDown: (evt: any) => void;
-    boundOnMouseMove: (evt: any) => void;
-    boundOnMouseUp: (evt: any) => void;
-    boundOnMouseWheelMove: (evt: any) => void;
-    boundOnPointerlockChange: (evt: any) => void;
-    boundOnPointerlockError: (evt: any) => void;
-    boundOnKeyDown: (evt: any) => void;
-    boundOnKeyUp: (evt: any) => void;
+    public world: any;
+    public domElement: any;
+    public pointerLock: any;
+    public isLocked: boolean;
+    public boundOnMouseDown: (evt: any) => void;
+    public boundOnMouseMove: (evt: any) => void;
+    public boundOnMouseUp: (evt: any) => void;
+    public boundOnMouseWheelMove: (evt: any) => void;
+    public boundOnPointerlockChange: (evt: any) => void;
+    public boundOnPointerlockError: (evt: any) => void;
+    public boundOnKeyDown: (evt: any) => void;
+    public boundOnKeyUp: (evt: any) => void;
     
-    constructor(world, domElement)
+    constructor(world: World, domElement)
     {
         this.world = world;
         this.domElement = domElement || document.body;
@@ -22,18 +24,18 @@ export class InputManager
         
         // Bindings for later event use
         // Mouse
-        this.boundOnMouseDown = evt => this.onMouseDown(evt);
-        this.boundOnMouseMove = evt => this.onMouseMove(evt);
-        this.boundOnMouseUp = evt => this.onMouseUp(evt);
-        this.boundOnMouseWheelMove = evt => this.onMouseWheelMove(evt);
+        this.boundOnMouseDown = (evt) => this.onMouseDown(evt);
+        this.boundOnMouseMove = (evt) => this.onMouseMove(evt);
+        this.boundOnMouseUp = (evt) => this.onMouseUp(evt);
+        this.boundOnMouseWheelMove = (evt) => this.onMouseWheelMove(evt);
 
         // Pointer lock
-        this.boundOnPointerlockChange = evt => this.onPointerlockChange(evt);
-        this.boundOnPointerlockError = evt => this.onPointerlockError(evt);
+        this.boundOnPointerlockChange = (evt) => this.onPointerlockChange(evt);
+        this.boundOnPointerlockError = (evt) => this.onPointerlockError(evt);
 
         // Keys
-        this.boundOnKeyDown = evt => this.onKeyDown(evt);
-        this.boundOnKeyUp = evt => this.onKeyUp(evt);
+        this.boundOnKeyDown = (evt) => this.onKeyDown(evt);
+        this.boundOnKeyUp = (evt) => this.onKeyUp(evt);
 
         // Init event listeners
         // Mouse
@@ -47,12 +49,12 @@ export class InputManager
         document.addEventListener("keyup", this.boundOnKeyUp, false);
     }
 
-    setPointerLock(enabled)
+    public setPointerLock(enabled: boolean): void
     {
         this.pointerLock = enabled;
     }
 
-    onPointerlockChange(event)
+    public onPointerlockChange(event: MouseEvent): void
     {
         if (document.pointerLockElement === this.domElement)
         {
@@ -68,12 +70,12 @@ export class InputManager
         }
     }
 
-    onPointerlockError(event)
+    public onPointerlockError(event: MouseEvent): void
     {
         console.error("PointerLockControls: Unable to use Pointer Lock API");
     }
 
-    onMouseDown(event)
+    public onMouseDown(event: MouseEvent): void
     {
         if (this.pointerLock)
         {
@@ -87,11 +89,11 @@ export class InputManager
 
         if (this.world.gameMode !== undefined)
         {
-            this.world.gameMode.handleAction(event, 'mouse' + event.button, true);
+            this.world.gameMode.handleKey(event, 'mouse' + event.button, true);
         }
     }
 
-    onMouseMove(event)
+    public onMouseMove(event: MouseEvent): void
     {
         if (this.world.gameMode !== undefined)
         {
@@ -99,7 +101,7 @@ export class InputManager
         }
     }
 
-    onMouseUp(event)
+    public onMouseUp(event: MouseEvent): void
     {
         if (!this.pointerLock)
         {
@@ -109,27 +111,28 @@ export class InputManager
 
         if (this.world.gameMode !== undefined)
         {
-            this.world.gameMode.handleAction(event, 'mouse' + event.button, false);
+            this.world.gameMode.handleKey(event, 'mouse' + event.button, false);
         }
     }
 
-    onKeyDown(event)
+    public onKeyDown(event: KeyboardEvent): void
     {
         if (this.world.gameMode !== undefined)
         {
-            this.world.gameMode.handleAction(event, event.keyCode, true);
+            this.world.gameMode.handleKey(event, event.code, true);
         }
     }
 
-    onKeyUp(event)
+    public onKeyUp(event: KeyboardEvent): void
     {
         if (this.world.gameMode !== undefined)
         {
-            this.world.gameMode.handleAction(event, event.keyCode, false);
+            console.log(event);
+            this.world.gameMode.handleKey(event, event.code, false);
         }
     }
 
-    onMouseWheelMove(event)
+    public onMouseWheelMove(event: WheelEvent): void
     {
         if (this.world.gameMode !== undefined)
         {

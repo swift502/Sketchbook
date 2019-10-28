@@ -15,7 +15,7 @@ import {
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
 
-export class CharacterStateBase implements ICharacterState
+export abstract class CharacterStateBase implements ICharacterState
 {
     public character: Character;
     public timer: number;
@@ -42,7 +42,7 @@ export class CharacterStateBase implements ICharacterState
         this.timer += timeStep;
     }
 
-    public changeState(): void {
+    public onInputChange(): void {
         return;
     }
 

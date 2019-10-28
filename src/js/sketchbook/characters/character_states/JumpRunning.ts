@@ -4,12 +4,13 @@ import
     Falling,
 } from './_stateLibrary';
 import { ICharacterState } from '../../interfaces/ICharacterState';
+import { Character } from '../Character';
 
 export class JumpRunning extends CharacterStateBase implements ICharacterState
 {
     private alreadyJumped: boolean;
 
-    constructor(character)
+    constructor(character: Character)
     {
         super(character);
 
@@ -18,7 +19,7 @@ export class JumpRunning extends CharacterStateBase implements ICharacterState
         this.alreadyJumped = false;
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
 
@@ -29,8 +30,6 @@ export class JumpRunning extends CharacterStateBase implements ICharacterState
         {
             this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
         }
-        this.character.update(timeStep);
-
         // Physically jump
         if (this.timer > 0.14 && !this.alreadyJumped)
         {

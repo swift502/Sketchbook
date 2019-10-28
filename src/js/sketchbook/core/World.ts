@@ -249,11 +249,11 @@ export class World
 
         // Changing time scale with scroll wheel
         this.timeScaleTarget = 1;
-        this.cameraDistanceTarget = 1.6;
+        this.cameraDistanceTarget = 1.8;
 
         //#endregion
 
-        //Initialization
+        // Initialization
         this.balls = [];
         this.objects = [];
         this.characters = [];
@@ -287,7 +287,7 @@ export class World
         // Characters
         this.characters.forEach(char =>
         {
-            char.behaviour.update(timeStep);
+            char.update(timeStep);
             char.updateMatrixWorld();
         });
 
@@ -303,8 +303,6 @@ export class World
 
     updatePhysics(timeStep)
     {
-        
-
         // Step the physics world
         this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
 

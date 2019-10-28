@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../simulation/SimulationFrame';
 
-export function createCapsuleGeometry(radius = 1, height = 2, N = 32)
+export function createCapsuleGeometry(radius = 1, height = 2, N = 32): THREE.Geometry
 {
     const geometry = new THREE.Geometry();
     const TWOPI = Math.PI * 2;
@@ -63,38 +63,38 @@ export function createCapsuleGeometry(radius = 1, height = 2, N = 32)
                 (i + 1) * (N + 1) + j
             );
 
-            if (i == N / 4)
+            if (i === N / 4)
             {
-                let face_1 = new THREE.Face3(vec.x, vec.y, vec.z, [ //ok
+                let face1 = new THREE.Face3(vec.x, vec.y, vec.z, [
                     normals[vec.x],
                     normals[vec.y],
                     normals[vec.z]
                 ]);
 
-                let face_2 = new THREE.Face3(vec.x, vec.z, vec.w, [
+                let face2 = new THREE.Face3(vec.x, vec.z, vec.w, [
                     normals[vec.x],
                     normals[vec.z],
                     normals[vec.w]
                 ]);
 
-                geometry.faces.push(face_2);
-                geometry.faces.push(face_1);
+                geometry.faces.push(face2);
+                geometry.faces.push(face1);
             } else
             {
-                let face_1 = new THREE.Face3(vec.x, vec.y, vec.z, [
+                let face1 = new THREE.Face3(vec.x, vec.y, vec.z, [
                     normals[vec.x],
                     normals[vec.y],
                     normals[vec.z]
                 ]);
 
-                let face_2 = new THREE.Face3(vec.x, vec.z, vec.w, [
+                let face2 = new THREE.Face3(vec.x, vec.z, vec.w, [
                     normals[vec.x],
                     normals[vec.z],
                     normals[vec.w]
                 ]);
 
-                geometry.faces.push(face_1);
-                geometry.faces.push(face_2);
+                geometry.faces.push(face1);
+                geometry.faces.push(face2);
             }
         }
         // if(i==(N/4)) break; // N/4 is when the center segments are solved
@@ -118,7 +118,7 @@ export function createCapsuleGeometry(radius = 1, height = 2, N = 32)
  * @param {Vector3} a Vector to construct 2D matrix from
  * @param {Vector3} b Vector to apply basis to
  */
-export function appplyVectorMatrixXZ(a, b)
+export function appplyVectorMatrixXZ(a, b): THREE.Vector3
 {
     return new THREE.Vector3(
         (a.x * b.z + a.z * b.x),
@@ -127,12 +127,12 @@ export function appplyVectorMatrixXZ(a, b)
     );
 }
 
-export function round(number: number, decimals: number = 0): number
+export function round(value: number, decimals: number = 0): number
 {
-    return Math.round(number * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 
-export function roundVector(vector: THREE.Vector3, decimals: number = 0)
+export function roundVector(vector: THREE.Vector3, decimals: number = 0): THREE.Vector3
 {
     return new THREE.Vector3(
         this.round(vector.x, decimals),
@@ -146,20 +146,20 @@ export function roundVector(vector: THREE.Vector3, decimals: number = 0)
  * @param {THREE.Vector3} v1 
  * @param {THREE.Vector3} v2 
  */
-export function getAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, dot_treshold: number = 0.0005)
+export function getAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, dotTreshold: number = 0.0005): number
 {
-    let angle;
+    let angle: number;
     let dot = v1.dot(v2);
 
     // If dot is close to 1, we'll round angle to zero
-    if (dot > 1 - dot_treshold)
+    if (dot > 1 - dotTreshold)
     {
         angle = 0;
     }
     else
     {
         // Dot too close to -1
-        if (dot < -1 + dot_treshold)
+        if (dot < -1 + dotTreshold)
         {
             angle = Math.PI / 2;
         }
@@ -175,13 +175,10 @@ export function getAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, dot
 
 /**
  * Finds an angle between two vectors with a sign relative to normal vector
- * @param {THREE.Vector3} v1 
- * @param {THREE.Vector3} v2 
- * @param {THREE.Vector3} normal Normal vector of the plane created by v1 and v2, independent of the order of v1 and v2
  */
-export function getSignedAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, normal = new THREE.Vector3(0, 1, 0), dot_treshold: number = 0.0005)
+export function getSignedAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, normal = new THREE.Vector3(0, 1, 0), dotTreshold: number = 0.0005): number
 {
-    let angle = this.getAngleBetweenVectors(v1, v2, dot_treshold);
+    let angle = this.getAngleBetweenVectors(v1, v2, dotTreshold);
 
     // Get vector pointing up or down
     let cross = new THREE.Vector3().crossVectors(v1, v2);
@@ -208,21 +205,7 @@ export function haveDifferentSigns(n1: number, n2: number): boolean
 
 //#region Miscellaneous
 
-export function createArray(length)
-{
-    let arr = new Array(length || 0),
-        i = length;
-
-    if (arguments.length > 1)
-    {
-        let args = Array.prototype.slice.call(arguments, 1);
-        while (i--) arr[length - 1 - i] = this.createArray.apply(this, args);
-    }
-
-    return arr;
-}
-
-export function setDefaults(options, defaults)
+export function setDefaults(options: {}, defaults: {}): {}
 {
     return _.defaults({}, _.clone(options), defaults);
 }
@@ -234,7 +217,7 @@ export function getGlobalProperties(prefix: string = ''): any[]
     for (let prop in global)
     {
         // check the prefix
-        if (prop.indexOf(prefix) == 0) {
+        if (prop.indexOf(prefix) === 0) {
             keyValues.push(prop /*+ "=" + global[prop]*/);
         }
     }
@@ -253,7 +236,7 @@ export function spring(source: number, dest: number, velocity: number, mass: num
     return new SimulationFrame(position, velocity);
 }
 
-export function springV(source, dest, velocity, mass, damping): void
+export function springV(source: THREE.Vector3, dest: THREE.Vector3, velocity: THREE.Vector3, mass: number, damping: number): void
 {
     let acceleration = new THREE.Vector3().subVectors(dest, source);
     acceleration.divideScalar(mass);
@@ -261,3 +244,9 @@ export function springV(source, dest, velocity, mass, damping): void
     velocity.multiplyScalar(damping);
     source.add(velocity);
 }
+
+export class GroundImpactData {
+    public velocity: THREE.Vector3 = new THREE.Vector3();
+}
+
+//#endregion

@@ -9,10 +9,11 @@ import
     Sprint,
     Walk,
 } from './_stateLibrary';
+import { Character } from '../Character';
 
 export class StartWalkBase extends CharacterStateBase
 {
-    constructor(character)
+    constructor(character: Character)
     {
         super(character);
 
@@ -52,12 +53,10 @@ export class StartWalkBase extends CharacterStateBase
 
         // this.character.setArcadeVelocity(directionVector.z * 0.8, directionVector.x * 0.8);
 
-        this.character.update(timeStep);
-
         this.fallInAir();
     }
 
-    public changeState(): void
+    public onInputChange(): void
     {
         if (this.justPressed(this.character.controls.jump))
         {

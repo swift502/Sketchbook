@@ -1,22 +1,23 @@
 import * as THREE from 'three';
-import * as CANNON from'cannon';
+import * as CANNON from 'cannon';
 import { GameModesBase } from './GameModesBase';
 import * as _ from 'lodash';
 import { SBObject } from '../objects/Object';
 import { FreeCameraControls } from './FreeCameraControls';
 import { SpherePhysics } from '../objects/object_physics/SpherePhysics';
+import { IGameMode } from '../interfaces/IGameMode';
+import { Character } from '../characters/Character';
 
 /**
  * Character controls game mode. Allows player to control a character.
  * @param {Character} character Character to control 
  */
-export class CharacterControls extends GameModesBase
+export class CharacterControls extends GameModesBase implements IGameMode
 {
-    character: any;
-    keymap: any;
-    world: any;
+    public character: any;
+    public keymap: any;
 
-    constructor(character)
+    constructor(character: Character)
     {
         super();
 
@@ -24,22 +25,20 @@ export class CharacterControls extends GameModesBase
 
         // Keymap
         this.keymap = {
-            '87': { action: 'up' },
-            '83': { action: 'down' },
-            '65': { action: 'left' },
-            '68': { action: 'right' },
-            '16': { action: 'run' },
-            '32': { action: 'jump' },
-            '69': { action: 'use' },
-            // Mouse events are generated in the input manager
-            // 'mouse' + event.button
-            'mouse0': { action: 'primary' },
-            'mouse1': { action: 'secondary' },
-            'mouse2': { action: 'tertiary' }
+            'KeyW': { action: 'up' },
+            'KeyS': { action: 'down' },
+            'KeyA': { action: 'left' },
+            'KeyD': { action: 'right' },
+            'ShiftLeft': { action: 'run' },
+            'Space': { action: 'jump' },
+            'KeyE': { action: 'use' },
+            'Mouse0': { action: 'primary' },
+            'Mouse1': { action: 'secondary' },
+            'Mouse2': { action: 'tertiary' }
         };
     }
 
-    init()
+    public init(): void
     {
         this.checkIfWorldIsSet();
 
@@ -51,33 +50,31 @@ export class CharacterControls extends GameModesBase
     /**
      * Handles game keys based on supplied inputs.
      * @param {*} event Keyboard or mouse event
-     * @param {char} key Key or button pressed
-     * @param {boolean} value Value to be assigned to action
+     * @param {char} code Key or button pressed
+     * @param {boolean} pressed Value to be assigned to action
      */
-    handleAction(event, key, value)
+    public handleKey(event: KeyboardEvent, code: string, pressed: boolean): void
     {
+        this.timescaleSwitch(code, pressed);
 
-        super.handleAction(event, key, value);
-
-        if(key == '86' && value == true)
+        if (code === 'KeyC' && pressed === true)
         {
-            if(this.world.cameraDistanceTarget > 1.8)
+            if (this.world.cameraDistanceTarget > 1.8)
             {
-                this.world.cameraDistanceTarget = 1.1;
+                this.world.cameraDistanceTarget = 1.3;
             }
-            else if(this.world.cameraDistanceTarget > 1.3)
+            else if (this.world.cameraDistanceTarget > 1.3)
             {
-                this.world.cameraDistanceTarget = 2.1;
+                this.world.cameraDistanceTarget = 2.3;
             }
-            else if(this.world.cameraDistanceTarget > 0)
+            else if (this.world.cameraDistanceTarget > 0)
             {
-                this.world.cameraDistanceTarget = 1.6;
+                this.world.cameraDistanceTarget = 1.8;
             }
         }
-        else if(key == '70' && value == true) 
+        else if (code === 'KeyF' && pressed === true) 
         {
-            let forward_three = new THREE.Vector3().copy(this.character.orientation);
-            let forward = new CANNON.Vec3(forward_three.x, forward_three.y, forward_three.z);
+            let forward = new CANNON.Vec3().copy(this.character.orientation);
             let ball = new SBObject();
             ball.setPhysics(new SpherePhysics({
                 mass: 1,
@@ -89,39 +86,39 @@ export class CharacterControls extends GameModesBase
 
             this.world.balls.push(ball);
 
-            if(this.world.balls.length > 10)
+            if (this.world.balls.length > 10)
             {
                 this.world.remove(this.world.balls[0]);
                 _.pull(this.world.balls, this.world.balls[0]);
             }
         }
 
-        //Free cam
-        if (key == '67' && value == true && event.shiftKey == true)
+        // Free cam
+        if (code === 'KeyC' && pressed === true && event.shiftKey === true)
         {
             this.character.resetControls();
             this.world.setGameMode(new FreeCameraControls(this));
         }
         // Is key bound to action
-        if (key in this.keymap)
+        if (code in this.keymap)
         {
-            this.character.setControl(this.keymap[key].action, value);
+            this.character.setControl(this.keymap[code].action, pressed);
         }
     }
 
-    handleScroll(event, value)
+    public handleScroll(event: WheelEvent, value: number): void
     {
         this.scrollTheTimeScale(value);
     }
 
-    handleMouseMove(event, deltaX, deltaY)
+    public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
     {
         this.world.cameraController.move(deltaX, deltaY);
     }
 
-    update()
+    public update(): void
     {
-        if(!_.includes(this.world.characters, this.character))
+        if (!_.includes(this.world.characters, this.character))
         {
             this.world.setGameMode(new FreeCameraControls());
         }

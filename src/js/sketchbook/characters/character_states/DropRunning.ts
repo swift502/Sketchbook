@@ -7,10 +7,11 @@ import
     Walk,
 } from './_stateLibrary';
 import { ICharacterState } from '../../interfaces/ICharacterState';
+import { Character } from '../Character';
 
 export class DropRunning extends CharacterStateBase implements ICharacterState
 {
-    constructor(character)
+    constructor(character: Character)
     {
         super(character);
 
@@ -18,12 +19,11 @@ export class DropRunning extends CharacterStateBase implements ICharacterState
         this.animationLength = this.character.setAnimation('drop_running', 0.1);
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
 
         this.character.setCameraRelativeOrientationTarget();
-        this.character.update(timeStep);
 
         if (this.animationEnded(timeStep))
         {
@@ -31,7 +31,7 @@ export class DropRunning extends CharacterStateBase implements ICharacterState
         }
     }
 
-    public changeState(): void
+    public onInputChange(): void
     {
         if (this.noDirection())
         {

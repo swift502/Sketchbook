@@ -5,10 +5,11 @@ import
     Walk,
 } from './_stateLibrary';
 import { ICharacterState } from '../../interfaces/ICharacterState';
+import { Character } from '../Character';
 
 export class Idle extends CharacterStateBase implements ICharacterState
 {
-    constructor(character)
+    constructor(character: Character)
     {
         super(character);
 
@@ -19,15 +20,13 @@ export class Idle extends CharacterStateBase implements ICharacterState
         this.character.setAnimation('idle', 0.1);
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
         super.update(timeStep);
 
-        this.character.update(timeStep);
-
         this.fallInAir();
     }
-    public changeState(): void
+    public onInputChange(): void
     {
         if (this.justPressed(this.character.controls.jump))
         {

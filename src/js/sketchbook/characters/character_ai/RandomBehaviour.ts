@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import { AIBase } from './AIBase';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
+import { Character } from '../Character';
+import { CharacterAIBase } from './CharacterAIBase';
 
-export class RandomBehaviour extends AIBase implements ICharacterAI
+export class RandomBehaviour extends CharacterAIBase implements ICharacterAI
 {
     private randomFrequency: number;
 
@@ -12,10 +13,8 @@ export class RandomBehaviour extends AIBase implements ICharacterAI
         this.randomFrequency = randomFrequency;
     }
 
-    public update(timeStep): void
+    public update(timeStep: number): void
     {
-        super.update(timeStep);
-
         let rndInt = Math.floor(Math.random() * this.randomFrequency);
         let rndBool = Math.random() > 0.5 ? true : false;
 
@@ -39,7 +38,5 @@ export class RandomBehaviour extends AIBase implements ICharacterAI
         {
             this.character.setControl('jump', rndBool);
         }
-
-        this.updateCharacter(timeStep);
     }
 }

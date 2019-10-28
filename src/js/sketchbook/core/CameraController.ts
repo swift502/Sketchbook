@@ -2,17 +2,17 @@ import * as THREE from 'three';
 
 export class CameraController
 {
-    camera: any;
-    target: THREE.Vector3;
-    sensitivity: THREE.Vector2;
-    radius: number;
-    theta: number;
-    phi: number;
-    onMouseDownPosition: THREE.Vector2;
-    onMouseDownTheta: any;
-    onMouseDownPhi: any;
+    public camera: any;
+    public target: THREE.Vector3;
+    public sensitivity: THREE.Vector2;
+    public radius: number;
+    public theta: number;
+    public phi: number;
+    public onMouseDownPosition: THREE.Vector2;
+    public onMouseDownTheta: any;
+    public onMouseDownPhi: any;
     
-    constructor(camera, sensitivityX = 1, sensitivityY = sensitivityX)
+    constructor(camera: THREE.Camera, sensitivityX = 1, sensitivityY = sensitivityX)
     {
         this.camera = camera;
         this.target = new THREE.Vector3();
@@ -27,17 +27,17 @@ export class CameraController
         this.onMouseDownPhi = this.phi;
     }
 
-    setSensitivity(sensitivityX, sensitivityY = sensitivityX)
+    public setSensitivity(sensitivityX: number, sensitivityY: number = sensitivityX): void
     {
         this.sensitivity = new THREE.Vector2(sensitivityX, sensitivityY);
     }
 
-    setRadius(value)
+    public setRadius(value: number): void
     {
         this.radius = Math.max(0.001, value);
     }
 
-    move(deltaX, deltaY)
+    public move(deltaX: number, deltaY: number): void
     {
         this.theta -= deltaX * this.sensitivity.x;
         this.theta %= 720;
@@ -45,7 +45,7 @@ export class CameraController
         this.phi = Math.min(170, Math.max(-170, this.phi));
     }
 
-    update()
+    public update(): void
     {
         this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
         this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 360);
