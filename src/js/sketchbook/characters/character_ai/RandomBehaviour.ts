@@ -22,21 +22,21 @@ export class RandomBehaviour extends CharacterAIBase implements ICharacterAI
         {
             this.character.setViewVector(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5));
 
-            this.character.triggerCharacterAction('up', true);
+            this.character.triggerAction('up', true);
             this.character.charState.update(timeStep);
-            this.character.triggerCharacterAction('up', false);
+            this.character.triggerAction('up', false);
         }
         else if (rndInt === 1)
         {
-            this.character.triggerCharacterAction('up', rndBool);
+            this.character.triggerAction('up', rndBool);
         }
         else if (rndInt === 2)
         {
-            this.character.triggerCharacterAction('run', rndBool);
+            this.character.triggerAction('run', rndBool);
         }
         else if (rndInt === 3)
         {
-            this.character.triggerCharacterAction('jump', rndBool);
+            this.character.triggerAction('jump', rndBool);
         }
     }
 }

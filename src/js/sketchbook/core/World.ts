@@ -14,9 +14,7 @@ import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
 import * as _ from 'lodash';
 import { InputManager } from './InputManager';
-import { FreeCameraControls } from '../game_modes/FreeCameraControls';
 import { SBObject } from '../objects/SBObject';
-import { IGameMode } from '../interfaces/IGameMode';
 import { Character } from '../characters/Character';
 
 export class World
@@ -47,7 +45,7 @@ export class World
     public cameraDistanceTarget: number;
     public balls: any[];
     public vehicles: any[];
-    public gameMode: IGameMode;
+    // public gameMode: IGameMode;
 
     constructor()
     {
@@ -254,19 +252,19 @@ export class World
         this.objects = [];
         this.characters = [];
         this.vehicles = [];
-        this.cameraController = new CameraController(this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.7);
+        this.cameraController = new CameraController(this, this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.7);
         this.inputManager = new InputManager(this, this.renderer.domElement);
-        this.setGameMode(new FreeCameraControls());
+        // this.setGameMode(new FreeCameraControls());
 
         this.render(this);
     }
 
-    public setGameMode(gameMode: IGameMode): void
-    {
-        gameMode.world = this;
-        this.gameMode = gameMode;
-        gameMode.init();
-    }
+    // public setGameMode(gameMode: IGameMode): void
+    // {
+    //     gameMode.world = this;
+    //     this.gameMode = gameMode;
+    //     gameMode.init();
+    // }
 
     // Update
     // Handles all logic updates.
@@ -287,11 +285,11 @@ export class World
             char.updateMatrixWorld();
         });
 
-        this.gameMode.update(timeStep);
+        // this.gameMode.update(timeStep);
+        this.inputManager.update(timeStep);
 
         // Lerp parameters
         this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
-        this.cameraController.radius = THREE.Math.lerp(this.cameraController.radius, this.cameraDistanceTarget, 0.1);
 
         // Rotate and position camera
         this.cameraController.update();
@@ -394,6 +392,26 @@ export class World
         else
         {
             console.error('Object type not supported: ' + (typeof object));
+        }
+    }
+
+    public scrollTheTimeScale(scrollAmount: number): void
+    {
+        // Changing time scale with scroll wheel
+        const timeScaleBottomLimit = 0.003;
+        const timeScaleChangeSpeed = 1.3;
+    
+        if (scrollAmount > 0)
+        {
+            this.timeScaleTarget /= timeScaleChangeSpeed;
+            if (this.timeScaleTarget < timeScaleBottomLimit) this.timeScaleTarget = 0;
+        }
+        else
+        {
+            this.timeScaleTarget *= timeScaleChangeSpeed;
+            if (this.timeScaleTarget < timeScaleBottomLimit) this.timeScaleTarget = timeScaleBottomLimit;
+            this.timeScaleTarget = Math.min(this.timeScaleTarget, 1);
+            if (this.params.Time_Scale > 0.9) this.params.Time_Scale *= timeScaleChangeSpeed;
         }
     }
 }

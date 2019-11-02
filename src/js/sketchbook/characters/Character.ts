@@ -4,18 +4,18 @@ import * as _ from 'lodash';
 
 import * as Utils from '../core/Utilities';
 
-import { InputController } from '../core/InputController';
+import { KeyBinding } from '../core/KeyBinding';
 import { SBObject } from '../objects/SBObject';
 import { VectorSpringSimulator } from '../simulation/VectorSpringSimulator';
 import { RelativeSpringSimulator } from '../simulation/RelativeSpringSimulator';
-import { CharacterControls } from '../game_modes/CharacterControls';
 import { Idle } from './character_states/Idle';
 import { CapsulePhysics } from '../objects/object_physics/CapsulePhysics';
-import { ICharacterState } from '../interfaces/ICharacterState';
 import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
+import { IControllable } from '../interfaces/IControllable';
+import { ICharacterState } from '../interfaces/ICharacterState';
 
-export class Character extends THREE.Object3D
+export class Character extends THREE.Object3D implements IControllable
 {
     public isCharacter: boolean = true;
     public height: number = 1;
@@ -44,7 +44,7 @@ export class Character extends THREE.Object3D
     public defaultRotationSimulatorMass: number = 10;
     public rotationSimulator: RelativeSpringSimulator;
     public viewVector: THREE.Vector3;
-    public actions: any;
+    public actions: { [action: string]: KeyBinding };
     public characterCapsule: SBObject;
 
     // Ray casting
@@ -56,10 +56,13 @@ export class Character extends THREE.Object3D
     public initJumpSpeed: number = -1;
     public groundImpactData: Utils.GroundImpactData = new Utils.GroundImpactData();
 
+    public controllingCharacter: Character;
+    public controlledObject: IControllable;
+
     public raycastBox: THREE.Mesh;
-    public charState: any;
-    public behaviour: any;
-    public world: any;
+    public charState: ICharacterState;
+    public behaviour: ICharacterAI;
+    public world: World;
     public character: any;
     
     constructor(options: {})
@@ -107,19 +110,18 @@ export class Character extends THREE.Object3D
         this.setState(Idle);
         this.viewVector = new THREE.Vector3();
 
-        // Controls
+        // Actions
         this.actions = {
-            up: new InputController(),
-            down: new InputController(),
-            left: new InputController(),
-            right: new InputController(),
-            run: new InputController(),
-            jump: new InputController(),
-            use: new InputController(),
-            primary: new InputController(),
-            secondary: new InputController(),
-            tertiary: new InputController(),
-            lastControl: new InputController()
+            'up': new KeyBinding('KeyW'),
+            'down': new KeyBinding('KeyS'),
+            'left': new KeyBinding('KeyA'),
+            'right': new KeyBinding('KeyD'),
+            'run': new KeyBinding('ShiftLeft'),
+            'jump': new KeyBinding('Space'),
+            'use': new KeyBinding('KeyE'),
+            'primary': new KeyBinding('Mouse0'),
+            'secondary': new KeyBinding('Mouse1'),
+            'camera':  new KeyBinding('KeyC'),
         };
 
         // Physics
@@ -228,37 +230,73 @@ export class Character extends THREE.Object3D
         this.behaviour = behaviour;
     }
 
-    public triggerCharacterAction(actionName: string, value: boolean): void
+    public handleKey(code: string, pressed: boolean): void
     {
-        // Get action and set it's parameters
-        let action = this.actions[actionName];
-
-        if (action.value !== value)
+        if (this.controlledObject !== undefined)
         {
-            // Set value
-            action.value = value;
-
-            // Set the 'just' attributes
-            if (value) action.justPressed = true;
-            else action.justReleased = true;
-
-            // Tag control as last activated
-            this.actions.lastControl = action;
-
-            // Tell player to handle states according to new input
-            this.charState.onInputChange();
-
-            // Reset the 'just' attributes
-            action.justPressed = false;
-            action.justReleased = false;
+            this.controlledObject.handleKey(code, pressed);
         }
+        else
+        {
+            for (const action in this.actions) {
+                if (this.actions.hasOwnProperty(action)) {
+                    const binding = this.actions[action];
+
+                    if (code === binding.keyCode)
+                    {
+                        this.triggerAction(action, pressed);
+                    }
+                }
+            }
+        }
+    }
+
+    public handleScroll(value: number): void
+    {
+        this.world.scrollTheTimeScale(value);
+    }
+
+    public handleMouseMove(deltaX: number, deltaY: number): void
+    {
+        this.world.cameraController.move(deltaX, deltaY);
+    }
+
+    public triggerAction(actionName: string, value: boolean): void
+    {
+        if (actionName === 'camera' && value === true/* && event.shiftKey === true*/)
+        {
+            this.resetControls();
+            this.world.inputManager.setInputReceiver(this.world.cameraController);
+        }
+        else {
+            // Get action and set it's parameters
+            let action = this.actions[actionName];
+
+            if (action.value !== value)
+            {
+                // Set value
+                action.value = value;
+
+                // Set the 'just' attributes
+                if (value) action.justPressed = true;
+                else action.justReleased = true;
+
+                // Tell player to handle states according to new input
+                this.charState.onInputChange();
+
+                // Reset the 'just' attributes
+                action.justPressed = false;
+                action.justReleased = false;
+            }
+        }
+        
     }
 
     public takeControl(): void
     {
         if (this.world !== undefined)
         {
-            this.world.setGameMode(new CharacterControls(this));
+            this.world.inputManager.setInputReceiver(this);
         }
         else
         {
@@ -268,16 +306,11 @@ export class Character extends THREE.Object3D
 
     public resetControls(): void
     {
-        this.triggerCharacterAction('up', false);
-        this.triggerCharacterAction('down', false);
-        this.triggerCharacterAction('left', false);
-        this.triggerCharacterAction('right', false);
-        this.triggerCharacterAction('run', false);
-        this.triggerCharacterAction('jump', false);
-        this.triggerCharacterAction('use', false);
-        this.triggerCharacterAction('primary', false);
-        this.triggerCharacterAction('secondary', false);
-        this.triggerCharacterAction('tertiary', false);
+        for (const action in this.actions) {
+            if (this.actions.hasOwnProperty(action)) {
+                this.triggerAction(action, false);
+            }
+        }
     }
 
     public update(timeStep: number, options: {} = {}): void
@@ -309,6 +342,31 @@ export class Character extends THREE.Object3D
             this.characterCapsule.physics.physical.interpolatedPosition.x,
             this.characterCapsule.physics.physical.interpolatedPosition.y - this.height / 2,
             this.characterCapsule.physics.physical.interpolatedPosition.z
+        );
+    }
+
+    public inputReceiverInit(): void
+    {
+        this.world.cameraController.setRadius(1.6);
+        this.world.dirLight.target = this;
+    }
+
+    public inputReceiverUpdate(timeStep: number): void
+    {
+        // Look in camera's direction
+        this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
+
+        // Make light follow player (for shadows)
+        this.world.dirLight.position.set(
+            this.position.x + this.world.sun.x * 15,
+            this.position.y + this.world.sun.y * 15,
+            this.position.z + this.world.sun.z * 15);
+
+        // Position camera
+        this.world.cameraController.target.set(
+            this.position.x,
+            this.position.y + this.height / 1.7,
+            this.position.z
         );
     }
 
@@ -491,7 +549,7 @@ export class Character extends THREE.Object3D
             newVelocity.applyMatrix4(m);
 
             // Compensate for gravity
-            newVelocity.y -= this.world.gravity.y / this.character.world.physicsFrameRate;
+            // newVelocity.y -= this.world.physicsWorld.gravity.y / this.character.world.physicsFrameRate;
 
             // Apply velocity
             this.velocity.copy(newVelocity);
