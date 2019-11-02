@@ -45,7 +45,6 @@ export class World
     public cameraDistanceTarget: number;
     public balls: any[];
     public vehicles: any[];
-    // public gameMode: IGameMode;
 
     constructor()
     {
@@ -254,17 +253,9 @@ export class World
         this.vehicles = [];
         this.cameraController = new CameraController(this, this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.7);
         this.inputManager = new InputManager(this, this.renderer.domElement);
-        // this.setGameMode(new FreeCameraControls());
 
         this.render(this);
     }
-
-    // public setGameMode(gameMode: IGameMode): void
-    // {
-    //     gameMode.world = this;
-    //     this.gameMode = gameMode;
-    //     gameMode.init();
-    // }
 
     // Update
     // Handles all logic updates.
@@ -285,7 +276,6 @@ export class World
             char.updateMatrixWorld();
         });
 
-        // this.gameMode.update(timeStep);
         this.inputManager.update(timeStep);
 
         // Lerp parameters

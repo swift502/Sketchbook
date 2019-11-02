@@ -2,13 +2,6 @@ import "../../css/dat.gui.css";
 import "../../css/main.css";
 import * as THREEImport from "three";
 
-// import { CharacterControls } from './game_modes/CharacterControls';
-// import { FreeCameraControls } from './game_modes/FreeCameraControls';
-// export const GameModes = {
-//     CharacterControls,
-//     FreeCameraControls,
-// };
-
 import { FollowCharacter } from './characters/character_ai/FollowCharacter';
 import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
 export const CharacterAI = {

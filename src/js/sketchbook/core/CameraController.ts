@@ -17,7 +17,6 @@ export class CameraController implements IInputReceiver
     public onMouseDownPhi: any;
     public targetRadius: number = 1;
 
-    public previousGameMode: any;
     public movementSpeed: number;
     public actions: { [action: string]: KeyBinding };
 
