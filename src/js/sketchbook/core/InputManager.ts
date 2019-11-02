@@ -1,11 +1,14 @@
 import { World } from "./World";
+import { IInputReceiver } from "../interfaces/IInputReceiver";
 
 export class InputManager
 {
-    public world: any;
+    public world: World;
     public domElement: any;
     public pointerLock: any;
     public isLocked: boolean;
+    public inputReceiver: IInputReceiver;
+
     public boundOnMouseDown: (evt: any) => void;
     public boundOnMouseMove: (evt: any) => void;
     public boundOnMouseUp: (evt: any) => void;
@@ -49,6 +52,28 @@ export class InputManager
         document.addEventListener("keyup", this.boundOnKeyUp, false);
     }
 
+    public update(timestep: number): void
+    {
+        if (this.inputReceiver === undefined) 
+        {
+            if (this.world !== undefined && this.world.cameraController !== undefined)
+            {
+                this.setInputReceiver(this.world.cameraController);
+            }
+        }
+
+        if (this.inputReceiver !== undefined) 
+        {
+            this.inputReceiver.inputReceiverUpdate(timestep);
+        }
+    }
+
+    public setInputReceiver(receiver: IInputReceiver): void
+    {
+        this.inputReceiver = receiver;
+        this.inputReceiver.inputReceiverInit();
+    }
+
     public setPointerLock(enabled: boolean): void
     {
         this.pointerLock = enabled;
@@ -87,17 +112,17 @@ export class InputManager
             this.domElement.addEventListener("mouseup", this.boundOnMouseUp, false);
         }
 
-        if (this.world.gameMode !== undefined)
+        if (this.inputReceiver !== undefined)
         {
-            this.world.gameMode.handleKey(event, 'mouse' + event.button, true);
+            this.inputReceiver.handleKey('mouse' + event.button, true);
         }
     }
 
     public onMouseMove(event: MouseEvent): void
     {
-        if (this.world.gameMode !== undefined)
+        if (this.inputReceiver !== undefined)
         {
-            this.world.gameMode.handleMouseMove(event, event.movementX, event.movementY);
+            this.inputReceiver.handleMouseMove(event.movementX, event.movementY);
         }
     }
 
@@ -109,33 +134,33 @@ export class InputManager
             this.domElement.removeEventListener("mouseup", this.boundOnMouseUp, false);
         }
 
-        if (this.world.gameMode !== undefined)
+        if (this.inputReceiver !== undefined)
         {
-            this.world.gameMode.handleKey(event, 'mouse' + event.button, false);
+            this.inputReceiver.handleKey('mouse' + event.button, false);
         }
     }
 
     public onKeyDown(event: KeyboardEvent): void
     {
-        if (this.world.gameMode !== undefined)
+        if (this.inputReceiver !== undefined)
         {
-            this.world.gameMode.handleKey(event, event.code, true);
+            this.inputReceiver.handleKey(event.code, true);
         }
     }
 
     public onKeyUp(event: KeyboardEvent): void
     {
-        if (this.world.gameMode !== undefined)
+        if (this.inputReceiver !== undefined)
         {
-            this.world.gameMode.handleKey(event, event.code, false);
+            this.inputReceiver.handleKey(event.code, false);
         }
     }
 
     public onMouseWheelMove(event: WheelEvent): void
     {
-        if (this.world.gameMode !== undefined)
+        if (this.inputReceiver !== undefined)
         {
-            this.world.gameMode.handleScroll(event, event.deltaY);
+            this.inputReceiver.handleScroll(event.deltaY);
         }
     }
 }

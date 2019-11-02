@@ -23,12 +23,12 @@ export class FollowCharacter extends CharacterAIBase implements ICharacterAI
         // Follow character
         if (viewVector.length() > this.stopDistance)
         {
-            this.character.triggerCharacterAction('up', true);
+            this.character.triggerAction('up', true);
         }
         // Stand still
         else
         {
-            this.character.triggerCharacterAction('up', false);
+            this.character.triggerAction('up', false);
 
             // Look at character
             this.character.setOrientationTarget(viewVector);

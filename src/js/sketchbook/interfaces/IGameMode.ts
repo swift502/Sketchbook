@@ -1,12 +1,12 @@
-import { World } from "../core/World";
+// import { World } from "../core/World";
 
-export interface IGameMode {
+// export interface IGameMode {
 
-    world: World;
+//     world: World;
 
-    init(): void;
-    update(timeStep: number): void;
-    handleKey(event: KeyboardEvent, code: string, pressed: boolean): void;
-    handleScroll(event: WheelEvent, value: number): void;
-    handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void;
-}
+//     init(): void;
+//     update(timeStep: number): void;
+//     handleKey(event: KeyboardEvent, code: string, pressed: boolean): void;
+//     handleScroll(event: WheelEvent, value: number): void;
+//     handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void;
+// }

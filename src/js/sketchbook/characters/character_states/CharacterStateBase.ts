@@ -14,7 +14,7 @@ import {
 } from './_stateLibrary';
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
-import { InputController } from '../../core/InputController';
+import { KeyBinding } from '../../core/KeyBinding';
 
 export abstract class CharacterStateBase implements ICharacterState
 {
@@ -57,19 +57,19 @@ export abstract class CharacterStateBase implements ICharacterState
         return this.character.actions.up.value || this.character.actions.down.value || this.character.actions.left.value || this.character.actions.right.value;
     }
 
-    public justPressed(key: InputController): boolean
+    public justPressed(key: KeyBinding): boolean
     {
-        return this.character.actions.lastControl === key && key.justPressed;
+        return key.justPressed;
     }
 
-    public isPressed(key: InputController): boolean
+    public isPressed(key: KeyBinding): boolean
     {
         return key.value;
     }
 
-    public justReleased(key: InputController): boolean
+    public justReleased(key: KeyBinding): boolean
     {
-        return this.character.actions.lastControl === key && key.justReleased;
+        return key.justReleased;
     }
 
     public fallInAir(): void

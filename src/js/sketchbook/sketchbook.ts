@@ -2,12 +2,12 @@ import "../../css/dat.gui.css";
 import "../../css/main.css";
 import * as THREEImport from "three";
 
-import { CharacterControls } from './game_modes/CharacterControls';
-import { FreeCameraControls } from './game_modes/FreeCameraControls';
-export const GameModes = {
-    CharacterControls,
-    FreeCameraControls,
-};
+// import { CharacterControls } from './game_modes/CharacterControls';
+// import { FreeCameraControls } from './game_modes/FreeCameraControls';
+// export const GameModes = {
+//     CharacterControls,
+//     FreeCameraControls,
+// };
 
 import { FollowCharacter } from './characters/character_ai/FollowCharacter';
 import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
@@ -33,7 +33,7 @@ import * as statesLibrary from './characters/character_states/_stateLibrary';
 export const CharacterStates = statesLibrary;
 
 export { Character } from "./characters/Character";
-export { InputController } from "./core/InputController";
+export { KeyBinding as InputController } from "./core/KeyBinding";
 export { SBObject } from "./objects/SBObject";
 export { World } from "./core/World";
 
