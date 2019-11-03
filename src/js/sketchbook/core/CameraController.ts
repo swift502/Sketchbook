@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { World } from './World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
+import { Character } from '../characters/Character';
 
 export class CameraController implements IInputReceiver
 {
@@ -24,7 +25,9 @@ export class CameraController implements IInputReceiver
     public forwardVelocity: number = 0;
     public rightVelocity: number = 0;
 
-    constructor(world: World, camera: THREE.Camera, sensitivityX: number = 1, sensitivityY: number = sensitivityX)
+    public characterCaller: Character;
+
+    constructor(world: World, camera: THREE.Camera, sensitivityX: number = 1, sensitivityY: number = sensitivityX * 0.8)
     {
         this.world = world;
         this.camera = camera;
@@ -56,9 +59,13 @@ export class CameraController implements IInputReceiver
         this.sensitivity = new THREE.Vector2(sensitivityX, sensitivityY);
     }
 
-    public setRadius(value: number): void
+    public setRadius(value: number, instantly: boolean = false): void
     {
         this.targetRadius = Math.max(0.001, value);
+        if (instantly === true)
+        {
+            this.radius = value;
+        }
     }
 
     public move(deltaX: number, deltaY: number): void
@@ -80,7 +87,38 @@ export class CameraController implements IInputReceiver
         this.camera.lookAt(this.target);
     }
 
-    public handleKey(code: string, pressed: boolean): void
+    public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
+    {
+        // Free camera
+        if (code === 'KeyC' && pressed === true && event.shiftKey === true)
+        {
+            if (this.characterCaller !== undefined)
+            {
+                this.world.inputManager.setInputReceiver(this.characterCaller);
+                this.characterCaller = undefined;
+            }
+        }
+        else
+        {
+            for (const action in this.actions) {
+                if (this.actions.hasOwnProperty(action)) {
+                    const binding = this.actions[action];
+    
+                    if (code === binding.keyCode)
+                    {
+                        binding.value = pressed;
+                    }
+                }
+            }
+        }
+    }
+
+    public handleMouseWheel(event: WheelEvent, value: number): void
+    {
+        this.world.scrollTheTimeScale(value);
+    }
+
+    public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
     {
         for (const action in this.actions) {
             if (this.actions.hasOwnProperty(action)) {
@@ -94,12 +132,7 @@ export class CameraController implements IInputReceiver
         }
     }
 
-    public handleScroll(value: number): void
-    {
-        this.world.scrollTheTimeScale(value);
-    }
-
-    public handleMouseMove(deltaX: number, deltaY: number): void
+    public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
     {
         this.move(deltaX, deltaY);
     }
@@ -107,7 +140,7 @@ export class CameraController implements IInputReceiver
     public inputReceiverInit(): void
     {
         this.target.copy(this.camera.position);
-        this.setRadius(0);
+        this.setRadius(0, true);
         this.world.dirLight.target = this.world.camera;
     }
 

@@ -114,7 +114,7 @@ export class InputManager
 
         if (this.inputReceiver !== undefined)
         {
-            this.inputReceiver.handleKey('mouse' + event.button, true);
+            this.inputReceiver.handleMouseButton(event, 'mouse' + event.button, true);
         }
     }
 
@@ -122,7 +122,7 @@ export class InputManager
     {
         if (this.inputReceiver !== undefined)
         {
-            this.inputReceiver.handleMouseMove(event.movementX, event.movementY);
+            this.inputReceiver.handleMouseMove(event, event.movementX, event.movementY);
         }
     }
 
@@ -136,7 +136,7 @@ export class InputManager
 
         if (this.inputReceiver !== undefined)
         {
-            this.inputReceiver.handleKey('mouse' + event.button, false);
+            this.inputReceiver.handleMouseButton(event, 'mouse' + event.button, false);
         }
     }
 
@@ -144,7 +144,7 @@ export class InputManager
     {
         if (this.inputReceiver !== undefined)
         {
-            this.inputReceiver.handleKey(event.code, true);
+            this.inputReceiver.handleKeyboardEvent(event, event.code, true);
         }
     }
 
@@ -152,7 +152,7 @@ export class InputManager
     {
         if (this.inputReceiver !== undefined)
         {
-            this.inputReceiver.handleKey(event.code, false);
+            this.inputReceiver.handleKeyboardEvent(event, event.code, false);
         }
     }
 
@@ -160,7 +160,7 @@ export class InputManager
     {
         if (this.inputReceiver !== undefined)
         {
-            this.inputReceiver.handleScroll(event.deltaY);
+            this.inputReceiver.handleMouseWheel(event, event.deltaY);
         }
     }
 }

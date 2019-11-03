@@ -19,7 +19,7 @@ export class Character extends THREE.Object3D implements IControllable
 {
     public isCharacter: boolean = true;
     public height: number = 1;
-    public modelOffset: THREE.Vector3;
+    public modelOffset: THREE.Vector3 = new THREE.Vector3();
     public visuals: THREE.Group;
     public modelContainer: THREE.Group;
     public characterModel: THREE.Mesh;
@@ -63,7 +63,6 @@ export class Character extends THREE.Object3D implements IControllable
     public charState: ICharacterState;
     public behaviour: ICharacterAI;
     public world: World;
-    public character: any;
     
     constructor(options: {})
     {
@@ -71,13 +70,8 @@ export class Character extends THREE.Object3D implements IControllable
 
         let defaults = {
             position: new THREE.Vector3(),
-            height: 1
         };
         options = Utils.setDefaults(options, defaults);
-
-        // Geometry
-        this.height = options['height'];
-        this.modelOffset = new THREE.Vector3();
 
         // The visuals group is centered for easy character tilting
         this.visuals = new THREE.Group();
@@ -121,7 +115,6 @@ export class Character extends THREE.Object3D implements IControllable
             'use': new KeyBinding('KeyE'),
             'primary': new KeyBinding('Mouse0'),
             'secondary': new KeyBinding('Mouse1'),
-            'camera':  new KeyBinding('KeyC'),
         };
 
         // Physics
@@ -156,8 +149,8 @@ export class Character extends THREE.Object3D implements IControllable
         this.raycastBox.visible = false;
 
         // Physics pre/post step callback bindings
-        this.characterCapsule.physics.physical.preStep = this.physicsPreStep;
-        this.characterCapsule.physics.physical.postStep = this.physicsPostStep;
+        this.characterCapsule.physics.physical.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
+        this.characterCapsule.physics.physical.postStep = (body: CANNON.Body) => { this.physicsPostStep(body, this); };
     }
 
     public setAnimations(animations: []): void
@@ -230,11 +223,42 @@ export class Character extends THREE.Object3D implements IControllable
         this.behaviour = behaviour;
     }
 
-    public handleKey(code: string, pressed: boolean): void
+    public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
     {
         if (this.controlledObject !== undefined)
         {
-            this.controlledObject.handleKey(code, pressed);
+            this.controlledObject.handleKeyboardEvent(event, code, pressed);
+        }
+        else
+        {
+            // Free camera
+            if (code === 'KeyC' && pressed === true && event.shiftKey === true)
+            {
+                this.resetControls();
+                this.world.cameraController.characterCaller = this;
+                this.world.inputManager.setInputReceiver(this.world.cameraController);
+            }
+            else
+            {
+                for (const action in this.actions) {
+                    if (this.actions.hasOwnProperty(action)) {
+                        const binding = this.actions[action];
+    
+                        if (code === binding.keyCode)
+                        {
+                            this.triggerAction(action, pressed);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
+    {
+        if (this.controlledObject !== undefined)
+        {
+            this.controlledObject.handleMouseButton(event, code, pressed);
         }
         else
         {
@@ -251,45 +275,51 @@ export class Character extends THREE.Object3D implements IControllable
         }
     }
 
-    public handleScroll(value: number): void
+    public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
     {
-        this.world.scrollTheTimeScale(value);
+        if (this.controlledObject !== undefined)
+        {
+            this.controlledObject.handleMouseMove(event, deltaX, deltaY);
+        }
+        else
+        {
+            this.world.cameraController.move(deltaX, deltaY);
+        }
     }
-
-    public handleMouseMove(deltaX: number, deltaY: number): void
+    
+    public handleMouseWheel(event: WheelEvent, value: number): void
     {
-        this.world.cameraController.move(deltaX, deltaY);
+        if (this.controlledObject !== undefined)
+        {
+            this.controlledObject.handleMouseWheel(event, value);
+        }
+        else
+        {
+            this.world.scrollTheTimeScale(value);
+        }
     }
 
     public triggerAction(actionName: string, value: boolean): void
     {
-        if (actionName === 'camera' && value === true/* && event.shiftKey === true*/)
+        // Get action and set it's parameters
+        let action = this.actions[actionName];
+
+        if (action.value !== value)
         {
-            this.resetControls();
-            this.world.inputManager.setInputReceiver(this.world.cameraController);
+            // Set value
+            action.value = value;
+
+            // Set the 'just' attributes
+            if (value) action.justPressed = true;
+            else action.justReleased = true;
+
+            // Tell player to handle states according to new input
+            this.charState.onInputChange();
+
+            // Reset the 'just' attributes
+            action.justPressed = false;
+            action.justReleased = false;
         }
-        else {
-            // Get action and set it's parameters
-            let action = this.actions[actionName];
-
-            if (action.value !== value)
-            {
-                // Set value
-                action.value = value;
-
-                // Set the 'just' attributes
-                if (value) action.justPressed = true;
-                else action.justReleased = true;
-
-                // Tell player to handle states according to new input
-                this.charState.onInputChange();
-
-                // Reset the 'just' attributes
-                action.justPressed = false;
-                action.justReleased = false;
-            }
-        }
-        
     }
 
     public takeControl(): void
@@ -347,7 +377,7 @@ export class Character extends THREE.Object3D implements IControllable
 
     public inputReceiverInit(): void
     {
-        this.world.cameraController.setRadius(1.6);
+        this.world.cameraController.setRadius(1.6, true);
         this.world.dirLight.target = this;
     }
 
@@ -462,78 +492,72 @@ export class Character extends THREE.Object3D implements IControllable
         this.initJumpSpeed = initJumpSpeed;
     }
 
-    /**
-     * Gets called with the call() function by the CANNON.Body caller
-     * "this" in this functions actually refers to CANNON.Body
-     */
-    public physicsPreStep(): void
+    public physicsPreStep(body: CANNON.Body, character: Character): void
     {
         // Player ray casting
         // Create ray
-        const start = new CANNON.Vec3(this.position.x, this.position.y, this.position.z);
-        const end = new CANNON.Vec3(this.position.x, this.position.y - this.character.rayCastLength - this.character.raySafeOffset, this.position.z);
+        const start = new CANNON.Vec3(body.position.x, body.position.y, body.position.z);
+        const end = new CANNON.Vec3(body.position.x, body.position.y - character.rayCastLength - character.raySafeOffset, body.position.z);
         // Raycast options
         const rayCastOptions = {
             collisionFilterMask: ~2, /* cast against everything except second collision group (player) */
             skipBackfaces: true      /* ignore back faces */
         };
         // Cast the ray
-        this.character.rayHasHit = this.character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, this.character.rayResult);
+        character.rayHasHit = character.world.physicsWorld['raycastClosest'](start, end, rayCastOptions, character.rayResult);
 
         // Raycast debug
-        if (this.character.rayHasHit)
+        if (character.rayHasHit)
         {
-            if (this.character.raycastBox.visible) {
-                this.character.raycastBox.position.copy(this.character.rayResult.hitPointWorld);
+            if (character.raycastBox.visible) {
+                character.raycastBox.position.x = character.rayResult.hitPointWorld.x;
+                character.raycastBox.position.y = character.rayResult.hitPointWorld.y;
+                character.raycastBox.position.z = character.rayResult.hitPointWorld.z;
             }
         }
         else
         {
-            if (this.character.raycastBox.visible) {
-                this.character.raycastBox.position.set(this.position.x, this.position.y - this.character.rayCastLength - this.character.raySafeOffset, this.position.z);
+            if (character.raycastBox.visible) {
+                character.raycastBox.position.set(body.position.x, body.position.y - character.rayCastLength - character.raySafeOffset, body.position.z);
             }
         }
     }
 
-    /**
-     * Gets called with the call() function by the CANNON.Body caller
-     * "this" in this functions actually refers to CANNON.Body
-     */
-    public physicsPostStep(): void
+    public physicsPostStep(body: CANNON.Body, character: Character): void
     {
         // Get velocities
-        let simulatedVelocity = new THREE.Vector3().copy(this.velocity);
+        let simulatedVelocity = new THREE.Vector3(body.velocity.x, body.velocity.y, body.velocity.z);
 
         // Take local velocity
-        let arcadeVelocity = new THREE.Vector3().copy(this.character.velocity).multiplyScalar(this.character.moveSpeed);
+        let arcadeVelocity = new THREE.Vector3().copy(character.velocity).multiplyScalar(character.moveSpeed);
         // Turn local into global
-        arcadeVelocity = Utils.appplyVectorMatrixXZ(this.character.orientation, arcadeVelocity);
+        arcadeVelocity = Utils.appplyVectorMatrixXZ(character.orientation, arcadeVelocity);
 
         let newVelocity = new THREE.Vector3();
 
         // Additive velocity mode
-        if (this.character.arcadeVelocityIsAdditive)
+        if (character.arcadeVelocityIsAdditive)
         {
             newVelocity.copy(simulatedVelocity);
 
-            let globalVelocityTarget = Utils.appplyVectorMatrixXZ(this.character.orientation, this.character.velocityTarget);
-            let add = new THREE.Vector3().copy(arcadeVelocity).multiply(this.character.arcadeVelocityInfluence);
+            let globalVelocityTarget = Utils.appplyVectorMatrixXZ(character.orientation, character.velocityTarget);
+            let add = new THREE.Vector3().copy(arcadeVelocity).multiply(character.arcadeVelocityInfluence);
 
-            if (Math.abs(simulatedVelocity.x) < Math.abs(globalVelocityTarget.x * this.character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.x, arcadeVelocity.x)) { newVelocity.x += add.x; }
-            if (Math.abs(simulatedVelocity.y) < Math.abs(globalVelocityTarget.y * this.character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.y, arcadeVelocity.y)) { newVelocity.y += add.y; }
-            if (Math.abs(simulatedVelocity.z) < Math.abs(globalVelocityTarget.z * this.character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.z, arcadeVelocity.z)) { newVelocity.z += add.z; }
+            if (Math.abs(simulatedVelocity.x) < Math.abs(globalVelocityTarget.x * character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.x, arcadeVelocity.x)) { newVelocity.x += add.x; }
+            if (Math.abs(simulatedVelocity.y) < Math.abs(globalVelocityTarget.y * character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.y, arcadeVelocity.y)) { newVelocity.y += add.y; }
+            if (Math.abs(simulatedVelocity.z) < Math.abs(globalVelocityTarget.z * character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.z, arcadeVelocity.z)) { newVelocity.z += add.z; }
         }
         else
         {
             newVelocity = new THREE.Vector3(
-                THREE.Math.lerp(simulatedVelocity.x, arcadeVelocity.x, this.character.arcadeVelocityInfluence.x),
-                THREE.Math.lerp(simulatedVelocity.y, arcadeVelocity.y, this.character.arcadeVelocityInfluence.y),
-                THREE.Math.lerp(simulatedVelocity.z, arcadeVelocity.z, this.character.arcadeVelocityInfluence.z),
+                THREE.Math.lerp(simulatedVelocity.x, arcadeVelocity.x, character.arcadeVelocityInfluence.x),
+                THREE.Math.lerp(simulatedVelocity.y, arcadeVelocity.y, character.arcadeVelocityInfluence.y),
+                THREE.Math.lerp(simulatedVelocity.z, arcadeVelocity.z, character.arcadeVelocityInfluence.z),
             );
         }
 
         // If we're hitting the ground, stick to ground
-        if (this.character.rayHasHit)
+        if (character.rayHasHit)
         {
             // Flatten velocity
             newVelocity.y = 0;
@@ -541,7 +565,7 @@ export class Character extends THREE.Object3D implements IControllable
             // Measure the normal vector offset from direct "up" vector
             // and transform it into a matrix
             let up = new THREE.Vector3(0, 1, 0);
-            let normal = new THREE.Vector3().copy(this.character.rayResult.hitNormalWorld);
+            let normal = new THREE.Vector3(character.rayResult.hitNormalWorld.x, character.rayResult.hitNormalWorld.y, character.rayResult.hitNormalWorld.z);
             let q = new THREE.Quaternion().setFromUnitVectors(up, normal);
             let m = new THREE.Matrix4().makeRotationFromQuaternion(q);
 
@@ -549,44 +573,52 @@ export class Character extends THREE.Object3D implements IControllable
             newVelocity.applyMatrix4(m);
 
             // Compensate for gravity
-            // newVelocity.y -= this.world.physicsWorld.gravity.y / this.character.world.physicsFrameRate;
+            // newVelocity.y -= body.world.physicsWorld.gravity.y / body.character.world.physicsFrameRate;
 
             // Apply velocity
-            this.velocity.copy(newVelocity);
+            body.velocity.x = newVelocity.x;
+            body.velocity.y = newVelocity.y;
+            body.velocity.z = newVelocity.z;
             // Ground character
-            this.position.y = this.character.rayResult.hitPointWorld.y + this.character.rayCastLength + (newVelocity.y / this.character.world.physicsFrameRate);
+            body.position.y = character.rayResult.hitPointWorld.y + character.rayCastLength + (newVelocity.y / character.world.physicsFrameRate);
         }
         else
         {
             // If we're in air
-            this.velocity.copy(newVelocity);
+            body.velocity.x = newVelocity.x;
+            body.velocity.y = newVelocity.y;
+            body.velocity.z = newVelocity.z;
+
+
             // Save last in-air information
-            this.character.groundImpactData.velocity.copy(this.velocity);
+            character.groundImpactData.velocity.x = body.velocity.x;
+            character.groundImpactData.velocity.y = body.velocity.y;
+            character.groundImpactData.velocity.z = body.velocity.z;
         }
 
         // Jumping
-        if (this.character.wantsToJump)
+        if (character.wantsToJump)
         {
             // If initJumpSpeed is set
-            if (this.character.initJumpSpeed > -1)
+            if (character.initJumpSpeed > -1)
             {
                 // Flatten velocity
-                this.velocity.y = 0;
+                body.velocity.y = 0;
 
                 // Velocity needs to be at least as much as initJumpSpeed
-                if (this.velocity['lengthSquared']() < this.character.initJumpSpeed ** 2)
+                if (body.velocity['lengthSquared']() < character.initJumpSpeed ** 2)
                 {
-                    this.velocity.normalize();
-                    this.velocity['mult'](this.character.initJumpSpeed, this.velocity);
+                    body.velocity.normalize();
+                    body.velocity.mult(character.initJumpSpeed, body.velocity);
                 }
             }
 
             // Add positive vertical velocity 
-            this.velocity.y += 4;
+            body.velocity.y += 4;
             // Move above ground by 2x safe offset value
-            this.position.y += this.character.raySafeOffset * 2;
+            body.position.y += character.raySafeOffset * 2;
             // Reset flag
-            this.character.wantsToJump = false;
+            character.wantsToJump = false;
         }
     }
 

@@ -251,7 +251,7 @@ export class World
         this.objects = [];
         this.characters = [];
         this.vehicles = [];
-        this.cameraController = new CameraController(this, this.camera, this.params.Mouse_Sensitivity, this.params.Mouse_Sensitivity * 0.7);
+        this.cameraController = new CameraController(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
 
         this.render(this);
