@@ -1,5 +1,5 @@
 import { Character } from "../Character";
 
-export abstract class CharacterAIBase {
+export class CharacterAIBase {
     public character: Character;
 }

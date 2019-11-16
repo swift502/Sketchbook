@@ -1,6 +1,3 @@
-import * as THREE from 'three';
-import { SimulationFrame } from './SimulationFrame';
-
 export abstract class SimulatorBase
 {
     public mass: any;

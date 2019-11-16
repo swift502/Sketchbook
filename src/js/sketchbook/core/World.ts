@@ -40,9 +40,10 @@ export class World
     public inputManager: InputManager;
     public cameraController: CameraController;
     public timeScaleTarget: number;
+    public cameraDistanceTarget: number;
+
     public objects: SBObject[];
     public characters: Character[];
-    public cameraDistanceTarget: number;
     public balls: any[];
     public vehicles: any[];
 

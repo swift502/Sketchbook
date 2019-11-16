@@ -23,7 +23,7 @@ export class Character extends THREE.Object3D implements IControllable
     public visuals: THREE.Group;
     public modelContainer: THREE.Group;
     public characterModel: THREE.Mesh;
-    public mixer: any;
+    public mixer: THREE.AnimationMixer;
     public animations: any[];
 
     // Movement
@@ -113,6 +113,7 @@ export class Character extends THREE.Object3D implements IControllable
             'run': new KeyBinding('ShiftLeft'),
             'jump': new KeyBinding('Space'),
             'use': new KeyBinding('KeyE'),
+            'enter': new KeyBinding('KeyF'),
             'primary': new KeyBinding('Mouse0'),
             'secondary': new KeyBinding('Mouse1'),
         };
@@ -415,8 +416,7 @@ export class Character extends THREE.Object3D implements IControllable
             action.fadeIn(fadeIn);
             action.play();
 
-            return action._clip.duration;
-            // return 0;
+            return action['_clip'].duration;
         }
     }
 
@@ -588,7 +588,6 @@ export class Character extends THREE.Object3D implements IControllable
             body.velocity.x = newVelocity.x;
             body.velocity.y = newVelocity.y;
             body.velocity.z = newVelocity.z;
-
 
             // Save last in-air information
             character.groundImpactData.velocity.x = body.velocity.x;
