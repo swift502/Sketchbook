@@ -2,6 +2,7 @@ import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
 import { IPhysicsType } from '../../interfaces/IPhysicsType';
+import { threeToCannon } from '../../../lib/utils/three-to-cannon';
 
 export class TrimeshPhysics implements IPhysicsType
 {
@@ -31,14 +32,14 @@ export class TrimeshPhysics implements IPhysicsType
             this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
         }
 
-        // let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
-        // shape.material = mat;
+        let shape = threeToCannon(this.mesh, {type: threeToCannon.Type.MESH});
+        // shape['material'] = mat;
 
         // Add phys sphere
         let physBox = new CANNON.Body({
             mass: options.mass,
             position: options.position,
-            shape: undefined, // todo reimplment threeToCannon
+            shape: shape
         });
 
         physBox.material = mat;

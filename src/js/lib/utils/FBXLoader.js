@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Zlib } from './inflate.min.js';
+import { NURBSCurve } from './NURBSCurve';
 
 /**
  * @author Kyle-Larson https://github.com/Kyle-Larson
@@ -2250,7 +2251,7 @@ export var FBXLoader = ( function () {
 		// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 		parseNurbsGeometry: function ( geoNode ) {
 
-			if ( THREE.NURBSCurve === undefined ) {
+			if ( NURBSCurve === undefined ) {
 
 				console.error( 'THREE.FBXLoader: The loader relies on THREE.NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
 				return new THREE.BufferGeometry();
@@ -2297,7 +2298,7 @@ export var FBXLoader = ( function () {
 
 			}
 
-			var curve = new THREE.NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
+			var curve = new NURBSCurve( degree, knots, controlPoints, startKnot, endKnot );
 			var vertices = curve.getPoints( controlPoints.length * 7 );
 
 			var positions = new Float32Array( vertices.length * 3 );
