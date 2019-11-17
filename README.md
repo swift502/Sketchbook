@@ -4,6 +4,8 @@
    Welcome to the dev branch
 </p>
 
+![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)
+![badge](https://img.shields.io/npm/l/sketchbook?style=flat-square)
 
 # Sketchbook
 
@@ -17,7 +19,6 @@ Simple third-person game engine built on [three.js](https://github.com/mrdoob/th
     * Variable timescale
     * Frame skipping
     * FXAA anti-aliasing
-    * Custom damped-spring simulation
 * Characters
     * Third-person camera
     * Raycast character controller with capsule collisions
@@ -28,7 +29,7 @@ Simple third-person game engine built on [three.js](https://github.com/mrdoob/th
     * Airplanes
     * Helicopters
 
-All planned features can be found in the [GitHub projects](https://github.com/swift502/Sketchbook/projects).
+All planned features can be found in the [GitHub Projects](https://github.com/swift502/Sketchbook/projects).
 
 ## Installation
 
@@ -67,10 +68,9 @@ To learn specifics about using Sketchbook, check out the [examples](https://gith
 I appreciate all help, be it suggestions, issues or even pull requests.
 
 1. Clone the repository
-2. Switch to the `dev` branch
+2. Switch to the **dev** branch
 3. Run `npm install`
-4. Try sticking to existing code style
-5. Contribute!
+4. Contribute!
 
 Use the npm scripts defined in `package.json`:
 * `npm run dev` - start a local server, build in dev mode and watch changes
