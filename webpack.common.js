@@ -4,10 +4,6 @@ module.exports = {
     entry: {
         app: './src/sketchbook/sketchbook.ts'
     },
-    devServer: {
-        progress: true,
-        liveReload: false
-    },
     output: {
         filename: 'build/sketchbook.min.js',
         library: 'Sketchbook',
