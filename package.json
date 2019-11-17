@@ -14,9 +14,8 @@
   ],
   "main": "build/sketchbook.min.js",
   "scripts": {
-    "watch": "webpack --config webpack.dev.js --watch",
-    "build": "webpack --config webpack.prod.js",
-    "devserver": "webpack-dev-server --config webpack.common.js"
+    "dev": "webpack-dev-server --config webpack.common.js",
+    "build": "webpack --config webpack.prod.js && tsc --declaration --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
