@@ -1,5 +1,5 @@
-import "../../css/dat.gui.css";
-import "../../css/main.css";
+import "../css/dat.gui.css";
+import "../css/main.css";
 import * as THREEImport from "three";
 
 import { FollowCharacter } from './characters/character_ai/FollowCharacter';

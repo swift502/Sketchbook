@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        app: './src/js/sketchbook/sketchbook.ts'
+        app: './src/sketchbook/sketchbook.ts'
     },
     devServer: {
         progress: true,
@@ -15,7 +15,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-          cannon: path.resolve(__dirname, './src/js/lib/cannon/cannon.min.js')
+          cannon: path.resolve(__dirname, './src/lib/cannon/cannon.min.js')
         },
         extensions: [ '.tsx', '.ts', '.js' ],
       },

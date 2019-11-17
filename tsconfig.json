@@ -1,6 +1,6 @@
 {
     "include": [
-        "./src/js/sketchbook/**/*"
+        "src/sketchbook/**/*"
     ],
     "compilerOptions": {
         "module": "commonjs",
