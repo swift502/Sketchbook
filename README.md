@@ -4,8 +4,8 @@
    Welcome to the dev branch
 </p>
 
-![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)
-![badge](https://img.shields.io/npm/l/sketchbook?style=flat-square)
+[![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
+[![badge](https://img.shields.io/npm/l/sketchbook?style=flat-square)](https://github.com/swift502/Sketchbook/blob/master/LICENSE)
 
 # Sketchbook
 
