@@ -12,7 +12,7 @@ module.exports = {
         filename: 'build/sketchbook.min.js',
         library: 'Sketchbook',
         libraryTarget: 'umd',
-        path: path.resolve(__dirname, 'build')
+        path: path.resolve(__dirname)
     },
     resolve: {
         alias: {

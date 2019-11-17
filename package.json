@@ -16,7 +16,7 @@
   "types": "build/types/sketchbook.d.ts",
   "scripts": {
     "dev": "webpack-dev-server --config webpack.common.js",
-    "build": "webpack --config webpack.prod.js && tsc"
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
