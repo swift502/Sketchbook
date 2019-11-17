@@ -13,9 +13,10 @@
     "physics"
   ],
   "main": "build/sketchbook.min.js",
+  "types": "build/types/sketchbook.d.ts",
   "scripts": {
     "dev": "webpack-dev-server --config webpack.common.js",
-    "build": "webpack --config webpack.prod.js && tsc --declaration --emitDeclarationOnly"
+    "build": "webpack --config webpack.prod.js && tsc"
   },
   "repository": {
     "type": "git",
