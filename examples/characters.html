@@ -89,7 +89,7 @@
         //
 
         function LoadBoxmanModel(character) {	
-            fbxLoader.load('../build/models/game_man/game_man.fbx', function (object) {	
+            fbxLoader.load('../build/graphics/game_man/game_man.fbx', function (object) {	
                 object.traverse(function (child) {	
                     if (child.isMesh) {	
                         child.castShadow = true;	
@@ -97,7 +97,7 @@
                     }	
                     if (child.name == 'game_man') {	
                         child.material = new SB.THREE.MeshLambertMaterial({	
-                            map: new SB.THREE.TextureLoader().load('../build/models/game_man/game_man.png'),	
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/game_man/game_man.png'),	
                             skinning: true	
                         });	
                     }	
@@ -117,7 +117,7 @@
         function LoadExampleWorld(world) {
 
             //World
-            gltfLoader.load('../build/models/test_world/scene.glb', function (object)
+            gltfLoader.load('../build/graphics/test_world/scene.glb', function (object)
             {
                 world.graphicsWorld.add(object.scene);
 
@@ -131,7 +131,7 @@
 
                                 let mapOverride = undefined;
                                 if(obj.userData.map !== undefined) {
-                                    mapOverride = new SB.THREE.TextureLoader().load('../build/models/test_world/' + obj.userData.map);
+                                    mapOverride = new SB.THREE.TextureLoader().load('../build/graphics/test_world/' + obj.userData.map);
                                 }
                                 else {
                                     mapOverride = obj.material.map;
@@ -182,7 +182,7 @@
             });
 
             // Signs
-            fbxLoader.load('../build/models/credits_sign/sign.fbx', function (object) {
+            fbxLoader.load('../build/graphics/credits_sign/sign.fbx', function (object) {
                 object.traverse(function (child) {
                     
                     if (child.isMesh) {
@@ -191,7 +191,7 @@
                     }
                     if (child.name == 'grass') {
                         child.material = new SB.THREE.MeshLambertMaterial({
-                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/grass.png'),
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/credits_sign/grass.png'),
                             transparent: true,
                             depthWrite: false,
                             side: SB.THREE.DoubleSide
@@ -200,19 +200,19 @@
                     }
                     if (child.name == 'sign') {
                         child.material = new SB.THREE.MeshLambertMaterial({
-                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/sign.png')
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/credits_sign/sign.png')
                         });
                     }
                     if (child.name == 'sign_shadow') {
                         child.material = new SB.THREE.MeshLambertMaterial({
-                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/sign_shadow.png'),
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/credits_sign/sign_shadow.png'),
                             transparent: true,
                         });
                         child.renderOrder = -1;
                     }
                     if (child.name == 'credits') {
                         child.material = new SB.THREE.MeshLambertMaterial({
-                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/credits2.png'),
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/credits_sign/credits2.png'),
                             transparent: true
                         });
                     }
@@ -232,7 +232,7 @@
                 object2.traverse(function (child) {
                     if (child.name == 'credits') {
                         child.material = new SB.THREE.MeshLambertMaterial({
-                            map: new SB.THREE.TextureLoader().load('../build/models/credits_sign/credits.png'),
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/credits_sign/credits.png'),
                             transparent: true
                         });
                         child.translateZ(-0.2);
