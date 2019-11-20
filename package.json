@@ -31,17 +31,16 @@
   "devDependencies": {
     "@types/cannon": "^0.1.4",
     "@types/dat.gui": "^0.7.5",
-    "@types/lodash": "^4.14.144",
+    "@types/lodash": "^4.14.149",
     "@types/stats": "^0.16.30",
     "css-loader": "^3.2.0",
-    "eslint": "^6.5.1",
     "file-loader": "^4.2.0",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.1",
-    "typescript": "^3.6.4",
+    "typescript": "^3.7.2",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9",
-    "webpack-dev-server": "^3.8.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
