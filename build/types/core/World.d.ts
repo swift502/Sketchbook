@@ -37,7 +37,6 @@ export declare class World {
     inputManager: InputManager;
     cameraController: CameraController;
     timeScaleTarget: number;
-    cameraDistanceTarget: number;
     objects: SBObject[];
     characters: Character[];
     balls: any[];
@@ -55,4 +54,5 @@ export declare class World {
     add(object: any): void;
     remove(object: any): void;
     scrollTheTimeScale(scrollAmount: number): void;
+    private getGUI;
 }
