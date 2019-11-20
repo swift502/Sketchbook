@@ -1,40 +1,53 @@
 {
-  "name": "Sketchbook",
-  "version": "1.0.0",
-  "description": "A test ground for various custom 3D features. Built with [three.js](https://github.com/mrdoob/three.js).",
-  "main": "index.html",
+  "name": "sketchbook",
+  "version": "0.2.4",
+  "description": "Three.js and Cannon.js sandbox",
+  "keywords": [
+    "3d",
+    "threejs",
+    "cannonjs",
+    "game",
+    "engine",
+    "characters",
+    "vehicles",
+    "physics"
+  ],
+  "main": "build/sketchbook.min.js",
+  "types": "build/types/sketchbook.d.ts",
   "scripts": {
-    "watch": "webpack --config webpack.dev.js --watch",
+    "dev": "webpack-dev-server --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swift502/sketchbook.git"
+    "url": "https://github.com/swift502/Sketchbook.git"
   },
-  "author": "",
-  "license": "MIT",
+  "author": "swift502 <blaha.j502@gmail.com> (http://jblaha.art/)",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/swift502/sketchbook/issues"
   },
-  "homepage": "https://github.com/swift502/sketchbook#readme",
+  "homepage": "https://github.com/swift502/sketchbook",
   "devDependencies": {
-    "@types/cannon": "^0.1.3",
-    "@types/dat.gui": "^0.6.0",
+    "@types/cannon": "^0.1.4",
+    "@types/dat.gui": "^0.7.5",
+    "@types/lodash": "^4.14.144",
     "@types/stats": "^0.16.30",
-    "@types/three": "^0.91.3",
-    "css-loader": "^1.0.0",
-    "eslint": "^5.5.0",
-    "file-loader": "^2.0.0",
-    "style-loader": "^0.23.1",
-    "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0",
-    "webpack-merge": "^4.1.4"
+    "css-loader": "^3.2.0",
+    "eslint": "^6.5.1",
+    "file-loader": "^4.2.0",
+    "style-loader": "^1.0.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.6.4",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.2",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "cannon": "^0.6.2",
-    "lodash": "^4.17.11",
-    "three": "^0.92.0",
-    "three-gltf-loader": "^1.97.0",
-    "three-to-cannon": "^2.0.0"
+    "@johh/three-effectcomposer": "0.0.7",
+    "lodash": "^4.17.15",
+    "three": "^0.109.0",
+    "three-sky": "^1.1.2"
   }
 }
