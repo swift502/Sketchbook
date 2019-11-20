@@ -40,7 +40,6 @@ export class World
     public inputManager: InputManager;
     public cameraController: CameraController;
     public timeScaleTarget: number;
-    public cameraDistanceTarget: number;
 
     public objects: SBObject[];
     public characters: Character[];
@@ -140,8 +139,7 @@ export class World
 
         //#endregion
 
-        //#region Physics
-
+        // Physics
         this.physicsWorld = new CANNON.World();
         this.physicsWorld.gravity.set(0, -9.81, 0);
         this.physicsWorld.broadphase = new CANNON.NaiveBroadphase();
@@ -152,17 +150,12 @@ export class World
         this.physicsFrameTime = 1 / this.physicsFrameRate;
         this.physicsMaxPrediction = this.physicsFrameRate;
 
-        //#endregion
-
-        //#region RenderLoop
-
+        // RenderLoop
         this.clock = new THREE.Clock();
         this.renderDelta = 0;
         this.logicDelta = 0;
         this.sinceLastFrame = 0;
         this.justRendered = false;
-
-        //#endregion
 
         //#region ParamGUI
 
@@ -179,71 +172,11 @@ export class World
         };
         this.params = params;
 
-        let gui = new GUI.GUI();
-        // Input
-        let inputFolder = gui.addFolder('Input');
-        inputFolder.add(params, 'Pointer_Lock')
-            .onChange((enabled) =>
-            {
-                scope.inputManager.setPointerLock(enabled);
-            });
-        inputFolder.add(params, 'Mouse_Sensitivity', 0, 1)
-            .onChange((value) =>
-            {
-                scope.cameraController.setSensitivity(value, value * 0.8);
-            });
-
-        // Graphics
-        let graphicsFolder = gui.addFolder('Rendering');
-        graphicsFolder.add(params, 'FPS_Limit', 0, 60);
-        graphicsFolder.add(params, 'Time_Scale', 0, 1).listen()
-            .onChange((value) =>
-            {
-                scope.timeScaleTarget = value;
-            });
-        graphicsFolder.add(params, 'Shadows')
-            .onChange((enabled) =>
-            {
-                if (enabled)
-                {
-                    dirLight.castShadow = true;
-                }
-                else
-                {
-                    dirLight.castShadow = false;
-                }
-            });
-        graphicsFolder.add(params, 'FXAA');
-
-        // Debug
-        let debugFolder = gui.addFolder('Debug');
-        debugFolder.add(params, 'Draw_Physics')
-            .onChange((enabled) =>
-            {
-                scope.objects.forEach((obj) =>
-                {
-                    if (obj.physics.visual !== undefined)
-                    {
-                        if (enabled) obj.physics.visual.visible = true;
-                        else obj.physics.visual.visible = false;
-                    }
-                });
-            });
-        debugFolder.add(params, 'RayCast_Debug')
-            .onChange((enabled) =>
-            {
-                scope.characters.forEach((char) =>
-                {
-                    if (enabled) char.raycastBox.visible = true;
-                    else char.raycastBox.visible = false;
-                });
-            });
-
+        let gui = this.getGUI(scope);
         gui.open();
 
         // Changing time scale with scroll wheel
         this.timeScaleTarget = 1;
-        this.cameraDistanceTarget = 1.8;
 
         //#endregion
 
@@ -404,5 +337,71 @@ export class World
             this.timeScaleTarget = Math.min(this.timeScaleTarget, 1);
             if (this.params.Time_Scale > 0.9) this.params.Time_Scale *= timeScaleChangeSpeed;
         }
+    }
+
+    private getGUI(scope): GUI
+    {
+        const gui = new GUI.GUI();
+
+        // Input
+        let inputFolder = gui.addFolder('Input');
+        inputFolder.add(this.params, 'Pointer_Lock')
+            .onChange((enabled) =>
+            {
+                scope.inputManager.setPointerLock(enabled);
+            });
+        inputFolder.add(this.params, 'Mouse_Sensitivity', 0, 1)
+            .onChange((value) =>
+            {
+                scope.cameraController.setSensitivity(value, value * 0.8);
+            });
+
+        // Graphics
+        let graphicsFolder = gui.addFolder('Rendering');
+        graphicsFolder.add(this.params, 'FPS_Limit', 0, 60);
+        graphicsFolder.add(this.params, 'Time_Scale', 0, 1).listen()
+            .onChange((value) =>
+            {
+                scope.timeScaleTarget = value;
+            });
+        graphicsFolder.add(this.params, 'Shadows')
+            .onChange((enabled) =>
+            {
+                if (enabled)
+                {
+                    this.dirLight.castShadow = true;
+                }
+                else
+                {
+                    this.dirLight.castShadow = false;
+                }
+            });
+        graphicsFolder.add(this.params, 'FXAA');
+
+        // Debug
+        let debugFolder = gui.addFolder('Debug');
+        debugFolder.add(this.params, 'Draw_Physics')
+            .onChange((enabled) =>
+            {
+                scope.objects.forEach((obj) =>
+                {
+                    if (obj.physics.visual !== undefined)
+                    {
+                        if (enabled) obj.physics.visual.visible = true;
+                        else obj.physics.visual.visible = false;
+                    }
+                });
+            });
+        debugFolder.add(this.params, 'RayCast_Debug')
+            .onChange((enabled) =>
+            {
+                scope.characters.forEach((char) =>
+                {
+                    if (enabled) char.raycastBox.visible = true;
+                    else char.raycastBox.visible = false;
+                });
+            });
+
+        return gui;
     }
 }

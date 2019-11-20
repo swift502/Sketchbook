@@ -1,6 +1,6 @@
 {
   "name": "sketchbook",
-  "version": "0.3.0",
+  "version": "0.2.4",
   "description": "Three.js and Cannon.js sandbox",
   "keywords": [
     "3d",

@@ -1,15 +1,17 @@
 <p align="center">
-   <img src="https://media2.giphy.com/media/JlTWySGCqScBG/giphy.gif">
+   <a href="http://jblaha.art"><img src="https://i.imgur.com/VM9yu68.png"></a>
    <br>
-   Welcome to the dev branch
+   Play it <a href="http://jblaha.art">here</a>!
 </p>
 
 [![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
-[![badge](https://img.shields.io/npm/l/sketchbook?style=flat-square)](https://github.com/swift502/Sketchbook/blob/master/LICENSE)
 
 # Sketchbook
 
-Simple third-person game engine built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js). Mostly it's just my little playground focused on exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
+Simple web based game engine built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js) focused on third-person character controls and related gameplay mechanics.
+
+Mostly a playground for exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
+
 
 ## Features
 
@@ -46,20 +48,18 @@ Or download the [latest release](https://github.com/swift502/Sketchbook/releases
 <script src="sketchbook.min.js"></script>
 ```
 
-## Usage
+<!-- ## Usage
 
 This snippet turns a blank page into a playable character demo.
 
 ```js
-// Initialize a HTML canvas element and create a world
 const world = new Sketchbook.World();
-world.loadTestLevel();
+world.loadBasicLevel();
 
-// Create player
 let player = new Sketchbook.Character();
 world.add(player);
 player.takeControl();
-```
+``` -->
 
 To learn specifics about using Sketchbook, check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples).
 
@@ -68,7 +68,6 @@ To learn specifics about using Sketchbook, check out the [examples](https://gith
 I appreciate all help, be it suggestions, issues or even pull requests.
 
 1. Clone the repository
-2. Switch to the **dev** branch
 3. Run `npm install`
 4. Contribute!
 
