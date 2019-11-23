@@ -61,7 +61,7 @@ export declare class Character extends THREE.Object3D implements IControllable {
      * Set state to the player. Pass state class (function) name.
      * @param {function} State
      */
-    setState(State: any): void;
+    setState(new State: any): void;
     setPosition(x: number, y: number, z: number): void;
     setArcadeVelocity(velZ: number, velX?: number, velY?: number): void;
     setArcadeVelocityTarget(velZ: number, velX?: number, velY?: number): void;

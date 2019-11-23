@@ -31,7 +31,7 @@ export class StartWalkBase extends CharacterStateBase
 
         if (this.animationEnded(timeStep))
         {
-            this.character.setState(Walk);
+            this.character.setState(new Walk(this.character));
         }
 
         this.character.setCameraRelativeOrientationTarget();
@@ -58,9 +58,11 @@ export class StartWalkBase extends CharacterStateBase
 
     public onInputChange(): void
     {
+        super.onInputChange();
+        
         if (this.justPressed(this.character.actions.jump))
         {
-            this.character.setState(JumpRunning);
+            this.character.setState(new JumpRunning(this.character));
         }
 
         if (this.noDirection())
@@ -71,26 +73,26 @@ export class StartWalkBase extends CharacterStateBase
 
                 if (angle > Math.PI * 0.4)
                 {
-                    this.character.setState(IdleRotateLeft);
+                    this.character.setState(new IdleRotateLeft(this.character));
                 }
                 else if (angle < -Math.PI * 0.4)
                 {
-                    this.character.setState(IdleRotateRight);
+                    this.character.setState(new IdleRotateRight(this.character));
                 }
                 else
                 {
-                    this.character.setState(Idle);
+                    this.character.setState(new Idle(this.character));
                 }
             }
             else
             {
-                this.character.setState(Idle);
+                this.character.setState(new Idle(this.character));
             }
         }
 
         if (this.justPressed(this.character.actions.run))
         {
-            this.character.setState(Sprint);
+            this.character.setState(new Sprint(this.character));
         }
     }
 }

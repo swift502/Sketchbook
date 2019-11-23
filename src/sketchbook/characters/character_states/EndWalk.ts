@@ -26,7 +26,7 @@ export class EndWalk extends CharacterStateBase implements ICharacterState
         if (this.animationEnded(timeStep))
         {
 
-            this.character.setState(Idle);
+            this.character.setState(new Idle(this.character));
         }
 
         this.fallInAir();
@@ -34,22 +34,24 @@ export class EndWalk extends CharacterStateBase implements ICharacterState
 
     public onInputChange(): void
     {
+        super.onInputChange();
+        
         if (this.justPressed(this.character.actions.jump))
         {
-            this.character.setState(JumpIdle);
+            this.character.setState(new JumpIdle(this.character));
         }
 
         if (this.anyDirection())
         {
             if (this.isPressed(this.character.actions.run))
             {
-                this.character.setState(Sprint);
+                this.character.setState(new Sprint(this.character));
             }
             else
             {
                 if (this.character.velocity.length() > 0.5)
                 {
-                    this.character.setState(Walk);
+                    this.character.setState(new Walk(this.character));
                 }
                 else
                 {

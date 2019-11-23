@@ -48,7 +48,7 @@ export class JumpIdle extends CharacterStateBase implements ICharacterState
         }
         else if (this.timer > this.animationLength - timeStep)
         {
-            this.character.setState(Falling);
+            this.character.setState(new Falling(this.character));
         }
     }
 }

@@ -5,7 +5,7 @@ module.exports = merge(common, {
     mode: 'development',
     devtool: 'inline-source-map',
     devServer: {
-        progress: true,
+        // progress: true,
         liveReload: false
     },
 });

@@ -30,11 +30,11 @@ export class DropRolling extends CharacterStateBase implements ICharacterState
         {
             if (this.anyDirection())
             {
-                this.character.setState(Walk);
+                this.character.setState(new Walk(this.character));
             }
             else
             {
-                this.character.setState(EndWalk);
+                this.character.setState(new EndWalk(this.character));
             }
         }
     }

@@ -14,8 +14,11 @@ import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
+import { FollowObject } from './character_ai/FollowObject';
+import { EnteringVehicle } from './character_states/EnteringVehicle';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 
-export class Character extends THREE.Object3D implements IControllable
+export class Character extends THREE.Object3D implements IControllable, IWorldEntity
 {
     public isCharacter: boolean = true;
     public height: number = 1;
@@ -63,6 +66,10 @@ export class Character extends THREE.Object3D implements IControllable
     public charState: ICharacterState;
     public behaviour: ICharacterAI;
     public world: World;
+    private physicsEnabled: boolean = true;
+    private enteringVehicle: IControllable;
+
+    // private enteringVehiclePath: any[];
     
     constructor(options: {})
     {
@@ -101,7 +108,7 @@ export class Character extends THREE.Object3D implements IControllable
         this.rotationSimulator = new RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
 
         // States
-        this.setState(Idle);
+        this.setState(new Idle(this));
         this.viewVector = new THREE.Vector3();
 
         // Actions
@@ -166,7 +173,7 @@ export class Character extends THREE.Object3D implements IControllable
         this.modelContainer.add(this.characterModel);
 
         this.mixer = new THREE.AnimationMixer(this.characterModel);
-        this.setState(Idle);
+        this.setState(new Idle(this));
         this.charState.onInputChange();
     }
 
@@ -189,9 +196,9 @@ export class Character extends THREE.Object3D implements IControllable
      * Set state to the player. Pass state class (function) name.
      * @param {function} State 
      */
-    public setState(State: any): void
+    public setState(state: ICharacterState): void
     {
-        this.charState = new State(this);
+        this.charState = state;
     }
 
     public setPosition(x: number, y: number, z: number): void
@@ -222,6 +229,19 @@ export class Character extends THREE.Object3D implements IControllable
     {
         behaviour.character = this;
         this.behaviour = behaviour;
+    }
+
+    public setPhysicsEnabled(value: boolean): void {
+        this.physicsEnabled = value;
+
+        if(value === true)
+        {
+            this.world.physicsWorld.addBody(this.characterCapsule.physics.physical);
+        }
+        else
+        {
+            this.world.physicsWorld.remove(this.characterCapsule.physics.physical);
+        }
     }
 
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
@@ -344,19 +364,20 @@ export class Character extends THREE.Object3D implements IControllable
         }
     }
 
-    public update(timeStep: number, options: {} = {}): void
+    public update(timeStep: number): void
     {
-        let defaults = {
-            rotateModel: true,
-            rotationMultiplier: 1,
-            springRotation: true,
-            springVelocity: true,
-            updateAnimation: true
-        };
-        options = Utils.setDefaults(options, defaults);
-
         if (this.behaviour !== undefined) {
             this.behaviour.update(timeStep);
+        }
+
+        if (this.enteringVehicle !== undefined) {
+            let viewVector = new THREE.Vector3().subVectors(this.enteringVehicle.position, this.position);
+            this.setViewVector(viewVector);
+            this.triggerAction('up', true);
+            if (viewVector.lengthSq() < 3) {
+                this.setState(new EnteringVehicle(this, this.enteringVehicle));
+                this.enteringVehicle = undefined;
+            }
         }
 
         if (this.charState !== undefined) {
@@ -364,15 +385,21 @@ export class Character extends THREE.Object3D implements IControllable
         }
         
         this.visuals.position.copy(this.modelOffset);
-        if (options['springVelocity']) this.springMovement(timeStep);
-        if (options['springRotation']) this.springRotation(timeStep, options['rotationMultiplier']);
-        if (options['rotateModel']) this.rotateModel();
-        if (options['updateAnimation'] && this.mixer !== undefined) this.mixer.update(timeStep);
+        if (this.physicsEnabled) this.springMovement(timeStep);
+        if (this.physicsEnabled) this.springRotation(timeStep);
+        this.rotateModel();
+        if (this.mixer !== undefined) this.mixer.update(timeStep);
+
+        // this.position.set(
+        //     this.characterCapsule.physics.physical.interpolatedPosition.x,
+        //     this.characterCapsule.physics.physical.interpolatedPosition.y - this.height / 2,
+        //     this.characterCapsule.physics.physical.interpolatedPosition.z
+        // );
 
         this.position.set(
-            this.characterCapsule.physics.physical.interpolatedPosition.x,
-            this.characterCapsule.physics.physical.interpolatedPosition.y - this.height / 2,
-            this.characterCapsule.physics.physical.interpolatedPosition.z
+            this.characterCapsule.physics.physical.position.x,
+            this.characterCapsule.physics.physical.position.y - this.height / 2,
+            this.characterCapsule.physics.physical.position.z
         );
     }
 
@@ -431,14 +458,14 @@ export class Character extends THREE.Object3D implements IControllable
         this.acceleration.copy(this.velocitySimulator.velocity);
     }
 
-    public springRotation(timeStep: number, RotationMultiplier: number): void
+    public springRotation(timeStep: number): void
     {
         // Spring rotation
         // Figure out angle between current and target orientation
         let angle = Utils.getSignedAngleBetweenVectors(this.orientation, this.orientationTarget);
 
         // Simulator
-        this.rotationSimulator.target = angle * RotationMultiplier;
+        this.rotationSimulator.target = angle;
         this.rotationSimulator.simulate(timeStep);
         let rot = this.rotationSimulator.position;
 
@@ -490,6 +517,39 @@ export class Character extends THREE.Object3D implements IControllable
     {
         this.wantsToJump = true;
         this.initJumpSpeed = initJumpSpeed;
+    }
+
+    public enterVehicle(): void
+    {
+        // TODO follow a path (generated using a navmesh?)
+        // this.enteringVehiclePath = [];
+        // this.enteringVehiclePath.push(vehicle.getMountPoint(this));
+
+        if (this.world.vehicles[0] !== undefined)
+        {
+            this.enteringVehicle = this.world.vehicles[0];
+        }
+        else {
+            console.error("world has no vehicles");
+        }
+    }
+
+    public exitVehicle(): void
+    {
+        console.log("test");
+        this.controlledObject = undefined;
+        this.setState(new Idle(this));
+        this.setPhysicsEnabled(true);
+    }
+
+    public stopEnteringVehicle(): void
+    {
+        this.enteringVehicle = undefined;
+    }
+
+    public getMountPoint(character: Character): THREE.Vector3
+    {
+        return this.position;
     }
 
     public physicsPreStep(body: CANNON.Body, character: Character): void

@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 import { InputManager } from './InputManager';
 import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
+import { ObjectPhysics } from '../sketchbook';
 
 export class World
 {
@@ -111,9 +112,9 @@ export class World
 
         // Sun helper
         this.sun = new THREE.Vector3();
-        this.sun.x = -1;
+        this.sun.x = -0.5;
         this.sun.y = 1;
-        this.sun.z = -1;
+        this.sun.z = -0.5;
         sky.material.uniforms.sunPosition.value.copy(this.sun);
 
         // Lighting
@@ -317,6 +318,14 @@ export class World
         {
             console.error('Object type not supported: ' + (typeof object));
         }
+    }
+
+    public addFloor(): void {
+        let SBobj = new SBObject();
+        let phys = new ObjectPhysics.BoxPhysics({size: new THREE.Vector3(100, 1, 100)});
+        SBobj.setPhysics(phys);
+        SBobj.setModelFromPhysicsShape();
+        this.add(SBobj);
     }
 
     public scrollTheTimeScale(scrollAmount: number): void

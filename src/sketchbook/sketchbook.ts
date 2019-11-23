@@ -3,9 +3,12 @@ import "../css/main.css";
 import * as THREEImport from "three";
 
 import { FollowCharacter } from './characters/character_ai/FollowCharacter';
+import { FollowObject } from './characters/character_ai/FollowObject';
 import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
+
 export const CharacterAI = {
     FollowCharacter,
+    FollowObject,
     RandomBehaviour,
 };
 
@@ -20,6 +23,15 @@ export const ObjectPhysics = {
     ConvexPhysics,
     SpherePhysics,
     TrimeshPhysics,
+};
+
+import {Airplane} from './vehicles/Airplane';
+import {Car} from './vehicles/Car';
+import {Helicopter} from './vehicles/Helicopter';
+export const Vehicles = {
+    Airplane,
+    Car,
+    Helicopter,
 };
 
 import * as statesLibrary from './characters/character_states/_stateLibrary';

@@ -21,7 +21,7 @@ export class DropIdle extends CharacterStateBase implements ICharacterState
 
         if (this.anyDirection())
         {
-            this.character.setState(StartWalkForward);
+            this.character.setState(new StartWalkForward(character));
         }
     }
 
@@ -31,22 +31,23 @@ export class DropIdle extends CharacterStateBase implements ICharacterState
         this.character.setCameraRelativeOrientationTarget();
         if (this.animationEnded(timeStep))
         {
-            this.character.setState(Idle);
+            this.character.setState(new Idle(this.character));
         }
         this.fallInAir();
     }
 
     public onInputChange(): void
     {
-
+        super.onInputChange();
+        
         if (this.justPressed(this.character.actions.jump))
         {
-            this.character.setState(JumpIdle);
+            this.character.setState(new JumpIdle(this.character));
         }
 
         if (this.anyDirection())
         {
-            this.character.setState(StartWalkForward);
+            this.character.setState(new StartWalkForward(this.character));
         }
     }
 }

@@ -22,7 +22,7 @@ export class Sprint extends CharacterStateBase
 
         if (!this.isPressed(this.character.actions.run))
         {
-            this.character.setState(Walk);
+            this.character.setState(new Walk(this.character));
         }
     }
 
@@ -35,19 +35,21 @@ export class Sprint extends CharacterStateBase
 
     public onInputChange(): void
     {
+        super.onInputChange();
+        
         if (this.justReleased(this.character.actions.run))
         {
-            this.character.setState(Walk);
+            this.character.setState(new Walk(this.character));
         }
 
         if (this.justPressed(this.character.actions.jump))
         {
-            this.character.setState(JumpRunning);
+            this.character.setState(new JumpRunning(this.character));
         }
 
         if (this.noDirection())
         {
-            this.character.setState(EndWalk);
+            this.character.setState(new EndWalk(this.character));
         }
     }
 }
