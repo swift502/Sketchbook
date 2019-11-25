@@ -18,11 +18,9 @@
     <div id="controls-menu" class="controls-card" style="display: none">
         <div class="controls-ctrl"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span><span class="ctrl-desc"></span>movement</span></div>
         <div class="controls-ctrl"><span class="key">Space</span><span class="ctrl-desc"></span>jump</span></div>
-        <!-- <div class="controls-ctrl"><span class="key">Shift</span><span class="ctrl-desc">sprint</span></div>
-        <div class="controls-ctrl"><span class="key">F</span><span class="ctrl-desc"></span>spawn a ball</span></div>
-        <div class="controls-ctrl"><span class="key">T</span><span class="ctrl-desc"></span>toggle slow motion</span></div>
-        <div class="controls-ctrl"><span class="key">C</span><span class="ctrl-desc"></span>change view distance</span></div>
-        <div class="controls-ctrl"><span class="key">Shift</span>&nbsp;+&nbsp;<span class="key">C</span><span class="ctrl-desc"></span>free camera</span></div> -->
+        <div class="controls-ctrl"><span class="key">Shift</span><span class="ctrl-desc">sprint</span></div>
+        <div class="controls-ctrl"><span class="key">F</span><span class="ctrl-desc"></span>enter/exit vehicle</span></div>
+        <div class="controls-ctrl"><span class="key">Shift</span>&nbsp;+&nbsp;<span class="key">C</span><span class="ctrl-desc"></span>free camera</span></div>
     </div>
     
     <script src="/build/sketchbook.min.js"></script>
@@ -68,10 +66,6 @@
         player.setOrientationTarget(new SB.THREE.Vector3(0, 0, -1));
         player.orientation = new SB.THREE.Vector3(0, 0, -1);
 
-        let car = new SB.Vehicles.Car();
-        car.position.y = 2;
-        world.add(car);
-
         //
         // Functions
         //
@@ -101,6 +95,122 @@
                 document.getElementById('controls-menu').style.display = 'flex';
             });	
         }
+
+        let car = new SB.Car();
+        car.position.y = 3;
+        // car.fromGLTF();
+
+        let carCollision = new SB.CANNON.Body({
+            mass: 1
+        });
+        carCollision.position.y = 3;
+
+        // Load a glTF resource
+        gltfLoader.load('../build/graphics/car.glb',
+            function ( gltf ) {
+                
+                var objectDict = {};
+
+                console.log(gltf);
+
+                // Set car model
+                car.setModel(gltf.scene);
+
+                gltf.scene.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+
+                    if (child.hasOwnProperty('userData'))
+                    {
+                        if(child.userData.hasOwnProperty('data'))
+                        {
+                            if(child.userData.data === 'wheel')
+                            {
+                                var wheel = new SB.Wheel();
+
+                                if(child.userData.hasOwnProperty('facing')) 
+                                {
+                                    wheel.facing = child.userData.facing;
+                                }
+                                if(child.userData.hasOwnProperty('steering')) 
+                                {
+                                    wheel.steering = (child.userData.steering == "true");
+                                }
+
+                                car.wheels.push(wheel);
+                            }
+                            if(child.userData.data === 'seat')
+                            {
+                                var seat = new SB.Seat();
+                                seat.object = child;
+
+                                if(child.userData.hasOwnProperty('door')) 
+                                {
+                                    console.log(child.userData.door);
+                                    seat.door = gltf.scene.getObjectByName(child.userData.door);
+                                }
+                                if(child.userData.hasOwnProperty('entry_point')) 
+                                {
+                                    seat.entryPoint = gltf.scene.getObjectByName(child.userData.entry_point);
+                                }
+                                if(child.userData.hasOwnProperty('type')) 
+                                {
+                                    seat.type = child.userData.type;
+                                }
+
+                                car.seats.push(seat);
+                            }
+                            if(child.userData.data === 'collision')
+                            {
+                                if(child.userData.shape === 'box')
+                                {
+                                    
+                                    // let phys = new SB.ObjectPhysics.BoxPhysics({
+                                    //     mass: 1,
+                                    //     size: new SB.THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)
+                                    // });
+                                    
+                                    // let SBobj = new SB.SBObject();
+                                    // SBobj.setPhysics(phys);
+                                    
+                                        console.log(child.scale);
+                                        console.log(child.position);
+
+                                    child.visible = false;
+
+                                    let phys = new SB.CANNON.Box(new SB.CANNON.Vec3(child.scale.x, child.scale.y, child.scale.z));
+                                    phys.material = new SB.CANNON.Material("boxMat");
+                                    phys.material.friction = 1;
+                                    carCollision.addShape(phys, new SB.CANNON.Vec3(child.position.x, child.position.y, child.position.z));
+                                }
+                            }
+                            if(child.userData.data === 'navmesh')
+                            {
+                                child.visible = false;
+                            }
+                        }
+                        if(child.userData.hasOwnProperty('texture'))
+                        {
+                            child.material = new SB.THREE.MeshLambertMaterial({
+                            map: new SB.THREE.TextureLoader().load('../build/graphics/' + child.userData.texture)
+                        });
+                        }
+                    }
+                });
+
+                car.collision = carCollision;
+                console.log(car);
+                world.add(car);
+            },
+            function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            },
+            function ( error ) {
+                console.error(error);
+            }
+        );
     </script>
 </body>
 </html>

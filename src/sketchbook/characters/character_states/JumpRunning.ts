@@ -15,7 +15,7 @@ export class JumpRunning extends CharacterStateBase implements ICharacterState
         super(character);
 
         this.character.velocitySimulator.mass = 100;
-        this.animationLength = this.character.setAnimation('jump_running', 0.1);
+        this.animationLength = this.character.setAnimation('jump_running', 0.03);
         this.alreadyJumped = false;
     }
 
@@ -31,7 +31,7 @@ export class JumpRunning extends CharacterStateBase implements ICharacterState
             this.character.setArcadeVelocityTarget(this.anyDirection() ? 0.8 : 0);
         }
         // Physically jump
-        if (this.timer > 0.14 && !this.alreadyJumped)
+        if (this.timer > 0.04 && !this.alreadyJumped)
         {
             this.character.jump(4);
             this.alreadyJumped = true;

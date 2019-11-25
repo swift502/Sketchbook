@@ -14,9 +14,9 @@ import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
-import { FollowObject } from './character_ai/FollowObject';
 import { EnteringVehicle } from './character_states/EnteringVehicle';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { Seat } from '../vehicles/Seat';
 
 export class Character extends THREE.Object3D implements IControllable, IWorldEntity
 {
@@ -28,6 +28,8 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public characterModel: THREE.Mesh;
     public mixer: THREE.AnimationMixer;
     public animations: any[];
+
+    public seats: Seat[];
 
     // Movement
     public acceleration: THREE.Vector3 = new THREE.Vector3();
@@ -66,8 +68,8 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public charState: ICharacterState;
     public behaviour: ICharacterAI;
     public world: World;
+    public enteringVehicle: IControllable;
     private physicsEnabled: boolean = true;
-    private enteringVehicle: IControllable;
 
     // private enteringVehiclePath: any[];
     
@@ -234,7 +236,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public setPhysicsEnabled(value: boolean): void {
         this.physicsEnabled = value;
 
-        if(value === true)
+        if (value === true)
         {
             this.world.physicsWorld.addBody(this.characterCapsule.physics.physical);
         }
@@ -371,11 +373,14 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         }
 
         if (this.enteringVehicle !== undefined) {
-            let viewVector = new THREE.Vector3().subVectors(this.enteringVehicle.position, this.position);
-            this.setViewVector(viewVector);
-            this.triggerAction('up', true);
-            if (viewVector.lengthSq() < 3) {
-                this.setState(new EnteringVehicle(this, this.enteringVehicle));
+            let memoryWaste = new THREE.Vector3();
+            this.enteringVehicle.seats[0].entryPoint.getWorldPosition(memoryWaste);
+            let viewVector = new THREE.Vector3().subVectors(memoryWaste, this.position);
+            this.setOrientationTarget(viewVector);
+
+            if (viewVector.length() < 0.5) {
+                this.resetControls();
+                this.setState(new EnteringVehicle(this, this.enteringVehicle, this.enteringVehicle.seats[0]));
                 this.enteringVehicle = undefined;
             }
         }
@@ -390,6 +395,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.rotateModel();
         if (this.mixer !== undefined) this.mixer.update(timeStep);
 
+        // getting into cars
         // this.position.set(
         //     this.characterCapsule.physics.physical.interpolatedPosition.x,
         //     this.characterCapsule.physics.physical.interpolatedPosition.y - this.height / 2,
@@ -494,15 +500,18 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
     public setCameraRelativeOrientationTarget(): void
     {
-        let moveVector = this.getCameraRelativeMovementVector();
-
-        if (moveVector.x === 0 && moveVector.y === 0 && moveVector.z === 0)
+        if (this.enteringVehicle === undefined)
         {
-            this.setOrientationTarget(this.orientation);
-        }
-        else
-        {
-            this.setOrientationTarget(moveVector);
+            let moveVector = this.getCameraRelativeMovementVector();
+    
+            if (moveVector.x === 0 && moveVector.y === 0 && moveVector.z === 0)
+            {
+                this.setOrientationTarget(this.orientation);
+            }
+            else
+            {
+                this.setOrientationTarget(moveVector);
+            }
         }
     }
 
@@ -528,6 +537,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         if (this.world.vehicles[0] !== undefined)
         {
             this.enteringVehicle = this.world.vehicles[0];
+            this.triggerAction('up', true);
         }
         else {
             console.error("world has no vehicles");
@@ -537,6 +547,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public exitVehicle(): void
     {
         console.log("test");
+        this.controlledObject.controllingCharacter = undefined;
         this.controlledObject = undefined;
         this.setState(new Idle(this));
         this.setPhysicsEnabled(true);

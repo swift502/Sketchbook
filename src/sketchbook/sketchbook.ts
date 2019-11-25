@@ -1,6 +1,7 @@
 import "../css/dat.gui.css";
 import "../css/main.css";
 import * as THREEImport from "three";
+import * as CANNONImport from 'cannon';
 
 import { FollowCharacter } from './characters/character_ai/FollowCharacter';
 import { FollowObject } from './characters/character_ai/FollowObject';
@@ -25,14 +26,11 @@ export const ObjectPhysics = {
     TrimeshPhysics,
 };
 
-import {Airplane} from './vehicles/Airplane';
-import {Car} from './vehicles/Car';
-import {Helicopter} from './vehicles/Helicopter';
-export const Vehicles = {
-    Airplane,
-    Car,
-    Helicopter,
-};
+export {Airplane} from './vehicles/Airplane';
+export {Car} from './vehicles/Car';
+export {Helicopter} from './vehicles/Helicopter';
+export {Wheel} from './vehicles/Wheel';
+export {Seat} from './vehicles/Seat';
 
 import * as statesLibrary from './characters/character_states/_stateLibrary';
 export const CharacterStates = statesLibrary;
@@ -43,5 +41,6 @@ export { SBObject } from "./objects/SBObject";
 export { World } from "./core/World";
 
 export let THREE = THREEImport;
+export let CANNON = CANNONImport;
 export { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 export { FBXLoader } from "../lib/utils/FBXLoader";

@@ -211,6 +211,11 @@ export class World
             char.updateMatrixWorld();
         });
 
+        this.vehicles.forEach((vehicle) => {
+            vehicle.update(timeStep);
+            // vehicle.updateMatrixWorld();
+        });
+
         this.inputManager.update(timeStep);
 
         // Lerp parameters
@@ -241,8 +246,12 @@ export class World
                     obj.physics.physical.interpolatedPosition.z = -2.2;
                 }
 
-                obj.position.copy(obj.physics.physical.interpolatedPosition);
-                obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
+                obj.position.copy(obj.physics.physical.position);
+                obj.quaternion.copy(obj.physics.physical.quaternion);
+                
+                //entering vehicles
+                // obj.position.copy(obj.physics.physical.interpolatedPosition);
+                // obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
             }
         });
     }

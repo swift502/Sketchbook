@@ -10,20 +10,25 @@ import { Character } from '../Character';
 import { IControllable } from '../../interfaces/IControllable';
 import THREE = require('three');
 import { Sitting } from './Sitting';
+import { Seat } from '../../vehicles/Seat';
 
 export class EnteringVehicle extends CharacterStateBase
 {
     private vehicle: IControllable;
-    private lerpFactor: number = 0;
-    private initialPosition: THREE.Vector3;
+    private seat: THREE.Vector3 = new THREE.Vector3();
+    private entryPoint: THREE.Vector3 = new THREE.Vector3();
 
-    constructor(character: Character, vehicle: IControllable)
+    constructor(character: Character, vehicle: IControllable, seat: Seat)
     {
         super(character);
 
         this.vehicle = vehicle;
-        this.initialPosition = character.characterCapsule.physics.physical.position.clone();
-        this.character.setAnimation('idle', 0.1);
+        seat.object.getWorldPosition( this.seat );
+        // this.seat.y += this.character.height / 2;
+        seat.entryPoint.getWorldPosition( this.entryPoint );
+        // this.entryPoint.y += this.character.height / 2;
+
+        this.animationLength = this.character.setAnimation('sit_down_right', 0.1);
         this.character.setPhysicsEnabled(false);
     }
 
@@ -31,13 +36,17 @@ export class EnteringVehicle extends CharacterStateBase
     {
         super.update(timeStep);
 
-        if (this.timer > 0.5) {
-            this.character.setPosition(this.vehicle.position.x, this.vehicle.position.y, this.vehicle.position.z);
+        console.log(this.animationLength);
+
+        if (this.timer > this.animationLength - timeStep)
+        {
+            this.character.setPosition(this.seat.x, this.seat.y, this.seat.z);
             this.character.controlledObject = this.vehicle;
+            this.vehicle.controllingCharacter = this.character;
             this.character.setState(new Sitting(this.character));
         }
 
-        let lerpPosition = new THREE.Vector3().lerpVectors(this.initialPosition, this.vehicle.position, this.timer / 0.5);
+        let lerpPosition = new THREE.Vector3().lerpVectors(this.entryPoint, this.seat, this.timer / this.animationLength);
         this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
     }
 }

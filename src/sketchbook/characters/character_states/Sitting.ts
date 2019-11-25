@@ -14,7 +14,7 @@ export class Sitting extends CharacterStateBase
     {
         super(character);
 
-        this.character.setAnimation('idle', 0.1);
+        this.character.setAnimation('driving', 0.1);
 
     }
 

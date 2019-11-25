@@ -49,8 +49,17 @@ export abstract class CharacterStateBase implements ICharacterState
         {
                 this.character.enterVehicle();
         }
-
-        return;
+        else if (this.character.enteringVehicle !== undefined)
+        {
+            if (this.justPressed(this.character.actions.up) ||
+                this.justPressed(this.character.actions.down) ||
+                this.justPressed(this.character.actions.left) ||
+                this.justPressed(this.character.actions.right))
+                {
+                    this.character.enteringVehicle = undefined;
+                    this.character.actions.up.value = false;
+                }
+        }
     }
 
     public noDirection(): boolean
