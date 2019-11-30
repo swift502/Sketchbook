@@ -9,10 +9,13 @@ import { Sitting } from '../Sitting';
 
 export class CloseVehicleDoorInside extends CharacterStateBase
 {
+    private seat: Seat;
+
     constructor(character: Character, seat: Seat)
     {
         super(character);
 
+        this.seat = seat;
         this.canFindVehiclesToEnter = false;
         this.canLeaveVehicles = false;
 
@@ -29,6 +32,11 @@ export class CloseVehicleDoorInside extends CharacterStateBase
     public update(timeStep: number): void
     {
         super.update(timeStep);
+
+        if (this.timer > 0.3)
+        {
+            this.seat.closeDoorTest();   
+        }
 
         if (this.timer > this.animationLength - timeStep)
         {

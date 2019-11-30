@@ -9,10 +9,13 @@ import { Idle } from '../Idle';
 
 export class CloseVehicleDoorOutside extends CharacterStateBase
 {
+    private seat: Seat;
+
     constructor(character: Character, seat: Seat)
     {
         super(character);
 
+        this.seat = seat;
         this.canFindVehiclesToEnter = false;
 
         if (seat.doorSide === Side.Left)
@@ -28,6 +31,11 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
     public update(timeStep: number): void
     {
         super.update(timeStep);
+
+        if (this.timer > 0.3)
+        {
+            this.seat.closeDoorTest();   
+        }
 
         if (this.timer > this.animationLength - timeStep)
         {

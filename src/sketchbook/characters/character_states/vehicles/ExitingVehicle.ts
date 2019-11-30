@@ -25,13 +25,15 @@ export class ExitingVehicle extends CharacterStateBase
         this.vehicle = vehicle;
         this.seat = seat;
 
+        this.seat.openDoorTest();
+
         // seat.object.getWorldPosition( this.startPosition );
         this.startPosition.copy(seat.object.position);
-        this.startPosition.y += this.character.height / 2 - this.character.modelOffset.y;
+        this.startPosition.y +=  0.5;
         
         // seat.entryPoint.getWorldPosition( this.endPosition );
         this.endPosition.copy(seat.entryPoint.position);
-        this.endPosition.y += this.character.height / 2 - this.character.modelOffset.y;
+        // this.endPosition.y += this.character.height / 2 - this.character.modelOffset.y;
         this.endPosition.y += 1;
 
         if (seat.doorSide === Side.Left)

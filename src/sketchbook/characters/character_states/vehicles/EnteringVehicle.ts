@@ -16,6 +16,8 @@ export class EnteringVehicle extends CharacterStateBase
     private seat: Seat;
     private startPosition: THREE.Vector3 = new THREE.Vector3();
     private endPosition: THREE.Vector3 = new THREE.Vector3();
+    private startRotation: THREE.Vector3 = new THREE.Vector3();
+    private endRotation: THREE.Vector3 = new THREE.Vector3();
 
     constructor(character: Character, seat: Seat)
     {
@@ -25,13 +27,16 @@ export class EnteringVehicle extends CharacterStateBase
         this.vehicle = seat.vehicle;
         this.seat = seat;
 
-        // seat.entryPoint.getWorldPosition( this.startPosition );
-        this.startPosition.copy(seat.entryPoint.position);
-        this.startPosition.y += this.character.height / 2 - this.character.modelOffset.y;
+        // this.startPosition.copy(seat.entryPoint.position);
+        // this.startPosition.y += this.character.height / 2 - this.character.modelOffset.y;
+        // this.startPosition = (this.seat.vehicle as unknown as THREE.Object3D).worldToLocal(this.character.position);
 
-        // seat.object.getWorldPosition( this.endPosition );
-        this.endPosition.copy(seat.object.position);
-        this.endPosition.y += this.character.height / 2 - this.character.modelOffset.y;
+        // this.endPosition.copy(seat.object.position);
+        // this.endPosition.y += this.character.height / 2 - this.character.modelOffset.y;
+
+        // this.startRotation = (this.seat.vehicle as unknown as THREE.Object3D).worldToLocal(this.character.orientation);
+        // this.startRotation.copy(seat.entryPoint.quaternion);
+        // this.endRotation.copy(seat.object.quaternion);
 
         if (seat.doorSide === Side.Left)
         {
@@ -45,6 +50,15 @@ export class EnteringVehicle extends CharacterStateBase
         this.character.setPhysicsEnabled(false);
         (this.seat.vehicle as unknown as THREE.Object3D).attach(this.character);
 
+        this.startPosition.copy(this.character.position);
+        this.endPosition.copy(seat.object.position);
+        this.endPosition.y += 0.5;
+
+        // this.startRotation.copy(this.character.orientation);
+        // const elements = this.seat.entryPoint.matrix.elements;
+        // this.endRotation = new THREE.Vector3(-elements[8], -elements[9], -elements[10]);
+        // this.endRotation.copy(seat.object.quaternion);
+        // this.character.visuals.setRotationFromQuaternion(this.startRotation);
     }
 
     public update(timeStep: number): void
@@ -72,7 +86,16 @@ export class EnteringVehicle extends CharacterStateBase
 
         let factor = this.timer / this.animationLength;
         let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
+
         let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
         this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
+
+        // let quat = this.startRotation.slerp(this.endRotation, sineFactor);
+        // let lerpRotation = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
+        // this.character.orientation.copy(lerpRotation);
+        // this.character.visuals.lookAt(lerpRotation);
+
+        // let lerpRotation = new THREE.Vector3().lerpVectors(this.startRotation, this.endRotation, sineFactor);
+        // this.character.setRotationFromEuler(new THREE.Euler(lerpRotation.x, lerpRotation.y, lerpRotation.z));
     }
 }

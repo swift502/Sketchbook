@@ -23,7 +23,7 @@ import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/
 export class Character extends THREE.Object3D implements IControllable, IWorldEntity
 {
     public isCharacter: boolean = true;
-    public height: number = 1;
+    public height: number = 0;
     public modelOffset: THREE.Vector3 = new THREE.Vector3();
     public visuals: THREE.Group;
     public modelContainer: THREE.Group;
@@ -72,6 +72,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public behaviour: ICharacterAI;
     public world: World;
 
+    public help1: any;
+    public help2: any;
+    public help3: any;
+
     // Data for entering vehicles, should probably be
     // grouped together a little better e.g. as a class instance
     public isRunningTowardsVehicle: boolean = false;
@@ -82,6 +86,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     constructor(options: {})
     {
         super();
+
+        this.help1 = new THREE.AxesHelper(2);
+        this.help2 = new THREE.AxesHelper(2);
+        this.help3 = new THREE.AxesHelper(2);
 
         let defaults = {
             position: new THREE.Vector3(),
@@ -94,7 +102,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
         // Model container is used to reliably ground the character, as animation can alter the position of the model itself
         this.modelContainer = new THREE.Group();
-        this.modelContainer.position.y = -this.height / 2;
+        this.modelContainer.position.y = -0.57;
         this.visuals.add(this.modelContainer);
 
         // Default model
@@ -190,10 +198,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.arcadeVelocityInfluence.set(x, y, z);
     }
 
-    public setModelOffset(offset: THREE.Vector3): void
-    {
-        this.modelOffset.copy(offset);
-    }
+    // public setModelOffset(offset: THREE.Vector3): void
+    // {
+    //     this.modelOffset.copy(offset);
+    // }
 
     public setViewVector(vector: THREE.Vector3): void
     {
@@ -219,7 +227,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         else
         {
             this.position.x = x;
-            this.position.y = y - this.height / 2;
+            this.position.y = y;
             this.position.z = z;
         }
     }
@@ -396,7 +404,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             let viewVector = new THREE.Vector3().subVectors(entryPoint, this.position);
             this.setOrientationTarget(viewVector);
 
-            if (this.charState.canEnterVehicles && viewVector.length() < 0.5) {
+            if (this.charState.canEnterVehicles && viewVector.length() < 0.9) {
                 this.enterVehicle(this.targetSeat);
             }
         }
@@ -408,7 +416,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.visuals.position.copy(this.modelOffset);
         if (this.physicsEnabled) this.springMovement(timeStep);
         if (this.physicsEnabled) this.springRotation(timeStep);
-        this.rotateModel();
+        if (this.physicsEnabled) this.rotateModel();
         if (this.mixer !== undefined) this.mixer.update(timeStep);
 
         // Sync physics/graphics
@@ -416,18 +424,22 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         {
             this.position.set(
                 this.characterCapsule.physics.physical.interpolatedPosition.x,
-                this.characterCapsule.physics.physical.interpolatedPosition.y - this.height / 2,
+                this.characterCapsule.physics.physical.interpolatedPosition.y,
                 this.characterCapsule.physics.physical.interpolatedPosition.z
             );
         }
         else {
             let newPos = new THREE.Vector3();
             this.getWorldPosition(newPos);
-            newPos.y += this.height / 2;
+            // newPos.y -= this.height;
 
             this.characterCapsule.physics.physical.position.copy(newPos);
             this.characterCapsule.physics.physical.interpolatedPosition.copy(newPos);
         }
+
+        this.help1.position.copy(this.position);
+        this.modelContainer.getWorldPosition(this.help2.position);
+        this.visuals.getWorldPosition(this.help3.position);
     }
 
     public inputReceiverInit(): void
@@ -438,7 +450,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
     public inputReceiverUpdate(timeStep: number): void
     {
-        if(this.controlledObject !== undefined)
+        if (this.controlledObject !== undefined)
         {
             this.controlledObject.inputReceiverUpdate(timeStep);
         }
@@ -460,7 +472,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             //     this.position.z
             // );
             this.getWorldPosition(this.world.cameraOperator.target);
-            this.world.cameraOperator.target.y += this.height / 1.7;
+            // this.world.cameraOperator.target.y += this.height / 1.7;
         }
         
     }
@@ -548,9 +560,11 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
     public rotateModel(): void
     {
+        // let worldPosition = new THREE.Vector3();
+        // this.getWorldPosition(worldPosition);
         this.visuals.lookAt(this.position.x + this.orientation.x, this.position.y + this.visuals.position.y, this.position.z + this.orientation.z);
         this.visuals.rotateZ(-this.angularVelocity * 2.3 * this.velocity.length());
-        this.visuals.position.setY(this.visuals.position.y + (Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2));
+        this.visuals.position.setY(this.visuals.position.y + (Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2) - 0.5);
     }
 
     public jump(initJumpSpeed: number = -1): void
@@ -759,6 +773,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
             // Register characters physical capsule object
             world.objects.push(this.characterCapsule);
+
+            world.graphicsWorld.add(this.help1);
+            world.graphicsWorld.add(this.help2);
+            world.graphicsWorld.add(this.help3);
         }
     }
 
