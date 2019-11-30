@@ -1,7 +1,7 @@
-import { WheelFacing } from "../enums/WheelFacing";
+import { Side } from "../enums/Side";
 
 export class Wheel
 {
-    public facing: WheelFacing;
+    public facing: Side;
     public steering: boolean;
 }

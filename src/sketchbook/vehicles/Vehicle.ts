@@ -1,7 +1,8 @@
 import { Character } from "../characters/Character";
 import { IControllable } from "../interfaces/IControllable";
 import { InputController } from "../sketchbook";
-import THREE = require("three");
+import * as THREE from 'three';
+import * as CANNON from 'cannon';
 import { IWorldEntity } from "../interfaces/IWorldEntity";
 import { World } from "../core/World";
 import _ = require("lodash");
@@ -32,7 +33,11 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
 
         // Actions
         this.actions = {
-            'exitVehicle': new KeyBinding('Keyf'),
+            'forward': new KeyBinding('KeyW'),
+            'backward': new KeyBinding('KeyS'),
+            'left': new KeyBinding('KeyA'),
+            'right': new KeyBinding('KeyD'),
+            'exitVehicle': new KeyBinding('KeyF'),
         };
     }
 
@@ -43,8 +48,56 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
         this.modelContainer.add(this.model);
     }
 
-    public update()
+    public update(): void
     {
+        if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+        {
+            this.controllingCharacter.exitVehicle();
+        }
+
+        if (this.actions.forward.value)
+        {
+            let quat = new THREE.Quaternion(
+                this.collision.quaternion.x,
+                this.collision.quaternion.y,
+                this.collision.quaternion.z,
+                this.collision.quaternion.w
+            );
+
+            let dir = new THREE.Vector3(0, 0, 0.3);
+
+            dir.applyQuaternion(quat);
+
+            this.collision.velocity.x +=  dir.x;
+            this.collision.velocity.y +=  dir.y;
+            this.collision.velocity.z +=  dir.z;
+        }
+        if (this.actions.backward.value)
+        {
+            let quat = new THREE.Quaternion(
+                this.collision.quaternion.x,
+                this.collision.quaternion.y,
+                this.collision.quaternion.z,
+                this.collision.quaternion.w
+            );
+
+            let dir = new THREE.Vector3(0, 0, -0.3);
+
+            dir.applyQuaternion(quat);
+
+            this.collision.velocity.x +=  dir.x;
+            this.collision.velocity.y +=  dir.y;
+            this.collision.velocity.z +=  dir.z;
+        }
+        if (this.actions.left.value)
+        {
+            this.collision.angularVelocity.y += 0.5;
+        }
+        if (this.actions.right.value)
+        {
+            this.collision.angularVelocity.y -= 0.5;
+        }
+
         this.position.set(
             this.collision.position.x,
             this.collision.position.y,
@@ -61,16 +114,39 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
         );
     }
 
-    public triggerAction(actionName: string, value: boolean): void
-    {
-        return;
-    }
-
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
     {
-        if (code === 'KeyF' && pressed === true && this.controllingCharacter !== undefined)
+        for (const action in this.actions) {
+            if (this.actions.hasOwnProperty(action)) {
+                const binding = this.actions[action];
+
+                if (code === binding.keyCode)
+                {
+                    this.triggerAction(action, pressed);
+                }
+            }
+        }
+    }
+    
+    public triggerAction(actionName: string, value: boolean): void
+    {
+        // Get action and set it's parameters
+        let action = this.actions[actionName];
+
+        if (action.value !== value)
         {
-            this.controllingCharacter.exitVehicle();
+            // Set value
+            action.value = value;
+
+            // Set the 'just' attributes
+            if (value) action.justPressed = true;
+            else action.justReleased = true;
+
+            this.update();
+
+            // Reset the 'just' attributes
+            action.justPressed = false;
+            action.justReleased = false;
         }
     }
 
@@ -81,7 +157,7 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
 
     public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
     {
-        this.world.cameraController.move(deltaX, deltaY);
+        this.world.cameraOperator.move(deltaX, deltaY);
     }
 
     public handleMouseWheel(event: WheelEvent, value: number): void
@@ -91,12 +167,17 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
 
     public inputReceiverInit(): void
     {
-        return;
+        this.world.cameraOperator.setRadius(2.4);
     }
 
     public inputReceiverUpdate(timeStep: number): void
     {
-        return;
+        // Position camera
+        this.world.cameraOperator.target.set(
+            this.position.x,
+            this.position.y + 1,
+            this.position.z
+        );
     }
 
     public getMountPoint(character: Character): THREE.Vector3

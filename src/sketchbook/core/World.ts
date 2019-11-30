@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
-import { CameraController } from './CameraController';
+import { CameraOperator } from './CameraOperator';
 import { FXAAShader } from '../../lib/shaders/FXAAShader';
 import EffectComposer, {
     RenderPass,
@@ -39,7 +39,7 @@ export class World
     public justRendered: boolean;
     public params: { Pointer_Lock: boolean; Mouse_Sensitivity: number; FPS_Limit: number; Time_Scale: number; Shadows: boolean; FXAA: boolean; Draw_Physics: boolean; RayCast_Debug: boolean; };
     public inputManager: InputManager;
-    public cameraController: CameraController;
+    public cameraOperator: CameraOperator;
     public timeScaleTarget: number;
 
     public objects: SBObject[];
@@ -186,7 +186,7 @@ export class World
         this.objects = [];
         this.characters = [];
         this.vehicles = [];
-        this.cameraController = new CameraController(this, this.camera, this.params.Mouse_Sensitivity);
+        this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
 
         this.render(this);
@@ -222,7 +222,7 @@ export class World
         this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
 
         // Rotate and position camera
-        this.cameraController.update();
+        this.cameraOperator.update();
     }
 
     public updatePhysics(timeStep: number): void

@@ -15,12 +15,17 @@ import {
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
 import { KeyBinding } from '../../core/KeyBinding';
+import THREE = require('three');
 
 export abstract class CharacterStateBase implements ICharacterState
 {
     public character: Character;
     public timer: number;
     public animationLength: any;
+
+    public canFindVehiclesToEnter: boolean;
+    public canEnterVehicles: boolean;
+    public canLeaveVehicles: boolean;
 
     constructor(character: Character)
     {
@@ -35,6 +40,10 @@ export abstract class CharacterStateBase implements ICharacterState
         this.character.arcadeVelocityIsAdditive = false;
         this.character.setArcadeVelocityInfluence(1, 0, 1);
 
+        this.canFindVehiclesToEnter = true;
+        this.canEnterVehicles = false;
+        this.canLeaveVehicles = true;
+
         this.timer = 0;
     }
 
@@ -45,18 +54,18 @@ export abstract class CharacterStateBase implements ICharacterState
 
     public onInputChange(): void
     {
-        if (this.justPressed(this.character.actions.enter))
+        if (this.canFindVehiclesToEnter && this.justPressed(this.character.actions.enter))
         {
-                this.character.enterVehicle();
+                this.character.findVehicleToEnter();
         }
-        else if (this.character.enteringVehicle !== undefined)
+        else if (this.character.isRunningTowardsVehicle === true)
         {
             if (this.justPressed(this.character.actions.up) ||
                 this.justPressed(this.character.actions.down) ||
                 this.justPressed(this.character.actions.left) ||
                 this.justPressed(this.character.actions.right))
                 {
-                    this.character.enteringVehicle = undefined;
+                    this.character.isRunningTowardsVehicle = false;
                     this.character.actions.up.value = false;
                 }
         }

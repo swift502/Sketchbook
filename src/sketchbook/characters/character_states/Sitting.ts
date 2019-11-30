@@ -21,5 +21,6 @@ export class Sitting extends CharacterStateBase
     public update(timeStep: number): void
     {
         super.update(timeStep);
+
     }
 }

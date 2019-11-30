@@ -56,9 +56,9 @@ export class InputManager
     {
         if (this.inputReceiver === undefined) 
         {
-            if (this.world !== undefined && this.world.cameraController !== undefined)
+            if (this.world !== undefined && this.world.cameraOperator !== undefined)
             {
-                this.setInputReceiver(this.world.cameraController);
+                this.setInputReceiver(this.world.cameraOperator);
             }
         }
 
