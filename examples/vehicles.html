@@ -143,13 +143,12 @@
                             }
                             if(child.userData.data === 'seat')
                             {
-                                var seat = new SB.Seat();
-                                seat.object = child;
+                                var seat = new SB.VehicleSeat(child);
                                 seat.vehicle = car;
 
                                 if(child.userData.hasOwnProperty('door')) 
                                 {
-                                    seat.door = gltf.scene.getObjectByName(child.userData.door);
+                                    seat.door = new SB.VehicleDoor(gltf.scene.getObjectByName(child.userData.door));
                                 }
                                 if(child.userData.hasOwnProperty('door_side')) 
                                 {

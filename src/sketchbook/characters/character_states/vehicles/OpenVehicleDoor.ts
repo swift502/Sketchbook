@@ -3,7 +3,7 @@ import
     CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { Seat } from '../../../vehicles/Seat';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 import { EnteringVehicle } from './EnteringVehicle';
@@ -11,9 +11,9 @@ import THREE = require('three');
 
 export class OpenVehicleDoor extends CharacterStateBase
 {
-    private seat: Seat;
+    private seat: VehicleSeat;
 
-    constructor(character: Character, seat: Seat)
+    constructor(character: Character, seat: VehicleSeat)
     {
         super(character);
 
@@ -37,12 +37,12 @@ export class OpenVehicleDoor extends CharacterStateBase
         super.update(timeStep);
 
         const elements = this.seat.entryPoint.matrixWorld.elements;
-        let forward = new THREE.Vector3(-elements[8], -elements[9], -elements[10]);
+        let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
         this.character.setOrientationTarget(forward);
 
         if (this.timer > 0.3)
         {
-            this.seat.openDoorTest();   
+            this.seat.door.open();   
         }
 
         if (this.timer > this.animationLength - timeStep)

@@ -3,15 +3,15 @@ import
     CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { Seat } from '../../../vehicles/Seat';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 
 export class CloseVehicleDoorOutside extends CharacterStateBase
 {
-    private seat: Seat;
+    private seat: VehicleSeat;
 
-    constructor(character: Character, seat: Seat)
+    constructor(character: Character, seat: VehicleSeat)
     {
         super(character);
 
@@ -34,7 +34,7 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 
         if (this.timer > 0.3)
         {
-            this.seat.closeDoorTest();   
+            this.seat.door.close();   
         }
 
         if (this.timer > this.animationLength - timeStep)

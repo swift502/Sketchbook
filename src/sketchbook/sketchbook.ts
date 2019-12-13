@@ -30,13 +30,14 @@ export {Airplane} from './vehicles/Airplane';
 export {Car} from './vehicles/Car';
 export {Helicopter} from './vehicles/Helicopter';
 export {Wheel} from './vehicles/Wheel';
-export {Seat} from './vehicles/Seat';
+export {VehicleSeat} from './vehicles/VehicleSeat';
+export {VehicleDoor} from './vehicles/VehicleDoor';
 
 import * as statesLibrary from './characters/character_states/_stateLibrary';
 export const CharacterStates = statesLibrary;
 
 export { Character } from "./characters/Character";
-export { KeyBinding as InputController } from "./core/KeyBinding";
+export { KeyBinding } from "./core/KeyBinding";
 export { SBObject } from "./objects/SBObject";
 export { World } from "./core/World";
 
