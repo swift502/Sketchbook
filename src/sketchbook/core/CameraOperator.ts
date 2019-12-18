@@ -4,7 +4,7 @@ import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
 import { Character } from '../characters/Character';
 
-export class CameraController implements IInputReceiver
+export class CameraOperator implements IInputReceiver
 {
     public world: World;
     public camera: THREE.Camera;
@@ -156,7 +156,7 @@ export class CameraController implements IInputReceiver
         // Set fly speed
         let speed = this.movementSpeed * (this.actions.fast.value ? 5 : 1);
 
-        const elements = this.world.cameraController.camera.matrix.elements;
+        const elements = this.world.cameraOperator.camera.matrix.elements;
         let up = new THREE.Vector3(elements[4], elements[5], elements[6]);
         let forward = new THREE.Vector3(-elements[8], -elements[9], -elements[10]);
         let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
@@ -165,8 +165,8 @@ export class CameraController implements IInputReceiver
         this.forwardVelocity = THREE.Math.lerp(this.forwardVelocity, +this.actions.forward.value - +this.actions.back.value, 0.3);
         this.rightVelocity = THREE.Math.lerp(this.rightVelocity, +this.actions.right.value - +this.actions.left.value, 0.3);
 
-        this.world.cameraController.target.add(up.multiplyScalar(speed * this.upVelocity));
-        this.world.cameraController.target.add(forward.multiplyScalar(speed * this.forwardVelocity));
-        this.world.cameraController.target.add(right.multiplyScalar(speed * this.rightVelocity));
+        this.world.cameraOperator.target.add(up.multiplyScalar(speed * this.upVelocity));
+        this.world.cameraOperator.target.add(forward.multiplyScalar(speed * this.forwardVelocity));
+        this.world.cameraOperator.target.add(right.multiplyScalar(speed * this.rightVelocity));
     }
 }

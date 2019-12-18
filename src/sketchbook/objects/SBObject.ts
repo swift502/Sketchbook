@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { World } from '../core/World';
 import { IPhysicsType } from '../interfaces/IPhysicsType';
 
+//TODO static and dynamic props
 export class SBObject extends THREE.Object3D
 {
     public isObject: boolean;
@@ -23,6 +24,7 @@ export class SBObject extends THREE.Object3D
     {
         if (this.physics.visual !== undefined)
         {
+            // TODO encapulate physics, updating positions should be automatic?
             this.physics.visual.position.copy(this.position);
             this.physics.visual.quaternion.copy(this.quaternion);
         }

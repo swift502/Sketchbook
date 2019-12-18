@@ -10,24 +10,26 @@ export class VectorSpringSimulator extends SimulatorBase
     public target: THREE.Vector3;
     public cache: SimulationFrameVector[];
     
-    constructor(fps: number, mass: number, damping: number, startPosition = new THREE.Vector3(), startVelocity = new THREE.Vector3())
+    constructor(fps: number, mass: number, damping: number)
     {
         // Construct base
         super(fps, mass, damping);
 
-        // Simulated values
-        this.position = startPosition;
-        this.velocity = startVelocity;
+        this.init();
+    }
 
-        // Simulation parameters
+    public init(): void
+    {
+        this.position = new THREE.Vector3();
+        this.velocity = new THREE.Vector3();
         this.target = new THREE.Vector3();
 
         // Initialize cache by pushing two frames
-        this.cache = []; // At least two frames
+        this.cache = [];
         for (let i = 0; i < 2; i++)
         {
             this.cache.push(
-                new SimulationFrameVector(startPosition, startVelocity),
+                new SimulationFrameVector(new THREE.Vector3(), new THREE.Vector3()),
             );
         }
     }

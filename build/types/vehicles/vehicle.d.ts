@@ -1,10 +1,10 @@
 import { Character } from "../characters/Character";
 import { IControllable } from "../interfaces/IControllable";
-import { InputController } from "../sketchbook";
+import { KeyBinding } from "../core/KeyBinding";
 export declare class Vehicle implements IControllable {
     controllingCharacter: Character;
     actions: {
-        [action: string]: InputController;
+        [action: string]: KeyBinding;
     };
     triggerAction(actionName: string, value: boolean): void;
     handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void;

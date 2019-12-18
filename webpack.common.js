@@ -30,19 +30,19 @@ module.exports = {
               'css-loader',
             ],
         },
-        {
-            test: /\.(fbx|png)$/,
-            use: [
-                {
-                loader: 'file-loader',
-                options: {
-                    name: '[name].[ext]',
-                    outputPath: 'assets/',
-                    publicPath: '/build/'
-                }
-                }
-            ],
-          }
+        // {
+        //     test: /\.(fbx|png)$/,
+        //     use: [
+        //         {
+        //         loader: 'file-loader',
+        //         options: {
+        //             name: '[name].[ext]',
+        //             outputPath: 'assets/',
+        //             publicPath: '/build/'
+        //         }
+        //         }
+        //     ],
+        //   }
       ]
     },
     performance: {

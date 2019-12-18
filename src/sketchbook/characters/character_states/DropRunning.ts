@@ -27,25 +27,27 @@ export class DropRunning extends CharacterStateBase implements ICharacterState
 
         if (this.animationEnded(timeStep))
         {
-            this.character.setState(Walk);
+            this.character.setState(new Walk(this.character));
         }
     }
 
     public onInputChange(): void
     {
+        super.onInputChange();
+        
         if (this.noDirection())
         {
-            this.character.setState(EndWalk);
+            this.character.setState(new EndWalk(this.character));
         }
 
         if (this.anyDirection() && this.justPressed(this.character.actions.run))
         {
-            this.character.setState(Sprint);
+            this.character.setState(new Sprint(this.character));
         }
 
         if (this.justPressed(this.character.actions.jump))
         {
-            this.character.setState(JumpRunning);
+            this.character.setState(new JumpRunning(this.character));
         }
     }
 }

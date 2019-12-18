@@ -13,13 +13,14 @@ export class BoxPhysics implements IPhysicsType
     {
         let defaults = {
             mass: 0,
-            position: new CANNON.Vec3(),
-            size: new CANNON.Vec3(0.3, 0.3, 0.3),
+            position: new THREE.Vector3(),
+            size: new THREE.Vector3(0.3, 0.3, 0.3),
             friction: 0.3
         };
         options = Utils.setDefaults(options, defaults);
         this.options = options;
 
+        options.position = new CANNON.Vec3(options.position.x, options.position.y, options.position.z);
         options.size = new CANNON.Vec3(options.size.x, options.size.y, options.size.z);
 
         let mat = new CANNON.Material("boxMat");

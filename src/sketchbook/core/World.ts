@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
-import { CameraController } from './CameraController';
+import { CameraOperator } from './CameraOperator';
 import { FXAAShader } from '../../lib/shaders/FXAAShader';
 import EffectComposer, {
     RenderPass,
@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 import { InputManager } from './InputManager';
 import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
+import { ObjectPhysics } from '../sketchbook';
 
 export class World
 {
@@ -38,7 +39,7 @@ export class World
     public justRendered: boolean;
     public params: { Pointer_Lock: boolean; Mouse_Sensitivity: number; FPS_Limit: number; Time_Scale: number; Shadows: boolean; FXAA: boolean; Draw_Physics: boolean; RayCast_Debug: boolean; };
     public inputManager: InputManager;
-    public cameraController: CameraController;
+    public cameraOperator: CameraOperator;
     public timeScaleTarget: number;
 
     public objects: SBObject[];
@@ -111,9 +112,9 @@ export class World
 
         // Sun helper
         this.sun = new THREE.Vector3();
-        this.sun.x = -1;
+        this.sun.x = -0.5;
         this.sun.y = 1;
-        this.sun.z = -1;
+        this.sun.z = -0.5;
         sky.material.uniforms.sunPosition.value.copy(this.sun);
 
         // Lighting
@@ -185,7 +186,7 @@ export class World
         this.objects = [];
         this.characters = [];
         this.vehicles = [];
-        this.cameraController = new CameraController(this, this.camera, this.params.Mouse_Sensitivity);
+        this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
 
         this.render(this);
@@ -210,13 +211,18 @@ export class World
             char.updateMatrixWorld();
         });
 
+        this.vehicles.forEach((vehicle) => {
+            vehicle.update(timeStep);
+            // vehicle.updateMatrixWorld();
+        });
+
         this.inputManager.update(timeStep);
 
         // Lerp parameters
         this.params.Time_Scale = THREE.Math.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
 
         // Rotate and position camera
-        this.cameraController.update();
+        this.cameraOperator.update();
     }
 
     public updatePhysics(timeStep: number): void
@@ -240,8 +246,12 @@ export class World
                     obj.physics.physical.interpolatedPosition.z = -2.2;
                 }
 
-                obj.position.copy(obj.physics.physical.interpolatedPosition);
-                obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
+                obj.position.copy(obj.physics.physical.position);
+                obj.quaternion.copy(obj.physics.physical.quaternion);
+                
+                //entering vehicles
+                // obj.position.copy(obj.physics.physical.interpolatedPosition);
+                // obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
             }
         });
     }
@@ -317,6 +327,14 @@ export class World
         {
             console.error('Object type not supported: ' + (typeof object));
         }
+    }
+
+    public addFloor(): void {
+        let SBobj = new SBObject();
+        let phys = new ObjectPhysics.BoxPhysics({size: new THREE.Vector3(100, 1, 100)});
+        SBobj.setPhysics(phys);
+        SBobj.setModelFromPhysicsShape();
+        this.add(SBobj);
     }
 
     public scrollTheTimeScale(scrollAmount: number): void

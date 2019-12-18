@@ -15,12 +15,17 @@ import {
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
 import { KeyBinding } from '../../core/KeyBinding';
+import THREE = require('three');
 
 export abstract class CharacterStateBase implements ICharacterState
 {
     public character: Character;
     public timer: number;
     public animationLength: any;
+
+    public canFindVehiclesToEnter: boolean;
+    public canEnterVehicles: boolean;
+    public canLeaveVehicles: boolean;
 
     constructor(character: Character)
     {
@@ -35,6 +40,10 @@ export abstract class CharacterStateBase implements ICharacterState
         this.character.arcadeVelocityIsAdditive = false;
         this.character.setArcadeVelocityInfluence(1, 0, 1);
 
+        this.canFindVehiclesToEnter = true;
+        this.canEnterVehicles = false;
+        this.canLeaveVehicles = true;
+
         this.timer = 0;
     }
 
@@ -43,8 +52,23 @@ export abstract class CharacterStateBase implements ICharacterState
         this.timer += timeStep;
     }
 
-    public onInputChange(): void {
-        return;
+    public onInputChange(): void
+    {
+        if (this.canFindVehiclesToEnter && this.justPressed(this.character.actions.enter))
+        {
+                this.character.findVehicleToEnter();
+        }
+        else if (this.character.isRunningTowardsVehicle === true)
+        {
+            if (this.justPressed(this.character.actions.up) ||
+                this.justPressed(this.character.actions.down) ||
+                this.justPressed(this.character.actions.left) ||
+                this.justPressed(this.character.actions.right))
+                {
+                    this.character.isRunningTowardsVehicle = false;
+                    this.character.actions.up.value = false;
+                }
+        }
     }
 
     public noDirection(): boolean
@@ -74,7 +98,7 @@ export abstract class CharacterStateBase implements ICharacterState
 
     public fallInAir(): void
     {
-        if (!this.character.rayHasHit) { this.character.setState(Falling); }
+        if (!this.character.rayHasHit) { this.character.setState(new Falling(this.character)); }
     }
 
     public animationEnded(timeStep: number): boolean
@@ -98,29 +122,29 @@ export abstract class CharacterStateBase implements ICharacterState
     {
         if (this.character.groundImpactData.velocity.y < -6)
         {
-            this.character.setState(DropRolling);
+            this.character.setState(new DropRolling(this.character));
         }
         else if (this.anyDirection())
         {
             if (this.character.groundImpactData.velocity.y < -2)
             {
-                this.character.setState(DropRunning);
+                this.character.setState(new DropRunning(this.character));
             }
             else
             {
                 if (this.isPressed(this.character.actions.run))
                 {
-                    this.character.setState(Sprint);
+                    this.character.setState(new Sprint(this.character));
                 }
                 else
                 {
-                    this.character.setState(Walk);
+                    this.character.setState(new Walk(this.character));
                 }
             }
         }
         else
         {
-            this.character.setState(DropIdle);
+            this.character.setState(new DropIdle(this.character));
         }
     }
 
@@ -131,23 +155,23 @@ export abstract class CharacterStateBase implements ICharacterState
 
         if (angle > range * 0.8)
         {
-            this.character.setState(StartWalkBackLeft);
+            this.character.setState(new StartWalkBackLeft(this.character));
         }
         else if (angle < -range * 0.8)
         {
-            this.character.setState(StartWalkBackRight);
+            this.character.setState(new StartWalkBackRight(this.character));
         }
         else if (angle > range * 0.3)
         {
-            this.character.setState(StartWalkLeft);
+            this.character.setState(new StartWalkLeft(this.character));
         }
         else if (angle < -range * 0.3)
         {
-            this.character.setState(StartWalkRight);
+            this.character.setState(new StartWalkRight(this.character));
         }
         else
         {
-            this.character.setState(StartWalkForward);
+            this.character.setState(new StartWalkForward(this.character));
         }
     }
 }

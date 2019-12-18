@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import { Character } from '../Character';
 import { CharacterAIBase } from './CharacterAIBase';
 
 export class RandomBehaviour extends CharacterAIBase implements ICharacterAI
