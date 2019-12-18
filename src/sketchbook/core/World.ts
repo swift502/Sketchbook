@@ -17,6 +17,7 @@ import { InputManager } from './InputManager';
 import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
 import { ObjectPhysics } from '../sketchbook';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 
 export class World
 {
@@ -305,28 +306,14 @@ export class World
         }
     }
 
-    public add(object: any): void
+    public add(object: IWorldEntity): void
     {
-        if (typeof object.addToWorld === 'function')
-        {
-            object.addToWorld(this);
-        }
-        else
-        {
-            console.error('Object type not supported: ' + (typeof object));
-        }
+        object.addToWorld(this);
     }
 
-    public remove(object: any): void
+    public remove(object: IWorldEntity): void
     {
-        if (typeof object.removeFromWorld === 'function')
-        {
-            object.removeFromWorld(this);
-        }
-        else
-        {
-            console.error('Object type not supported: ' + (typeof object));
-        }
+        object.removeFromWorld(this);
     }
 
     public addFloor(): void {

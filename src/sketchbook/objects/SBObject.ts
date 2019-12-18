@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import * as _ from 'lodash';
 import { World } from '../core/World';
 import { IPhysicsType } from '../interfaces/IPhysicsType';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 
-//TODO static and dynamic props
-export class SBObject extends THREE.Object3D
+// TODO static and dynamic props
+export class SBObject extends THREE.Object3D implements IWorldEntity
 {
     public isObject: boolean;
     public model: any;
