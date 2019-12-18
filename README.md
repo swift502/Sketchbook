@@ -4,9 +4,10 @@
     <br>
     <a href="http://jblaha.art" target="_blank"><img src="https://i.imgur.com/JDmSWj9.png"></a>
     <br>
-    <a href="https://www.npmjs.com/package/sketchbook"><img src="https://img.shields.io/npm/v/sketchbook?style=flat-square"></a>
-    <a href="https://travis-ci.org/swift502/Sketchbook"><img src="https://img.shields.io/travis/swift502/sketchbook?style=flat-square"></a>
 </p>
+
+[![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
+[![badge](https://img.shields.io/travis/swift502/sketchbook?style=flat-square)](https://travis-ci.org/swift502/Sketchbook)
 
 # Sketchbook
 
