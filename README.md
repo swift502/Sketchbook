@@ -2,10 +2,10 @@
    <a href="http://jblaha.art"><img src="https://i.imgur.com/VM9yu68.png"></a>
    <br>
    Play it <a href="http://jblaha.art">here</a>!
+   <br><br>
+   <a href="https://www.npmjs.com/package/sketchbook"><img src="https://img.shields.io/npm/v/sketchbook?style=flat-square"></a>
+   <a href="https://travis-ci.org/swift502/Sketchbook"><img src="https://img.shields.io/travis/swift502/sketchbook?style=flat-square"></a>
 </p>
-
-[![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
-[![badge](https://img.shields.io/travis/swift502/sketchbook?style=flat-square)](https://travis-ci.org/swift502/Sketchbook)
 
 # :ledger: Sketchbook
 
