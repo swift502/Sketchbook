@@ -2,7 +2,7 @@
     <a href="http://jblaha.art"><img src="https://i.imgur.com/VM9yu68.png"></a>
     <br>
     <br>
-    <a href="http://jblaha.art" target="_blank"><img src="https://i.imgur.com/JDmSWj9.png"></a>
+    <a href="http://jblaha.art" target="_blank"><img src="https://i.imgur.com/1LIwT1M.png"></a>
     <br>
 </p>
 
