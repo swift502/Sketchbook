@@ -1,9 +1,11 @@
 <p align="center">
-   <a href="http://jblaha.art"><img src="https://i.imgur.com/VM9yu68.png"></a>
-   <br>
-   <a href="http://jblaha.art"><img src="https://img.shields.io/badge/-Launch%20demo-brightgreen?color=2eb800&logoWidth=10&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8%2BPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj48c3ZnIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCIgdmlld0JveD0iMTAyLjk5OTk5OTk5OTk5OTk3IDc5LjQ5MTY4NTA5MzIwNTEgNDMyIDQ4NC4yMjUyOTk3MjQ2NDM1IiB3aWR0aD0iNDI4IiBoZWlnaHQ9IjQ4MC4yMyI%2BPGRlZnM%2BPHBhdGggZD0iTTEwNCAxMzZDMTA0IDkzLjMzIDE0OS4zMyA2Ni42NyAxODQgODhDMjE2IDEwNi40IDQ3MiAyNTMuNiA1MDQgMjcyQzU0MS4zMyAyOTMuMzMgNTQxLjMzIDM0OS4zMyA1MDQgMzcwLjY3QzQ3MiAzODkuMDcgMjE2IDUzNi4yNyAxODQgNTU0LjY3QzE0OS4zMyA1NzMuMzMgMTA0IDU0Ni42NyAxMDQgNTA0QzEwNCA0MzAuNCAxMDQgMTcyLjggMTA0IDEzNloiIGlkPSJhVFZpVGFSY0MiPjwvcGF0aD48L2RlZnM%2BPGc%2BPGc%2BPHVzZSB4bGluazpocmVmPSIjYVRWaVRhUmNDIiBvcGFjaXR5PSIxIiBmaWxsPSIjZmZmZmZmIiBmaWxsLW9wYWNpdHk9IjEiPjwvdXNlPjxnPjx1c2UgeGxpbms6aHJlZj0iI2FUVmlUYVJjQyIgb3BhY2l0eT0iMSIgZmlsbC1vcGFjaXR5PSIwIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLW9wYWNpdHk9IjAiPjwvdXNlPjwvZz48L2c%2BPC9nPjwvc3ZnPg%3D%3D"></a>
-   <a href="https://www.npmjs.com/package/sketchbook"><img src="https://img.shields.io/npm/v/sketchbook"></a>
-   <a href="https://travis-ci.org/swift502/Sketchbook"><img src="https://img.shields.io/travis/swift502/sketchbook"></a>
+    <a href="http://jblaha.art"><img src="https://i.imgur.com/VM9yu68.png"></a>
+    <br>
+    <br>
+    <a href="http://jblaha.art"><img src="https://i.imgur.com/JDmSWj9.png"></a>
+    <br>
+    <a href="https://www.npmjs.com/package/sketchbook"><img src="https://img.shields.io/npm/v/sketchbook?style=flat-square"></a>
+    <a href="https://travis-ci.org/swift502/Sketchbook"><img src="https://img.shields.io/travis/swift502/sketchbook?style=flat-square"></a>
 </p>
 
 # Sketchbook
