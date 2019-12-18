@@ -1,8 +1,7 @@
 <p align="center">
     <a href="http://jblaha.art"><img src="https://i.imgur.com/VM9yu68.png"></a>
     <br>
-    <br>
-    <a href="http://jblaha.art" target="_blank"><img src="https://i.imgur.com/1LIwT1M.png"></a>
+    Play it <a href="http://jblaha.art">here</a>!
     <br>
 </p>
 
