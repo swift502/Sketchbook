@@ -1,7 +1,7 @@
 export class KeyBinding
 {
     public keyCode: string;
-    public value: boolean = false;
+    public isPressed: boolean = false;
     public justPressed: boolean = false;
     public justReleased: boolean = false;
     

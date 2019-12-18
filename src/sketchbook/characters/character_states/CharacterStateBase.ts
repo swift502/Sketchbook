@@ -54,47 +54,47 @@ export abstract class CharacterStateBase implements ICharacterState
 
     public onInputChange(): void
     {
-        if (this.canFindVehiclesToEnter && this.justPressed(this.character.actions.enter))
+        if (this.canFindVehiclesToEnter && this.character.actions.enter.justPressed)
         {
                 this.character.findVehicleToEnter();
         }
         else if (this.character.isRunningTowardsVehicle === true)
         {
-            if (this.justPressed(this.character.actions.up) ||
-                this.justPressed(this.character.actions.down) ||
-                this.justPressed(this.character.actions.left) ||
-                this.justPressed(this.character.actions.right))
+            if (this.character.actions.up.justPressed ||
+                this.character.actions.down.justPressed ||
+                this.character.actions.left.justPressed ||
+                this.character.actions.right.justPressed)
                 {
                     this.character.isRunningTowardsVehicle = false;
-                    this.character.actions.up.value = false;
+                    this.character.actions.up.isPressed = false;
                 }
         }
     }
 
     public noDirection(): boolean
     {
-        return !this.character.actions.up.value && !this.character.actions.down.value && !this.character.actions.left.value && !this.character.actions.right.value;
+        return !this.character.actions.up.isPressed && !this.character.actions.down.isPressed && !this.character.actions.left.isPressed && !this.character.actions.right.isPressed;
     }
 
     public anyDirection(): boolean
     {
-        return this.character.actions.up.value || this.character.actions.down.value || this.character.actions.left.value || this.character.actions.right.value;
+        return this.character.actions.up.isPressed || this.character.actions.down.isPressed || this.character.actions.left.isPressed || this.character.actions.right.isPressed;
     }
 
-    public justPressed(key: KeyBinding): boolean
-    {
-        return key.justPressed;
-    }
+    // public justPressed(key: KeyBinding): boolean
+    // {
+    //     return key.justPressed;
+    // }
 
-    public isPressed(key: KeyBinding): boolean
-    {
-        return key.value;
-    }
+    // public isPressed(key: KeyBinding): boolean
+    // {
+    //     return key.pressed;
+    // }
 
-    public justReleased(key: KeyBinding): boolean
-    {
-        return key.justReleased;
-    }
+    // public justReleased(key: KeyBinding): boolean
+    // {
+    //     return key.justReleased;
+    // }
 
     public fallInAir(): void
     {
@@ -132,7 +132,7 @@ export abstract class CharacterStateBase implements ICharacterState
             }
             else
             {
-                if (this.isPressed(this.character.actions.run))
+                if (this.character.actions.run.isPressed)
                 {
                     this.character.setState(new Sprint(this.character));
                 }

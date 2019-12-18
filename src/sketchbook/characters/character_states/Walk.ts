@@ -22,7 +22,7 @@ export class Walk extends CharacterStateBase
         {
             this.character.setState(new EndWalk(this.character));
         }
-        if (this.isPressed(this.character.actions.run))
+        if (this.character.actions.run.isPressed)
         {
             this.character.setState(new Sprint(this.character));
         }
@@ -41,12 +41,12 @@ export class Walk extends CharacterStateBase
     {
         super.onInputChange();
         
-        if (this.justPressed(this.character.actions.run))
+        if (this.character.actions.run.justPressed)
         {
             this.character.setState(new Sprint(this.character));
         }
 
-        if (this.justPressed(this.character.actions.jump))
+        if (this.character.actions.jump.justPressed)
         {
             this.character.setState(new JumpRunning(this.character));
         }

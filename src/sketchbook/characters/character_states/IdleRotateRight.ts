@@ -40,7 +40,7 @@ export class IdleRotateRight extends CharacterStateBase implements ICharacterSta
     {
         super.onInputChange();
         
-        if (this.justPressed(this.character.actions.jump))
+        if (this.character.actions.jump.justPressed)
         {
             this.character.setState(new JumpIdle(this.character));
         }

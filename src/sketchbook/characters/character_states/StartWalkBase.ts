@@ -61,7 +61,7 @@ export class StartWalkBase extends CharacterStateBase
     {
         super.onInputChange();
         
-        if (this.justPressed(this.character.actions.jump))
+        if (this.character.actions.jump.justPressed)
         {
             this.character.setState(new JumpRunning(this.character));
         }
@@ -91,7 +91,7 @@ export class StartWalkBase extends CharacterStateBase
             }
         }
 
-        if (this.justPressed(this.character.actions.run))
+        if (this.character.actions.run.justPressed)
         {
             this.character.setState(new Sprint(this.character));
         }

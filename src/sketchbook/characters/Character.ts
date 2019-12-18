@@ -365,10 +365,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         // Get action and set it's parameters
         let action = this.actions[actionName];
 
-        if (action.value !== value)
+        if (action.isPressed !== value)
         {
             // Set value
-            action.value = value;
+            action.isPressed = value;
 
             // Set the 'just' attributes
             if (value) action.justPressed = true;
@@ -543,10 +543,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
     public getLocalMovementDirection(): THREE.Vector3
     {
-        const positiveX = this.actions.right.value ? -1 : 0;
-        const negativeX = this.actions.left.value ? 1 : 0;
-        const positiveZ = this.actions.up.value ? 1 : 0;
-        const negativeZ = this.actions.down.value ? -1 : 0;
+        const positiveX = this.actions.right.isPressed ? -1 : 0;
+        const negativeX = this.actions.left.isPressed ? 1 : 0;
+        const positiveZ = this.actions.up.isPressed ? 1 : 0;
+        const negativeZ = this.actions.down.isPressed ? -1 : 0;
 
         return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ).normalize();
     }

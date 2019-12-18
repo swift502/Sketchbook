@@ -64,7 +64,7 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
             this.controllingCharacter.exitVehicle();
         }
 
-        if (this.actions.forward.value)
+        if (this.actions.forward.isPressed)
         {
             let quat = new THREE.Quaternion(
                 this.collision.quaternion.x,
@@ -81,7 +81,7 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
             this.collision.velocity.y +=  dir.y;
             this.collision.velocity.z +=  dir.z;
         }
-        if (this.actions.backward.value)
+        if (this.actions.backward.isPressed)
         {
             let quat = new THREE.Quaternion(
                 this.collision.quaternion.x,
@@ -98,11 +98,11 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
             this.collision.velocity.y +=  dir.y;
             this.collision.velocity.z +=  dir.z;
         }
-        if (this.actions.left.value)
+        if (this.actions.left.isPressed)
         {
             this.collision.angularVelocity.y += 0.5;
         }
-        if (this.actions.right.value)
+        if (this.actions.right.isPressed)
         {
             this.collision.angularVelocity.y -= 0.5;
         }
@@ -153,10 +153,10 @@ export class Vehicle extends THREE.Object3D implements IControllable, IWorldEnti
         // Get action and set it's parameters
         let action = this.actions[actionName];
 
-        if (action.value !== value)
+        if (action.isPressed !== value)
         {
             // Set value
-            action.value = value;
+            action.isPressed = value;
 
             // Set the 'just' attributes
             if (value) action.justPressed = true;
