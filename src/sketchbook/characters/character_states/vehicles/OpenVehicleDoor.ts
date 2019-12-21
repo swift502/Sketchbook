@@ -42,7 +42,7 @@ export class OpenVehicleDoor extends CharacterStateBase
 
         if (this.timer > 0.3)
         {
-            this.seat.door.open();   
+            this.seat.openDoor();   
         }
 
         if (this.timer > this.animationLength - timeStep)

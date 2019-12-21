@@ -8,11 +8,6 @@ export class VehicleDoor
     public targetRotation: number = 0;
     public rotationSpeed: number = 5;
 
-    get isOpen(): boolean
-    {
-        return this.rotation > 0.5;
-    }
-
     constructor(object: THREE.Object3D)
     {
         this.doorObject = object;
@@ -51,5 +46,10 @@ export class VehicleDoor
     public close(): void
     {
         this.targetRotation = 0;
+    }
+
+    public isOpen(): boolean
+    {
+        return this.rotation > 0.5;
     }
 }

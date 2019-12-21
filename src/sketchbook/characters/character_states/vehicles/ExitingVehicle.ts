@@ -27,7 +27,7 @@ export class ExitingVehicle extends CharacterStateBase
         this.vehicle = vehicle;
         this.seat = seat;
 
-        this.seat.door.open();
+        this.seat.openDoor();
 
         this.startPosition.copy(this.character.position);
         this.endPosition.copy(seat.entryPoint.position);
@@ -61,7 +61,7 @@ export class ExitingVehicle extends CharacterStateBase
             this.character.resetOrientation();
             this.character.setPhysicsEnabled(true);
 
-            if (this.anyDirection())
+            if (this.anyDirection() || this.seat.door === undefined)
             {
                 this.character.setState(new Idle(this.character));
             }

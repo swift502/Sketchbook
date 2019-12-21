@@ -27,6 +27,7 @@ export class EnteringVehicle extends CharacterStateBase
         this.vehicle = seat.vehicle;
         this.seat = seat;
 
+        this.animationLength = 1;
         if (seat.doorSide === Side.Left)
         {
             this.animationLength = this.character.setAnimation('sit_down_right', 0.1);
@@ -39,6 +40,8 @@ export class EnteringVehicle extends CharacterStateBase
         this.character.setPhysicsEnabled(false);
         (this.seat.vehicle as unknown as THREE.Object3D).attach(this.character);
 
+        console.log(this.seat);
+
         this.startPosition.copy(this.character.position);
         this.endPosition.copy(seat.seatObject.position);
         this.endPosition.y += 0.5;
@@ -46,8 +49,8 @@ export class EnteringVehicle extends CharacterStateBase
         this.startRotation.copy(this.character.quaternion);
         this.endRotation.copy(this.seat.seatObject.quaternion);
 
-        console.log(this.startRotation);
-        console.log(this.endRotation);
+        // console.log(this.startRotation);
+        // console.log(this.endRotation);
     }
 
     public update(timeStep: number): void
@@ -63,7 +66,7 @@ export class EnteringVehicle extends CharacterStateBase
             this.character.controlledObjectSeat = this.seat;
             this.vehicle.controllingCharacter = this.character;
 
-            if (this.anyDirection())
+            if (this.anyDirection() || this.seat.door === undefined)
             {
                 this.character.setState(new Sitting(this.character));
             }

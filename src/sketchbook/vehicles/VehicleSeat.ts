@@ -20,6 +20,31 @@ export class VehicleSeat
 
     public update(timeStep: number): void
     {
-        this.door.update(timeStep);
+        if (this.door !== undefined)
+        {
+            this.door.update(timeStep);
+        }
+    }
+
+    public isDoorOpen(): boolean
+    {
+        if (this.door === undefined)
+        {
+            return true;
+        }
+        else 
+        {
+            return this.door.isOpen();
+        }
+    }
+
+    public openDoor(): void
+    {
+        if (this.door !== undefined) this.door.open();
+    }
+
+    public closeDoor(): void
+    {
+        if (this.door !== undefined) this.door.close();
     }
 }

@@ -149,7 +149,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             height: 0.5,
             radius: 0.25,
             segments: 8,
-            friction: 0
+            friction: 0.1
         });
         this.characterCapsule = new SBObject();
         this.characterCapsule.setPhysics(capsulePhysics);
@@ -598,11 +598,24 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     {
         // TODO follow a path (generated using a navmesh?)
         // TODO identify a seat to get into
-        // TODO sort vehicles by closest, exclude ones beyond a certain distance
-        if (this.world.vehicles[0] !== undefined)
+        let bestVehicle: IControllable;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        let maxDistance = 10;
+
+        this.world.vehicles.forEach((vehicle) => {
+           
+            let distance = new THREE.Vector3().subVectors(this.position, vehicle.position).lengthSq();
+
+            if (distance < maxDistance && distance < bestDistance)
+            {
+                bestVehicle = vehicle;
+            }
+        });
+
+        if (bestVehicle !== undefined)
         {
             this.isRunningTowardsVehicle = true;
-            this.targetSeat = this.world.vehicles[0].seats[0];
+            this.targetSeat = bestVehicle.seats[0];
             this.triggerAction('up', true);
         }
         else {
@@ -614,7 +627,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     {
         this.resetControls();
 
-        if (seat.door.isOpen)
+        if (seat.isDoorOpen())
         {
             this.setState(new EnteringVehicle(this, this.targetSeat));
         }

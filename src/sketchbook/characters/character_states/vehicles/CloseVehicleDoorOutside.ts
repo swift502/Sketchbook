@@ -34,7 +34,7 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 
         if (this.timer > 0.3)
         {
-            this.seat.door.close();   
+            this.seat.closeDoor();   
         }
 
         if (this.timer > this.animationLength - timeStep)
