@@ -460,7 +460,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public inputReceiverInit(): void
     {
         this.world.cameraOperator.setRadius(1.6, true);
-        this.world.dirLight.target = this;
+        // this.world.dirLight.target = this;
     }
 
     public inputReceiverUpdate(timeStep: number): void
@@ -477,20 +477,9 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             // TODO: Make global property
             let globalPos = new THREE.Vector3();
             this.getWorldPosition(globalPos);
-            // Make light follow player (for shadows)
-            this.world.dirLight.position.set(
-                globalPos.x + this.world.sun.x * 15,
-                globalPos.y + this.world.sun.y * 15,
-                globalPos.z + this.world.sun.z * 15);
 
-            // Position camera
-            // this.world.cameraOperator.target.set(
-            //     this.position.x,
-            //     this.position.y + this.height / 1.7,
-            //     this.position.z
-            // );
+            this.world.sky.updateSkyCenter(this.position);
             this.getWorldPosition(this.world.cameraOperator.target);
-            // this.world.cameraOperator.target.y += this.height / 1.7;
         }
         
     }

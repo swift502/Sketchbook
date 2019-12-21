@@ -40,17 +40,12 @@ export class EnteringVehicle extends CharacterStateBase
         this.character.setPhysicsEnabled(false);
         (this.seat.vehicle as unknown as THREE.Object3D).attach(this.character);
 
-        console.log(this.seat);
-
         this.startPosition.copy(this.character.position);
         this.endPosition.copy(seat.seatObject.position);
         this.endPosition.y += 0.5;
 
         this.startRotation.copy(this.character.quaternion);
         this.endRotation.copy(this.seat.seatObject.quaternion);
-
-        // console.log(this.startRotation);
-        // console.log(this.endRotation);
     }
 
     public update(timeStep: number): void

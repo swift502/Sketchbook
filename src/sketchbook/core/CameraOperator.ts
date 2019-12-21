@@ -70,19 +70,19 @@ export class CameraOperator implements IInputReceiver
 
     public move(deltaX: number, deltaY: number): void
     {
-        this.theta -= deltaX * this.sensitivity.x;
-        this.theta %= 720;
-        this.phi += deltaY * this.sensitivity.y;
-        this.phi = Math.min(170, Math.max(-170, this.phi));
+        this.theta -= deltaX * (this.sensitivity.x / 2);
+        this.theta %= 360;
+        this.phi += deltaY * (this.sensitivity.y / 2);
+        this.phi = Math.min(85, Math.max(-85, this.phi));
     }
 
     public update(): void
     {
         this.radius = THREE.Math.lerp(this.radius, this.targetRadius, 0.1);
 
-        this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
-        this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 360);
-        this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 360) * Math.cos(this.phi * Math.PI / 360);
+        this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+        this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 180);
+        this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
         this.camera.updateMatrix();
         this.camera.lookAt(this.target);
     }
@@ -141,17 +141,12 @@ export class CameraOperator implements IInputReceiver
     {
         this.target.copy(this.camera.position);
         this.setRadius(0, true);
-        this.world.dirLight.target = this.world.camera;
+        // this.world.dirLight.target = this.world.camera;
     }
 
     public inputReceiverUpdate(): void
     {
-        // Make light follow camera (for shadows)
-        this.world.dirLight.position.set(
-            this.world.camera.position.x + this.world.sun.x * 15,
-            this.world.camera.position.y + this.world.sun.y * 15,
-            this.world.camera.position.z + this.world.sun.z * 15
-        );
+        this.world.sky.updateSkyCenter(this.camera.position);
 
         // Set fly speed
         let speed = this.movementSpeed * (this.actions.fast.isPressed ? 5 : 1);

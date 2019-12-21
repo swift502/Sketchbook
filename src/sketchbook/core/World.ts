@@ -7,7 +7,6 @@ import EffectComposer, {
     RenderPass,
     ShaderPass,
 } from '@johh/three-effectcomposer';
-import * as Sky from 'three-sky';
 
 import { Detector } from '../../lib/utils/Detector';
 import { Stats } from '../../lib/utils/Stats';
@@ -18,6 +17,7 @@ import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
 import { ObjectPhysics } from '../sketchbook';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { Sky } from './Sky';
 
 export class World
 {
@@ -26,8 +26,9 @@ export class World
     public composer: EffectComposer;
     public stats: Stats;
     public graphicsWorld: THREE.Scene;
-    public sun: THREE.Vector3;
-    public dirLight: THREE.DirectionalLight;
+    public sky: Sky;
+    // public sun: THREE.Vector3;
+    // public dirLight: THREE.DirectionalLight;
     public physicsWorld: CANNON.World;
     public parallelPairs: any[];
     public physicsFrameRate: number;
@@ -38,7 +39,7 @@ export class World
     public logicDelta: number;
     public sinceLastFrame: number;
     public justRendered: boolean;
-    public params: { Pointer_Lock: boolean; Mouse_Sensitivity: number; FPS_Limit: number; Time_Scale: number; Shadows: boolean; FXAA: boolean; Draw_Physics: boolean; RayCast_Debug: boolean; };
+    public params: any;
     public inputManager: InputManager;
     public cameraOperator: CameraOperator;
     public timeScaleTarget: number;
@@ -51,8 +52,6 @@ export class World
     constructor()
     {
         const scope = this;
-
-        //#region HTML
 
         // WebGL not supported
         if (!Detector.webgl)
@@ -84,17 +83,11 @@ export class World
         this.stats = Stats();
         document.body.appendChild(this.stats.dom);
 
-        //#endregion
-
-        //#region Graphics
-
+        // Three.js scene
         this.graphicsWorld = new THREE.Scene();
-
-        // Fog
-        // this.graphicsWorld.fog = new THREE.FogExp2(0xC8D3D5, 0.25);
-
-        // Camera
         this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 120);
+        this.sky = new Sky(this);
+        this.graphicsWorld.add(this.sky);
 
         // FXAA
         let effectFXAA = new ShaderPass(FXAAShader);
@@ -105,41 +98,6 @@ export class World
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(new RenderPass(this.graphicsWorld, this.camera));
         this.composer.addPass(effectFXAA);
-        
-        // Sky
-        let sky = new Sky();
-        sky.scale.setScalar(100);
-        this.graphicsWorld.add(sky);
-
-        // Sun helper
-        this.sun = new THREE.Vector3();
-        this.sun.x = -0.5;
-        this.sun.y = 1;
-        this.sun.z = -0.5;
-        sky.material.uniforms.sunPosition.value.copy(this.sun);
-
-        // Lighting
-        let ambientLight = new THREE.AmbientLight(0xaaaaaa); // soft white light
-        this.graphicsWorld.add(ambientLight);
-
-        // Sun light with shadowmap
-        let dirLight = new THREE.DirectionalLight(0xffffff, 0.4);
-        this.dirLight = dirLight;
-        dirLight.castShadow = true;
-
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 1;
-        dirLight.shadow.camera.far = 50;
-
-        dirLight.shadow.camera.top = 15;
-        dirLight.shadow.camera.right = 15;
-        dirLight.shadow.camera.bottom = -15;
-        dirLight.shadow.camera.left = -15;
-
-        this.graphicsWorld.add(dirLight);
-
-        //#endregion
 
         // Physics
         this.physicsWorld = new CANNON.World();
@@ -170,7 +128,9 @@ export class World
             Shadows: true,
             FXAA: true,
             Draw_Physics: false,
-            RayCast_Debug: false
+            RayCast_Debug: false,
+            Phi: 60,
+            Theta: 225,
         };
         this.params = params;
 
@@ -344,7 +304,7 @@ export class World
         }
     }
 
-    private getGUI(scope): GUI
+    private getGUI(scope: any): GUI
     {
         const gui = new GUI.GUI();
 
@@ -374,11 +334,11 @@ export class World
             {
                 if (enabled)
                 {
-                    this.dirLight.castShadow = true;
+                    this.sky.sun.castShadow = true;
                 }
                 else
                 {
-                    this.dirLight.castShadow = false;
+                    this.sky.sun.castShadow = false;
                 }
             });
         graphicsFolder.add(this.params, 'FXAA');
@@ -405,6 +365,19 @@ export class World
                     if (enabled) char.raycastBox.visible = true;
                     else char.raycastBox.visible = false;
                 });
+            });
+            
+        // Debug
+        let skyFolder = gui.addFolder('Sky');
+        skyFolder.add(this.params, 'Phi', 0, 360).listen()
+            .onChange((value) =>
+            {
+                scope.sky.phi = value;
+            });
+        skyFolder.add(this.params, 'Theta', 0, 360).listen()
+            .onChange((value) =>
+            {
+                scope.sky.theta = value;
             });
 
         return gui;

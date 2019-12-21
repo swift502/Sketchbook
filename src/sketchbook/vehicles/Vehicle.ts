@@ -200,11 +200,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             this.position.z
         );
 
-        // Make light follow vehicle (for shadows)
-        this.world.dirLight.position.set(
-            this.position.x + this.world.sun.x * 15,
-            this.position.y + this.world.sun.y * 15,
-            this.position.z + this.world.sun.z * 15);
+        this.world.sky.updateSkyCenter(this.position);
     }
 
     public getMountPoint(character: Character): THREE.Vector3

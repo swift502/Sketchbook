@@ -39,7 +39,7 @@
         let world = new SB.World();
         world.addFloor();
 
-        var gridHelper = new SB.THREE.GridHelper( 100, 50, 0x888888, 0xbbbbbb );
+        var gridHelper = new SB.THREE.GridHelper( 100, 50, 0x444444, 0xaaaaaa );
         gridHelper.position.y = 1.01;
         world.graphicsWorld.add( gridHelper );
 
@@ -48,9 +48,7 @@
         document.getElementsByClassName('statsBox')[0].style.display = 'none';
 
         // Setup camera
-        world.cameraOperator.theta = 360;
-        world.cameraOperator.target.z = -3;
-        world.cameraOperator.target.y = 2;
+        world.cameraOperator.theta = 180;
 
         //
         // Load characters

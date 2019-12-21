@@ -18,6 +18,7 @@
         "curly": false,
         "object-literal-sort-keys": false,
         "object-literal-key-quotes": false,
+        "variable-name": false,
         "typedef": [
             true,
             "call-signature",

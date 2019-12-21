@@ -46,7 +46,6 @@
   "dependencies": {
     "@johh/three-effectcomposer": "0.0.7",
     "lodash": "^4.17.15",
-    "three": "^0.109.0",
-    "three-sky": "^1.1.2"
+    "three": "^0.109.0"
   }
 }
