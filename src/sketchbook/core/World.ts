@@ -210,7 +210,7 @@ export class World
                 obj.position.copy(obj.physics.physical.position);
                 obj.quaternion.copy(obj.physics.physical.quaternion);
                 
-                //entering vehicles
+                // entering vehicles
                 // obj.position.copy(obj.physics.physical.interpolatedPosition);
                 // obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
             }

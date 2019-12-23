@@ -1,5 +1,5 @@
-import { World } from "./World";
-import { IInputReceiver } from "../interfaces/IInputReceiver";
+import { World } from './World';
+import { IInputReceiver } from '../interfaces/IInputReceiver';
 
 export class InputManager
 {
@@ -42,14 +42,14 @@ export class InputManager
 
         // Init event listeners
         // Mouse
-        this.domElement.addEventListener("mousedown", this.boundOnMouseDown, false);
-        document.addEventListener("wheel", this.boundOnMouseWheelMove, false);
-        document.addEventListener("pointerlockchange", this.boundOnPointerlockChange, false);
-        document.addEventListener("pointerlockerror", this.boundOnPointerlockError, false);
+        this.domElement.addEventListener('mousedown', this.boundOnMouseDown, false);
+        document.addEventListener('wheel', this.boundOnMouseWheelMove, false);
+        document.addEventListener('pointerlockchange', this.boundOnPointerlockChange, false);
+        document.addEventListener('pointerlockerror', this.boundOnPointerlockError, false);
         
         // Keys
-        document.addEventListener("keydown", this.boundOnKeyDown, false);
-        document.addEventListener("keyup", this.boundOnKeyUp, false);
+        document.addEventListener('keydown', this.boundOnKeyDown, false);
+        document.addEventListener('keyup', this.boundOnKeyUp, false);
     }
 
     public update(timestep: number): void
@@ -83,21 +83,21 @@ export class InputManager
     {
         if (document.pointerLockElement === this.domElement)
         {
-            this.domElement.addEventListener("mousemove", this.boundOnMouseMove, false);
-            this.domElement.addEventListener("mouseup", this.boundOnMouseUp, false);
+            this.domElement.addEventListener('mousemove', this.boundOnMouseMove, false);
+            this.domElement.addEventListener('mouseup', this.boundOnMouseUp, false);
             this.isLocked = true;
         }
         else
         {
-            this.domElement.removeEventListener("mousemove", this.boundOnMouseMove, false);
-            this.domElement.removeEventListener("mouseup", this.boundOnMouseUp, false);
+            this.domElement.removeEventListener('mousemove', this.boundOnMouseMove, false);
+            this.domElement.removeEventListener('mouseup', this.boundOnMouseUp, false);
             this.isLocked = false;
         }
     }
 
     public onPointerlockError(event: MouseEvent): void
     {
-        console.error("PointerLockControls: Unable to use Pointer Lock API");
+        console.error('PointerLockControls: Unable to use Pointer Lock API');
     }
 
     public onMouseDown(event: MouseEvent): void
@@ -108,8 +108,8 @@ export class InputManager
         }
         else
         {
-            this.domElement.addEventListener("mousemove", this.boundOnMouseMove, false);
-            this.domElement.addEventListener("mouseup", this.boundOnMouseUp, false);
+            this.domElement.addEventListener('mousemove', this.boundOnMouseMove, false);
+            this.domElement.addEventListener('mouseup', this.boundOnMouseUp, false);
         }
 
         if (this.inputReceiver !== undefined)
@@ -130,8 +130,8 @@ export class InputManager
     {
         if (!this.pointerLock)
         {
-            this.domElement.removeEventListener("mousemove", this.boundOnMouseMove, false);
-            this.domElement.removeEventListener("mouseup", this.boundOnMouseUp, false);
+            this.domElement.removeEventListener('mousemove', this.boundOnMouseMove, false);
+            this.domElement.removeEventListener('mouseup', this.boundOnMouseUp, false);
         }
 
         if (this.inputReceiver !== undefined)

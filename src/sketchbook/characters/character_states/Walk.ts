@@ -17,15 +17,6 @@ export class Walk extends CharacterStateBase
         this.canEnterVehicles = true;
         this.character.setArcadeVelocityTarget(0.8);
         this.character.setAnimation('run', 0.1);
-
-        if (this.noDirection())
-        {
-            this.character.setState(new EndWalk(this.character));
-        }
-        if (this.character.actions.run.isPressed)
-        {
-            this.character.setState(new Sprint(this.character));
-        }
     }
 
     public update(timeStep: number): void
@@ -40,6 +31,16 @@ export class Walk extends CharacterStateBase
     public onInputChange(): void
     {
         super.onInputChange();
+
+        if (this.noDirection())
+        {
+            this.character.setState(new EndWalk(this.character));
+        }
+        
+        if (this.character.actions.run.isPressed)
+        {
+            this.character.setState(new Sprint(this.character));
+        }
         
         if (this.character.actions.run.justPressed)
         {

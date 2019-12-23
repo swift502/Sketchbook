@@ -56,7 +56,6 @@ export class ExitingVehicle extends CharacterStateBase
             this.character.controlledObjectSeat = undefined;
             this.vehicle.controllingCharacter = undefined;
             this.character.world.graphicsWorld.attach(this.character);
-            // this.character.quaternion.set(0, 0, 0, 1);
             this.character.resetVelocity();
             this.character.resetOrientation();
             this.character.setPhysicsEnabled(true);

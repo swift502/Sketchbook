@@ -7,7 +7,7 @@
     "rules": {
         "one-line": false,
         "no-console": false,
-        "quotemark": false,
+        "quotemark": [true, "single"],
         "prefer-const": false,
         "eofline": false,
         "max-line-length": false,

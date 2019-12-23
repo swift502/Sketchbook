@@ -112,8 +112,6 @@ export let SkyShader = {
       'uniform float mieDirectionalG;',
       'uniform vec3 cameraPos;',
   
-    //   'const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );',
-  
       // constants for atmospheric scattering
       'const float pi = 3.141592653589793238462643383279502884197169;',
   

@@ -15,12 +15,10 @@ export class Sitting extends CharacterStateBase
         super(character);
 
         this.character.setAnimation('driving', 0.1);
-
     }
 
     public update(timeStep: number): void
     {
         super.update(timeStep);
-
     }
 }

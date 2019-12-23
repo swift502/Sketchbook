@@ -9,4 +9,5 @@ export interface IControllable extends IInputReceiver
     controllingCharacter: Character;
 
     getMountPoint(character: Character): THREE.Vector3;
+    resetControls(): void;
 }

@@ -1,4 +1,4 @@
-import { KeyBinding } from "../core/KeyBinding";
+import { KeyBinding } from '../core/KeyBinding';
 
 export interface IInputReceiver
 {

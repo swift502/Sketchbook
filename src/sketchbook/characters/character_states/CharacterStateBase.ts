@@ -81,21 +81,6 @@ export abstract class CharacterStateBase implements ICharacterState
         return this.character.actions.up.isPressed || this.character.actions.down.isPressed || this.character.actions.left.isPressed || this.character.actions.right.isPressed;
     }
 
-    // public justPressed(key: KeyBinding): boolean
-    // {
-    //     return key.justPressed;
-    // }
-
-    // public isPressed(key: KeyBinding): boolean
-    // {
-    //     return key.pressed;
-    // }
-
-    // public justReleased(key: KeyBinding): boolean
-    // {
-    //     return key.justReleased;
-    // }
-
     public fallInAir(): void
     {
         if (!this.character.rayHasHit) { this.character.setState(new Falling(this.character)); }

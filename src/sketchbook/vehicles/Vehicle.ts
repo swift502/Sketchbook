@@ -60,11 +60,6 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
         // this.help.position.copy(this.seats[0].seatObject.position);
         // this.help.quaternion.copy(this.seats[0].seatObject.quaternion);
 
-        if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
-        {
-            this.controllingCharacter.exitVehicle();
-        }
-
         if (this.actions.forward.isPressed)
         {
             let quat = new THREE.Quaternion(
@@ -121,18 +116,26 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             this.collision.interpolatedQuaternion.w
         );
 
-        // this.rotation.setFromQuaternion(
-        //     new THREE.Quaternion(
-        //         this.collision.interpolatedQuaternion.x,
-        //         this.collision.interpolatedQuaternion.y,
-        //         this.collision.interpolatedQuaternion.z,
-        //         this.collision.interpolatedQuaternion.w
-        //     )
-        // );
-
         this.seats.forEach((seat: VehicleSeat) => {
             seat.update(timeStep);
         });
+    }
+
+    public onInputChange(): void
+    {
+        if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+        {
+            this.controllingCharacter.exitVehicle();
+        }
+    }
+
+    public resetControls(): void
+    {
+        for (const action in this.actions) {
+            if (this.actions.hasOwnProperty(action)) {
+                this.triggerAction(action, false);
+            }
+        }
     }
 
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
@@ -163,7 +166,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             if (value) action.justPressed = true;
             else action.justReleased = true;
 
-            this.update(0);
+            this.onInputChange();
 
             // Reset the 'just' attributes
             action.justPressed = false;

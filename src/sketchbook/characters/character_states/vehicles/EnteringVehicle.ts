@@ -37,6 +37,8 @@ export class EnteringVehicle extends CharacterStateBase
             this.animationLength = this.character.setAnimation('sit_down_left', 0.1);
         }
 
+        this.character.resetVelocity();
+        this.character.rotateModel();
         this.character.setPhysicsEnabled(false);
         (this.seat.vehicle as unknown as THREE.Object3D).attach(this.character);
 

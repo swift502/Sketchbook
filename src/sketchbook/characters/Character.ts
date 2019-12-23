@@ -24,7 +24,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 {
     public isCharacter: boolean = true;
     public height: number = 0;
-    // public modelOffset: THREE.Vector3 = new THREE.Vector3();
     public tiltContainer: THREE.Group;
     public modelContainer: THREE.Group;
     public characterModel: THREE.Mesh;
@@ -123,8 +122,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.velocitySimulator = new VectorSpringSimulator(60, this.defaultVelocitySimulatorMass, this.defaultVelocitySimulatorDamping);
         this.rotationSimulator = new RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
 
-        // States
-        this.setState(new Idle(this));
         this.viewVector = new THREE.Vector3();
 
         // Actions
@@ -175,6 +172,9 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         // Physics pre/post step callback bindings
         this.characterCapsule.physics.physical.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
         this.characterCapsule.physics.physical.postStep = (body: CANNON.Body) => { this.physicsPostStep(body, this); };
+
+        // States
+        this.setState(new Idle(this));
     }
 
     public setAnimations(animations: []): void
@@ -198,11 +198,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.arcadeVelocityInfluence.set(x, y, z);
     }
 
-    // public setModelOffset(offset: THREE.Vector3): void
-    // {
-    //     this.modelOffset.copy(offset);
-    // }
-
     public setViewVector(vector: THREE.Vector3): void
     {
         this.viewVector.copy(vector).normalize();
@@ -215,6 +210,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public setState(state: ICharacterState): void
     {
         this.charState = state;
+        this.charState.onInputChange();
     }
 
     public setPosition(x: number, y: number, z: number): void
@@ -367,6 +363,8 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
         if (action.isPressed !== value)
         {
+            console.log(actionName + ' ' + value + ' ' + this.charState['constructor'].name);
+
             // Set value
             action.isPressed = value;
 
@@ -416,7 +414,9 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             let viewVector = new THREE.Vector3().subVectors(entryPoint, this.position);
             this.setOrientationTarget(viewVector);
 
-            if (this.charState.canEnterVehicles && viewVector.length() < 0.9) {
+            let heightDifference = viewVector.y;
+            viewVector.y = 0;
+            if (this.charState.canEnterVehicles && viewVector.length() < 0.15 && heightDifference < 2) {
                 this.enterVehicle(this.targetSeat);
             }
         }
@@ -443,18 +443,19 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         else {
             let newPos = new THREE.Vector3();
             this.getWorldPosition(newPos);
-            // newPos.y -= this.height;
 
             this.characterCapsule.physics.physical.position.copy(newPos);
             this.characterCapsule.physics.physical.interpolatedPosition.copy(newPos);
         }
 
+        // Debug
         this.help1.position.copy(this.position);
         this.help1.quaternion.copy(this.quaternion);
         this.modelContainer.getWorldPosition(this.help2.position);
         this.modelContainer.getWorldQuaternion(this.help2.quaternion);
         this.tiltContainer.getWorldPosition(this.help3.position);
         this.tiltContainer.getWorldQuaternion(this.help3.quaternion);
+        document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
     }
 
     public inputReceiverInit(): void
@@ -567,10 +568,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
     public rotateModel(): void
     {
-        // let worldPosition = new THREE.Vector3();
-        // this.getWorldPosition(worldPosition);
-
-        // this.visuals.lookAt(this.position.x + this.orientation.x, this.position.y + this.visuals.position.y, this.position.z + this.orientation.z);
         this.lookAt(this.position.x + this.orientation.x, this.position.y + this.orientation.y, this.position.z + this.orientation.z);
 
         this.tiltContainer.rotation.z = (-this.angularVelocity * 2.3 * this.velocity.length());
@@ -632,6 +629,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public exitVehicle(): void
     {
         this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
+        this.controlledObject.resetControls();
         this.controlledObject.controllingCharacter = undefined;
         this.controlledObject = undefined;
         this.inputReceiverInit();
