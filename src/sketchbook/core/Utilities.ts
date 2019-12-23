@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../simulation/SimulationFrame';
 
@@ -247,6 +248,26 @@ export function springV(source: THREE.Vector3, dest: THREE.Vector3, velocity: TH
 
 export class GroundImpactData {
     public velocity: THREE.Vector3 = new THREE.Vector3();
+}
+
+export function threeVector(vec: CANNON.Vec3): THREE.Vector3
+{
+    return new THREE.Vector3(vec.x, vec.y, vec.z);
+}
+
+export function cannonVector(vec: THREE.Vector3): CANNON.Vec3
+{
+    return new CANNON.Vec3(vec.x, vec.y, vec.z);
+}
+
+export function threeQuat(quat: CANNON.Quaternion): THREE.Quaternion
+{
+    return new THREE.Quaternion(quat.x, quat.y, quat.z, quat.w);
+}
+
+export function cannonQuat(quat: THREE.Quaternion): CANNON.Quaternion
+{
+    return new CANNON.Quaternion(quat.x, quat.y, quat.z, quat.w);
 }
 
 //#endregion

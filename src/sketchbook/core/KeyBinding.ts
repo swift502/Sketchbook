@@ -1,12 +1,12 @@
 export class KeyBinding
 {
-    public keyCode: string;
+    public eventCodes: string[];
     public isPressed: boolean = false;
     public justPressed: boolean = false;
     public justReleased: boolean = false;
     
-    constructor(code: string)
+    constructor(...code: string[])
     {
-        this.keyCode = code;
+        this.eventCodes = code;
     }
 }

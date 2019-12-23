@@ -301,7 +301,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
                     if (this.actions.hasOwnProperty(action)) {
                         const binding = this.actions[action];
     
-                        if (code === binding.keyCode)
+                        if (_.includes(binding.eventCodes, code))
                         {
                             this.triggerAction(action, pressed);
                         }
@@ -323,7 +323,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
                 if (this.actions.hasOwnProperty(action)) {
                     const binding = this.actions[action];
 
-                    if (code === binding.keyCode)
+                    if (_.includes(binding.eventCodes, code))
                     {
                         this.triggerAction(action, pressed);
                     }
@@ -363,8 +363,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
         if (action.isPressed !== value)
         {
-            console.log(actionName + ' ' + value + ' ' + this.charState['constructor'].name);
-
             // Set value
             action.isPressed = value;
 
@@ -416,7 +414,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
 
             let heightDifference = viewVector.y;
             viewVector.y = 0;
-            if (this.charState.canEnterVehicles && viewVector.length() < 0.15 && heightDifference < 2) {
+            if (this.charState.canEnterVehicles && viewVector.length() < 0.2 && heightDifference < 2) {
                 this.enterVehicle(this.targetSeat);
             }
         }
@@ -461,6 +459,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public inputReceiverInit(): void
     {
         this.world.cameraOperator.setRadius(1.6, true);
+        this.world.cameraOperator.followMode = false;
         // this.world.dirLight.target = this;
     }
 

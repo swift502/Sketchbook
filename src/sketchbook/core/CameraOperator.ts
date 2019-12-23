@@ -3,6 +3,7 @@ import { World } from './World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
 import { Character } from '../characters/Character';
+import _ = require('lodash');
 
 export class CameraOperator implements IInputReceiver
 {
@@ -24,6 +25,8 @@ export class CameraOperator implements IInputReceiver
     public upVelocity: number = 0;
     public forwardVelocity: number = 0;
     public rightVelocity: number = 0;
+
+    public followMode: boolean = false;
 
     public characterCaller: Character;
 
@@ -78,13 +81,25 @@ export class CameraOperator implements IInputReceiver
 
     public update(): void
     {
-        this.radius = THREE.Math.lerp(this.radius, this.targetRadius, 0.1);
-
-        this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
-        this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 180);
-        this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
-        this.camera.updateMatrix();
-        this.camera.lookAt(this.target);
+        if (this.followMode === true)
+        {
+            this.camera.position.y = THREE.Math.clamp(this.camera.position.y, this.target.y, Number.POSITIVE_INFINITY);
+            this.camera.lookAt(this.target);
+            let newPos = this.target.clone().add(new THREE.Vector3().subVectors(this.camera.position, this.target).normalize().multiplyScalar(this.targetRadius));
+            this.camera.position.x = newPos.x;
+            this.camera.position.y = newPos.y;
+            this.camera.position.z = newPos.z;
+        }
+        else 
+        {
+            this.radius = THREE.Math.lerp(this.radius, this.targetRadius, 0.1);
+    
+            this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+            this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 180);
+            this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+            this.camera.updateMatrix();
+            this.camera.lookAt(this.target);
+        }
     }
 
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
@@ -104,7 +119,7 @@ export class CameraOperator implements IInputReceiver
                 if (this.actions.hasOwnProperty(action)) {
                     const binding = this.actions[action];
     
-                    if (code === binding.keyCode)
+                    if (_.includes(binding.eventCodes, code))
                     {
                         binding.isPressed = pressed;
                     }
@@ -124,7 +139,7 @@ export class CameraOperator implements IInputReceiver
             if (this.actions.hasOwnProperty(action)) {
                 const binding = this.actions[action];
 
-                if (code === binding.keyCode)
+                if (_.includes(binding.eventCodes, code))
                 {
                     binding.isPressed = pressed;
                 }

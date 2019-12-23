@@ -1,7 +1,9 @@
+import * as CANNON from 'cannon';
+
 import { Vehicle } from "./Vehicle";
 import { IControllable } from "../interfaces/IControllable";
 import { IWorldEntity } from "../interfaces/IWorldEntity";
-import { CANNON } from "../sketchbook";
+import { KeyBinding } from '../core/KeyBinding';
 
 export class Airplane extends Vehicle implements IControllable, IWorldEntity
 {
@@ -9,6 +11,15 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
     public elevators: THREE.Object3D[];
     public leftAileron: THREE.Object3D;
     public rightAileron: THREE.Object3D;
+
+    constructor()
+    {
+        super();
+
+        this.actions = {
+            'exitVehicle': new KeyBinding('KeyF'),
+        };
+    }
 
     public fromGLTF(gltf: any): void
     {

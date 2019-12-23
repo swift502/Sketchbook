@@ -1,11 +1,26 @@
+import * as CANNON from 'cannon';
+
 import { Vehicle } from "./Vehicle";
 import { IControllable } from "../interfaces/IControllable";
 import { IWorldEntity } from "../interfaces/IWorldEntity";
-import { CANNON } from "../sketchbook";
+import { KeyBinding } from '../core/KeyBinding';
 
 export class Car extends Vehicle implements IControllable, IWorldEntity
 {
     private steeringWheel: THREE.Object3D;
+
+    constructor()
+    {
+        super();
+
+        this.actions = {
+            'throttle': new KeyBinding('KeyW'),
+            'brake': new KeyBinding('KeyS'),
+            'left': new KeyBinding('KeyA'),
+            'right': new KeyBinding('KeyD'),
+            'exitVehicle': new KeyBinding('KeyF'),
+        };
+    }
 
     public fromGLTF(gltf: any): void
     {

@@ -13,7 +13,7 @@ import { VehicleDoor } from "./VehicleDoor";
 export abstract class Vehicle extends THREE.Object3D implements IControllable, IWorldEntity
 {
     public controllingCharacter: Character;
-    public actions: { [action: string]: KeyBinding; };
+    public actions: { [action: string]: KeyBinding; } = {};
     public seats: VehicleSeat[] = [];
     public wheels: Wheel[] = [];
 
@@ -22,7 +22,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
     public collision: CANNON.Body;
     
     private modelContainer: THREE.Group;
-    private world: World;
+    public world: World;
 
     public help: any;
 
@@ -34,13 +34,13 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
         this.add(this.modelContainer);
 
         // Actions
-        this.actions = {
-            'forward': new KeyBinding('KeyW'),
-            'backward': new KeyBinding('KeyS'),
-            'left': new KeyBinding('KeyA'),
-            'right': new KeyBinding('KeyD'),
-            'exitVehicle': new KeyBinding('KeyF'),
-        };
+        // this.actions = {
+        //     'forward': new KeyBinding('KeyW'),
+        //     'backward': new KeyBinding('KeyS'),
+        //     'left': new KeyBinding('KeyA'),
+        //     'right': new KeyBinding('KeyD'),
+        //     'exitVehicle': new KeyBinding('KeyF'),
+        // };
 
         this.help = new THREE.AxesHelper(2);
     }
@@ -60,48 +60,48 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
         // this.help.position.copy(this.seats[0].seatObject.position);
         // this.help.quaternion.copy(this.seats[0].seatObject.quaternion);
 
-        if (this.actions.forward.isPressed)
-        {
-            let quat = new THREE.Quaternion(
-                this.collision.quaternion.x,
-                this.collision.quaternion.y,
-                this.collision.quaternion.z,
-                this.collision.quaternion.w
-            );
+        // if (this.actions.forward.isPressed)
+        // {
+        //     let quat = new THREE.Quaternion(
+        //         this.collision.quaternion.x,
+        //         this.collision.quaternion.y,
+        //         this.collision.quaternion.z,
+        //         this.collision.quaternion.w
+        //     );
 
-            let dir = new THREE.Vector3(0, 0, 0.3);
+        //     let dir = new THREE.Vector3(0, 0, 0.3);
 
-            dir.applyQuaternion(quat);
+        //     dir.applyQuaternion(quat);
 
-            this.collision.velocity.x +=  dir.x;
-            this.collision.velocity.y +=  dir.y;
-            this.collision.velocity.z +=  dir.z;
-        }
-        if (this.actions.backward.isPressed)
-        {
-            let quat = new THREE.Quaternion(
-                this.collision.quaternion.x,
-                this.collision.quaternion.y,
-                this.collision.quaternion.z,
-                this.collision.quaternion.w
-            );
+        //     this.collision.velocity.x +=  dir.x;
+        //     this.collision.velocity.y +=  dir.y;
+        //     this.collision.velocity.z +=  dir.z;
+        // }
+        // if (this.actions.backward.isPressed)
+        // {
+        //     let quat = new THREE.Quaternion(
+        //         this.collision.quaternion.x,
+        //         this.collision.quaternion.y,
+        //         this.collision.quaternion.z,
+        //         this.collision.quaternion.w
+        //     );
 
-            let dir = new THREE.Vector3(0, 0, -0.3);
+        //     let dir = new THREE.Vector3(0, 0, -0.3);
 
-            dir.applyQuaternion(quat);
+        //     dir.applyQuaternion(quat);
 
-            this.collision.velocity.x +=  dir.x;
-            this.collision.velocity.y +=  dir.y;
-            this.collision.velocity.z +=  dir.z;
-        }
-        if (this.actions.left.isPressed)
-        {
-            this.collision.angularVelocity.y += 0.5;
-        }
-        if (this.actions.right.isPressed)
-        {
-            this.collision.angularVelocity.y -= 0.5;
-        }
+        //     this.collision.velocity.x +=  dir.x;
+        //     this.collision.velocity.y +=  dir.y;
+        //     this.collision.velocity.z +=  dir.z;
+        // }
+        // if (this.actions.left.isPressed)
+        // {
+        //     this.collision.angularVelocity.y += 0.5;
+        // }
+        // if (this.actions.right.isPressed)
+        // {
+        //     this.collision.angularVelocity.y -= 0.5;
+        // }
 
         this.position.set(
             this.collision.interpolatedPosition.x,
@@ -144,7 +144,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             if (this.actions.hasOwnProperty(action)) {
                 const binding = this.actions[action];
 
-                if (code === binding.keyCode)
+                if (_.includes(binding.eventCodes, code))
                 {
                     this.triggerAction(action, pressed);
                 }
@@ -191,7 +191,8 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
 
     public inputReceiverInit(): void
     {
-        this.world.cameraOperator.setRadius(2.4);
+        this.world.cameraOperator.setRadius(3);
+        this.world.cameraOperator.followMode = true;
     }
 
     public inputReceiverUpdate(timeStep: number): void

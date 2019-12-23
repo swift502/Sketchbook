@@ -15,9 +15,9 @@ import * as _ from 'lodash';
 import { InputManager } from './InputManager';
 import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
-import { ObjectPhysics } from '../sketchbook';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
+import { BoxPhysics } from '../objects/object_physics/BoxPhysics';
 
 export class World
 {
@@ -278,7 +278,7 @@ export class World
 
     public addFloor(): void {
         let SBobj = new SBObject();
-        let phys = new ObjectPhysics.BoxPhysics({size: new THREE.Vector3(100, 1, 100)});
+        let phys = new BoxPhysics({size: new THREE.Vector3(100, 1, 100)});
         SBobj.setPhysics(phys);
         SBobj.setModelFromPhysicsShape();
         this.add(SBobj);
