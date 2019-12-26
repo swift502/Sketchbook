@@ -1,30 +1,29 @@
-import { Character } from "../characters/Character";
-import { IControllable } from "../interfaces/IControllable";
+import { Character } from '../characters/Character';
+import { IControllable } from '../interfaces/IControllable';
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { IWorldEntity } from "../interfaces/IWorldEntity";
-import { World } from "../core/World";
-import _ = require("lodash");
-import { KeyBinding } from "../core/KeyBinding";
-import { VehicleSeat } from "./VehicleSeat";
-import { Wheel } from "./Wheel";
-import { VehicleDoor } from "./VehicleDoor";
+import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { World } from '../core/World';
+import _ = require('lodash');
+import { KeyBinding } from '../core/KeyBinding';
+import { VehicleSeat } from './VehicleSeat';
+import { Wheel } from './Wheel';
+import { VehicleDoor } from './VehicleDoor';
 
 export abstract class Vehicle extends THREE.Object3D implements IControllable, IWorldEntity
 {
     public controllingCharacter: Character;
     public actions: { [action: string]: KeyBinding; } = {};
     public seats: VehicleSeat[] = [];
-    public wheels: Wheel[] = [];
 
     public model: any;
-    // TODO: remake to a Sketchbook Object
-    public collision: CANNON.Body;
-    
-    private modelContainer: THREE.Group;
     public world: World;
 
     public help: any;
+
+    // TODO: remake to a Sketchbook Object
+    public collision: CANNON.Body;
+    private modelContainer: THREE.Group;
 
     constructor()
     {
@@ -192,7 +191,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
     public inputReceiverInit(): void
     {
         this.world.cameraOperator.setRadius(3);
-        this.world.cameraOperator.followMode = true;
+        // this.world.cameraOperator.followMode = true;
     }
 
     public inputReceiverUpdate(timeStep: number): void
@@ -263,25 +262,6 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             {
                 if (child.userData.hasOwnProperty('data'))
                 {
-                    if (child.userData.data === 'wheel')
-                    {
-                        let wheel = new Wheel();
-
-                        if (child.userData.hasOwnProperty('facing')) 
-                        {
-                            wheel.facing = child.userData.facing;
-                        }
-                        else
-                        {
-                            console.error("Wheel object " + child + " has no facing property.");
-                        }
-                        if (child.userData.hasOwnProperty('steering')) 
-                        {
-                            wheel.steering = (child.userData.steering === "true");
-                        }
-
-                        this.wheels.push(wheel);
-                    }
                     if (child.userData.data === 'seat')
                     {
                         let seat = new VehicleSeat(child);
@@ -298,7 +278,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
                         }
                         else
                         {
-                            console.error("Seat object " + child + " has no doorSide property.");
+                            console.error('Seat object ' + child + ' has no doorSide property.');
                         }
 
                         if (child.userData.hasOwnProperty('entry_point')) 
@@ -307,7 +287,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
                         }
                         else
                         {
-                            console.error("Seat object " + child + " has no entry point reference property.");
+                            console.error('Seat object ' + child + ' has no entry point reference property.');
                         }
 
                         if (child.userData.hasOwnProperty('seat_type')) 
@@ -316,7 +296,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
                         }
                         else
                         {
-                            console.error("Seat object " + child + " has no seat type property.");
+                            console.error('Seat object ' + child + ' has no seat type property.');
                         }
 
                         this.seats.push(seat);
@@ -347,11 +327,11 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
 
         if (this.collision.shapes.length === 0)
         {
-            console.warn("Vehicle " + typeof(this) + " has no collision data.");
+            console.warn('Vehicle ' + typeof(this) + ' has no collision data.');
         }
         if (this.seats.length === 0)
         {
-            console.warn("Vehicle " + typeof(this) + " has no seats.");
+            console.warn('Vehicle ' + typeof(this) + ' has no seats.');
         }
     }
 }

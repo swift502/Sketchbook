@@ -88,7 +88,8 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         let gravityCompensation = new CANNON.Vec3(-gravity.x, -gravity.y, -gravity.z)['length']();
         gravityCompensation *= heli.world.physicsFrameTime;
         gravityCompensation *= 0.95;
-        gravityCompensation *= THREE.Math.clamp(globalUp.dot(up), 0, 1);
+        let dot = globalUp.dot(up);
+        gravityCompensation *= THREE.Math.clamp(Math.sqrt(dot), 0, 1);
 
         let vertDamping = Utils.threeVector(body.velocity);
         vertDamping.x *= up.x;

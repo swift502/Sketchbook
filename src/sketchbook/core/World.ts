@@ -102,7 +102,7 @@ export class World
         // Physics
         this.physicsWorld = new CANNON.World();
         this.physicsWorld.gravity.set(0, -9.81, 0);
-        this.physicsWorld.broadphase = new CANNON.NaiveBroadphase();
+        this.physicsWorld.broadphase = new CANNON.SAPBroadphase(this.physicsWorld);
         this.physicsWorld.solver.iterations = 10;
 
         this.parallelPairs = [];
