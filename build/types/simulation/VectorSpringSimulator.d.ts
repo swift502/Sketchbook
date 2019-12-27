@@ -6,7 +6,8 @@ export declare class VectorSpringSimulator extends SimulatorBase {
     velocity: THREE.Vector3;
     target: THREE.Vector3;
     cache: SimulationFrameVector[];
-    constructor(fps: number, mass: number, damping: number, startPosition?: THREE.Vector3, startVelocity?: THREE.Vector3);
+    constructor(fps: number, mass: number, damping: number);
+    init(): void;
     /**
      * Advances the simulation by given time step
      * @param {number} timeStep

@@ -1,5 +1,5 @@
-import { World } from "./World";
-import { IInputReceiver } from "../interfaces/IInputReceiver";
+import { World } from './World';
+import { IInputReceiver } from '../interfaces/IInputReceiver';
 export declare class InputManager {
     world: World;
     domElement: any;

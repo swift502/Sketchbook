@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { World } from '../core/World';
 import { IPhysicsType } from '../interfaces/IPhysicsType';
-export declare class SBObject extends THREE.Object3D {
+import { IWorldEntity } from '../interfaces/IWorldEntity';
+export declare class SBObject extends THREE.Object3D implements IWorldEntity {
     isObject: boolean;
     model: any;
     physics: any;

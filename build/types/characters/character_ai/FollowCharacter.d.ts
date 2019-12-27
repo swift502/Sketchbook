@@ -1,9 +1,6 @@
-import { Character } from '../Character';
-import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import { CharacterAIBase } from './CharacterAIBase';
-export declare class FollowCharacter extends CharacterAIBase implements ICharacterAI {
-    private targetCharacter;
-    private stopDistance;
+import { FollowObject } from "./FollowObject";
+import { Character } from "../Character";
+export declare class FollowCharacter extends FollowObject {
     constructor(targetCharacter: Character, stopDistance?: number);
-    update(timeStep: number): void;
+    setTarget(targetCharacter: Character): void;
 }

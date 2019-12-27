@@ -1,7 +1,7 @@
 export declare class KeyBinding {
-    keyCode: string;
-    value: boolean;
+    eventCodes: string[];
+    isPressed: boolean;
     justPressed: boolean;
     justReleased: boolean;
-    constructor(code: string);
+    constructor(...code: string[]);
 }

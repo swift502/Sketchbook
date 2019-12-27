@@ -53,19 +53,6 @@ Or download the [latest release](https://github.com/swift502/Sketchbook/releases
 <script src="sketchbook.min.js"></script>
 ```
 
-<!-- ## Usage
-
-This snippet turns a blank page into a playable character demo.
-
-```js
-const world = new Sketchbook.World();
-world.loadBasicLevel();
-
-let player = new Sketchbook.Character();
-world.add(player);
-player.takeControl();
-``` -->
-
 To learn specifics about using Sketchbook, check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples).
 
 ## Contributing
@@ -73,8 +60,8 @@ To learn specifics about using Sketchbook, check out the [examples](https://gith
 I appreciate all help, be it suggestions, issues or even pull requests.
 
 1. Clone the repository
-3. Run `npm install`
-4. Contribute!
+2. Run `npm install`
+3. Contribute!
 
 Use the npm scripts defined in `package.json`:
 * `npm run dev` - start a local server, build in dev mode and watch changes

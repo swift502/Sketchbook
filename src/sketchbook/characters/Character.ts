@@ -604,7 +604,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             this.triggerAction('up', true);
         }
         else {
-            console.error("World has no vehicles");
+            console.error('World has no vehicles');
         }
     }
 
@@ -652,7 +652,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             skipBackfaces: true      /* ignore back faces */
         };
         // Cast the ray
-        character.rayHasHit = character.world.physicsWorld['raycastClosest'](start, end, rayCastOptions, character.rayResult);
+        character.rayHasHit = character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, character.rayResult);
 
         // Raycast debug
         if (character.rayHasHit)
@@ -753,7 +753,7 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
                 body.velocity.y = 0;
 
                 // Velocity needs to be at least as much as initJumpSpeed
-                if (body.velocity['lengthSquared']() < character.initJumpSpeed ** 2)
+                if (body.velocity.lengthSquared() < character.initJumpSpeed ** 2)
                 {
                     body.velocity.normalize();
                     body.velocity.mult(character.initJumpSpeed, body.velocity);

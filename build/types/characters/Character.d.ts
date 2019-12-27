@@ -9,15 +9,17 @@ import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
-export declare class Character extends THREE.Object3D implements IControllable {
+import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { VehicleSeat } from '../vehicles/VehicleSeat';
+export declare class Character extends THREE.Object3D implements IControllable, IWorldEntity {
     isCharacter: boolean;
     height: number;
-    modelOffset: THREE.Vector3;
-    visuals: THREE.Group;
+    tiltContainer: THREE.Group;
     modelContainer: THREE.Group;
     characterModel: THREE.Mesh;
     mixer: THREE.AnimationMixer;
     animations: any[];
+    seats: VehicleSeat[];
     acceleration: THREE.Vector3;
     velocity: THREE.Vector3;
     arcadeVelocityInfluence: THREE.Vector3;
@@ -47,26 +49,34 @@ export declare class Character extends THREE.Object3D implements IControllable {
     groundImpactData: Utils.GroundImpactData;
     controllingCharacter: Character;
     controlledObject: IControllable;
+    controlledObjectSeat: VehicleSeat;
     raycastBox: THREE.Mesh;
     charState: ICharacterState;
     behaviour: ICharacterAI;
     world: World;
+    help1: THREE.AxesHelper;
+    help2: THREE.AxesHelper;
+    help3: THREE.AxesHelper;
+    isRunningTowardsVehicle: boolean;
+    targetSeat: VehicleSeat;
+    private physicsEnabled;
     constructor(options: {});
     setAnimations(animations: []): void;
     setModel(model: THREE.Mesh): void;
     setArcadeVelocityInfluence(x: number, y?: number, z?: number): void;
-    setModelOffset(offset: THREE.Vector3): void;
     setViewVector(vector: THREE.Vector3): void;
     /**
      * Set state to the player. Pass state class (function) name.
      * @param {function} State
      */
-    setState(new State: any): void;
+    setState(state: ICharacterState): void;
     setPosition(x: number, y: number, z: number): void;
-    setArcadeVelocity(velZ: number, velX?: number, velY?: number): void;
+    resetVelocity(): void;
+    resetOrientation(): void;
     setArcadeVelocityTarget(velZ: number, velX?: number, velY?: number): void;
     setOrientationTarget(vector: THREE.Vector3): void;
     setBehaviour(behaviour: ICharacterAI): void;
+    setPhysicsEnabled(value: boolean): void;
     handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void;
     handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void;
     handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void;
@@ -74,17 +84,21 @@ export declare class Character extends THREE.Object3D implements IControllable {
     triggerAction(actionName: string, value: boolean): void;
     takeControl(): void;
     resetControls(): void;
-    update(timeStep: number, options?: {}): void;
+    update(timeStep: number): void;
     inputReceiverInit(): void;
     inputReceiverUpdate(timeStep: number): void;
     setAnimation(clipName: string, fadeIn: number): void;
     springMovement(timeStep: number): void;
-    springRotation(timeStep: number, RotationMultiplier: number): void;
+    springRotation(timeStep: number): void;
     getLocalMovementDirection(): THREE.Vector3;
     getCameraRelativeMovementVector(): THREE.Vector3;
     setCameraRelativeOrientationTarget(): void;
     rotateModel(): void;
     jump(initJumpSpeed?: number): void;
+    findVehicleToEnter(): void;
+    enterVehicle(seat: VehicleSeat): void;
+    exitVehicle(): void;
+    getMountPoint(character: Character): THREE.Vector3;
     physicsPreStep(body: CANNON.Body, character: Character): void;
     physicsPostStep(body: CANNON.Body, character: Character): void;
     addToWorld(world: World): void;

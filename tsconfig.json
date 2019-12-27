@@ -8,5 +8,9 @@
         "moduleResolution": "node",
         "declaration": true,
         "declarationDir": "build/types",
+        "baseUrl": ".",
+        "paths": {
+            "cannon" : ["src/lib/cannon/cannon"]
+        }
     }
 }

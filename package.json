@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/swift502/sketchbook",
   "devDependencies": {
-    "@types/cannon": "^0.1.4",
     "@types/dat.gui": "^0.7.5",
     "@types/lodash": "^4.14.149",
     "@types/stats": "^0.16.30",

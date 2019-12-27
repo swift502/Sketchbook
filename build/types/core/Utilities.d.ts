@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon';
 import { SimulationFrame } from '../simulation/SimulationFrame';
 export declare function createCapsuleGeometry(radius?: number, height?: number, N?: number): THREE.Geometry;
 /**
@@ -30,3 +31,7 @@ export declare function springV(source: THREE.Vector3, dest: THREE.Vector3, velo
 export declare class GroundImpactData {
     velocity: THREE.Vector3;
 }
+export declare function threeVector(vec: CANNON.Vec3): THREE.Vector3;
+export declare function cannonVector(vec: THREE.Vector3): CANNON.Vec3;
+export declare function threeQuat(quat: CANNON.Quaternion): THREE.Quaternion;
+export declare function cannonQuat(quat: THREE.Quaternion): CANNON.Quaternion;

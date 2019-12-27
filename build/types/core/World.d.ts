@@ -1,19 +1,20 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { CameraController } from './CameraController';
+import { CameraOperator } from './CameraOperator';
 import EffectComposer from '@johh/three-effectcomposer';
 import { Stats } from '../../lib/utils/Stats';
 import { InputManager } from './InputManager';
 import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { Sky } from './Sky';
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.Camera;
     composer: EffectComposer;
     stats: Stats;
     graphicsWorld: THREE.Scene;
-    sun: THREE.Vector3;
-    dirLight: THREE.DirectionalLight;
+    sky: Sky;
     physicsWorld: CANNON.World;
     parallelPairs: any[];
     physicsFrameRate: number;
@@ -24,18 +25,9 @@ export declare class World {
     logicDelta: number;
     sinceLastFrame: number;
     justRendered: boolean;
-    params: {
-        Pointer_Lock: boolean;
-        Mouse_Sensitivity: number;
-        FPS_Limit: number;
-        Time_Scale: number;
-        Shadows: boolean;
-        FXAA: boolean;
-        Draw_Physics: boolean;
-        RayCast_Debug: boolean;
-    };
+    params: any;
     inputManager: InputManager;
-    cameraController: CameraController;
+    cameraOperator: CameraOperator;
     timeScaleTarget: number;
     objects: SBObject[];
     characters: Character[];
@@ -51,8 +43,9 @@ export declare class World {
      * @param {World} world
      */
     render(world: World): void;
-    add(object: any): void;
-    remove(object: any): void;
+    add(object: IWorldEntity): void;
+    remove(object: IWorldEntity): void;
+    addFloor(): void;
     scrollTheTimeScale(scrollAmount: number): void;
     private getGUI;
 }
