@@ -1,16 +1,15 @@
 import { Character } from '../characters/Character';
-import { IControllable } from '../interfaces/IControllable';
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { World } from '../core/World';
 import _ = require('lodash');
 import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';
 import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
+import * as Utils from '../core/Utilities';
 
-export abstract class Vehicle extends THREE.Object3D implements IControllable, IWorldEntity
+export abstract class Vehicle extends THREE.Object3D
 {
     public controllingCharacter: Character;
     public actions: { [action: string]: KeyBinding; } = {};
@@ -19,7 +18,7 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
     public model: any;
     public world: World;
 
-    public help: any;
+    public help: THREE.AxesHelper;
 
     // TODO: remake to a Sketchbook Object
     public collision: CANNON.Body;
@@ -53,11 +52,11 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
 
     public update(timeStep: number): void
     {
-        this.seats[0].seatObject.getWorldPosition(this.help.position);
-        this.seats[0].seatObject.getWorldQuaternion(this.help.quaternion);
+        this.help.position.copy(Utils.threeVector(this.collision.interpolatedPosition));
+        this.help.quaternion.copy(Utils.threeQuat(this.collision.interpolatedQuaternion));
 
-        // this.help.position.copy(this.seats[0].seatObject.position);
-        // this.help.quaternion.copy(this.seats[0].seatObject.quaternion);
+        // this.seats[0].seatObject.getWorldPosition(this.help.position);
+        // this.seats[0].seatObject.getWorldQuaternion(this.help.quaternion);
 
         // if (this.actions.forward.isPressed)
         // {
@@ -252,6 +251,8 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
 
     public readGLTF(gltf: any): void
     {
+        // let newCOM: THREE.Vector3;
+
         gltf.scene.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;
@@ -262,6 +263,10 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             {
                 if (child.userData.hasOwnProperty('data'))
                 {
+                    // if (child.userData.data === 'com')
+                    // {
+                    //     newCOM = child.position;
+                    // }
                     if (child.userData.data === 'seat')
                     {
                         let seat = new VehicleSeat(child);
@@ -325,6 +330,13 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             }
         });
 
+        // Set COM only after all the collision objects have been identified
+        // if (newCOM !== undefined)
+        // {
+            // this.setCOMFromLocalPoint(Utils.cannonVector(newCOM));
+            // this.setCOMFromLocalPoint(new CANNON.Vec3(0, 10, 0));
+        // }
+
         if (this.collision.shapes.length === 0)
         {
             console.warn('Vehicle ' + typeof(this) + ' has no collision data.');
@@ -334,4 +346,24 @@ export abstract class Vehicle extends THREE.Object3D implements IControllable, I
             console.warn('Vehicle ' + typeof(this) + ' has no seats.');
         }
     }
+
+    // public setCOMFromLocalPoint( newCOM: CANNON.Vec3 ): void
+    // {
+    //     if (this.collision === undefined)
+    //     {
+    //         console.error('Trying to set COM to a vehicle with no collisions.');
+    //         return;
+    //     }
+
+    //     // Move the shapes so the body origin is at the COM
+    //     this.collision.shapeOffsets.forEach(( offset: CANNON.Vec3 ) =>
+    //     {
+    //         offset.vsub( newCOM, offset );
+    //     });
+        
+    //     // Now move the body so the shapes' net displacement is 0
+    //     let worldCOM = new CANNON.Vec3();
+    //     this.collision.vectorToWorldFrame( newCOM, worldCOM );
+    //     this.collision.position.vadd( worldCOM, this.collision.position );
+    // }
 }

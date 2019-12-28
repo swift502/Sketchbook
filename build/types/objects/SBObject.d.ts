@@ -5,7 +5,7 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 export declare class SBObject extends THREE.Object3D implements IWorldEntity {
     isObject: boolean;
     model: any;
-    physics: any;
+    physics: IPhysicsType;
     constructor(model?: THREE.Mesh, physics?: IPhysicsType);
     update(timeStep: number): void;
     setModel(model: THREE.Mesh): void;

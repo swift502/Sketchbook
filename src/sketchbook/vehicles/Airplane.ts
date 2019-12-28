@@ -24,7 +24,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
     public fromGLTF(gltf: any): void
     {
         this.collision = new CANNON.Body({
-            mass: 10
+            mass: 50
         });
         let mat = new CANNON.Material("Mat");
         mat.friction = 0.01;

@@ -1,4 +1,4 @@
-// Sun, 03 Nov 2019 14:32:48 GMT
+// Sat, 28 Dec 2019 19:21:11 GMT
 
 /*
  * Copyright (c) 2015 cannon.js Authors
@@ -66,7 +66,9 @@ module.exports={
     "nodeunit": "^0.9.0",
     "uglify-js": "latest"
   },
-  "dependencies": {}
+  "dependencies": {
+    "typescript": "^3.7.4"
+  }
 }
 
 },{}],2:[function(_dereq_,module,exports){
@@ -5966,8 +5968,8 @@ Body.prototype.vectorToLocalFrame = function(worldVector, result){
  */
 Body.prototype.pointToWorldFrame = function(localPoint,result){
     var result = result || new Vec3();
-    this.quaternion.vmult(localPoint,result);
-    result.vadd(this.position,result);
+    this.interpolatedQuaternion.vmult(localPoint,result);
+    result.vadd(this.interpolatedPosition,result);
     return result;
 };
 
@@ -5980,7 +5982,7 @@ Body.prototype.pointToWorldFrame = function(localPoint,result){
  */
 Body.prototype.vectorToWorldFrame = function(localVector, result){
     var result = result || new Vec3();
-    this.quaternion.vmult(localVector, result);
+    this.interpolatedQuaternion.vmult(localVector, result);
     return result;
 };
 
@@ -6395,6 +6397,12 @@ function RaycastVehicle(options){
      * @default 2
      */
     this.indexUpAxis = typeof(options.indexUpAxis) !== 'undefined' ? options.indexUpAxis : 2;
+
+    /**
+     * Number of wheels currently touching the ground
+     * @property {integer} numWheelsOnGround
+     */
+    this.numWheelsOnGround = 0;
 }
 
 var tmpVec1 = new Vec3();
@@ -6566,6 +6574,7 @@ RaycastVehicle.prototype.updateVehicle = function(timeStep){
             wheel.deltaRotation = 0;
         }
 
+        wheel.lastRotation = wheel.rotation;
         wheel.rotation += wheel.deltaRotation; // Use the old value
         wheel.deltaRotation *= 0.99; // damping of rotation when not in contact
     }
@@ -6655,6 +6664,8 @@ RaycastVehicle.prototype.castRay = function(wheel) {
 
     wheel.raycastResult.groundObject = 0;
 
+    wheel.lastSuspensionLength = wheel.suspensionLength;
+
     if (object) {
         depth = raycastResult.distance;
         wheel.raycastResult.hitNormalWorld  = raycastResult.hitNormalWorld;
@@ -6693,6 +6704,7 @@ RaycastVehicle.prototype.castRay = function(wheel) {
     } else {
 
         //put wheel info as in rest position
+        
         wheel.suspensionLength = wheel.suspensionRestLength + 0 * wheel.maxSuspensionTravel;
         wheel.suspensionRelativeVelocity = 0.0;
         wheel.directionWorld.scale(-1, wheel.raycastResult.hitNormalWorld);
@@ -6737,7 +6749,7 @@ RaycastVehicle.prototype.updateWheelTransform = function(wheelIndex){
     steeringOrn.setFromAxisAngle(up, steering);
 
     var rotatingOrn = new Quaternion();
-    rotatingOrn.setFromAxisAngle(right, wheel.rotation);
+    rotatingOrn.setFromAxisAngle(right, this.lerp(wheel.lastRotation, wheel.rotation, this.world.interpolationFactor));
 
     // World rotation of the wheel
     var q = wheel.worldTransform.quaternion;
@@ -6749,9 +6761,15 @@ RaycastVehicle.prototype.updateWheelTransform = function(wheelIndex){
     // world position of the wheel
     var p = wheel.worldTransform.position;
     p.copy(wheel.directionWorld);
-    p.scale(wheel.suspensionLength, p);
+    p.scale(this.lerp(wheel.lastSuspensionLength, wheel.suspensionLength, this.world.interpolationFactor), p);
     p.vadd(wheel.chassisConnectionPointWorld, p);
 };
+
+RaycastVehicle.prototype.lerp = function (value1, value2, amount) {
+    amount = amount < 0 ? 0 : amount;
+    amount = amount > 1 ? 1 : amount;
+    return value1 + (value2 - value1) * amount;
+}
 
 var directions = [
     new Vec3(1, 0, 0),
@@ -6784,14 +6802,14 @@ RaycastVehicle.prototype.updateFriction = function(timeStep) {
     var forwardWS = updateFriction_forwardWS;
     var axle = updateFriction_axle;
 
-    var numWheelsOnGround = 0;
+    this.numWheelsOnGround = 0;
 
     for (var i = 0; i < numWheels; i++) {
         var wheel = wheelInfos[i];
 
         var groundObject = wheel.raycastResult.body;
         if (groundObject){
-            numWheelsOnGround++;
+            this.numWheelsOnGround++;
         }
 
         wheel.sideImpulse = 0;
@@ -6838,7 +6856,7 @@ RaycastVehicle.prototype.updateFriction = function(timeStep) {
     }
 
     var sideFactor = 1;
-    var fwdFactor = 0.5;
+    var fwdFactor = 1;
 
     this.sliding = false;
     for (var i = 0; i < numWheels; i++) {
@@ -7840,6 +7858,12 @@ function WheelInfo(options){
     this.rotation = 0;
 
     /**
+     * Rotation value, in radians.
+     * @property {number} lastRotation
+     */
+    this.lastRotation = 0;
+
+    /**
      * @property {number} deltaRotation
      */
     this.deltaRotation = 0;
@@ -7893,6 +7917,11 @@ function WheelInfo(options){
      * @property {number} suspensionLength
      */
     this.suspensionLength = 0;
+
+    /**
+     * @property {number} lastSuspensionLength
+     */
+    this.lastSuspensionLength = 0;
 
     /**
      * @property {number} sideImpulse
@@ -11100,105 +11129,100 @@ function sortById(a, b){
     return b.id - a.id;
 }
 },{"../math/Quaternion":29,"../math/Vec3":31,"../objects/Body":32,"./Solver":48}],50:[function(_dereq_,module,exports){
+module.exports = EventTarget;
+
 /**
  * Base class for objects that dispatches events.
  * @class EventTarget
  * @constructor
  */
-var EventTarget = function () {
+function EventTarget(){
+}
 
-};
-
-module.exports = EventTarget;
-
-EventTarget.prototype = {
-    constructor: EventTarget,
-
-    /**
-     * Add an event listener
-     * @method addEventListener
-     * @param  {String} type
-     * @param  {Function} listener
-     * @return {EventTarget} The self object, for chainability.
-     */
-    addEventListener: function ( type, listener ) {
-        if ( this._listeners === undefined ){ this._listeners = {}; }
-        var listeners = this._listeners;
-        if ( listeners[ type ] === undefined ) {
-            listeners[ type ] = [];
-        }
-        if ( listeners[ type ].indexOf( listener ) === - 1 ) {
-            listeners[ type ].push( listener );
-        }
-        return this;
-    },
-
-    /**
-     * Check if an event listener is added
-     * @method hasEventListener
-     * @param  {String} type
-     * @param  {Function} listener
-     * @return {Boolean}
-     */
-    hasEventListener: function ( type, listener ) {
-        if ( this._listeners === undefined ){ return false; }
-        var listeners = this._listeners;
-        if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Check if any event listener of the given type is added
-     * @method hasAnyEventListener
-     * @param  {String} type
-     * @return {Boolean}
-     */
-    hasAnyEventListener: function ( type ) {
-        if ( this._listeners === undefined ){ return false; }
-        var listeners = this._listeners;
-        return ( listeners[ type ] !== undefined );
-    },
-
-    /**
-     * Remove an event listener
-     * @method removeEventListener
-     * @param  {String} type
-     * @param  {Function} listener
-     * @return {EventTarget} The self object, for chainability.
-     */
-    removeEventListener: function ( type, listener ) {
-        if ( this._listeners === undefined ){ return this; }
-        var listeners = this._listeners;
-        if ( listeners[type] === undefined ){ return this; }
-        var index = listeners[ type ].indexOf( listener );
-        if ( index !== - 1 ) {
-            listeners[ type ].splice( index, 1 );
-        }
-        return this;
-    },
-
-    /**
-     * Emit an event.
-     * @method dispatchEvent
-     * @param  {Object} event
-     * @param  {String} event.type
-     * @return {EventTarget} The self object, for chainability.
-     */
-    dispatchEvent: function ( event ) {
-        if ( this._listeners === undefined ){ return this; }
-        var listeners = this._listeners;
-        var listenerArray = listeners[ event.type ];
-        if ( listenerArray !== undefined ) {
-            event.target = this;
-            for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
-                listenerArray[ i ].call( this, event );
-            }
-        }
-        return this;
+/**
+ * Add an event listener
+ * @method addEventListener
+ * @param  {String} type
+ * @param  {Function} listener
+ * @return {EventTarget} The self object, for chainability.
+ */
+EventTarget.prototype.addEventListener = function ( type, listener ) {
+    if ( this._listeners === undefined ){ this._listeners = {}; }
+    var listeners = this._listeners;
+    if ( listeners[ type ] === undefined ) {
+        listeners[ type ] = [];
     }
-};
+    if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+        listeners[ type ].push( listener );
+    }
+    return this;
+},
+
+/**
+ * Check if an event listener is added
+ * @method hasEventListener
+ * @param  {String} type
+ * @param  {Function} listener
+ * @return {Boolean}
+ */
+EventTarget.prototype.hasEventListener = function ( type, listener ) {
+    if ( this._listeners === undefined ){ return false; }
+    var listeners = this._listeners;
+    if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
+        return true;
+    }
+    return false;
+},
+
+/**
+ * Check if any event listener of the given type is added
+ * @method hasAnyEventListener
+ * @param  {String} type
+ * @return {Boolean}
+ */
+EventTarget.prototype.hasAnyEventListener = function ( type ) {
+    if ( this._listeners === undefined ){ return false; }
+    var listeners = this._listeners;
+    return ( listeners[ type ] !== undefined );
+},
+
+/**
+ * Remove an event listener
+ * @method removeEventListener
+ * @param  {String} type
+ * @param  {Function} listener
+ * @return {EventTarget} The self object, for chainability.
+ */
+EventTarget.prototype.removeEventListener = function ( type, listener ) {
+    if ( this._listeners === undefined ){ return this; }
+    var listeners = this._listeners;
+    if ( listeners[type] === undefined ){ return this; }
+    var index = listeners[ type ].indexOf( listener );
+    if ( index !== - 1 ) {
+        listeners[ type ].splice( index, 1 );
+    }
+    return this;
+},
+
+/**
+ * Emit an event.
+ * @method dispatchEvent
+ * @param  {Object} event
+ * @param  {String} event.type
+ * @return {EventTarget} The self object, for chainability.
+ */
+EventTarget.prototype.dispatchEvent = function ( event ) {
+    if ( this._listeners === undefined ){ return this; }
+    var listeners = this._listeners;
+    var listenerArray = listeners[ event.type ];
+    if ( listenerArray !== undefined ) {
+        event.target = this;
+        for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+            listenerArray[ i ].call( this, event );
+        }
+    }
+    return this;
+}
 
 },{}],51:[function(_dereq_,module,exports){
 var AABB = _dereq_('../collision/AABB');
@@ -13583,6 +13607,15 @@ function World(options){
      */
     this.time = 0.0;
 
+
+    /**
+     * Factor for interpolation 0-1
+     * @property interpolationFactor
+     * @type {Number}
+     */
+    this.interpolationFactor = 0;
+
+    
     /**
      * Number of timesteps taken since start
      * @property stepnumber
@@ -14040,6 +14073,7 @@ World.prototype.step = function(dt, timeSinceLastCalled, maxSubSteps){
         this.accumulator %= dt;
 
         var t = this.accumulator / dt;
+        this.interpolationFactor = t;
         for(var j=0; j !== this.bodies.length; j++){
             var b = this.bodies[j];
             b.previousPosition.lerp(b.position, t, b.interpolatedPosition);

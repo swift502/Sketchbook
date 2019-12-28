@@ -9,7 +9,7 @@ export class SBObject extends THREE.Object3D implements IWorldEntity
 {
     public isObject: boolean;
     public model: any;
-    public physics: any;
+    public physics: IPhysicsType;
 
     constructor(model?: THREE.Mesh, physics?: IPhysicsType)
     {

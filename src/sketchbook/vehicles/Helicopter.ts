@@ -87,7 +87,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         let gravity = heli.world.physicsWorld.gravity;
         let gravityCompensation = new CANNON.Vec3(-gravity.x, -gravity.y, -gravity.z)['length']();
         gravityCompensation *= heli.world.physicsFrameTime;
-        gravityCompensation *= 0.95;
+        gravityCompensation *= 0.98;
         let dot = globalUp.dot(up);
         gravityCompensation *= THREE.Math.clamp(Math.sqrt(dot), 0, 1);
 
@@ -105,6 +105,10 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         body.velocity.x += vertStab.x;
         body.velocity.y += vertStab.y;
         body.velocity.z += vertStab.z;
+
+        // Positional damping
+        body.velocity.x *= 0.99;
+        body.velocity.z *= 0.99;
 
         // Rotation stabilization
         let rotStabVelocity = new THREE.Quaternion().setFromUnitVectors(up, globalUp);
@@ -169,7 +173,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
     public fromGLTF(gltf: any): void
     {
         this.collision = new CANNON.Body({
-            mass: 10
+            mass: 50
         });
         this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
         let mat = new CANNON.Material('Mat');

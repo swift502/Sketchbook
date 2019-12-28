@@ -18,6 +18,7 @@ import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import { BoxPhysics } from '../objects/object_physics/BoxPhysics';
+import * as Utils from './Utilities';
 
 export class World
 {
@@ -207,8 +208,8 @@ export class World
                     obj.physics.physical.interpolatedPosition.z = -2.2;
                 }
 
-                obj.position.copy(obj.physics.physical.position);
-                obj.quaternion.copy(obj.physics.physical.quaternion);
+                obj.position.copy(Utils.threeVector(obj.physics.physical.position));
+                obj.quaternion.copy(Utils.threeQuat(obj.physics.physical.quaternion));
                 
                 // entering vehicles
                 // obj.position.copy(obj.physics.physical.interpolatedPosition);
@@ -282,6 +283,16 @@ export class World
         SBobj.setPhysics(phys);
         SBobj.setModelFromPhysicsShape();
         this.add(SBobj);
+
+        // Ramp
+        let SBobj2 = new SBObject();
+        let phys2 = new BoxPhysics({size: new THREE.Vector3(10, 1, 10)});
+        phys2.physical.position.z = 10;
+        phys2.physical.quaternion.setFromEuler(-0.3, 0, 0);
+        phys2.physical.computeAABB();
+        SBobj2.setPhysics(phys2);
+        SBobj2.setModelFromPhysicsShape();
+        this.add(SBobj2);
     }
 
     public scrollTheTimeScale(scrollAmount: number): void

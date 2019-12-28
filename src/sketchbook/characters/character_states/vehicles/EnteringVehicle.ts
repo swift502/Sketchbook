@@ -44,7 +44,7 @@ export class EnteringVehicle extends CharacterStateBase
 
         this.startPosition.copy(this.character.position);
         this.endPosition.copy(seat.seatObject.position);
-        this.endPosition.y += 0.5;
+        this.endPosition.y += 0.6;
 
         this.startRotation.copy(this.character.quaternion);
         this.endRotation.copy(this.seat.seatObject.quaternion);

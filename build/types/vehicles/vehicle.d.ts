@@ -1,12 +1,10 @@
 import { Character } from '../characters/Character';
-import { IControllable } from '../interfaces/IControllable';
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { World } from '../core/World';
 import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';
-export declare abstract class Vehicle extends THREE.Object3D implements IControllable, IWorldEntity {
+export declare abstract class Vehicle extends THREE.Object3D {
     controllingCharacter: Character;
     actions: {
         [action: string]: KeyBinding;
@@ -14,7 +12,7 @@ export declare abstract class Vehicle extends THREE.Object3D implements IControl
     seats: VehicleSeat[];
     model: any;
     world: World;
-    help: any;
+    help: THREE.AxesHelper;
     collision: CANNON.Body;
     private modelContainer;
     constructor();

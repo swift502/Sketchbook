@@ -442,8 +442,8 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             let newPos = new THREE.Vector3();
             this.getWorldPosition(newPos);
 
-            this.characterCapsule.physics.physical.position.copy(newPos);
-            this.characterCapsule.physics.physical.interpolatedPosition.copy(newPos);
+            this.characterCapsule.physics.physical.position.copy(Utils.cannonVector(newPos));
+            this.characterCapsule.physics.physical.interpolatedPosition.copy(Utils.cannonVector(newPos));
         }
 
         // Debug

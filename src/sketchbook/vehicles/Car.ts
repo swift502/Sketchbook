@@ -9,6 +9,7 @@ import _ = require('lodash');
 import { World } from '../core/World';
 import THREE = require('three');
 import * as Utils from '../core/Utilities';
+import { SpringSimulator } from '../simulation/SpringSimulator';
 
 export class Car extends Vehicle implements IControllable, IWorldEntity
 {
@@ -17,6 +18,10 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
     private wheelsDebug: THREE.Mesh[] = [];
     // private wheelBodies: CANNON.Body[] = [];
     private steeringWheel: THREE.Object3D;
+
+    private steering: number = 0;
+    private steeringSimulator: SpringSimulator;
+    private gear: number = 1;
 
     constructor()
     {
@@ -30,11 +35,15 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             'right': new KeyBinding('KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
         };
+
+        this.steeringSimulator = new SpringSimulator(60, 10, 0.6);
     }
 
     public update(timeStep: number): void
     {
         super.update(timeStep);
+
+        // console.log('0: ', Utils.round(this.rayCastVehicle.wheelInfos[0].suspensionForce, 0));
 
         for (let i = 0; i < this.rayCastVehicle.wheelInfos.length; i++) {
             this.rayCastVehicle['updateWheelTransform'](i);
@@ -48,26 +57,117 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
             // wheelBody.rotateOnWorldAxis(Utils.threeVector(upAxisWorld), -Math.PI / 2);
         }
+
+        let quat = new THREE.Quaternion(
+            this.collision.quaternion.x,
+            this.collision.quaternion.y,
+            this.collision.quaternion.z,
+            this.collision.quaternion.w
+        );
+        // let right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
+        // let globalUp = new THREE.Vector3(0, 1, 0);
+        // let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
+        let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+        
+        const engineForce = 4000;
+        const maxGears = 4;
+        const gearsMaxSpeeds = {
+            '0': 0,
+            '1': 4,
+            '2': 8,
+            '3': 12,
+            '4': 16
+        };
+        const velocity = new CANNON.Vec3().copy(this.collision.velocity);
+        const currentSpeed = velocity.dot(Utils.cannonVector(forward));
+
+        // Transmission
+        if (currentSpeed > gearsMaxSpeeds[this.gear] && this.gear < maxGears) this.gear++;
+        else if (this.gear > 1)
+        {
+            if (currentSpeed < gearsMaxSpeeds[this.gear - 1]) this.gear--;
+        }
+
+        document.getElementById('speed-debug').innerHTML = 'Speed: ' + Utils.round(currentSpeed * 5, 0);
+        document.getElementById('gear-debug').innerHTML = 'Gear: ' + Utils.round(this.gear, 0);
+
+        if (this.actions.throttle.isPressed)
+        {
+            const engineForceDivider = THREE.Math.clamp(currentSpeed - gearsMaxSpeeds[this.gear - 1], 1, Number.POSITIVE_INFINITY);
+            const force = (engineForce / this.gear) / (engineForceDivider ** this.gear);
+
+            this.rayCastVehicle.applyEngineForce(-force, 1);
+            this.rayCastVehicle.applyEngineForce(-force, 3);
+
+            document.getElementById('force-debug').innerHTML = 'Force: ' + Utils.round(force, 0);
+        }
+        if (this.actions.reverse.isPressed)
+        {
+            const engineForceDivider = THREE.Math.clamp(-currentSpeed, 1, Number.POSITIVE_INFINITY);
+            const force = (engineForce * 2) / (engineForceDivider ** 4);
+
+            this.rayCastVehicle.applyEngineForce(force, 1);
+            this.rayCastVehicle.applyEngineForce(force, 3);
+
+            document.getElementById('force-debug').innerHTML = 'Force: ' + Utils.round(force, 0);
+        }
+
+        const maxSteerVal = 0.8;
+        const steeringFactor = THREE.Math.clamp(currentSpeed * 0.3, 1, Number.POSITIVE_INFINITY);
+
+        if (this.actions.right.isPressed) this.steeringSimulator.target = -maxSteerVal;
+        else if (this.actions.left.isPressed) this.steeringSimulator.target = maxSteerVal;
+        else this.steeringSimulator.target = 0;
+        
+        this.steeringSimulator.simulate(timeStep);
+        this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position / steeringFactor, 0);
+        this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position / steeringFactor, 2);
+    }
+
+    public physicsPreStep(body: CANNON.Body, car: Car): void
+    {
+        let quat = new THREE.Quaternion(
+            body.quaternion.x,
+            body.quaternion.y,
+            body.quaternion.z,
+            body.quaternion.w
+        );
+
+        // let right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
+        // let globalUp = new THREE.Vector3(0, 1, 0);
+        // let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
+        let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+
+        const tiresHaveContact = this.rayCastVehicle['numWheelsOnGround'] === 4;
+
+        if (this.actions.right.isPressed && !tiresHaveContact)
+        {
+            body.angularVelocity.x += forward.x * 0.2;
+            body.angularVelocity.y += forward.y * 0.2;
+            body.angularVelocity.z += forward.z * 0.2;
+        }
+
+        if (this.actions.left.isPressed && !tiresHaveContact)
+        {
+            body.angularVelocity.x -= forward.x * 0.2;
+            body.angularVelocity.y -= forward.y * 0.2;
+            body.angularVelocity.z -= forward.z * 0.2;
+        }
+
+        if (!this.actions.throttle.isPressed && !this.actions.reverse.isPressed) 
+        {
+            body.velocity.x *= 0.99;
+            body.velocity.y *= 0.99;
+            body.velocity.z *= 0.99;
+        }
     }
 
     public onInputChange(): void
     {
         super.onInputChange();
 
-        const maxSteerVal = 0.8;
-        const maxForce = 50;
         const brakeForce = 1000000;
 
-        if (this.actions.throttle.justPressed)
-        {
-            this.rayCastVehicle.applyEngineForce(-maxForce, 1);
-            this.rayCastVehicle.applyEngineForce(-maxForce, 3);
-        }
-        if (this.actions.reverse.justPressed)
-        {
-            this.rayCastVehicle.applyEngineForce(maxForce, 1);
-            this.rayCastVehicle.applyEngineForce(maxForce, 3);
-        }
         if (this.actions.throttle.justReleased || this.actions.reverse.justReleased)
         {
             this.rayCastVehicle.applyEngineForce(0, 1);
@@ -76,47 +176,22 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
         if (this.actions.brake.justPressed)
         {
-            this.rayCastVehicle.setBrake(brakeForce, 0);
             this.rayCastVehicle.setBrake(brakeForce, 1);
-            this.rayCastVehicle.setBrake(brakeForce, 2);
             this.rayCastVehicle.setBrake(brakeForce, 3);
         }
         if (this.actions.brake.justReleased)
         {
-            this.rayCastVehicle.setBrake(0, 0);
             this.rayCastVehicle.setBrake(0, 1);
-            this.rayCastVehicle.setBrake(0, 2);
             this.rayCastVehicle.setBrake(0, 3);
-        }
-
-        if (this.actions.right.isPressed)
-        {
-            this.rayCastVehicle.setSteeringValue(-maxSteerVal, 0);
-            this.rayCastVehicle.setSteeringValue(-maxSteerVal, 2);
-        }
-        if (this.actions.right.justReleased)
-        {
-            this.rayCastVehicle.setSteeringValue(0, 0);
-            this.rayCastVehicle.setSteeringValue(0, 2);
-        }
-
-        if (this.actions.left.justPressed)
-        {
-            this.rayCastVehicle.setSteeringValue(maxSteerVal, 0);
-            this.rayCastVehicle.setSteeringValue(maxSteerVal, 2);
-        }
-        if (this.actions.left.justReleased)
-        {
-            this.rayCastVehicle.setSteeringValue(0, 0);
-            this.rayCastVehicle.setSteeringValue(0, 2);
         }
     }
 
     public fromGLTF(gltf: any): void
     {
         this.collision = new CANNON.Body({
-            mass: 10
+            mass: 50
         });
+        this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
         let mat = new CANNON.Material('Mat');
         mat.friction = 0.01;
         this.collision.material = mat;
@@ -182,19 +257,19 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             const options = {
                 radius: 0.25,
                 directionLocal: new CANNON.Vec3(0, -1, 0),
-                suspensionStiffness: 10,
-                suspensionRestLength: 0.6,
-                frictionSlip: 0.9,
-                dampingRelaxation: 1,
-                dampingCompression: 1,
+                suspensionStiffness: 20,
+                suspensionRestLength: 0.35,
+                frictionSlip: 0.8,
+                dampingRelaxation: 2,
+                dampingCompression: 2,
                 maxSuspensionForce: 100000,
                 rollInfluence:  1,
                 axleLocal: new CANNON.Vec3(-1, 0, 0),
                 chassisConnectionPointLocal: new CANNON.Vec3(),
-                maxSuspensionTravel: 0.3,
+                // maxSuspensionTravel: 0.3,
                 rotation: Math.PI / 2,
-                useCustomSlidingRotationalSpeed: true,
-                customSlidingRotationalSpeed: -0.01,
+                // useCustomSlidingRotationalSpeed: true,
+                // customSlidingRotationalSpeed: 30,
             };
 
             // Create the vehicle
@@ -210,10 +285,18 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             let cylinderGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.15, 12);
             cylinderGeo.rotateZ(Math.PI / 2);
             let defaultMat = new THREE.MeshLambertMaterial();
-            let wheel1 = new THREE.Mesh(cylinderGeo, defaultMat);
-            let wheel2 = new THREE.Mesh(cylinderGeo, defaultMat);
-            let wheel3 = new THREE.Mesh(cylinderGeo, defaultMat);
-            let wheel4 = new THREE.Mesh(cylinderGeo, defaultMat);
+            let wheel1 = new THREE.Mesh(cylinderGeo.clone(), defaultMat);
+            let wheel2 = new THREE.Mesh(cylinderGeo.clone(), defaultMat);
+            let wheel3 = new THREE.Mesh(cylinderGeo.clone(), defaultMat);
+            let wheel4 = new THREE.Mesh(cylinderGeo.clone(), defaultMat);
+            if (this.wheels[0].facing === 'left') wheel1.geometry.translate(0.06, 0, 0);
+            if (this.wheels[0].facing === 'right') wheel1.geometry.translate(-0.06, 0, 0);
+            if (this.wheels[1].facing === 'left') wheel2.geometry.translate(0.06, 0, 0);
+            if (this.wheels[1].facing === 'right') wheel2.geometry.translate(-0.06, 0, 0);
+            if (this.wheels[2].facing === 'left') wheel3.geometry.translate(0.06, 0, 0);
+            if (this.wheels[2].facing === 'right') wheel3.geometry.translate(-0.06, 0, 0);
+            if (this.wheels[3].facing === 'left') wheel4.geometry.translate(0.06, 0, 0);
+            if (this.wheels[3].facing === 'right') wheel4.geometry.translate(-0.06, 0, 0);
             wheel1.castShadow = true;
             wheel1.receiveShadow = true;
             wheel2.castShadow = true;
