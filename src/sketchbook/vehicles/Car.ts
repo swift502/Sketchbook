@@ -70,14 +70,23 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         const engineForce = 4000;
         const maxGears = 4;
         const gearsMaxSpeeds = {
+            'R': -4,
             '0': 0,
             '1': 4,
             '2': 8,
             '3': 12,
-            '4': 16
+            '4': 32
         };
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
+        velocity.normalize();
+        let driftCorrection = Utils.getSignedAngleBetweenVectors(Utils.threeVector(velocity), forward);
+        // let sliding = 0;
+        // sliding = sliding + this.rayCastVehicle.wheelInfos[1].skidInfo / 2;
+        // sliding = sliding + this.rayCastVehicle.wheelInfos[3].skidInfo / 2;
+
+        // velocity.normalize();
+        // const forwardFactor = velocity.dot(Utils.cannonVector(forward));
 
         // Engine
 
@@ -89,13 +98,28 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         else
         {
             // Transmission 
-            const powerFactor = (gearsMaxSpeeds[this.gear] - currentSpeed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
-                            
-            if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
-            else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
-            else
+
+            if (this.actions.reverse.isPressed)
             {
-                if (this.actions.throttle.isPressed)
+                // const engineForceDivider = THREE.Math.clamp(-currentSpeed, 1, Number.POSITIVE_INFINITY);
+                // const force = (engineForce * 2) / (engineForceDivider ** 4);
+
+                const powerFactor = (gearsMaxSpeeds['R'] - currentSpeed) / Math.abs(gearsMaxSpeeds['R']);
+                const force = (engineForce / this.gear) * (powerFactor ** 2);
+
+                this.rayCastVehicle.applyEngineForce(force, 1);
+                this.rayCastVehicle.applyEngineForce(force, 3);
+
+                document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
+                document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
+            }
+            else if (this.actions.throttle.isPressed)
+            {
+                const powerFactor = (gearsMaxSpeeds[this.gear] - currentSpeed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
+                            
+                if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
+                else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
+                else
                 {
                     const force = (engineForce / this.gear) * (powerFactor ** 2);
     
@@ -104,19 +128,10 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
     
                     document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
                 }
-                if (this.actions.reverse.isPressed)
-                {
-                    const engineForceDivider = THREE.Math.clamp(-currentSpeed, 1, Number.POSITIVE_INFINITY);
-                    const force = (engineForce * 2) / (engineForceDivider ** 4);
-    
-                    this.rayCastVehicle.applyEngineForce(force, 1);
-                    this.rayCastVehicle.applyEngineForce(force, 3);
-    
-                    document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
-                }
+                document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
             }
 
-            document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
+            
         }
 
         document.getElementById('car-debug').innerHTML += '<br>Speed: ' + Utils.round(currentSpeed * 5, 0);
@@ -124,15 +139,23 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
         // Steering
         const maxSteerVal = 0.8;
-        const steeringFactor = THREE.Math.clamp(currentSpeed * 0.3, 1, Number.POSITIVE_INFINITY);
+        let speedFactor = THREE.Math.clamp(currentSpeed * 0.5, 1, Number.MAX_VALUE);
 
-        if (this.actions.right.isPressed) this.steeringSimulator.target = -maxSteerVal;
-        else if (this.actions.left.isPressed) this.steeringSimulator.target = maxSteerVal;
+        if (this.actions.right.isPressed)
+        {
+            let steering = Math.min(-maxSteerVal / speedFactor, -driftCorrection);
+            this.steeringSimulator.target = THREE.Math.clamp(steering, -maxSteerVal, maxSteerVal);
+        }
+        else if (this.actions.left.isPressed)
+        {
+            let steering = Math.max(maxSteerVal / speedFactor, -driftCorrection);
+            this.steeringSimulator.target = THREE.Math.clamp(steering, -maxSteerVal, maxSteerVal);
+        }
         else this.steeringSimulator.target = 0;
         
         this.steeringSimulator.simulate(timeStep);
-        this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position / steeringFactor, 0);
-        this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position / steeringFactor, 2);
+        this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position, 0);
+        this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position, 2);
     }
 
     public shiftUp(): void
