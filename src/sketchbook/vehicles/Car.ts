@@ -23,6 +23,10 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
     private steeringSimulator: SpringSimulator;
     private gear: number = 1;
 
+    // Transmission
+    private shiftTimer: number;
+    private timeToShift: number = 0.2;
+
     constructor()
     {
         super();
@@ -43,7 +47,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
     {
         super.update(timeStep);
 
-        // console.log('0: ', Utils.round(this.rayCastVehicle.wheelInfos[0].suspensionForce, 0));
+        document.getElementById('car-debug').innerHTML = '';
 
         for (let i = 0; i < this.rayCastVehicle.wheelInfos.length; i++) {
             this.rayCastVehicle['updateWheelTransform'](i);
@@ -51,11 +55,8 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             let wheelBody = this.wheelsDebug[i];
             wheelBody.position.copy(t.position);
             wheelBody.quaternion.copy(t.quaternion);
-            // if(i === 0) console.log(this.rayCastVehicle.wheelInfos[i].rotation);
-            // wheelBody.rotateY(Math.PI / 2);
             let upAxisWorld = new CANNON.Vec3();
             this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
-            // wheelBody.rotateOnWorldAxis(Utils.threeVector(upAxisWorld), -Math.PI / 2);
         }
 
         let quat = new THREE.Quaternion(
@@ -64,9 +65,6 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             this.collision.quaternion.z,
             this.collision.quaternion.w
         );
-        // let right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
-        // let globalUp = new THREE.Vector3(0, 1, 0);
-        // let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
         let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
         
         const engineForce = 4000;
@@ -81,37 +79,50 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
 
-        // Transmission
-        if (currentSpeed > gearsMaxSpeeds[this.gear] && this.gear < maxGears) this.gear++;
-        else if (this.gear > 1)
+        // Engine
+
+        if (this.shiftTimer > 0)
         {
-            if (currentSpeed < gearsMaxSpeeds[this.gear - 1]) this.gear--;
+            this.shiftTimer -= timeStep;
+            if (this.shiftTimer < 0) this.shiftTimer = 0;
+        }
+        else
+        {
+            // Transmission 
+            const powerFactor = (gearsMaxSpeeds[this.gear] - currentSpeed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
+                            
+            if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
+            else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
+            else
+            {
+                if (this.actions.throttle.isPressed)
+                {
+                    const force = (engineForce / this.gear) * (powerFactor ** 2);
+    
+                    this.rayCastVehicle.applyEngineForce(-force, 1);
+                    this.rayCastVehicle.applyEngineForce(-force, 3);
+    
+                    document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
+                }
+                if (this.actions.reverse.isPressed)
+                {
+                    const engineForceDivider = THREE.Math.clamp(-currentSpeed, 1, Number.POSITIVE_INFINITY);
+                    const force = (engineForce * 2) / (engineForceDivider ** 4);
+    
+                    this.rayCastVehicle.applyEngineForce(force, 1);
+                    this.rayCastVehicle.applyEngineForce(force, 3);
+    
+                    document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
+                }
+            }
+
+            document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
         }
 
-        document.getElementById('speed-debug').innerHTML = 'Speed: ' + Utils.round(currentSpeed * 5, 0);
-        document.getElementById('gear-debug').innerHTML = 'Gear: ' + Utils.round(this.gear, 0);
+        document.getElementById('car-debug').innerHTML += '<br>Speed: ' + Utils.round(currentSpeed * 5, 0);
+        document.getElementById('car-debug').innerHTML += '<br>Gear: ' + Utils.round(this.gear, 0);
 
-        if (this.actions.throttle.isPressed)
-        {
-            const engineForceDivider = THREE.Math.clamp(currentSpeed - gearsMaxSpeeds[this.gear - 1], 1, Number.POSITIVE_INFINITY);
-            const force = (engineForce / this.gear) / (engineForceDivider ** this.gear);
-
-            this.rayCastVehicle.applyEngineForce(-force, 1);
-            this.rayCastVehicle.applyEngineForce(-force, 3);
-
-            document.getElementById('force-debug').innerHTML = 'Force: ' + Utils.round(force, 0);
-        }
-        if (this.actions.reverse.isPressed)
-        {
-            const engineForceDivider = THREE.Math.clamp(-currentSpeed, 1, Number.POSITIVE_INFINITY);
-            const force = (engineForce * 2) / (engineForceDivider ** 4);
-
-            this.rayCastVehicle.applyEngineForce(force, 1);
-            this.rayCastVehicle.applyEngineForce(force, 3);
-
-            document.getElementById('force-debug').innerHTML = 'Force: ' + Utils.round(force, 0);
-        }
-
+        // Steering
         const maxSteerVal = 0.8;
         const steeringFactor = THREE.Math.clamp(currentSpeed * 0.3, 1, Number.POSITIVE_INFINITY);
 
@@ -122,6 +133,24 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         this.steeringSimulator.simulate(timeStep);
         this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position / steeringFactor, 0);
         this.rayCastVehicle.setSteeringValue(this.steeringSimulator.position / steeringFactor, 2);
+    }
+
+    public shiftUp(): void
+    {
+        this.gear++;
+        this.shiftTimer = this.timeToShift;
+
+        this.rayCastVehicle.applyEngineForce(0, 1);
+        this.rayCastVehicle.applyEngineForce(0, 3);
+    }
+
+    public shiftDown(): void
+    {
+        this.gear--;
+        this.shiftTimer = this.timeToShift;
+
+        this.rayCastVehicle.applyEngineForce(0, 1);
+        this.rayCastVehicle.applyEngineForce(0, 3);
     }
 
     public physicsPreStep(body: CANNON.Body, car: Car): void
@@ -138,7 +167,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         // let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
         let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
 
-        const tiresHaveContact = this.rayCastVehicle['numWheelsOnGround'] === 4;
+        const tiresHaveContact = this.rayCastVehicle['numWheelsOnGround'] > 0;
 
         if (this.actions.right.isPressed && !tiresHaveContact)
         {
