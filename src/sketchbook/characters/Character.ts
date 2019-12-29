@@ -461,6 +461,29 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.world.cameraOperator.setRadius(1.6, true);
         this.world.cameraOperator.followMode = false;
         // this.world.dirLight.target = this;
+
+        this.world.updateControls([
+            {
+                keys: ['W', 'A', 'S', 'D'],
+                desc: 'Movement'
+            },
+            {
+                keys: ['Space'],
+                desc: 'Jump'
+            },
+            {
+                keys: ['Shift'],
+                desc: 'Sprint'
+            },
+            {
+                keys: ['F'],
+                desc: 'Enter vehicle'
+            },
+            {
+                keys: ['Shift', '+', 'C'],
+                desc: 'Free camera'
+            },
+        ]);
     }
 
     public inputReceiverUpdate(timeStep: number): void

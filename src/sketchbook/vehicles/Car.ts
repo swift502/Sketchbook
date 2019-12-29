@@ -16,7 +16,6 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
     private rayCastVehicle: CANNON.RaycastVehicle;
     private wheels: Wheel[] = [];
     private wheelsDebug: THREE.Mesh[] = [];
-    // private wheelBodies: CANNON.Body[] = [];
     private steeringWheel: THREE.Object3D;
 
     private steering: number = 0;
@@ -81,15 +80,8 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
         velocity.normalize();
         let driftCorrection = Utils.getSignedAngleBetweenVectors(Utils.threeVector(velocity), forward);
-        // let sliding = 0;
-        // sliding = sliding + this.rayCastVehicle.wheelInfos[1].skidInfo / 2;
-        // sliding = sliding + this.rayCastVehicle.wheelInfos[3].skidInfo / 2;
-
-        // velocity.normalize();
-        // const forwardFactor = velocity.dot(Utils.cannonVector(forward));
 
         // Engine
-
         if (this.shiftTimer > 0)
         {
             this.shiftTimer -= timeStep;
@@ -98,14 +90,12 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         else
         {
             // Transmission 
-
             if (this.actions.reverse.isPressed)
             {
-                // const engineForceDivider = THREE.Math.clamp(-currentSpeed, 1, Number.POSITIVE_INFINITY);
-                // const force = (engineForce * 2) / (engineForceDivider ** 4);
-
                 const powerFactor = (gearsMaxSpeeds['R'] - currentSpeed) / Math.abs(gearsMaxSpeeds['R']);
                 const force = (engineForce / this.gear) * (powerFactor ** 2);
+                document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
+                document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
 
                 this.rayCastVehicle.applyEngineForce(force, 1);
                 this.rayCastVehicle.applyEngineForce(force, 3);
@@ -116,22 +106,18 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             else if (this.actions.throttle.isPressed)
             {
                 const powerFactor = (gearsMaxSpeeds[this.gear] - currentSpeed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
+                const force = (engineForce / this.gear) * (powerFactor ** 2);
+                document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
+                document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
                             
                 if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
                 else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
                 else
                 {
-                    const force = (engineForce / this.gear) * (powerFactor ** 2);
-    
                     this.rayCastVehicle.applyEngineForce(-force, 1);
                     this.rayCastVehicle.applyEngineForce(-force, 3);
-    
-                    document.getElementById('car-debug').innerHTML += '<br>Force: ' + Utils.round(force, 0);
                 }
-                document.getElementById('car-debug').innerHTML += '<br>Power factor: ' + Utils.round(powerFactor, 2);
             }
-
-            
         }
 
         document.getElementById('car-debug').innerHTML += '<br>Speed: ' + Utils.round(currentSpeed * 5, 0);
@@ -236,6 +222,30 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             this.rayCastVehicle.setBrake(0, 1);
             this.rayCastVehicle.setBrake(0, 3);
         }
+    }
+
+    public inputReceiverInit(): void
+    {
+        super.inputReceiverInit();
+
+        this.world.updateControls([
+            {
+                keys: ['W'],
+                desc: 'Throttle'
+            },
+            {
+                keys: ['S'],
+                desc: 'Brake / Reverse'
+            },
+            {
+                keys: ['A', 'D'],
+                desc: 'Steering'
+            },
+            {
+                keys: ['Space'],
+                desc: 'Handbrake'
+            }
+        ]);
     }
 
     public fromGLTF(gltf: any): void

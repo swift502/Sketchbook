@@ -203,4 +203,32 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
             }
         });
     }
+
+    public inputReceiverInit(): void
+    {
+        super.inputReceiverInit();
+
+        this.world.updateControls([
+            {
+                keys: ['W'],
+                desc: 'Ascend'
+            },
+            {
+                keys: ['S'],
+                desc: 'Descend'
+            },
+            {
+                keys: ['↑', '↓'],
+                desc: 'Pitch'
+            },
+            {
+                keys: ['←', '→', 'or', 'A', 'D'],
+                desc: 'Roll'
+            },
+            {
+                keys: ['Q', 'E'],
+                desc: 'Yaw'
+            },
+        ]);
+    }
 }

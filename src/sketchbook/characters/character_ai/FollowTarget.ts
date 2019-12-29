@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
 import { CharacterAIBase } from './CharacterAIBase';
 
-export class FollowObject extends CharacterAIBase implements ICharacterAI
+export class FollowTarget extends CharacterAIBase implements ICharacterAI
 {
     public isTargetReached: boolean;
 

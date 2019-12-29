@@ -74,4 +74,32 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
             }
         });
     }
+
+    public inputReceiverInit(): void
+    {
+        super.inputReceiverInit();
+
+        this.world.updateControls([
+            {
+                keys: ['W'],
+                desc: 'Increase engine RPM'
+            },
+            {
+                keys: ['S'],
+                desc: 'Decrease engine RPM'
+            },
+            {
+                keys: ['↑', '↓'],
+                desc: 'Elevators'
+            },
+            {
+                keys: ['←', '→', 'or', 'A', 'D'],
+                desc: 'Ailerons'
+            },
+            {
+                keys: ['Q', 'E'],
+                desc: 'Rudder / Steering'
+            },
+        ]);
+    }
 }

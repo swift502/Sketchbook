@@ -3,13 +3,11 @@ import "../css/main.css";
 import * as THREEImport from "three";
 import * as CANNONImport from 'cannon';
 
-import { FollowCharacter } from './characters/character_ai/FollowCharacter';
-import { FollowObject } from './characters/character_ai/FollowObject';
+import { FollowTarget } from './characters/character_ai/FollowTarget';
 import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
 
 export const CharacterAI = {
-    FollowCharacter,
-    FollowObject,
+    FollowTarget,
     RandomBehaviour,
 };
 

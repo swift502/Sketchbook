@@ -315,6 +315,25 @@ export class World
         }
     }
 
+    public updateControls(controls: any): void
+    {
+        let html = '';
+        html += '<div class="info-title">Controls:</div>';
+
+        controls.forEach((row) =>
+        {
+            html += '<div class="info-row">';
+            row.keys.forEach((key) => {
+                if (key === '+' || key === 'and' || key === 'or' || key === '&') html += '&nbsp;' + key + '&nbsp;';
+                else html += '<span class="key">' + key + '</span>';
+            });
+
+            html += '<span class="ctrl-desc">' + row.desc + '</span></div>';
+        });
+
+        document.getElementById('controls-menu').innerHTML = html;
+    }
+
     private getGUI(scope: any): GUI
     {
         const gui = new GUI.GUI();
