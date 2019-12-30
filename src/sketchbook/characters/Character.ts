@@ -20,7 +20,7 @@ import { VehicleSeat } from '../vehicles/VehicleSeat';
 import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
 import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
 
-export class Character extends THREE.Object3D implements IControllable, IWorldEntity
+export class Character extends THREE.Object3D implements IWorldEntity
 {
     public isCharacter: boolean = true;
     public height: number = 0;
@@ -29,8 +29,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public characterModel: THREE.Mesh;
     public mixer: THREE.AnimationMixer;
     public animations: any[];
-
-    public seats: VehicleSeat[];
 
     // Movement
     public acceleration: THREE.Vector3 = new THREE.Vector3();
@@ -62,7 +60,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
     public initJumpSpeed: number = -1;
     public groundImpactData: Utils.GroundImpactData = new Utils.GroundImpactData();
 
-    public controllingCharacter: Character;
     public controlledObject: IControllable;
     public controlledObjectSeat: VehicleSeat;
 
@@ -366,6 +363,10 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             // Set value
             action.isPressed = value;
 
+            // Reset the 'just' attributes
+            action.justPressed = false;
+            action.justReleased = false;
+
             // Set the 'just' attributes
             if (value) action.justPressed = true;
             else action.justReleased = true;
@@ -501,7 +502,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
             let globalPos = new THREE.Vector3();
             this.getWorldPosition(globalPos);
 
-            this.world.sky.updateSkyCenter(this.position);
             this.getWorldPosition(this.world.cameraOperator.target);
         }
         
@@ -656,11 +656,6 @@ export class Character extends THREE.Object3D implements IControllable, IWorldEn
         this.controlledObject = undefined;
         this.inputReceiverInit();
         // this.setPhysicsEnabled(true);
-    }
-
-    public getMountPoint(character: Character): THREE.Vector3
-    {
-        return this.position;
     }
 
     public physicsPreStep(body: CANNON.Body, character: Character): void

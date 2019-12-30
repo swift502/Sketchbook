@@ -109,7 +109,7 @@ export class World
         this.parallelPairs = [];
         this.physicsFrameRate = 60;
         this.physicsFrameTime = 1 / this.physicsFrameRate;
-        this.physicsMaxPrediction = this.physicsFrameRate;
+        this.physicsMaxPrediction = this.physicsFrameTime * 2;
 
         // RenderLoop
         this.clock = new THREE.Clock();
@@ -185,6 +185,7 @@ export class World
 
         // Rotate and position camera
         this.cameraOperator.update();
+        this.sky.update();
     }
 
     public updatePhysics(timeStep: number): void

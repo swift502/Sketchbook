@@ -1,24 +1,25 @@
 import * as CANNON from 'cannon';
 import * as Utils from '../core/Utilities';
 
-import { Vehicle } from "./Vehicle";
-import { IControllable } from "../interfaces/IControllable";
-import { IWorldEntity } from "../interfaces/IWorldEntity";
+import { Vehicle } from './Vehicle';
+import { IControllable } from '../interfaces/IControllable';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
 import THREE = require('three');
 import { World } from '../core/World';
 
 export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 {
-    public rotors: THREE.Object3D[];
-
+    public rotors: THREE.Object3D[] = [];
     private enginePower: number = 0;
-    // private rotStabVelocity: THREE.Quaternion; // Rotational stabilization velocity
-    actions: { 'ascend': KeyBinding; 'descend': KeyBinding; 'pitchUp': KeyBinding; 'pitchDown': KeyBinding; 'yawLeft': KeyBinding; 'yawRight': KeyBinding; 'rollLeft': KeyBinding; 'rollRight': KeyBinding; 'exitVehicle': KeyBinding; };
 
-    constructor()
+    constructor(gltf: any)
     {
-        super();
+        super(gltf);
+
+        this.readHelicopterData(gltf);
+
+        this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
         this.actions = {
             'ascend': new KeyBinding('KeyW'),
@@ -27,8 +28,8 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
             'pitchDown': new KeyBinding('ArrowUp'),
             'yawLeft': new KeyBinding('KeyQ'),
             'yawRight': new KeyBinding('KeyE'),
-            'rollLeft': new KeyBinding('ArrowLeft'),
-            'rollRight': new KeyBinding('ArrowRight'),
+            'rollLeft': new KeyBinding('ArrowLeft', 'KeyA'),
+            'rollRight': new KeyBinding('ArrowRight', 'KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
         };
     }
@@ -85,7 +86,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 
         // Vertical stabilization
         let gravity = heli.world.physicsWorld.gravity;
-        let gravityCompensation = new CANNON.Vec3(-gravity.x, -gravity.y, -gravity.z)['length']();
+        let gravityCompensation = new CANNON.Vec3(-gravity.x, -gravity.y, -gravity.z).length();
         gravityCompensation *= heli.world.physicsFrameTime;
         gravityCompensation *= 0.98;
         let dot = globalUp.dot(up);
@@ -170,26 +171,8 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         body.angularVelocity.z *= 0.96;
     }
 
-    public fromGLTF(gltf: any): void
+    public readHelicopterData(gltf: any): void
     {
-        this.collision = new CANNON.Body({
-            mass: 50
-        });
-        this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
-        let mat = new CANNON.Material('Mat');
-        mat.friction = 0.01;
-        this.collision.material = mat;
-
-        this.rotors = [];
-
-        this.readGLTF(gltf);
-        this.setModel(gltf.scene);
-    }
-
-    public readGLTF(gltf: any): void
-    {
-        super.readGLTF(gltf);
-
         gltf.scene.traverse((child) => {
             if (child.hasOwnProperty('userData'))
             {

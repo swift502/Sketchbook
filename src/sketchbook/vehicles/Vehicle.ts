@@ -13,7 +13,10 @@ export abstract class Vehicle extends THREE.Object3D
 {
     public controllingCharacter: Character;
     public actions: { [action: string]: KeyBinding; } = {};
+    public rayCastVehicle: CANNON.RaycastVehicle;
     public seats: VehicleSeat[] = [];
+    public wheels: Wheel[] = [];
+    public drive: string;
 
     public model: any;
     public world: World;
@@ -24,21 +27,44 @@ export abstract class Vehicle extends THREE.Object3D
     public collision: CANNON.Body;
     private modelContainer: THREE.Group;
 
-    constructor()
+    constructor(gltf: any, handlingSetup?: any)
     {
         super();
+
+        if (handlingSetup === undefined) handlingSetup = {};
+        handlingSetup.chassisConnectionPointLocal = new CANNON.Vec3(),
+        handlingSetup.axleLocal = new CANNON.Vec3(-1, 0, 0);
+        handlingSetup.directionLocal = new CANNON.Vec3(0, -1, 0);
 
         this.modelContainer = new THREE.Group();
         this.add(this.modelContainer);
 
-        // Actions
-        // this.actions = {
-        //     'forward': new KeyBinding('KeyW'),
-        //     'backward': new KeyBinding('KeyS'),
-        //     'left': new KeyBinding('KeyA'),
-        //     'right': new KeyBinding('KeyD'),
-        //     'exitVehicle': new KeyBinding('KeyF'),
-        // };
+        // Collision body
+        this.collision = new CANNON.Body({
+            mass: 50
+        });
+        let mat = new CANNON.Material('Mat');
+        mat.friction = 0.01;
+        this.collision.material = mat;
+
+        // Read GLTF
+        this.readVehicleData(gltf);
+        this.setModel(gltf.scene);
+
+        // Raycast vehicle component
+        this.rayCastVehicle = new CANNON.RaycastVehicle({
+            chassisBody: this.collision,
+            indexUpAxis: 1,
+            indexRightAxis: 0,
+            indexForwardAxis: 2
+        });
+
+        this.wheels.forEach((wheel) =>
+        {
+            handlingSetup.chassisConnectionPointLocal.set(wheel.position.x, wheel.position.y + 0.2, wheel.position.z);
+            const index = this.rayCastVehicle.addWheel(handlingSetup);
+            wheel.rayCastWheelInfoIndex = index;
+        });
 
         this.help = new THREE.AxesHelper(2);
     }
@@ -54,52 +80,6 @@ export abstract class Vehicle extends THREE.Object3D
     {
         this.help.position.copy(Utils.threeVector(this.collision.interpolatedPosition));
         this.help.quaternion.copy(Utils.threeQuat(this.collision.interpolatedQuaternion));
-
-        // this.seats[0].seatObject.getWorldPosition(this.help.position);
-        // this.seats[0].seatObject.getWorldQuaternion(this.help.quaternion);
-
-        // if (this.actions.forward.isPressed)
-        // {
-        //     let quat = new THREE.Quaternion(
-        //         this.collision.quaternion.x,
-        //         this.collision.quaternion.y,
-        //         this.collision.quaternion.z,
-        //         this.collision.quaternion.w
-        //     );
-
-        //     let dir = new THREE.Vector3(0, 0, 0.3);
-
-        //     dir.applyQuaternion(quat);
-
-        //     this.collision.velocity.x +=  dir.x;
-        //     this.collision.velocity.y +=  dir.y;
-        //     this.collision.velocity.z +=  dir.z;
-        // }
-        // if (this.actions.backward.isPressed)
-        // {
-        //     let quat = new THREE.Quaternion(
-        //         this.collision.quaternion.x,
-        //         this.collision.quaternion.y,
-        //         this.collision.quaternion.z,
-        //         this.collision.quaternion.w
-        //     );
-
-        //     let dir = new THREE.Vector3(0, 0, -0.3);
-
-        //     dir.applyQuaternion(quat);
-
-        //     this.collision.velocity.x +=  dir.x;
-        //     this.collision.velocity.y +=  dir.y;
-        //     this.collision.velocity.z +=  dir.z;
-        // }
-        // if (this.actions.left.isPressed)
-        // {
-        //     this.collision.angularVelocity.y += 0.5;
-        // }
-        // if (this.actions.right.isPressed)
-        // {
-        //     this.collision.angularVelocity.y -= 0.5;
-        // }
 
         this.position.set(
             this.collision.interpolatedPosition.x,
@@ -117,6 +97,19 @@ export abstract class Vehicle extends THREE.Object3D
         this.seats.forEach((seat: VehicleSeat) => {
             seat.update(timeStep);
         });
+
+        for (let i = 0; i < this.rayCastVehicle.wheelInfos.length; i++)
+        {
+            this.rayCastVehicle.updateWheelTransform(i);
+            let transform = this.rayCastVehicle.wheelInfos[i].worldTransform;
+
+            let wheelObject = this.wheels[i].wheelObject;
+            wheelObject.position.copy(Utils.threeVector(transform.position));
+            wheelObject.quaternion.copy(Utils.threeQuat(transform.quaternion));
+
+            let upAxisWorld = new CANNON.Vec3();
+            this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
+        }
     }
 
     public onInputChange(): void
@@ -160,6 +153,10 @@ export abstract class Vehicle extends THREE.Object3D
             // Set value
             action.isPressed = value;
 
+            // Reset the 'just' attributes
+            action.justPressed = false;
+            action.justReleased = false;
+
             // Set the 'just' attributes
             if (value) action.justPressed = true;
             else action.justReleased = true;
@@ -190,7 +187,6 @@ export abstract class Vehicle extends THREE.Object3D
     public inputReceiverInit(): void
     {
         this.world.cameraOperator.setRadius(3);
-        // this.world.cameraOperator.followMode = true;
     }
 
     public inputReceiverUpdate(timeStep: number): void
@@ -201,8 +197,6 @@ export abstract class Vehicle extends THREE.Object3D
             this.position.y + 1,
             this.position.z
         );
-
-        this.world.sky.updateSkyCenter(this.position);
     }
 
     public getMountPoint(character: Character): THREE.Vector3
@@ -216,14 +210,23 @@ export abstract class Vehicle extends THREE.Object3D
         {
             console.warn('Adding character to a world in which it already exists.');
         }
+        else if (this.rayCastVehicle === undefined)
+        {
+            console.error('Trying to create vehicle without raycastVehicleComponent');
+        }
         else
         {
             this.world = world;
             world.vehicles.push(this);
             world.graphicsWorld.add(this);
-            world.physicsWorld.addBody(this.collision);
-
+            // world.physicsWorld.addBody(this.collision);
+            this.rayCastVehicle.addToWorld(world.physicsWorld);
             world.graphicsWorld.add(this.help);
+
+            this.wheels.forEach((wheel) =>
+            {
+                this.world.graphicsWorld.attach(wheel.wheelObject);
+            });
         }
     }
 
@@ -232,6 +235,36 @@ export abstract class Vehicle extends THREE.Object3D
         this.collision.position.x = x;
         this.collision.position.y = y;
         this.collision.position.z = z;
+    }
+
+    public setSteeringValue(val: number): void
+    {
+        this.wheels.forEach((wheel) =>
+        {
+            if (wheel.steering) this.rayCastVehicle.setSteeringValue(val, wheel.rayCastWheelInfoIndex);
+        });
+    }
+
+    public applyEngineForce(force: number): void
+    {
+        this.wheels.forEach((wheel) =>
+        {
+            if (this.drive === undefined || this.drive === wheel.drive)
+            {
+                this.rayCastVehicle.applyEngineForce(force, wheel.rayCastWheelInfoIndex);
+            }
+        });
+    }
+
+    public setBrake(brakeForce: number, driveFilter?: string): void
+    {
+        this.wheels.forEach((wheel) =>
+        {
+            if (driveFilter === undefined || driveFilter === wheel.drive)
+            {
+                this.rayCastVehicle.setBrake(brakeForce, wheel.rayCastWheelInfoIndex);
+            }
+        });
     }
 
     public removeFromWorld(world: World): void
@@ -249,10 +282,8 @@ export abstract class Vehicle extends THREE.Object3D
         }
     }
 
-    public readGLTF(gltf: any): void
+    public readVehicleData(gltf: any): void
     {
-        // let newCOM: THREE.Vector3;
-
         gltf.scene.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;
@@ -263,10 +294,6 @@ export abstract class Vehicle extends THREE.Object3D
             {
                 if (child.userData.hasOwnProperty('data'))
                 {
-                    // if (child.userData.data === 'com')
-                    // {
-                    //     newCOM = child.position;
-                    // }
                     if (child.userData.data === 'seat')
                     {
                         let seat = new VehicleSeat(child);
@@ -306,6 +333,24 @@ export abstract class Vehicle extends THREE.Object3D
 
                         this.seats.push(seat);
                     }
+                    if (child.userData.data === 'wheel')
+                    {
+                        let wheel = new Wheel(child);
+
+                        wheel.position = child.position;
+
+                        if (child.userData.hasOwnProperty('steering')) 
+                        {
+                            wheel.steering = (child.userData.steering === 'true');
+                        }
+
+                        if (child.userData.hasOwnProperty('drive')) 
+                        {
+                            wheel.drive = child.userData.drive;
+                        }
+
+                        this.wheels.push(wheel);
+                    }
                     if (child.userData.data === 'collision')
                     {
                         if (child.userData.shape === 'box')
@@ -330,13 +375,6 @@ export abstract class Vehicle extends THREE.Object3D
             }
         });
 
-        // Set COM only after all the collision objects have been identified
-        // if (newCOM !== undefined)
-        // {
-            // this.setCOMFromLocalPoint(Utils.cannonVector(newCOM));
-            // this.setCOMFromLocalPoint(new CANNON.Vec3(0, 10, 0));
-        // }
-
         if (this.collision.shapes.length === 0)
         {
             console.warn('Vehicle ' + typeof(this) + ' has no collision data.');
@@ -346,24 +384,4 @@ export abstract class Vehicle extends THREE.Object3D
             console.warn('Vehicle ' + typeof(this) + ' has no seats.');
         }
     }
-
-    // public setCOMFromLocalPoint( newCOM: CANNON.Vec3 ): void
-    // {
-    //     if (this.collision === undefined)
-    //     {
-    //         console.error('Trying to set COM to a vehicle with no collisions.');
-    //         return;
-    //     }
-
-    //     // Move the shapes so the body origin is at the COM
-    //     this.collision.shapeOffsets.forEach(( offset: CANNON.Vec3 ) =>
-    //     {
-    //         offset.vsub( newCOM, offset );
-    //     });
-        
-    //     // Now move the body so the shapes' net displacement is 0
-    //     let worldCOM = new CANNON.Vec3();
-    //     this.collision.vectorToWorldFrame( newCOM, worldCOM );
-    //     this.collision.position.vadd( worldCOM, this.collision.position );
-    // }
 }

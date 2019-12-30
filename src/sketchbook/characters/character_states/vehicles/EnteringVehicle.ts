@@ -43,11 +43,11 @@ export class EnteringVehicle extends CharacterStateBase
         (this.seat.vehicle as unknown as THREE.Object3D).attach(this.character);
 
         this.startPosition.copy(this.character.position);
-        this.endPosition.copy(seat.seatObject.position);
+        this.endPosition.copy(seat.seatPoint.position);
         this.endPosition.y += 0.6;
 
         this.startRotation.copy(this.character.quaternion);
-        this.endRotation.copy(this.seat.seatObject.quaternion);
+        this.endRotation.copy(this.seat.seatPoint.quaternion);
     }
 
     public update(timeStep: number): void

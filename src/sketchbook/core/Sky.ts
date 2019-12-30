@@ -72,9 +72,9 @@ export class Sky extends THREE.Object3D
         this.refreshSunPosition();
     }
 
-    public updateSkyCenter(pos: THREE.Vector3): void
+    public update(): void
     {
-        this.position.copy(pos);
+        this.position.copy(this.world.camera.position);
         this.refreshSunPosition();
     }
 

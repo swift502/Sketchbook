@@ -69,24 +69,21 @@
 
         loadGLTF('../build/graphics/car.glb', function(gltf)
         {
-            let car = new SB.Car();
-            car.fromGLTF(gltf);
+            let car = new SB.Car(gltf);
             car.setPosition(0, 3, 0);
             world.add(car);
         });
 
         loadGLTF('../build/graphics/heli.glb', function(gltf)
         {
-            let heli = new SB.Helicopter();
-            heli.fromGLTF(gltf);
+            let heli = new SB.Helicopter(gltf);
             heli.setPosition(5, 3, 0);
             world.add(heli);
         });
 
         loadGLTF('../build/graphics/plane.glb', function(gltf)
         {
-            let plane = new SB.Airplane();
-            plane.fromGLTF(gltf);
+            let plane = new SB.Airplane(gltf);
             plane.setPosition(-5, 3, 0);
             world.add(plane);
         });

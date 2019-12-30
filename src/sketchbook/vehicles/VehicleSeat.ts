@@ -7,7 +7,7 @@ import { VehicleDoor } from "./VehicleDoor";
 export class VehicleSeat
 {
     public vehicle: IControllable;
-    public seatObject: THREE.Object3D;
+    public seatPoint: THREE.Object3D;
     public type: SeatType;
     public entryPoint: THREE.Object3D;
     public door: VehicleDoor;
@@ -15,7 +15,7 @@ export class VehicleSeat
 
     constructor(object: THREE.Object3D)
     {
-        this.seatObject = object;
+        this.seatPoint = object;
     }
 
     public update(timeStep: number): void

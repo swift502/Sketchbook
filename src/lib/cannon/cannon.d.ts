@@ -410,39 +410,59 @@ declare module CANNON {
 
         static ZERO: Vec3;
 
+        constructor(x?: number, y?: number, z?: number);
+
         x: number;
         y: number;
         z: number;
-
-        constructor(x?: number, y?: number, z?: number);
-
-        cross(v: Vec3, target?: Vec3): Vec3;
+        
+        cross(v: Vec3, target: Vec3): Vec3;
         set(x: number, y: number, z: number): Vec3;
         setZero(): void;
-        vadd(v: Vec3, target?: Vec3): Vec3;
-        vsub(v: Vec3, target?: Vec3): Vec3;
+        vadd(v: Vec3, target: Vec3): Vec3;
+        vsub(v: Vec3, target: Vec3): Vec3;
         crossmat(): Mat3;
         normalize(): number;
-        unit(target?: Vec3): Vec3;
+        unit(target: Vec3): Vec3;
         norm(): number;
+        /**
+         * Get the length of the vector
+         * @method length
+         * @return {Number}
+         */
+        length: any;
         norm2(): number;
+        /**
+         * Get the squared length of the vector.
+         * @method lengthSquared
+         * @return {Number}
+         */
+        lengthSquared: any;
         distanceTo(p: Vec3): number;
-        mult(scalar: number, target?: Vec3): Vec3;
-        scale(scalar: number, target?: Vec3): Vec3;
+        distanceSquared(p: Vec3): number;
+        mult(scalar: number, target: Vec3): Vec3;
+        vmul(vector: number, target: Vec3): Vec3;
+        /**
+         * Multiply the vector with a scalar.
+         * @method scale
+         * @param {Number} scalar
+         * @param {Vec3} target
+         * @return {Vec3}
+         */
+        scale: any;
+        addScaledVector(scalar: number, vector: Vec3, target: Vec3): Vec3;
         dot(v: Vec3): number;
         isZero(): boolean;
-        lengthSquared(): number;
-        negate(target?: Vec3): Vec3;
-        tangents(t1: Vec3, t2: Vec3): void;
+        negate(target: Vec3): Vec3;
+        tangents(t1: any, t2: any): void;
         toString(): string;
         toArray(): number[];
         copy(source: Vec3): Vec3;
-        lerp(v: Vec3, t: number, target?: Vec3): void;
-        almostEquals(v: Vec3, precision?: number): boolean;
-        almostZero(precision?: number): boolean;
-        isAntiparallelTo(v: Vec3, prescision?: number): boolean;
+        lerp(v: Vec3, t: number, target: Vec3): void;
+        almostEquals(v: Vec3, precision: number): boolean;
+        almostZero(precision: number): boolean;
+        isAntiparallelTo(v: Vec3, precision: number): boolean;
         clone(): Vec3;
-
     }
 
     export interface IBodyOptions {
@@ -549,7 +569,7 @@ declare module CANNON {
         indexRightAxis?: number;
         indexLeftAxis?: number;
         indexUpAxis?: number;
-
+        indexForwardAxis?: number;
     }
 
     export interface IWheelInfoOptions {
@@ -590,42 +610,155 @@ declare module CANNON {
     }
 
     export class WheelInfo {
-
-        maxSuspensionTravbel: number;
+        /**
+         * Max travel distance of the suspension, in meters.
+         * @property {number} maxSuspensionTravel
+         */
+        maxSuspensionTravel: number;
+        /**
+         * Speed to apply to the wheel rotation when the wheel is sliding.
+         * @property {number} customSlidingRotationalSpeed
+         */
         customSlidingRotationalSpeed: number;
+        /**
+         * If the customSlidingRotationalSpeed should be used.
+         * @property {Boolean} useCustomSlidingRotationalSpeed
+         */
         useCustomSlidingRotationalSpeed: boolean;
+        /**
+         * @property {Boolean} sliding
+         */
         sliding: boolean;
+        /**
+         * Connection point, defined locally in the chassis body frame.
+         * @property {Vec3} chassisConnectionPointLocal
+         */
         chassisConnectionPointLocal: Vec3;
+        /**
+         * @property {Vec3} chassisConnectionPointWorld
+         */
         chassisConnectionPointWorld: Vec3;
+        /**
+         * @property {Vec3} directionLocal
+         */
         directionLocal: Vec3;
+        /**
+         * @property {Vec3} directionWorld
+         */
         directionWorld: Vec3;
+        /**
+         * @property {Vec3} axleLocal
+         */
         axleLocal: Vec3;
+        /**
+         * @property {Vec3} axleWorld
+         */
         axleWorld: Vec3;
+        /**
+         * @property {number} suspensionRestLength
+         */
         suspensionRestLength: number;
+        /**
+         * @property {number} suspensionMaxLength
+         */
         suspensionMaxLength: number;
+        /**
+         * @property {number} radius
+         */
         radius: number;
+        /**
+         * @property {number} suspensionStiffness
+         */
         suspensionStiffness: number;
+        /**
+         * @property {number} dampingCompression
+         */
         dampingCompression: number;
+        /**
+         * @property {number} dampingRelaxation
+         */
         dampingRelaxation: number;
+        /**
+         * @property {number} frictionSlip
+         */
         frictionSlip: number;
+        /**
+         * @property {number} steering
+         */
         steering: number;
+        /**
+         * Rotation value, in radians.
+         * @property {number} rotation
+         */
         rotation: number;
+        /**
+         * @property {number} deltaRotation
+         */
         deltaRotation: number;
+        /**
+         * @property {number} rollInfluence
+         */
         rollInfluence: number;
+        /**
+         * @property {number} maxSuspensionForce
+         */
         maxSuspensionForce: number;
+        /**
+         * @property {number} engineForce
+         */
         engineForce: number;
+        /**
+         * @property {number} brake
+         */
         brake: number;
+        /**
+         * @property {number} isFrontWheel
+         */
         isFrontWheel: boolean;
+        /**
+         * @property {number} clippedInvContactDotSuspension
+         */
         clippedInvContactDotSuspension: number;
+        /**
+         * @property {number} suspensionRelativeVelocity
+         */
         suspensionRelativeVelocity: number;
+        /**
+         * @property {number} suspensionForce
+         */
         suspensionForce: number;
+        /**
+         * @property {number} skidInfo
+         */
         skidInfo: number;
+        /**
+         * @property {number} suspensionLength
+         */
         suspensionLength: number;
+        /**
+         * @property {number} sideImpulse
+         */
         sideImpulse: number;
+        /**
+         * @property {number} forwardImpulse
+         */
         forwardImpulse: number;
+        /**
+         * The result from raycasting
+         * @property {RaycastResult} raycastResult
+         */
         raycastResult: RaycastResult;
+        /**
+         * Wheel world transform
+         * @property {Transform} worldTransform
+         */
         worldTransform: Transform;
+        /**
+         * @property {boolean} isInContact
+         */
         isInContact: boolean;
+
+        updateWheel(chassis: any): void;
 
         constructor(options?: IWheelInfoOptions);
 
@@ -634,26 +767,32 @@ declare module CANNON {
     export class RaycastVehicle {
 
         chassisBody: Body;
-        wheelInfos: IWheelInfoOptions[];
+        wheelInfos: WheelInfo[];
         sliding: boolean;
         world: World;
         iindexRightAxis: number;
         indexForwardAxis: number;
         indexUpAxis: number;
+        numWheelsOnGround: number;
+        currentVehicleSpeedKmHour: number;
 
         constructor(options?: IRaycastVehicleOptions);
 
-        addWheel(options?: IWheelInfoOptions): void;
-        setSteeringValue(value: number, wheelIndex: number): void;
-        applyEngineForce(value: number, wheelIndex: number): void;
-        setBrake(brake: number, wheelIndex: number): void;
-        addToWorld(world: World): void;
-        getVehicleAxisWorld(axisIndex: number, result: Vec3): Vec3;
-        updateVehicle(timeStep: number): void;
-        updateSuspension(deltaTime: number): void;
-        removeFromWorld(world: World): void;
-        getWheelTransformWorld(wheelIndex: number): Transform;
-
+        addWheel(options?: any): number;
+        setSteeringValue(value: number, wheelIndex: any): void;
+        applyEngineForce(value: number, wheelIndex: any): void;
+        setBrake(brake: number, wheelIndex: any): void;
+        addToWorld(world: any): void;
+        preStepCallback: () => void;
+        getVehicleAxisWorld(axisIndex: any, result: Vec3): void;
+        updateVehicle(timeStep: any): void;
+        updateSuspension(deltaTime: any): void;
+        removeFromWorld(world: any): void;
+        castRay(wheel: any): number;
+        updateWheelTransformWorld(wheel: any): void;
+        updateWheelTransform(wheelIndex: any): void;
+        getWheelTransformWorld(wheelIndex: any): any;
+        updateFriction(timeStep: any): void;
     }
 
     export interface IRigidVehicleOptions {

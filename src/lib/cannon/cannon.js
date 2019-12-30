@@ -1,4 +1,4 @@
-// Sat, 28 Dec 2019 19:21:11 GMT
+// Mon, 30 Dec 2019 18:09:49 GMT
 
 /*
  * Copyright (c) 2015 cannon.js Authors
@@ -7740,11 +7740,11 @@ function WheelInfo(options){
         suspensionStiffness: 100,
         dampingCompression: 10,
         dampingRelaxation: 10,
-        frictionSlip: 10000,
+        frictionSlip: 1,
         steering: 0,
         rotation: 0,
         deltaRotation: 0,
-        rollInfluence: 0.01,
+        rollInfluence: 1,
         maxSuspensionForce: Number.MAX_VALUE,
         isFrontWheel: true,
         clippedInvContactDotSuspension: 1,

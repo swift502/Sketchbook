@@ -161,8 +161,6 @@ export class CameraOperator implements IInputReceiver
 
     public inputReceiverUpdate(): void
     {
-        this.world.sky.updateSkyCenter(this.camera.position);
-
         // Set fly speed
         let speed = this.movementSpeed * (this.actions.fast.isPressed ? 5 : 1);
 
