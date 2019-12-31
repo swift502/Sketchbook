@@ -185,7 +185,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
         let lowerMassInfluence = (currentSpeed - 7) / 3;
         lowerMassInfluence = THREE.Math.clamp(lowerMassInfluence, 0, 1);
-        this.collision.mass = 50 * (1 - (lowerMassInfluence * 0.5));
+        this.collision.mass = 50 * (1 - (lowerMassInfluence * 0.8));
 
         // Rotation stabilization
         let lookVelocity = body.velocity.clone();
@@ -196,8 +196,14 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         rotStabVelocity.z *= 0.3;
         rotStabVelocity.w *= 0.3;
         let rotStabEuler = new THREE.Euler().setFromQuaternion(rotStabVelocity);
+
+        let rotStabInfluence = THREE.Math.clamp(velLength1 - 1, 0, 1);  // Only with speed greater than 1 UPS
+        rotStabInfluence *= (this.rayCastVehicle.numWheelsOnGround > 0 && currentSpeed < 0 ? 0 : 1);    // Reverse fix
+        let loopFix = (this.actions.throttle.isPressed && currentSpeed > 0 ? 0 : 1);
         
-        body.angularVelocity.y += rotStabEuler.y * THREE.Math.clamp(velLength1 - 1, 0, 1) * (currentSpeed > 0 ? 1 : 0);
+        body.angularVelocity.x += rotStabEuler.x * rotStabInfluence * loopFix;
+        body.angularVelocity.y += rotStabEuler.y * rotStabInfluence;
+        body.angularVelocity.z += rotStabEuler.z * rotStabInfluence * loopFix;
 
         // Pitch
         if (plane.actions.pitchUp.isPressed)
@@ -260,6 +266,9 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         body.velocity.y += (velLength1 * this.lastDrag + speedModifier) * forward.y * this.enginePower;
         body.velocity.z += (velLength1 * this.lastDrag + speedModifier) * forward.z * this.enginePower;
 
+        document.getElementById('car-debug').innerHTML = 'Speed: ' + Utils.round(currentSpeed, 2) + '';
+        document.getElementById('car-debug').innerHTML += '<br>' + 'Power output: ' + Utils.round(velLength1 * this.lastDrag, 2) + '';
+
         // Drag
         let velLength2 = body.velocity.length();
         const drag = Math.pow(velLength2, 1) * 0.005;
@@ -268,19 +277,20 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         body.velocity.z -= body.velocity.z * drag;
         this.lastDrag = drag;
 
-        document.getElementById('car-debug').innerHTML = Utils.round(currentSpeed, 2) + '';
-        document.getElementById('car-debug').innerHTML += '<br>' + Utils.round(drag, 2) + '';
-
         // Lift
-        const lift = Math.pow(velLength2, 1) * 0.01;
+        let lift = Math.pow(velLength2, 1) * 0.01;
+        lift = THREE.Math.clamp(lift, 0, 0.1);
         body.velocity.x += up.x * lift;
         body.velocity.y += up.y * lift;
         body.velocity.z += up.z * lift;
 
+        document.getElementById('car-debug').innerHTML += '<br>' + 'Drag: ' + Utils.round(drag, 3) + '';
+        document.getElementById('car-debug').innerHTML += '<br>' + 'Lift: ' + Utils.round(lift, 3) + '';
+
         // Angular damping
-        body.angularVelocity.x *= 0.98;
-        body.angularVelocity.y *= 0.98;
-        body.angularVelocity.z *= 0.98;
+        body.angularVelocity.x = THREE.Math.lerp(body.angularVelocity.x, body.angularVelocity.x * 0.98, flightModeInfluence);
+        body.angularVelocity.y = THREE.Math.lerp(body.angularVelocity.y, body.angularVelocity.y * 0.98, flightModeInfluence);
+        body.angularVelocity.z = THREE.Math.lerp(body.angularVelocity.z, body.angularVelocity.z * 0.98, flightModeInfluence);
     }
 
     public onInputChange(): void

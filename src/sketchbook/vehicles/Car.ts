@@ -109,7 +109,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             }
         }
 
-        document.getElementById('car-debug').innerHTML = Utils.round(this.gear, 0) + '';
+        // document.getElementById('car-debug').innerHTML = Utils.round(this.gear, 0) + '';
 
         // Steering
         const maxSteerVal = 0.8;
