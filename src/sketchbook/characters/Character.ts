@@ -651,9 +651,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public exitVehicle(): void
     {
         this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
-        this.controlledObject.resetControls();
         this.controlledObject.controllingCharacter = undefined;
         this.controlledObject = undefined;
+        this.controlledObject.resetControls();
         this.inputReceiverInit();
         // this.setPhysicsEnabled(true);
     }

@@ -28,9 +28,6 @@ Mostly a playground for exploring how conventional third person gameplay mechani
     * Raycast character controller with capsule collisions
     * General state system
     * Character AI
-
-#### Not yet implemented
-
 * Vehicles
     * Cars
     * Airplanes

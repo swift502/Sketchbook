@@ -220,7 +220,11 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             {
                 keys: ['Space'],
                 desc: 'Handbrake'
-            }
+            },
+            {
+                keys: ['F'],
+                desc: 'Exit vehicle'
+            },
         ]);
     }
 

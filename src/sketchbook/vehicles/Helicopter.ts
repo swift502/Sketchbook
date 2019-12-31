@@ -90,7 +90,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         gravityCompensation *= heli.world.physicsFrameTime;
         gravityCompensation *= 0.98;
         let dot = globalUp.dot(up);
-        gravityCompensation *= THREE.Math.clamp(Math.sqrt(dot), 0, 1);
+        gravityCompensation *= Math.sqrt(THREE.Math.clamp(dot, 0, 1));
 
         let vertDamping = Utils.threeVector(body.velocity);
         vertDamping.x *= up.x;
@@ -112,16 +112,19 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         body.velocity.z *= 0.99;
 
         // Rotation stabilization
-        let rotStabVelocity = new THREE.Quaternion().setFromUnitVectors(up, globalUp);
-        rotStabVelocity.x *= 0.3;
-        rotStabVelocity.y *= 0.3;
-        rotStabVelocity.z *= 0.3;
-        rotStabVelocity.w *= 0.3;
-        let rotStabEuler = new THREE.Euler().setFromQuaternion(rotStabVelocity);
-        
-        body.angularVelocity.x += rotStabEuler.x;
-        body.angularVelocity.y += rotStabEuler.y;
-        body.angularVelocity.z += rotStabEuler.z;
+        if (this.controllingCharacter !== undefined)
+        {
+            let rotStabVelocity = new THREE.Quaternion().setFromUnitVectors(up, globalUp);
+            rotStabVelocity.x *= 0.3;
+            rotStabVelocity.y *= 0.3;
+            rotStabVelocity.z *= 0.3;
+            rotStabVelocity.w *= 0.3;
+            let rotStabEuler = new THREE.Euler().setFromQuaternion(rotStabVelocity);
+            
+            body.angularVelocity.x += rotStabEuler.x;
+            body.angularVelocity.y += rotStabEuler.y;
+            body.angularVelocity.z += rotStabEuler.z;
+        }
 
         // Pitch
         if (heli.actions.pitchUp.isPressed)
@@ -166,9 +169,9 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         }
 
         // Angular damping
-        body.angularVelocity.x *= 0.96;
-        body.angularVelocity.y *= 0.96;
-        body.angularVelocity.z *= 0.96;
+        body.angularVelocity.x *= 0.97;
+        body.angularVelocity.y *= 0.97;
+        body.angularVelocity.z *= 0.97;
     }
 
     public readHelicopterData(gltf: any): void
@@ -211,6 +214,10 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
             {
                 keys: ['Q', 'E'],
                 desc: 'Yaw'
+            },
+            {
+                keys: ['F'],
+                desc: 'Exit vehicle'
             },
         ]);
     }
