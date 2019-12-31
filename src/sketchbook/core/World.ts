@@ -312,7 +312,7 @@ export class World
             this.timeScaleTarget *= timeScaleChangeSpeed;
             if (this.timeScaleTarget < timeScaleBottomLimit) this.timeScaleTarget = timeScaleBottomLimit;
             this.timeScaleTarget = Math.min(this.timeScaleTarget, 1);
-            if (this.params.Time_Scale > 0.9) this.params.Time_Scale *= timeScaleChangeSpeed;
+            // if (this.params.Time_Scale > 0.9) this.params.Time_Scale *= timeScaleChangeSpeed;
         }
     }
 

@@ -131,13 +131,23 @@ export abstract class Vehicle extends THREE.Object3D
 
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
     {
-        for (const action in this.actions) {
-            if (this.actions.hasOwnProperty(action)) {
-                const binding = this.actions[action];
+        // Free camera
+        if (code === 'KeyC' && pressed === true && event.shiftKey === true)
+        {
+            this.resetControls();
+            this.world.cameraOperator.characterCaller = this.controllingCharacter;
+            this.world.inputManager.setInputReceiver(this.world.cameraOperator);
+        }
+        else
+        {
+            for (const action in this.actions) {
+                if (this.actions.hasOwnProperty(action)) {
+                    const binding = this.actions[action];
 
-                if (_.includes(binding.eventCodes, code))
-                {
-                    this.triggerAction(action, pressed);
+                    if (_.includes(binding.eventCodes, code))
+                    {
+                        this.triggerAction(action, pressed);
+                    }
                 }
             }
         }
@@ -181,7 +191,7 @@ export abstract class Vehicle extends THREE.Object3D
 
     public handleMouseWheel(event: WheelEvent, value: number): void
     {
-        return;
+        this.world.scrollTheTimeScale(value);
     }
 
     public inputReceiverInit(): void
@@ -194,7 +204,7 @@ export abstract class Vehicle extends THREE.Object3D
         // Position camera
         this.world.cameraOperator.target.set(
             this.position.x,
-            this.position.y + 1,
+            this.position.y + 0.5,
             this.position.z
         );
     }

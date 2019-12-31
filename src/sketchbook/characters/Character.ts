@@ -459,6 +459,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
     public inputReceiverInit(): void
     {
+        if (this.controlledObject !== undefined)
+        {
+            this.controlledObject.inputReceiverInit();
+            return;
+        }
+
         this.world.cameraOperator.setRadius(1.6, true);
         this.world.cameraOperator.followMode = false;
         // this.world.dirLight.target = this;
@@ -652,8 +658,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
     {
         this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
         this.controlledObject.controllingCharacter = undefined;
-        this.controlledObject = undefined;
         this.controlledObject.resetControls();
+        this.controlledObject = undefined;
         this.inputReceiverInit();
         // this.setPhysicsEnabled(true);
     }

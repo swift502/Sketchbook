@@ -95,19 +95,21 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
                 this.applyEngineForce(force);
             }
-            else if (this.actions.throttle.isPressed)
+            else
             {
                 const powerFactor = (gearsMaxSpeeds[this.gear] - currentSpeed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
-                const force = (engineForce / this.gear) * (powerFactor ** 2);
-                            
+
                 if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
                 else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
-                else
+                else if (this.actions.throttle.isPressed)
                 {
+                    const force = (engineForce / this.gear) * (powerFactor ** 2);
                     this.applyEngineForce(-force);
                 }
             }
         }
+
+        document.getElementById('car-debug').innerHTML = Utils.round(this.gear, 0) + '';
 
         // Steering
         const maxSteerVal = 0.8;

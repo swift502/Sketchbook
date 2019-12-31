@@ -52,7 +52,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 
         this.rotors.forEach((rotor) =>
         {
-            rotor.rotateX(this.enginePower * 0.5);
+            rotor.rotateX(this.enginePower * timeStep * 30);
         });
     }
 
