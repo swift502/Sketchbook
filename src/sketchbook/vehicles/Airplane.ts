@@ -23,8 +23,6 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
     private rudderSimulator: SpringSimulator;
 
     private enginePower: number = 0;
-
-    // private engineRPM: number = 0;
     private lastDrag: number = 0;
 
     constructor(gltf: any)
@@ -79,21 +77,6 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
             if (this.enginePower < 0) this.enginePower = 0;
         }
         this.rotor.rotateX(this.enginePower);
-
-        // if (this.actions.throttle.isPressed)
-        // {
-        //     this.engineRPM += 0.1 * timeStep;
-        //     if (this.engineRPM > 1.3) this.engineRPM = 1.3;
-        // }
-        // else
-        // {
-        //     if (this.engineRPM > 1) this.engineRPM = 1;
-        // }
-        // if (this.actions.brake.isPressed)
-        // {
-        //     this.engineRPM -= 0.1 * timeStep;
-        //     if (this.engineRPM < 0) this.engineRPM = 0;
-        // }
 
         // Steering
         if (this.rayCastVehicle.numWheelsOnGround > 0)
@@ -199,65 +182,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
 
-        // let flightModeBottomSpeed = 5;
-        // let flightModeTopSpeed = 15;
-
-        // let gravity = plane.world.physicsWorld.gravity;
-        // let gravityCompensation = new CANNON.Vec3(
-        //     -gravity.x * plane.world.physicsFrameTime,
-        //     -gravity.y * plane.world.physicsFrameTime,
-        //     -gravity.z * plane.world.physicsFrameTime);
-        // gravityCompensation *= 0.98;
-
-        // body.velocity.x += gravityCompensation.x * flightModeInfluence;
-        // body.velocity.y += gravityCompensation.y * flightModeInfluence;
-        // body.velocity.z += gravityCompensation.z * flightModeInfluence;
-
         document.getElementById('car-debug').innerHTML = Utils.round(currentSpeed, 2) + '';
-
-        // Throttle
-        // body.velocity.x += forward.x * this.enginePower * this.engineRPM * 0.2;
-        // body.velocity.y += forward.y * this.enginePower * this.engineRPM * 0.2;
-        // body.velocity.z += forward.z * this.enginePower * this.engineRPM * 0.2;
-
-        // document.getElementById('car-debug').innerHTML += '<br>' + Utils.round(this.engineRPM, 2) + '';
-
-        // Vertical stabilization
-        // let gravity = plane.world.physicsWorld.gravity;
-        // let gravityCompensation = new CANNON.Vec3(-gravity.x, -gravity.y, -gravity.z).length();
-        // gravityCompensation *= plane.world.physicsFrameTime;
-        // gravityCompensation *= 0.98;
-        // let dot = globalUp.dot(up);
-        // gravityCompensation *= THREE.Math.clamp(Math.sqrt(dot), 0, 1);
-
-        // let vertDamping = Utils.threeVector(body.velocity);
-        // vertDamping.x *= up.x;
-        // vertDamping.y *= up.y;
-        // vertDamping.z *= up.z;
-        // vertDamping.multiplyScalar(-0.01);
-
-        // let vertStab = up.clone();
-        // vertStab.multiplyScalar((gravityCompensation));
-        // vertStab.multiplyScalar(Math.pow(plane.enginePower, 3));
-        // vertStab.add(vertDamping);
-
-        // body.velocity.x += vertStab.x;
-        // body.velocity.y += vertStab.y;
-        // body.velocity.z += vertStab.z;
-        
-        // let idealVelocity = forward.clone().multiplyScalar(velLength);
-        // let idealVelDifference = new CANNON.Vec3();
-        // Utils.cannonVector(idealVelocity).vsub(body.velocity, idealVelDifference);
-
-        // body.velocity.x += idealVelDifference.x * flightModeInfluence;
-        // body.velocity.y += idealVelDifference.y * flightModeInfluence;
-        // body.velocity.z += idealVelDifference.z * flightModeInfluence;
-
-        // let  = Utils.cannonVector(new THREE.Vector3().lerpVectors(
-        //     Utils.threeVector(body.velocity),
-            
-        //     flightModeInfluence
-        // ));
 
         let velLength1 = body.velocity.length();
         let speedModifier = 0.03;
@@ -294,10 +219,6 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         body.velocity.x += up.x * lift;
         body.velocity.y += up.y * lift;
         body.velocity.z += up.z * lift;
-
-        // if (body.velocity.length() > )
-
-        // let flightModeInfluence = drag
 
         let flightModeBottomSpeed = 3;
         let flightModeTopSpeed = 10;
