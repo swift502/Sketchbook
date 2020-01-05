@@ -106,6 +106,13 @@
             }
         );
         }
+        
+        document.getElementsByClassName('dg ac')[0].style.display = 'block';
+        document.getElementsByClassName('statsBox')[0].style.display = 'block';
+        document.getElementById('loader').style.display = 'none';
+        document.getElementsByClassName('github-corner')[0].style.display = 'block';
+        document.getElementById('controls-menu').style.display = 'flex';
+        document.getElementById('debug-menu').style.display = 'flex';
 
         function LoadBoxmanModel(character) {	
             fbxLoader.load('../build/graphics/game_man/game_man.fbx', function (object) {	
@@ -119,19 +126,46 @@
                             map: new SB.THREE.TextureLoader().load('../build/graphics/game_man/game_man.png'),	
                             skinning: true	
                         });	
-                    }	
+                    }
                 });	
                 character.setModel(object);	
-                // character.setModelOffset(new SB.THREE.Vector3(0, -0.1, 0));	
-
-                // Hide loader, display ui
-                document.getElementsByClassName('dg ac')[0].style.display = 'block';
-                document.getElementsByClassName('statsBox')[0].style.display = 'block';
-                document.getElementById('loader').style.display = 'none';
-                document.getElementsByClassName('github-corner')[0].style.display = 'block';
-                document.getElementById('controls-menu').style.display = 'flex';
-                document.getElementById('debug-menu').style.display = 'flex';
             });	
+
+            // Load a glTF resource
+            //  gltfLoader.load(
+            //     // resource URL
+            //     '../build/graphics/game_man/game_man.glb',
+            //     // called when the resource is loaded
+            //     function ( gltf ) {
+                    
+            //         gltf.scene.traverse(function (child) {
+            //             if (child.isMesh) {
+            //                 child.castShadow = true;
+            //                 child.receiveShadow = true;
+            //             }
+            //             // if (child.name == 'Armature') {
+            //             //     character.setModel(child);
+            //             // }
+            //             if (child.name == 'game_man') {
+            //                 child.material = new SB.THREE.MeshLambertMaterial({
+            //                     map: new SB.THREE.TextureLoader().load('../build/graphics/game_man/game_man.png'),
+            //                     skinning: true
+            //                 });
+            //             }
+            //         });
+            //         character.setAnimations(gltf.animations);
+            //         character.setModel(gltf.scene);
+            //         // character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
+            //     },
+            //     // called while loading is progressing
+            //     function ( xhr ) {
+            //         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            //     },
+            //     // called when loading has errors
+            //     function ( error ) {
+            //         console.error(error);
+            //     }
+            // );
         }
     </script>
 </body>

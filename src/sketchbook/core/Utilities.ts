@@ -232,7 +232,7 @@ export function spring(source: number, dest: number, velocity: number, mass: num
     velocity += acceleration;
     velocity *= damping;
 
-    let position = source += velocity;
+    let position = source + velocity;
 
     return new SimulationFrame(position, velocity);
 }
