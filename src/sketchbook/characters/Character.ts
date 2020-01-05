@@ -518,10 +518,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
         if (this.mixer !== undefined)
         {
             // gltf
-            // let clip = THREE.AnimationClip.findByName( this.animations, clipName );
+            let clip = THREE.AnimationClip.findByName( this.animations, clipName );
 
-            let clips = this.characterModel['animations'];
-            let clip = THREE.AnimationClip.findByName(clips, clipName);
+            // let clips = this.characterModel['animations'];
+            // let clip = THREE.AnimationClip.findByName(clips, clipName);
 
             let action = this.mixer.clipAction(clip);
             this.mixer.stopAllAction();
