@@ -295,7 +295,9 @@ export abstract class Vehicle extends THREE.Object3D
     public readVehicleData(gltf: any): void
     {
         gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+
+            if (child.isMesh)
+            {
                 child.castShadow = true;
                 child.receiveShadow = true;
             }

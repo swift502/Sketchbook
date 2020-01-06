@@ -8,22 +8,23 @@
 </head>
 
 <body>
-
-    <div class="github-corner" style="display: none"><a href="https://github.com/swift502/Sketchbook" target="_blank" title="Fork me on GitHub"><svg viewbox="0 0 100 100" fill="currentColor"><title>Fork me on GitHub</title><path d="M0 0v100h100V0H0zm60 70.2h.2c1 2.7.3 4.7 0 5.2 1.4 1.4 2 3 2 5.2 0 7.4-4.4 9-8.7 9.5.7.7 1.3 2 1.3 3.7V99c0 .5 1.4 1 1.4 1H44s1.2-.5 1.2-1v-3.8c-3.5 1.4-5.2-.8-5.2-.8-1.5-2-3-2-3-2-2-.5-.2-1-.2-1 2-.7 3.5.8 3.5.8 2 1.7 4 1 5 .3.2-1.2.7-2 1.2-2.4-4.3-.4-8.8-2-8.8-9.4 0-2 .7-4 2-5.2-.2-.5-1-2.5.2-5 0 0 1.5-.6 5.2 1.8 1.5-.4 3.2-.6 4.8-.6 1.6 0 3.3.2 4.8.7 2.8-2 4.4-2 5-2z"></path></svg></a></div><style> .github-corner{position:absolute;left:0;top:0;width:120px;height:120px;overflow:hidden;}.github-corner a{position:absolute;right:0;top:0;left:0;bottom:0;transform:translate(-50%, -50%) rotate(-45deg);color:#000000;}</style>
-            
     <div id="loader">
         Loading...
     </div>
+    
+    <div id="ui-container">
+        <div class="github-corner"><a href="https://github.com/swift502/Sketchbook" target="_blank" title="Fork me on GitHub"><svg viewbox="0 0 100 100" fill="currentColor"><title>Fork me on GitHub</title><path d="M0 0v100h100V0H0zm60 70.2h.2c1 2.7.3 4.7 0 5.2 1.4 1.4 2 3 2 5.2 0 7.4-4.4 9-8.7 9.5.7.7 1.3 2 1.3 3.7V99c0 .5 1.4 1 1.4 1H44s1.2-.5 1.2-1v-3.8c-3.5 1.4-5.2-.8-5.2-.8-1.5-2-3-2-3-2-2-.5-.2-1-.2-1 2-.7 3.5.8 3.5.8 2 1.7 4 1 5 .3.2-1.2.7-2 1.2-2.4-4.3-.4-8.8-2-8.8-9.4 0-2 .7-4 2-5.2-.2-.5-1-2.5.2-5 0 0 1.5-.6 5.2 1.8 1.5-.4 3.2-.6 4.8-.6 1.6 0 3.3.2 4.8.7 2.8-2 4.4-2 5-2z"></path></svg></a></div><style> .github-corner{position:absolute;left:0;top:0;width:120px;height:120px;overflow:hidden;}.github-corner a{position:absolute;right:0;top:0;left:0;bottom:0;transform:translate(-50%, -50%) rotate(-45deg);color:#000000;}</style>
 
-    <div class="info-box">
-        <div id="controls-menu" class="info-card" style="display: none">
+        <div class="info-box">
+            <div id="controls-menu" class="info-card">
+            </div>
         </div>
-    </div>
 
-    <div id="debug-menu" class="info-card" style="display: none">
-        <div class="info-title">Debug:</div>
-        <div class="info-row"><div id="state-debug"></div></div>
-        <div class="info-row"><div id="car-debug"></div></div>
+        <div id="debug-menu" class="info-card">
+            <div class="info-title">Debug:</div>
+            <div class="info-row"><div id="state-debug"></div></div>
+            <div class="info-row"><div id="car-debug"></div></div>
+        </div>
     </div>
 
     <script src="/build/sketchbook.min.js"></script>
@@ -31,42 +32,31 @@
         const SB = Sketchbook;
 
         //
-        // Initialize
+        // 1. Initialization
         //
 
         // Instantiate loaders
-        const fbxLoader = new SB.FBXLoader();
         const gltfLoader = new SB.GLTFLoader();
+        let loadingTracker = [];
 
         // Initialize sketchbook
         let world = new SB.World();
         world.addFloor();
 
-        var gridHelper = new SB.THREE.GridHelper( 100, 50, 0x444444, 0xaaaaaa );
-        gridHelper.position.y = 1.01;
-        world.graphicsWorld.add( gridHelper );
-
-        // Hide ui for loading
-        document.getElementsByClassName('dg ac')[0].style.display = 'none';
-        document.getElementsByClassName('statsBox')[0].style.display = 'none';
-
         // Setup camera
         world.cameraOperator.theta = 180;
+        world.cameraOperator.phi = 10;
 
-        //
-        // Load characters
-        //
+        // Player
+        loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
+        {
+            let player = new SB.Character(gltf);
+            player.setPosition(0, 2, -5);
+            world.add(player);
+            player.takeControl();
+        });
 
-        // Spawn player
-        let player = new SB.Character();
-        LoadBoxmanModel(player);
-        world.add(player);
-        player.takeControl();
-
-        // Make player look at the camera
-        player.setOrientationTarget(new SB.THREE.Vector3(0, 0, -1));
-        player.orientation = new SB.THREE.Vector3(0, 0, -1);
-
+        // Car
         loadGLTF('../build/graphics/car.glb', function(gltf)
         {
             let car = new SB.Car(gltf);
@@ -74,6 +64,7 @@
             world.add(car);
         });
 
+        // Helicopter
         loadGLTF('../build/graphics/heli.glb', function(gltf)
         {
             let heli = new SB.Helicopter(gltf);
@@ -81,6 +72,7 @@
             world.add(heli);
         });
 
+        // Airplane
         loadGLTF('../build/graphics/plane.glb', function(gltf)
         {
             let plane = new SB.Airplane(gltf);
@@ -89,84 +81,54 @@
         });
 
         //
-        // Functions
+        // 2. Functions
         //
 
         function loadGLTF(path, onLoadingFinished)
         {
+            startLoading(path);
+
             gltfLoader.load(path,
             function ( gltf ) {
                 onLoadingFinished(gltf);
+                doneLoading(path);
             },
             function ( xhr ) {
                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
             },
             function ( error ) {
                 console.error(error);
+            });
+        }
+
+        function startLoading(path)
+        {
+            loadingTracker[path] = true;
+
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('ui-container').style.display = 'none';
+        }
+
+        function doneLoading(path)
+        {
+            loadingTracker[path] = false;
+
+            let done = true;
+            for (const key in loadingTracker) {
+                if (loadingTracker.hasOwnProperty(key)) {
+                    const stillLoading = loadingTracker[key];
+                    if (stillLoading) done = false;
+                }
             }
-        );
+
+            if(done)
+            {
+                // Hide loader
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('ui-container').style.display = 'block';
+            }
         }
         
-        document.getElementsByClassName('dg ac')[0].style.display = 'block';
-        document.getElementsByClassName('statsBox')[0].style.display = 'block';
-        document.getElementById('loader').style.display = 'none';
-        document.getElementsByClassName('github-corner')[0].style.display = 'block';
-        document.getElementById('controls-menu').style.display = 'flex';
-        document.getElementById('debug-menu').style.display = 'flex';
-
-        function LoadBoxmanModel(character) {	
-            // fbxLoader.load('../build/graphics/game_man/game_man.fbx', function (object) {	
-            //     object.traverse(function (child) {	
-            //         if (child.isMesh) {	
-            //             child.castShadow = true;	
-            //             child.receiveShadow = true;	
-            //         }	
-            //         if (child.name == 'game_man') {	
-            //             child.material = new SB.THREE.MeshLambertMaterial({	
-            //                 map: new SB.THREE.TextureLoader().load('../build/graphics/game_man/game_man.png'),	
-            //                 skinning: true	
-            //             });	
-            //         }
-            //     });	
-            //     character.setModel(object);	
-            // });	
-
-            // Load a glTF resource
-             gltfLoader.load(
-                // resource URL
-                '../build/graphics/game_man/game_man.glb',
-                // called when the resource is loaded
-                function ( gltf ) {
-                    
-                    gltf.scene.traverse(function (child) {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                        }
-                        // if (child.name == 'Armature') {
-                        //     character.setModel(child);
-                        // }
-                        if (child.name == 'game_man') {
-                            child.material = new SB.THREE.MeshLambertMaterial({
-                                map: new SB.THREE.TextureLoader().load('../build/graphics/game_man/game_man.png'),
-                                skinning: true
-                            });
-                        }
-                    });
-                    character.setAnimations(gltf.animations);
-                    character.setModel(gltf.scene);
-                    // character.setModelOffset(new THREE.Vector3(0, -0.1, 0));
-                },
-                // called while loading is progressing
-                function ( xhr ) {
-                    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-                },
-                // called when loading has errors
-                function ( error ) {
-                    console.error(error);
-                }
-            );
-        }
     </script>
 </body>
 </html>

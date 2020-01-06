@@ -38,7 +38,7 @@ export class OpenVehicleDoor extends CharacterStateBase
 
         const elements = this.seat.entryPoint.matrixWorld.elements;
         let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
-        this.character.setOrientationTarget(forward);
+        this.character.setOrientation(forward);
 
         if (this.timer > 0.3)
         {

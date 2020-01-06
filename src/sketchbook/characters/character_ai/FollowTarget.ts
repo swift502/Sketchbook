@@ -39,7 +39,7 @@ export class FollowTarget extends CharacterAIBase implements ICharacterAI
             this.character.triggerAction('up', false);
 
             // Look at character
-            this.character.setOrientationTarget(viewVector);
+            this.character.setOrientation(viewVector);
         }
     }
 }

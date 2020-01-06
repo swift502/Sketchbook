@@ -294,6 +294,11 @@ export class World
         SBobj2.setPhysics(phys2);
         SBobj2.setModelFromPhysicsShape();
         this.add(SBobj2);
+
+        // Grid helper
+        let gridHelper = new THREE.GridHelper( 100, 50, 0x444444, 0xaaaaaa );
+        gridHelper.position.y = 1.01;
+        this.graphicsWorld.add( gridHelper );
     }
 
     public scrollTheTimeScale(scrollAmount: number): void

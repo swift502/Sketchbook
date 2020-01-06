@@ -26,7 +26,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public height: number = 0;
     public tiltContainer: THREE.Group;
     public modelContainer: THREE.Group;
-    public characterModel: THREE.Mesh;
     public mixer: THREE.AnimationMixer;
     public animations: any[];
 
@@ -79,18 +78,16 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
     private physicsEnabled: boolean = true;
 
-    constructor(options: {})
+    constructor(gltf: any)
     {
         super();
+
+        this.readCharacterData(gltf);
+        this.setAnimations(gltf.animations);
 
         this.help1 = new THREE.AxesHelper(1);
         this.help2 = new THREE.AxesHelper(2);
         this.help3 = new THREE.AxesHelper(3);
-
-        let defaults = {
-            position: new THREE.Vector3(),
-        };
-        options = Utils.setDefaults(options, defaults);
 
         // The visuals group is centered for easy character tilting
         this.tiltContainer = new THREE.Group();
@@ -100,21 +97,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.modelContainer = new THREE.Group();
         this.modelContainer.position.y = -0.57;
         this.tiltContainer.add(this.modelContainer);
+        this.modelContainer.add(gltf.scene);
 
-        // Default model
-        let capsuleGeometry = Utils.createCapsuleGeometry(this.height / 4, this.height / 2, 8);
-
-        let capsule = new THREE.Mesh(
-            capsuleGeometry,
-            new THREE.MeshLambertMaterial({ color: 0xffffff })
-        );
-        capsule.position.set(0, this.height / 2, 0);
-        capsule.castShadow = true;
-
-        // Assign model to character
-        this.characterModel = capsule;
-        // Attach model to model container
-        this.modelContainer.add(capsule);
+        this.mixer = new THREE.AnimationMixer(gltf.scene);
 
         this.velocitySimulator = new VectorSpringSimulator(60, this.defaultVelocitySimulatorMass, this.defaultVelocitySimulatorDamping);
         this.rotationSimulator = new RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
@@ -139,7 +124,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
         // Player Capsule
         let capsulePhysics = new CapsulePhysics({
             mass: 1,
-            position: new CANNON.Vec3().copy(options['position']),
+            position: new CANNON.Vec3(),
             height: 0.5,
             radius: 0.25,
             segments: 8,
@@ -147,9 +132,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
         });
         this.characterCapsule = new SBObject();
         this.characterCapsule.setPhysics(capsulePhysics);
-
-        // Pass reference to character for callbacks
-        // this.characterCapsule.physics.physical.character = this;
 
         // Move character to different collision group for raycasting
         this.characterCapsule.physics.physical.collisionFilterGroup = 2;
@@ -177,17 +159,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public setAnimations(animations: []): void
     {
         this.animations = animations;
-    }
-
-    public setModel(model: THREE.Mesh): void
-    {
-        this.modelContainer.remove(this.characterModel);
-        this.characterModel = model;
-        this.modelContainer.add(this.characterModel);
-
-        this.mixer = new THREE.AnimationMixer(this.characterModel);
-        this.setState(new Idle(this));
-        this.charState.onInputChange();
     }
 
     public setArcadeVelocityInfluence(x: number, y: number = x, z: number = x): void
@@ -238,14 +209,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.velocitySimulator.init();
     }
 
-    public resetOrientation(): void
-    {
-        const elements = this.matrix.elements;
-        let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
-        this.orientation.copy(forward);
-        this.orientationTarget.copy(forward);
-    }
-
     public setArcadeVelocityTarget(velZ: number, velX: number = 0, velY: number = 0): void
     {
         this.velocityTarget.z = velZ;
@@ -253,9 +216,23 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.velocityTarget.y = velY;
     }
 
-    public setOrientationTarget(vector: THREE.Vector3): void
+    public setOrientation(vector: THREE.Vector3, instantly: boolean = false): void
     {
-        this.orientationTarget.copy(vector).setY(0).normalize();
+        let lookVector = new THREE.Vector3().copy(vector).setY(0).normalize();
+        this.orientationTarget.copy(lookVector);
+        
+        if (instantly)
+        {
+            this.orientation.copy(lookVector);
+        }
+    }
+
+    public resetOrientation(): void
+    {
+        const elements = this.matrix.elements;
+        let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
+
+        this.setOrientation(forward, true);
     }
 
     public setBehaviour(behaviour: ICharacterAI): void
@@ -275,6 +252,36 @@ export class Character extends THREE.Object3D implements IWorldEntity
         {
             this.world.physicsWorld.remove(this.characterCapsule.physics.physical);
         }
+    }
+
+    public readCharacterData(gltf: any): void
+    {
+        gltf.scene.traverse((child) => {
+
+            if (child.isMesh)
+            {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+
+            if (child.hasOwnProperty('userData'))
+            {
+                if (child.userData.hasOwnProperty('texture'))
+                {
+                    child.material = new THREE.MeshLambertMaterial({
+                        map: new THREE.TextureLoader().load('../build/graphics/' + child.userData.texture)
+                    });
+
+                    if (child.userData.hasOwnProperty('skinning'))
+                    {
+                        if (child.userData.skinning === 'true')
+                        {
+                            child.material.skinning = true;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
@@ -411,7 +418,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
             let entryPoint = new THREE.Vector3();
             this.targetSeat.entryPoint.getWorldPosition(entryPoint);
             let viewVector = new THREE.Vector3().subVectors(entryPoint, this.position);
-            this.setOrientationTarget(viewVector);
+            this.setOrientation(viewVector);
 
             let heightDifference = viewVector.y;
             viewVector.y = 0;
@@ -520,9 +527,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
             // gltf
             let clip = THREE.AnimationClip.findByName( this.animations, clipName );
 
-            // let clips = this.characterModel['animations'];
-            // let clip = THREE.AnimationClip.findByName(clips, clipName);
-
             let action = this.mixer.clipAction(clip);
             this.mixer.stopAllAction();
             action.fadeIn(fadeIn);
@@ -585,11 +589,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
     
             if (moveVector.x === 0 && moveVector.y === 0 && moveVector.z === 0)
             {
-                this.setOrientationTarget(this.orientation);
+                this.setOrientation(this.orientation);
             }
             else
             {
-                this.setOrientationTarget(moveVector);
+                this.setOrientation(moveVector);
             }
         }
     }
@@ -661,7 +665,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.controlledObject.resetControls();
         this.controlledObject = undefined;
         this.inputReceiverInit();
-        // this.setPhysicsEnabled(true);
     }
 
     public physicsPreStep(body: CANNON.Body, character: Character): void

@@ -65,7 +65,6 @@ body {
 
 .info-card {
     z-index: 3;
-    display: none;
     color: #fff;
     border-radius: 3px;
     text-shadow: 1px 1px 1px #000, 0px 1px 3px #000;
