@@ -1,0 +1,52 @@
+{
+    "0": {
+        "speaker": "guest",
+        "type": "text",
+        "text": [["Hello! How are you?"]],
+        "nextNode": 7
+    },
+    "1": {
+        "speaker": "host",
+        "type": "text",
+        "text": [["I'm fine, thanks!"]],
+        "nextNode": 4
+    },
+    "2": {
+        "speaker": "host",
+        "type": "text",
+        "text": [["Do you have any quests for me?"]],
+        "nextNode": 5
+    },
+    "3": {
+        "speaker": "host",
+        "type": "text",
+        "text": [["That's all for now."]],
+        "nextNode": 6
+    },
+    "4": {
+        "speaker": "guest",
+        "type": "text",
+        "text": [["...", " Cool."]],
+        "nextNode": 7
+    },
+    "5": {
+        "speaker": "guest",
+        "type": "text",
+        "text": [
+            ["Not right now."],
+            ["Come back later, maybe I'll have something for you."]
+        ],
+        "nextNode": 7
+    },
+    "6": {
+        "speaker": "guest",
+        "expression": "sad",
+        "type": "text",
+        "text": ["..."]
+    },
+    "7": {
+        "speaker": "host",
+        "type": "options",
+        "options": [1, 2, 3]
+    }
+}
