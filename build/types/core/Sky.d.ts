@@ -12,6 +12,6 @@ export declare class Sky extends THREE.Object3D {
     private skyMaterial;
     private world;
     constructor(world: World);
-    updateSkyCenter(pos: THREE.Vector3): void;
+    update(): void;
     refreshSunPosition(): void;
 }

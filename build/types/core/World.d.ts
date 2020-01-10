@@ -47,5 +47,6 @@ export declare class World {
     remove(object: IWorldEntity): void;
     addFloor(): void;
     scrollTheTimeScale(scrollAmount: number): void;
+    updateControls(controls: any): void;
     private getGUI;
 }

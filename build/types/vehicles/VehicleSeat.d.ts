@@ -5,7 +5,7 @@ import THREE = require("three");
 import { VehicleDoor } from "./VehicleDoor";
 export declare class VehicleSeat {
     vehicle: IControllable;
-    seatObject: THREE.Object3D;
+    seatPoint: THREE.Object3D;
     type: SeatType;
     entryPoint: THREE.Object3D;
     door: VehicleDoor;

@@ -1,6 +1,8 @@
-import { Side } from "../enums/Side";
 export declare class Wheel {
+    wheelObject: THREE.Object3D;
     position: THREE.Vector3;
-    facing: Side;
     steering: boolean;
+    drive: string;
+    rayCastWheelInfoIndex: number;
+    constructor(wheelObject: THREE.Object3D);
 }

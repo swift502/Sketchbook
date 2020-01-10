@@ -1,6 +1,6 @@
-import { Character } from "../characters/Character";
-import { IInputReceiver } from "./IInputReceiver";
-import { VehicleSeat } from "../vehicles/VehicleSeat";
+import { Character } from '../characters/Character';
+import { IInputReceiver } from './IInputReceiver';
+import { VehicleSeat } from '../vehicles/VehicleSeat';
 export interface IControllable extends IInputReceiver {
     seats: VehicleSeat[];
     position: THREE.Vector3;

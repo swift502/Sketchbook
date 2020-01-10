@@ -4,18 +4,22 @@ import * as CANNON from 'cannon';
 import { World } from '../core/World';
 import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';
+import { Wheel } from './Wheel';
 export declare abstract class Vehicle extends THREE.Object3D {
     controllingCharacter: Character;
     actions: {
         [action: string]: KeyBinding;
     };
+    rayCastVehicle: CANNON.RaycastVehicle;
     seats: VehicleSeat[];
+    wheels: Wheel[];
+    drive: string;
     model: any;
     world: World;
     help: THREE.AxesHelper;
     collision: CANNON.Body;
     private modelContainer;
-    constructor();
+    constructor(gltf: any, handlingSetup?: any);
     setModel(model: any): void;
     update(timeStep: number): void;
     onInputChange(): void;
@@ -30,6 +34,9 @@ export declare abstract class Vehicle extends THREE.Object3D {
     getMountPoint(character: Character): THREE.Vector3;
     addToWorld(world: World): void;
     setPosition(x: number, y: number, z: number): void;
+    setSteeringValue(val: number): void;
+    applyEngineForce(force: number): void;
+    setBrake(brakeForce: number, driveFilter?: string): void;
     removeFromWorld(world: World): void;
-    readGLTF(gltf: any): void;
+    readVehicleData(gltf: any): void;
 }
