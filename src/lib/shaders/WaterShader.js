@@ -1,16 +1,11 @@
 /**
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
- *
- * First implemented by Simon Wallner
- * http://www.simonwallner.at/projects/atmospheric-scattering
- *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
- *
- * Three.js integration by zz85 http://twitter.com/blurspline
- * Node.js module implementation by Danila Loginov https://loginov.rocks
+ * Ocean shader for three.js
+ * 
+ * Created by Jonathan Blaire https://codepen.io/knoland
+ * Original pen https://codepen.io/knoland/pen/XKxAJb
+ * 
+ * Adapted for Sketchbook by Jan Bláha
+ * https://github.com/swift502/Sketchbook
  */
 
 const THREE = require('three');
@@ -26,7 +21,8 @@ export let WaterShader = {
             type: 'v2',
             value: new THREE.Vector2()
         },
-        cameraPos: {value: new THREE.Vector3()}
+        cameraPos: {value: new THREE.Vector3()},
+        lightDir: {value: new THREE.Vector3()}
     },
   
     vertexShader: `
@@ -35,8 +31,6 @@ export let WaterShader = {
     varying vec2 vTexCoord;
 
     void main()	{
-        //gl_Position = vec4( position, 1.0 );
-
         vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
         vWorldPosition = worldPosition.xyz;
 
@@ -51,6 +45,7 @@ export let WaterShader = {
     uniform float iGlobalTime;
     uniform vec2 iResolution;
     uniform vec3 cameraPos;
+    uniform vec3 lightDir;
 
     varying vec3 vWorldPosition;
     varying vec2 vTexCoord;
@@ -196,6 +191,10 @@ export let WaterShader = {
       float atten = max(1.0 - dot(dist,dist) * 0.001, 0.0);
       color += SEA_WATER_COLOR * (p.y - SEA_HEIGHT) * 0.18 * atten;
   
+      float night = dot(l, vec3(0.0, 1.0, 0.0));
+      night = clamp(night + 0.1, 0.0, 0.5) * 2.0;
+      color *= vec3(night);
+
       color += vec3(specular(n,l,eye,60.0));
   
       return color;
@@ -243,25 +242,12 @@ export let WaterShader = {
     }
   
     void main() {
-      /*vec2 uv = gl_FragCoord.xy / iResolution.xy;
-      uv = uv * 2.0 - 1.0;
-      uv.x *= iResolution.x / iResolution.y;    */
-
-      //vec2 uv = vTexCoord;
-
       float time = iGlobalTime * 0.3;
   
       // ray
       vec3 ang = vec3(
         sin(time*3.0)*0.1,sin(time)*0.2+0.3,time
       );    
-      /*vec3 ori = vec3(0.0,3.5,time*5.0);*/
-
-      /*vec3 dir = normalize(
-        vec3(uv.xy,-2.0)
-      );
-      dir.z += length(uv) * 0.15;
-      dir = normalize(dir);*/
 
       vec3 dir = normalize( vWorldPosition - cameraPos );
   
@@ -273,19 +259,16 @@ export let WaterShader = {
         p,
         dot(dist,dist) * EPSILON_NRM
       );
-      vec3 light = normalize(vec3(0.0,1.0,0.8)); 
   
       // color
       vec3 color = mix(
         getSkyColor(dir),
-        getSeaColor(p,n,light,dir,dist),
+        getSeaColor(p,n,lightDir,dir,dist),
         pow(smoothstep(0.0,-0.05,dir.y),0.3)
       );
   
       // post
       gl_FragColor = vec4(pow(color,vec3(0.75)), 1.0);
-
-      //gl_FragColor = vec4(p * 0.5, 0.0);
     }
     `
 };

@@ -69,6 +69,7 @@ export class World
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
@@ -91,7 +92,7 @@ export class World
 
         // Three.js scene
         this.graphicsWorld = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 310);
+        this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 610);
         this.sky = new Sky(this);
         this.graphicsWorld.add(this.sky);
 
@@ -194,6 +195,7 @@ export class World
         if (this['waterMat'] !== undefined)
         {
             this['waterMat'].uniforms.cameraPos.value.copy(this.camera.position);
+            this['waterMat'].uniforms.lightDir.value.copy(new THREE.Vector3().copy(this.sky.sun.position).normalize());
             this['waterMat'].uniforms.iGlobalTime.value += timeStep;
         }
 

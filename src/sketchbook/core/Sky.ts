@@ -40,7 +40,7 @@ export class Sky extends THREE.Object3D
         });
 
         this.skyMesh = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(300, 32, 15),
+            new THREE.SphereBufferGeometry(600, 32, 15),
             this.skyMaterial
         );
         this.attach(this.skyMesh);
@@ -50,7 +50,7 @@ export class Sky extends THREE.Object3D
         this.attach(this.ambientLight);
 
         // Sun light with shadowmap
-        this.sun = new THREE.DirectionalLight(0xffffff, 0.4);
+        this.sun = new THREE.DirectionalLight(0xffffff, 0.6);
         this.sun.castShadow = true;
 
         this.sun.shadow.mapSize.width = 2048;
