@@ -40,7 +40,7 @@ export class Sky extends THREE.Object3D
         });
 
         this.skyMesh = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(100, 32, 15),
+            new THREE.SphereBufferGeometry(300, 32, 15),
             this.skyMaterial
         );
         this.attach(this.skyMesh);

@@ -8,6 +8,8 @@ import EffectComposer, {
     ShaderPass,
 } from '@johh/three-effectcomposer';
 
+import { WaterShader } from '../../lib/shaders/WaterShader';
+
 import { Detector } from '../../lib/utils/Detector';
 import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
@@ -19,6 +21,9 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import { BoxPhysics } from '../objects/object_physics/BoxPhysics';
 import * as Utils from './Utilities';
+import { ConvexPhysics } from '../objects/object_physics/ConvexPhysics';
+import { TrimeshPhysics } from '../objects/object_physics/TrimeshPhysics';
+import { MeshLambertMaterial } from 'three';
 
 export class World
 {
@@ -86,7 +91,7 @@ export class World
 
         // Three.js scene
         this.graphicsWorld = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 120);
+        this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 310);
         this.sky = new Sky(this);
         this.graphicsWorld.add(this.sky);
 
@@ -185,6 +190,13 @@ export class World
 
         // Rotate and position camera
         this.cameraOperator.update();
+
+        if (this['waterMat'] !== undefined)
+        {
+            this['waterMat'].uniforms.cameraPos.value.copy(this.camera.position);
+            this['waterMat'].uniforms.iGlobalTime.value += timeStep;
+        }
+
         this.sky.update();
     }
 
@@ -276,6 +288,80 @@ export class World
     public remove(object: IWorldEntity): void
     {
         object.removeFromWorld(this);
+    }
+
+    public loadScene(gltf: any): void
+    {
+        gltf.scene.traverse((child) => {
+            if (child.hasOwnProperty('userData'))
+            {
+                if (child.type === 'Mesh')
+                {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+
+                    if (child.material.name === 'ocean')
+                    {
+                        let uniforms = THREE.UniformsUtils.clone(WaterShader.uniforms);
+                        uniforms.iResolution.value.x = window.innerWidth;
+                        uniforms.iResolution.value.y = window.innerHeight;
+
+                        child.material = new THREE.ShaderMaterial({
+                            uniforms: uniforms,
+                            fragmentShader: WaterShader.fragmentShader,
+                            vertexShader: WaterShader.vertexShader,
+                        });
+
+                        this['waterMat'] = child.material;
+                    }
+                    else if (child.material.map !== null)
+                    {
+                        let mat = new MeshLambertMaterial();
+                        mat.map = child.material.map;
+                        mat.map.encoding = THREE.LinearEncoding;
+                        child.material = mat;
+                    }
+                }
+
+                if (child.userData.hasOwnProperty('data'))
+                {
+                    if (child.userData.data === 'physics')
+                    {
+                        if (child.userData.hasOwnProperty('type')) 
+                        {
+                            if (child.userData.type === 'box')
+                            {
+                                // let phys = new ConvexPhysics(child, {});
+
+                                let phys2 = new BoxPhysics({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
+                                phys2.physical.position.copy(Utils.cannonVector(child.position));
+                                phys2.physical.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                phys2.physical.computeAABB();
+
+                                let SBobj = new SBObject();
+                                SBobj.setPhysics(phys2);
+
+                                this.add(SBobj);
+                            }
+                            else if (child.userData.type === 'trimesh')
+                            {
+                                let phys = new TrimeshPhysics(child, {});
+
+                                let SBobj = new SBObject();
+                                SBobj.setPhysics(phys);
+
+                                this.add(SBobj);
+                            }
+
+                            child.visible = false;
+                        }
+                    }
+                }
+            }
+        });
+
+        console.log(gltf);
+        this.graphicsWorld.add(gltf.scene);
     }
 
     public addFloor(): void {

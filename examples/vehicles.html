@@ -41,17 +41,23 @@
 
         // Initialize sketchbook
         let world = new SB.World();
-        world.addFloor();
+        // world.addFloor();
 
         // Setup camera
         world.cameraOperator.theta = 180;
         world.cameraOperator.phi = 10;
 
+        // World
+        loadGLTF('../build/graphics/test_world/vehicles_world.glb', function(gltf)
+        {
+            world.loadScene(gltf);
+        });
+
         // Player
         loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
         {
             let player = new SB.Character(gltf);
-            player.setPosition(0, 2, -5);
+            player.setPosition(0, 20, -5);
             world.add(player);
             player.takeControl();
         });
@@ -60,7 +66,7 @@
         loadGLTF('../build/graphics/car.glb', function(gltf)
         {
             let car = new SB.Car(gltf);
-            car.setPosition(0, 3, 0);
+            car.setPosition(0, 20, 0);
             world.add(car);
         });
 
@@ -68,7 +74,7 @@
         loadGLTF('../build/graphics/heli.glb', function(gltf)
         {
             let heli = new SB.Helicopter(gltf);
-            heli.setPosition(5, 3, 0);
+            heli.setPosition(5, 20, 0);
             world.add(heli);
         });
 
@@ -76,7 +82,7 @@
         loadGLTF('../build/graphics/plane.glb', function(gltf)
         {
             let plane = new SB.Airplane(gltf);
-            plane.setPosition(-5, 3, 0);
+            plane.setPosition(-5, 20, 0);
             world.add(plane);
         });
 
