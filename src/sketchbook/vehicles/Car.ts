@@ -72,7 +72,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             '1': 4,
             '2': 8,
             '3': 12,
-            '4': 32
+            '4': 16
         };
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
@@ -108,8 +108,6 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
                 }
             }
         }
-
-        // document.getElementById('car-debug').innerHTML = Utils.round(this.gear, 0) + '';
 
         // Steering
         const maxSteerVal = 0.8;

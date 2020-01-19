@@ -172,7 +172,7 @@ export class World
         {
             obj.update(timeStep);
         });
-                    
+
         // Characters
         this.characters.forEach((char) =>
         {

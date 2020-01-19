@@ -57,7 +57,7 @@
         loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
         {
             let player = new SB.Character(gltf);
-            player.setPosition(60, 20, -30);
+            player.setPosition(0, 20, -5);
             world.add(player);
             player.takeControl();
         });

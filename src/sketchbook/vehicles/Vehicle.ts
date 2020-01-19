@@ -18,6 +18,9 @@ export abstract class Vehicle extends THREE.Object3D
     public wheels: Wheel[] = [];
     public drive: string;
 
+    public camera: any;
+    private firstPerson: boolean = false;
+
     public model: any;
     public world: World;
 
@@ -116,6 +119,7 @@ export abstract class Vehicle extends THREE.Object3D
     {
         if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
         {
+            this.controllingCharacter.modelContainer.visible = true;
             this.controllingCharacter.exitVehicle();
         }
     }
@@ -137,6 +141,12 @@ export abstract class Vehicle extends THREE.Object3D
             this.resetControls();
             this.world.cameraOperator.characterCaller = this.controllingCharacter;
             this.world.inputManager.setInputReceiver(this.world.cameraOperator);
+        }
+        else if (code === 'KeyC')
+        {
+            this.firstPerson = true;
+            this.world.cameraOperator.setRadius(0, true);
+            this.controllingCharacter.modelContainer.visible = false;
         }
         else
         {
@@ -201,12 +211,27 @@ export abstract class Vehicle extends THREE.Object3D
 
     public inputReceiverUpdate(timeStep: number): void
     {
-        // Position camera
-        this.world.cameraOperator.target.set(
-            this.position.x,
-            this.position.y + 0.5,
-            this.position.z
-        );
+        if (this.firstPerson)
+        {
+            // this.world.cameraOperator.target.set(
+            //     this.position.x + this.camera.position.x,
+            //     this.position.y + this.camera.position.y,
+            //     this.position.z + this.camera.position.z
+            // );
+
+            let temp = new THREE.Vector3().copy(this.camera.position);
+            temp.applyQuaternion(this.quaternion);
+            this.world.cameraOperator.target.copy(temp.add(this.position));
+        }
+        else
+        {
+            // Position camera
+            this.world.cameraOperator.target.set(
+                this.position.x,
+                this.position.y + 0.5,
+                this.position.z
+            );
+        }
     }
 
     public getMountPoint(character: Character): THREE.Vector3
@@ -344,6 +369,10 @@ export abstract class Vehicle extends THREE.Object3D
                         }
 
                         this.seats.push(seat);
+                    }
+                    if (child.userData.data === 'camera')
+                    {
+                        this.camera = child;
                     }
                     if (child.userData.data === 'wheel')
                     {
