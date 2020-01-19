@@ -24,6 +24,7 @@ import * as Utils from './Utilities';
 import { ConvexPhysics } from '../objects/object_physics/ConvexPhysics';
 import { TrimeshPhysics } from '../objects/object_physics/TrimeshPhysics';
 import { MeshLambertMaterial } from 'three';
+import { Grass } from '../objects/Grass';
 
 export class World
 {
@@ -199,6 +200,18 @@ export class World
             this['waterMat'].uniforms.iGlobalTime.value += timeStep;
         }
 
+        if (this['grassMat'] !== undefined)
+        {
+            this['grassMat'].uniforms.time.value += timeStep;
+
+            if (this.characters.length > 0)
+            {
+                this['grassMat'].uniforms.playerPos.value.copy(this.characters[0].position);
+            }
+
+            // console.log(this['grassMat'].uniforms.playerPos.value);
+        }
+
         this.sky.update();
     }
 
@@ -302,6 +315,15 @@ export class World
                     child.castShadow = true;
                     child.receiveShadow = true;
 
+                    if (child.material.name === 'grass')
+                    {
+                        let grass = new Grass(child);
+                        this.add(grass);
+
+                        // child.material = grass.groundMaterial;
+                        this['grassMat'] = grass.grassMaterial;
+                    }
+
                     if (child.material.name === 'ocean')
                     {
                         let uniforms = THREE.UniformsUtils.clone(WaterShader.uniforms);
@@ -320,6 +342,8 @@ export class World
                     {
                         let mat = new MeshLambertMaterial();
                         mat.map = child.material.map;
+                        console.log(child.material.transparent);
+                        mat.transparent = child.material.transparent;
                         mat.map.encoding = THREE.LinearEncoding;
                         child.material = mat;
                     }

@@ -44,7 +44,7 @@
         // world.addFloor();
 
         // Setup camera
-        world.cameraOperator.theta = 180;
+        world.cameraOperator.theta = 0;
         world.cameraOperator.phi = 10;
 
         // World
@@ -57,7 +57,7 @@
         loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
         {
             let player = new SB.Character(gltf);
-            player.setPosition(0, 20, -5);
+            player.setPosition(60, 20, -30);
             world.add(player);
             player.takeControl();
         });
