@@ -342,7 +342,7 @@ export class World
                     {
                         let mat = new MeshLambertMaterial();
                         mat.map = child.material.map;
-                        mat.map.anisotropy = 8;
+                        mat.map.anisotropy = 4;
                         mat.transparent = child.material.transparent;
                         mat.map.encoding = THREE.LinearEncoding;
                         child.material = mat;

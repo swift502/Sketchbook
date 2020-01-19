@@ -13,7 +13,7 @@ import { SpringSimulator } from '../simulation/SpringSimulator';
 
 export class Car extends Vehicle implements IControllable, IWorldEntity
 {
-    public drive: string = 'rwd';
+    public drive: string = 'awd';
 
     // private wheelsDebug: THREE.Mesh[] = [];
     private steeringWheel: THREE.Object3D;
@@ -64,15 +64,16 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         );
         let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
         
-        const engineForce = 4000;
-        const maxGears = 4;
+        const engineForce = 500;
+        const maxGears = 5;
         const gearsMaxSpeeds = {
             'R': -4,
             '0': 0,
-            '1': 4,
-            '2': 8,
-            '3': 12,
-            '4': 16
+            '1': 5,
+            '2': 9,
+            '3': 13,
+            '4': 17,
+            '5': 22,
         };
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
@@ -91,7 +92,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             if (this.actions.reverse.isPressed)
             {
                 const powerFactor = (gearsMaxSpeeds['R'] - currentSpeed) / Math.abs(gearsMaxSpeeds['R']);
-                const force = (engineForce / this.gear) * (powerFactor ** 2);
+                const force = (engineForce / this.gear) * (Math.abs(powerFactor) ** 1);
 
                 this.applyEngineForce(force);
             }
@@ -103,7 +104,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
                 else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
                 else if (this.actions.throttle.isPressed)
                 {
-                    const force = (engineForce / this.gear) * (powerFactor ** 2);
+                    const force = (engineForce / this.gear) * (powerFactor ** 1);
                     this.applyEngineForce(-force);
                 }
             }
@@ -111,7 +112,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
         // Steering
         const maxSteerVal = 0.8;
-        let speedFactor = THREE.Math.clamp(currentSpeed * 0.5, 1, Number.MAX_VALUE);
+        let speedFactor = THREE.Math.clamp(currentSpeed * 0.3, 1, Number.MAX_VALUE);
 
         if (this.actions.right.isPressed)
         {
@@ -158,26 +159,26 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
         const tiresHaveContact = this.rayCastVehicle.numWheelsOnGround > 0;
 
-        if (this.actions.right.isPressed && !tiresHaveContact)
-        {
-            body.angularVelocity.x += forward.x * 0.2;
-            body.angularVelocity.y += forward.y * 0.2;
-            body.angularVelocity.z += forward.z * 0.2;
-        }
+        // if (this.actions.right.isPressed && !tiresHaveContact)
+        // {
+        //     body.angularVelocity.x += forward.x * 0.2;
+        //     body.angularVelocity.y += forward.y * 0.2;
+        //     body.angularVelocity.z += forward.z * 0.2;
+        // }
 
-        if (this.actions.left.isPressed && !tiresHaveContact)
-        {
-            body.angularVelocity.x -= forward.x * 0.2;
-            body.angularVelocity.y -= forward.y * 0.2;
-            body.angularVelocity.z -= forward.z * 0.2;
-        }
+        // if (this.actions.left.isPressed && !tiresHaveContact)
+        // {
+        //     body.angularVelocity.x -= forward.x * 0.2;
+        //     body.angularVelocity.y -= forward.y * 0.2;
+        //     body.angularVelocity.z -= forward.z * 0.2;
+        // }
 
-        if (!this.actions.throttle.isPressed && !this.actions.reverse.isPressed) 
-        {
-            body.velocity.x *= 0.99;
-            body.velocity.y *= 0.99;
-            body.velocity.z *= 0.99;
-        }
+        // if (!this.actions.throttle.isPressed && !this.actions.reverse.isPressed) 
+        // {
+        //     body.velocity.x *= 0.99;
+        //     body.velocity.y *= 0.99;
+        //     body.velocity.z *= 0.99;
+        // }
     }
 
     public onInputChange(): void

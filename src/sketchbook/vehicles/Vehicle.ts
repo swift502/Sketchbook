@@ -284,7 +284,7 @@ export abstract class Vehicle extends THREE.Object3D
     {
         this.wheels.forEach((wheel) =>
         {
-            if (this.drive === undefined || this.drive === wheel.drive)
+            if (this.drive === wheel.drive || this.drive === 'awd')
             {
                 this.rayCastVehicle.applyEngineForce(force, wheel.rayCastWheelInfoIndex);
             }
