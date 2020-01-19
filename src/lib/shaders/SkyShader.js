@@ -199,5 +199,8 @@ export let SkyShader = {
   
       	gl_FragColor = vec4( retColor, 1.0 );
   
+        #if defined( TONE_MAPPING )
+          gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
+        #endif
       } `
   };

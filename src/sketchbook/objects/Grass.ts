@@ -158,7 +158,7 @@ export class Grass implements IWorldEntity
         let alphaMap = loader.load('https://al-ro.github.io/images/grass/blade_alpha.jpg');
 
         // Define the material, specifying attributes, uniforms, shaders etc.
-        this.grassMaterial = new THREE.RawShaderMaterial({
+        this.grassMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 map: { value: texture },
                 alphaMap: { value: alphaMap },

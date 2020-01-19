@@ -24,14 +24,14 @@ export let GrassShader = {
     },
   
     vertexShader: `
-    precision mediump float;
-    uniform mat4 modelViewMatrix;
-    uniform mat4 projectionMatrix;
-    uniform mat4 modelMatrix;
+    // precision mediump float;
+    // uniform mat4 modelViewMatrix;
+    // uniform mat4 projectionMatrix;
+    // uniform mat4 modelMatrix;
     uniform vec3 playerPos;
-    attribute vec3 position;
+    // attribute vec3 position;
     attribute vec3 offset;
-    attribute vec2 uv;
+    // attribute vec2 uv;
     attribute vec4 orientation;
     attribute float halfRootAngleSin;
     attribute float halfRootAngleCos;
@@ -151,7 +151,7 @@ export let GrassShader = {
   
     fragmentShader: 
     `
-    precision mediump float;
+    // precision mediump float;
     uniform sampler2D map;
     uniform sampler2D alphaMap;
     varying vec2 vUv;
@@ -171,5 +171,10 @@ export let GrassShader = {
     //Add a shadow towards root
     col = mix(vec4(0.0, 0.1, 0.0, 1.0), col, frc);
     gl_FragColor = col;
+
+    #if defined( TONE_MAPPING )
+      gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
+    #endif
+
     }`
   };

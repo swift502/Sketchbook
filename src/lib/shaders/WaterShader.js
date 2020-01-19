@@ -269,6 +269,10 @@ export let WaterShader = {
   
       // post
       gl_FragColor = vec4(pow(color,vec3(0.75)), 1.0);
+
+      #if defined( TONE_MAPPING )
+        gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
+      #endif
     }
     `
 };
