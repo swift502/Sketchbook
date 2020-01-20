@@ -34,6 +34,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             frictionSlip: 0.8,
             dampingRelaxation: 2,
             dampingCompression: 2,
+            rollInfluence: 0.9
         });
 
         this.readCarData(gltf);
