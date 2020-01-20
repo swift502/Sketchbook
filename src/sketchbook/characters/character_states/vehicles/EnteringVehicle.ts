@@ -57,11 +57,7 @@ export class EnteringVehicle extends CharacterStateBase
         if (this.timer > this.animationLength - timeStep)
         {
             this.character.setPosition(this.endPosition.x, this.endPosition.y, this.endPosition.z);
-            this.character.controlledObject = this.vehicle;
-            this.vehicle.inputReceiverInit();
-
-            this.character.controlledObjectSeat = this.seat;
-            this.vehicle.controllingCharacter = this.character;
+            this.character.startControllingVehicle(this.vehicle, this.seat);
 
             if (this.anyDirection() || this.seat.door === undefined)
             {

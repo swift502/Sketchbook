@@ -19,6 +19,8 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { VehicleSeat } from '../vehicles/VehicleSeat';
 import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
 import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
+import { Sitting } from './character_states/Sitting';
+import { Vehicle } from '../vehicles/Vehicle';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -656,6 +658,28 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
         this.isRunningTowardsVehicle = false;
         this.targetSeat = undefined;
+    }
+
+    public teleportToVehicle(vehicle: Vehicle, seat: any): void
+    {
+        this.resetVelocity();
+        this.rotateModel();
+        this.setPhysicsEnabled(false);
+        (vehicle as unknown as THREE.Object3D).attach(this);
+
+        this.setPosition(seat.seatPoint.position.x, seat.seatPoint.position.y + 0.6, seat.seatPoint.position.z);
+        this.quaternion.copy(seat.seatPoint.quaternion);
+
+        this.setState(new Sitting(this));
+    }
+
+    public startControllingVehicle(vehicle: any, seat: any): void
+    {
+        this.controlledObject = vehicle;
+        vehicle.inputReceiverInit();
+
+        this.controlledObjectSeat = seat;
+        vehicle.controllingCharacter = this;
     }
 
     public exitVehicle(): void

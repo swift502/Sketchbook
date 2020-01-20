@@ -60,31 +60,50 @@
             player.setPosition(0, 20, -5);
             world.add(player);
             player.takeControl();
-        });
 
-        // Car
-        loadGLTF('../build/graphics/car.glb', function(gltf)
-        {
-            let car = new SB.Car(gltf);
-            car.setPosition(0, 20, 0);
-            world.add(car);
+            // Car
+            loadGLTF('../build/graphics/car.glb', function(gltf)
+            {
+                let car = new SB.Car(gltf);
+                car.setPosition(0, 20, 0);
+                world.add(car);
+            });
+
+            // Bob
+            loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
+            {
+                let bob = new SB.Character(gltf);
+
+                loadGLTF('../build/graphics/car.glb', function(gltf)
+                {
+                    let bobCar = new SB.Car(gltf);
+                    bobCar.setPosition(10, 20, 0);
+                    
+                    world.add(bob);
+                    world.add(bobCar);
+
+                    bob.teleportToVehicle(bobCar, bobCar.seats[0]);
+                    bob.startControllingVehicle(bobCar, bobCar.seats[0]);
+                    bob.setBehaviour(new Sketchbook.CharacterAI.FollowTarget(player));
+                });
+            });
         });
 
         // Helicopter
-        loadGLTF('../build/graphics/heli.glb', function(gltf)
-        {
-            let heli = new SB.Helicopter(gltf);
-            heli.setPosition(5, 20, 0);
-            world.add(heli);
-        });
+        // loadGLTF('../build/graphics/heli.glb', function(gltf)
+        // {
+        //     let heli = new SB.Helicopter(gltf);
+        //     heli.setPosition(5, 20, 0);
+        //     world.add(heli);
+        // });
 
         // Airplane
-        loadGLTF('../build/graphics/plane.glb', function(gltf)
-        {
-            let plane = new SB.Airplane(gltf);
-            plane.setPosition(-5, 20, 0);
-            world.add(plane);
-        });
+        // loadGLTF('../build/graphics/plane.glb', function(gltf)
+        // {
+        //     let plane = new SB.Airplane(gltf);
+        //     plane.setPosition(-5, 15, 0);
+        //     world.add(plane);
+        // });
 
         //
         // 2. Functions
