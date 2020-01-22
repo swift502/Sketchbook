@@ -21,10 +21,9 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import { BoxPhysics } from '../objects/object_physics/BoxPhysics';
 import * as Utils from './Utilities';
-import { ConvexPhysics } from '../objects/object_physics/ConvexPhysics';
 import { TrimeshPhysics } from '../objects/object_physics/TrimeshPhysics';
-import { MeshLambertMaterial } from 'three';
 import { Grass } from '../objects/Grass';
+import { Path } from '../objects/Path';
 
 export class World
 {
@@ -55,6 +54,7 @@ export class World
     public characters: Character[];
     public balls: any[];
     public vehicles: any[];
+    public paths: {[id: string]: Path} = {};
 
     constructor()
     {
@@ -340,7 +340,7 @@ export class World
                     }
                     else if (child.material.map !== null)
                     {
-                        let mat = new MeshLambertMaterial();
+                        let mat = new THREE.MeshLambertMaterial();
                         mat.map = child.material.map;
                         mat.map.anisotropy = 4;
                         mat.transparent = child.material.transparent;
@@ -382,11 +382,31 @@ export class World
                             child.visible = false;
                         }
                     }
+
+                    if (child.userData.data === 'pathNode')
+                    {
+                        let pathName = child.userData.path;
+                        if (!this.paths.hasOwnProperty(pathName))
+                        {
+                            this.paths[pathName] = new Path();
+                        }
+
+                        this.paths[pathName].addNode(child);
+                    }
                 }
             }
         });
 
-        console.log(gltf);
+        // Initialize paths
+        for (const pathName in this.paths) {
+            if (this.paths.hasOwnProperty(pathName)) {
+                const path = this.paths[pathName];
+                path.connectNodes();
+            }
+        }
+
+        // console.log(gltf);
+        console.log(this.paths);
         this.graphicsWorld.add(gltf.scene);
     }
 

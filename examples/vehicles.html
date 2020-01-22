@@ -51,40 +51,93 @@
         loadGLTF('../build/graphics/test_world/vehicles_world.glb', function(gltf)
         {
             world.loadScene(gltf);
-        });
 
-        // Player
-        loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
-        {
-            let player = new SB.Character(gltf);
-            player.setPosition(0, 20, -5);
-            world.add(player);
-            player.takeControl();
-
-            // Car
-            loadGLTF('../build/graphics/car.glb', function(gltf)
-            {
-                let car = new SB.Car(gltf);
-                car.setPosition(0, 20, 0);
-                world.add(car);
-            });
-
-            // Bob
+                    // Player
             loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
             {
-                let bob = new SB.Character(gltf);
+                let player = new SB.Character(gltf);
+                player.setPosition(0, 20, -5);
+                world.add(player);
+                player.takeControl();
 
+                // Car
                 loadGLTF('../build/graphics/car.glb', function(gltf)
                 {
-                    let bobCar = new SB.Car(gltf);
-                    bobCar.setPosition(10, 20, 0);
-                    
-                    world.add(bob);
-                    world.add(bobCar);
+                    let car = new SB.Car(gltf);
+                    car.setPosition(0, 20, 0);
+                    world.add(car);
+                });
 
-                    bob.teleportToVehicle(bobCar, bobCar.seats[0]);
-                    bob.startControllingVehicle(bobCar, bobCar.seats[0]);
-                    bob.setBehaviour(new Sketchbook.CharacterAI.FollowTarget(player));
+                // Bob
+                loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
+                {
+                    let bob = new SB.Character(gltf);
+
+                    loadGLTF('../build/graphics/car.glb', function(gltf)
+                    {
+                        let bobCar = new SB.Car(gltf);
+                        bobCar.setPosition(10, 20, 0);
+                        
+                        world.add(bob);
+                        world.add(bobCar);
+
+                        bob.teleportToVehicle(bobCar, bobCar.seats[0]);
+                        bob.startControllingVehicle(bobCar, bobCar.seats[0]);
+
+                        if (Object.keys(world.paths).length > 0)
+                        {
+                            console.log(world.paths);
+                            bob.setBehaviour(new Sketchbook.CharacterAI.FollowPath(world.paths[Object.keys(world.paths)[2]].firstNode(), 5));
+                        }
+                    });
+                });
+
+                // Bob
+                loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
+                {
+                    let bob = new SB.Character(gltf);
+
+                    loadGLTF('../build/graphics/car.glb', function(gltf)
+                    {
+                        let bobCar = new SB.Car(gltf);
+                        bobCar.setPosition(-10, 20, 0);
+                        
+                        world.add(bob);
+                        world.add(bobCar);
+
+                        bob.teleportToVehicle(bobCar, bobCar.seats[0]);
+                        bob.startControllingVehicle(bobCar, bobCar.seats[0]);
+
+                        if (Object.keys(world.paths).length > 0)
+                        {
+                            console.log(world.paths);
+                            bob.setBehaviour(new Sketchbook.CharacterAI.FollowPath(world.paths[Object.keys(world.paths)[1]].firstNode(), 20));
+                        }
+                    });
+                });
+
+                // Bob
+                loadGLTF('../build/graphics/game_man/game_man.glb', function(gltf)
+                {
+                    let bob = new SB.Character(gltf);
+
+                    loadGLTF('../build/graphics/car.glb', function(gltf)
+                    {
+                        let bobCar = new SB.Car(gltf);
+                        bobCar.setPosition(-100, 20, 0);
+                        
+                        world.add(bob);
+                        world.add(bobCar);
+
+                        bob.teleportToVehicle(bobCar, bobCar.seats[0]);
+                        bob.startControllingVehicle(bobCar, bobCar.seats[0]);
+
+                        if (Object.keys(world.paths).length > 0)
+                        {
+                            console.log(world.paths);
+                            bob.setBehaviour(new Sketchbook.CharacterAI.FollowPath(world.paths[Object.keys(world.paths)[0]].firstNode(), 10));
+                        }
+                    });
                 });
             });
         });

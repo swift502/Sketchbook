@@ -1,21 +1,20 @@
 import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import { CharacterAIBase } from './CharacterAIBase';
 import * as Utils from '../../core/Utilities';
 import { Object3D } from 'three';
 import { Vehicle } from 'src/sketchbook/vehicles/Vehicle';
-import { Car } from 'src/sketchbook/vehicles/Car';
+import { Character } from '../Character';
 
-export class FollowTarget extends CharacterAIBase implements ICharacterAI
+export class FollowTarget implements ICharacterAI
 {
+    public character: Character;
     public isTargetReached: boolean;
 
-    private target: THREE.Object3D;
+    public target: THREE.Object3D;
     private stopDistance: number;
 
     constructor(target: THREE.Object3D, stopDistance: number = 1.3)
     {
-        super();
         this.target = target;
         this.stopDistance = stopDistance;
     }

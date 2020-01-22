@@ -66,15 +66,15 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
         
         const engineForce = 500;
-        const maxGears = 5;
+        const maxGears = 3;
         const gearsMaxSpeeds = {
             'R': -4,
             '0': 0,
             '1': 5,
             '2': 9,
             '3': 13,
-            '4': 17,
-            '5': 22,
+            // '4': 17,
+            // '5': 22,
         };
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));

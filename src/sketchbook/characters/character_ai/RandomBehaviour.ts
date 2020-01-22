@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import { CharacterAIBase } from './CharacterAIBase';
+import { Character } from '../Character';
 
-export class RandomBehaviour extends CharacterAIBase implements ICharacterAI
+export class RandomBehaviour implements ICharacterAI
 {
+    public character: Character;
     private randomFrequency: number;
 
     constructor(randomFrequency: number = 100)
     {
-        super();
         this.randomFrequency = randomFrequency;
     }
 
