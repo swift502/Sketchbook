@@ -11,6 +11,7 @@ import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { VehicleSeat } from '../vehicles/VehicleSeat';
+import { Vehicle } from '../vehicles/Vehicle';
 export declare class Character extends THREE.Object3D implements IWorldEntity {
     isCharacter: boolean;
     height: number;
@@ -94,6 +95,8 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     jump(initJumpSpeed?: number): void;
     findVehicleToEnter(): void;
     enterVehicle(seat: VehicleSeat): void;
+    teleportToVehicle(vehicle: Vehicle, seat: any): void;
+    startControllingVehicle(vehicle: any, seat: any): void;
     exitVehicle(): void;
     physicsPreStep(body: CANNON.Body, character: Character): void;
     physicsPostStep(body: CANNON.Body, character: Character): void;

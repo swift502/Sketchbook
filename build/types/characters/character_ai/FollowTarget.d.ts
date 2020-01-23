@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import { CharacterAIBase } from './CharacterAIBase';
-export declare class FollowTarget extends CharacterAIBase implements ICharacterAI {
+import { Character } from '../Character';
+export declare class FollowTarget implements ICharacterAI {
+    character: Character;
     isTargetReached: boolean;
-    private target;
+    target: THREE.Object3D;
     private stopDistance;
     constructor(target: THREE.Object3D, stopDistance?: number);
     setTarget(target: THREE.Object3D): void;

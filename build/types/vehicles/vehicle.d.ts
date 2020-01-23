@@ -14,6 +14,8 @@ export declare abstract class Vehicle extends THREE.Object3D {
     seats: VehicleSeat[];
     wheels: Wheel[];
     drive: string;
+    camera: any;
+    private firstPerson;
     model: any;
     world: World;
     help: THREE.AxesHelper;

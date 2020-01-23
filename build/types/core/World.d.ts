@@ -8,6 +8,7 @@ import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
+import { Path } from '../objects/Path';
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.Camera;
@@ -33,6 +34,9 @@ export declare class World {
     characters: Character[];
     balls: any[];
     vehicles: any[];
+    paths: {
+        [id: string]: Path;
+    };
     constructor();
     update(timeStep: number): void;
     updatePhysics(timeStep: number): void;
@@ -45,6 +49,7 @@ export declare class World {
     render(world: World): void;
     add(object: IWorldEntity): void;
     remove(object: IWorldEntity): void;
+    loadScene(gltf: any): void;
     addFloor(): void;
     scrollTheTimeScale(scrollAmount: number): void;
     updateControls(controls: any): void;

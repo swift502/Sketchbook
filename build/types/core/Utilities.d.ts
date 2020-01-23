@@ -35,3 +35,4 @@ export declare function threeVector(vec: CANNON.Vec3): THREE.Vector3;
 export declare function cannonVector(vec: THREE.Vector3): CANNON.Vec3;
 export declare function threeQuat(quat: CANNON.Quaternion): THREE.Quaternion;
 export declare function cannonQuat(quat: THREE.Quaternion): CANNON.Quaternion;
+export declare function setupMeshProperties(child: any): void;
