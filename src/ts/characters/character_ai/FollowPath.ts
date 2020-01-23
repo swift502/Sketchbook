@@ -1,11 +1,11 @@
-import { FollowTarget } from "./FollowTarget";
-import { ICharacterAI } from "src/sketchbook/interfaces/ICharacterAI";
-import { PathNode } from "src/sketchbook/objects/PathNode";
-import THREE = require("three");
+import { FollowTarget } from './FollowTarget';
+import { ICharacterAI } from '../../interfaces/ICharacterAI';
+import { PathNode } from '../../objects/PathNode';
+import THREE = require('three');
 
 export class FollowPath extends FollowTarget implements ICharacterAI
 {
-    public nodeRadius;
+    public nodeRadius: number;
     public reverse: boolean = false;
 
     private targetNode: PathNode;

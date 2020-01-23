@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
 import * as Utils from '../../core/Utilities';
 import { Object3D } from 'three';
-import { Vehicle } from 'src/sketchbook/vehicles/Vehicle';
+import { Vehicle } from '../../vehicles/Vehicle';
 import { Character } from '../Character';
 
 export class FollowTarget implements ICharacterAI
