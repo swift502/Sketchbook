@@ -27,6 +27,6 @@ export class Path
 
     public firstNode(): PathNode
     {
-        return this.nodes[Object.keys(this.nodes)[0]];
+        return this.nodes[Object.keys(this.nodes)[6]];
     }
 }

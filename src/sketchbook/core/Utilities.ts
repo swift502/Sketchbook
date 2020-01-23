@@ -270,4 +270,22 @@ export function cannonQuat(quat: THREE.Quaternion): CANNON.Quaternion
     return new CANNON.Quaternion(quat.x, quat.y, quat.z, quat.w);
 }
 
+export function setupMeshProperties(child: any): void
+{
+    child.castShadow = true;
+    child.receiveShadow = true;
+
+    if (child.material.map !== null)
+    {
+        let mat = new THREE.MeshLambertMaterial();
+        mat.name = child.material.name;
+        mat.map = child.material.map;
+        mat.map.anisotropy = 4;
+        mat.transparent = child.material.transparent;
+        mat.skinning = child.material.skinning;
+        mat.map.encoding = THREE.LinearEncoding;
+        child.material = mat;
+    }
+}
+
 //#endregion

@@ -66,15 +66,15 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
         
         const engineForce = 500;
-        const maxGears = 3;
+        const maxGears = 5;
         const gearsMaxSpeeds = {
             'R': -4,
             '0': 0,
             '1': 5,
             '2': 9,
             '3': 13,
-            // '4': 17,
-            // '5': 22,
+            '4': 17,
+            '5': 22,
         };
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
         const currentSpeed = velocity.dot(Utils.cannonVector(forward));
@@ -130,6 +130,11 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         this.steeringSimulator.simulate(timeStep);
         this.setSteeringValue(this.steeringSimulator.position);
         this.steeringWheel.rotation.z = -this.steeringSimulator.position * 2;
+
+        if (this.rayCastVehicle.numWheelsOnGround < 3 && Math.abs(this.collision.velocity.length()) < 0.1)
+        {
+            this.collision.quaternion.copy(this.collision.initQuaternion);
+        }
     }
 
     public shiftUp(): void

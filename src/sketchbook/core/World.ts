@@ -312,8 +312,7 @@ export class World
             {
                 if (child.type === 'Mesh')
                 {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+                    Utils.setupMeshProperties(child);
 
                     if (child.material.name === 'grass')
                     {
@@ -338,15 +337,6 @@ export class World
 
                         this['waterMat'] = child.material;
                     }
-                    else if (child.material.map !== null)
-                    {
-                        let mat = new THREE.MeshLambertMaterial();
-                        mat.map = child.material.map;
-                        mat.map.anisotropy = 4;
-                        mat.transparent = child.material.transparent;
-                        mat.map.encoding = THREE.LinearEncoding;
-                        child.material = mat;
-                    }
                 }
 
                 if (child.userData.hasOwnProperty('data'))
@@ -357,8 +347,6 @@ export class World
                         {
                             if (child.userData.type === 'box')
                             {
-                                // let phys = new ConvexPhysics(child, {});
-
                                 let phys2 = new BoxPhysics({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
                                 phys2.physical.position.copy(Utils.cannonVector(child.position));
                                 phys2.physical.quaternion.copy(Utils.cannonQuat(child.quaternion));
@@ -406,7 +394,7 @@ export class World
         }
 
         // console.log(gltf);
-        console.log(this.paths);
+        // console.log(this.paths);
         this.graphicsWorld.add(gltf.scene);
     }
 

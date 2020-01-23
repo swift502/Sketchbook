@@ -323,8 +323,7 @@ export abstract class Vehicle extends THREE.Object3D
 
             if (child.isMesh)
             {
-                child.castShadow = true;
-                child.receiveShadow = true;
+                Utils.setupMeshProperties(child);
             }
 
             if (child.hasOwnProperty('userData'))
@@ -406,12 +405,6 @@ export abstract class Vehicle extends THREE.Object3D
                     {
                         child.visible = false;
                     }
-                }
-                if (child.userData.hasOwnProperty('texture'))
-                {
-                    child.material = new THREE.MeshLambertMaterial({
-                    map: new THREE.TextureLoader().load('../build/graphics/' + child.userData.texture)
-                });
                 }
             }
         });

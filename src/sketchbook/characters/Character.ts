@@ -262,26 +262,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
             if (child.isMesh)
             {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-
-            if (child.hasOwnProperty('userData'))
-            {
-                if (child.userData.hasOwnProperty('texture'))
-                {
-                    child.material = new THREE.MeshLambertMaterial({
-                        map: new THREE.TextureLoader().load('../build/graphics/' + child.userData.texture)
-                    });
-
-                    if (child.userData.hasOwnProperty('skinning'))
-                    {
-                        if (child.userData.skinning === 'true')
-                        {
-                            child.material.skinning = true;
-                        }
-                    }
-                }
+                Utils.setupMeshProperties(child);
             }
         });
     }
