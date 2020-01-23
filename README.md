@@ -35,32 +35,16 @@ Mostly a playground for exploring how conventional third person gameplay mechani
 
 All planned features can be found in the [GitHub Projects](https://github.com/swift502/Sketchbook/projects).
 
-## Installation
+## Usage
 
-Use NPM:
-```shell
-npm install sketchbook --save
-```
-```js
-import * as Sketchbook from 'sketchbook'
-```
-
-Or download the [latest release](https://github.com/swift502/Sketchbook/releases) and import via the script tag:
-```html
-<script src="sketchbook.min.js"></script>
-```
-
-To learn specifics about using Sketchbook, check out the [examples](https://github.com/swift502/Sketchbook/tree/master/examples).
+Visit the [Sketch](https://github.com/swift502/Sketch) template repository to start using Sketchbook.
 
 ## Contributing
 
-I appreciate all help, be it suggestions, issues or even pull requests.
-
-1. Clone the repository
+1. [Fork this repository](https://help.github.com/en/github/getting-started-with-github/fork-a-repo)
 2. Run `npm install`
-3. Contribute!
-
-Use the npm scripts defined in `package.json`:
-* `npm run dev` - start a local server, build in dev mode and watch changes
-* `npm run build` - build in production mode and generate type decleration files
+3. Run `npm run dev`
+4. Make changes and test them out at http://localhost:8080
+5. Run `npm run build`
+6. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
