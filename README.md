@@ -37,7 +37,7 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 
 ## Usage
 
-Visit the [Sketch](https://github.com/swift502/Sketch) template repository to start using Sketchbook.
+Visit the [Sketch](https://github.com/swift502/Sketch) template repository to learn about using Sketchbook.
 
 ## Contributing
 
