@@ -41,10 +41,11 @@ Visit the [Sketch](https://github.com/swift502/Sketch) template repository to le
 
 ## Contributing
 
-1. [Fork this repository](https://help.github.com/en/github/getting-started-with-github/fork-a-repo)
-2. Run `npm install`
-3. Run `npm run dev`
-4. Make changes and test them out at http://localhost:8080
-5. Run `npm run build`
-6. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
+1. Get latest [Node.js](https://nodejs.org/en/)
+2. [Fork this repository](https://help.github.com/en/github/getting-started-with-github/fork-a-repo)
+3. Run `npm install`
+4. Run `npm run dev`
+5. Make changes and test them out at http://localhost:8080
+6. Run `npm run build`
+7. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
