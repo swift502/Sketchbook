@@ -63,7 +63,7 @@ export class Sky extends THREE.Object3D
         this.sun.shadow.camera.bottom = -15;
         this.sun.shadow.camera.left = -15;
 
-        this.attach(this.sun);
+        // this.attach(this.sun);
 
         this.sunTarget = new THREE.Object3D();
         this.sun.target = this.sunTarget;

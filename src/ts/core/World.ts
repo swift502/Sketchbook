@@ -7,6 +7,7 @@ import EffectComposer, {
     RenderPass,
     ShaderPass,
 } from '@johh/three-effectcomposer';
+import { default as CSM } from '../../lib/utils/three-csm.module.js';
 
 import { WaterShader } from '../../lib/shaders/WaterShader';
 
@@ -28,7 +29,7 @@ import { Path } from '../objects/Path';
 export class World
 {
     public renderer: THREE.WebGLRenderer;
-    public camera: THREE.Camera;
+    public camera: THREE.PerspectiveCamera;
     public composer: EffectComposer;
     public stats: Stats;
     public graphicsWorld: THREE.Scene;
@@ -49,6 +50,7 @@ export class World
     public inputManager: InputManager;
     public cameraOperator: CameraOperator;
     public timeScaleTarget: number;
+    public csm: CSM;
 
     public objects: SBObject[];
     public characters: Character[];
@@ -73,6 +75,7 @@ export class World
         this.renderer.toneMapping = THREE.Uncharted2ToneMapping;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
         document.body.appendChild(this.renderer.domElement);
         this.renderer.domElement.id = 'canvas';
 
@@ -96,6 +99,28 @@ export class World
         this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 610);
         this.sky = new Sky(this);
         this.graphicsWorld.add(this.sky);
+
+        let splitsCallback = (amount, near, far) =>
+        {
+            return [
+                Math.pow(1 / 3, 3),
+                Math.pow(1 / 3, 2),
+                Math.pow(1 / 3, 1),
+                Math.pow(1 / 3, 0)
+            ];
+        };
+
+        this.csm = new CSM({
+            fov: 80,
+            far: 300,
+            lightIntensity: 0.6,
+            cascades: 4,
+            shadowMapSize: 2048,
+            camera: this.camera,
+            parent: this.graphicsWorld,
+            mode: 'custom',
+            customSplitsCallback: splitsCallback
+        });
 
         // FXAA
         let effectFXAA = new ShaderPass(FXAAShader);
@@ -213,6 +238,9 @@ export class World
         }
 
         this.sky.update();
+
+        this.csm.update(this.camera.matrix);
+        this.csm.lightDirection = new THREE.Vector3(-this.sky.sun.position.x, -this.sky.sun.position.y, -this.sky.sun.position.z).normalize();
     }
 
     public updatePhysics(timeStep: number): void
@@ -313,6 +341,7 @@ export class World
                 if (child.type === 'Mesh')
                 {
                     Utils.setupMeshProperties(child);
+                    this.csm.setupMaterial(child.material);
 
                     if (child.material.name === 'grass')
                     {

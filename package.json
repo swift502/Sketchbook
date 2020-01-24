@@ -29,12 +29,16 @@
   },
   "homepage": "https://github.com/swift502/sketchbook",
   "devDependencies": {
+    "@johh/three-effectcomposer": "0.0.7",
     "@types/dat.gui": "^0.7.5",
     "@types/lodash": "^4.14.149",
     "@types/stats": "^0.16.30",
     "css-loader": "^3.4.0",
     "file-loader": "^4.3.0",
+    "lodash": "^4.17.15",
     "style-loader": "^1.0.2",
+    "three": "^0.109.0",
+    "three-csm": "^1.0.1",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.3",
     "webpack": "^4.41.3",
@@ -42,9 +46,5 @@
     "webpack-dev-server": "^3.10.0",
     "webpack-merge": "^4.2.2"
   },
-  "dependencies": {
-    "@johh/three-effectcomposer": "0.0.7",
-    "lodash": "^4.17.15",
-    "three": "^0.109.0"
-  }
+  "dependencies": {}
 }

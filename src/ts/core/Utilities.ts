@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../simulation/SimulationFrame';
+import { World } from './World';
 
 export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
 {
@@ -277,7 +278,8 @@ export function setupMeshProperties(child: any): void
 
     if (child.material.map !== null)
     {
-        let mat = new THREE.MeshLambertMaterial();
+        let mat = new THREE.MeshPhongMaterial();
+        mat.shininess = 0;
         mat.name = child.material.name;
         mat.map = child.material.map;
         mat.map.anisotropy = 4;

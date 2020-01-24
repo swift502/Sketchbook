@@ -28,6 +28,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public height: number = 0;
     public tiltContainer: THREE.Group;
     public modelContainer: THREE.Group;
+    // public model: any;
+    public materials: THREE.Material[] = [];
     public mixer: THREE.AnimationMixer;
     public animations: any[];
 
@@ -100,6 +102,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.modelContainer.position.y = -0.57;
         this.tiltContainer.add(this.modelContainer);
         this.modelContainer.add(gltf.scene);
+        // this.model = gltf.scene;
 
         this.mixer = new THREE.AnimationMixer(gltf.scene);
 
@@ -263,6 +266,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
             if (child.isMesh)
             {
                 Utils.setupMeshProperties(child);
+
+                if (child.material !== undefined)
+                {
+                    this.materials.push(child.material);
+                }
             }
         });
     }
@@ -825,6 +833,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
             // Register characters physical capsule object
             world.objects.push(this.characterCapsule);
+
+            // Shadow cascades
+            this.materials.forEach((mat) =>
+            {
+                world.csm.setupMaterial(mat);
+            });
 
             world.graphicsWorld.add(this.help1);
             // world.graphicsWorld.add(this.help2);

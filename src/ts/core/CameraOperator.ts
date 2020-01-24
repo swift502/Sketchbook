@@ -162,7 +162,7 @@ export class CameraOperator implements IInputReceiver
     public inputReceiverUpdate(): void
     {
         // Set fly speed
-        let speed = this.movementSpeed * (this.actions.fast.isPressed ? 5 : 1);
+        let speed = this.movementSpeed * (this.actions.fast.isPressed ? 10 : 1);
 
         const elements = this.world.cameraOperator.camera.matrix.elements;
         let up = new THREE.Vector3(elements[4], elements[5], elements[6]);

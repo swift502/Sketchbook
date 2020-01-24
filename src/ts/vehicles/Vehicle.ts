@@ -8,6 +8,7 @@ import { VehicleSeat } from './VehicleSeat';
 import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
 import * as Utils from '../core/Utilities';
+import { Object3D } from 'three';
 
 export abstract class Vehicle extends THREE.Object3D
 {
@@ -19,16 +20,18 @@ export abstract class Vehicle extends THREE.Object3D
     public drive: string;
 
     public camera: any;
-    private firstPerson: boolean = false;
 
-    public model: any;
     public world: World;
 
     public help: THREE.AxesHelper;
 
     // TODO: remake to a Sketchbook Object
     public collision: CANNON.Body;
+    // public model: any;
+    public materials: THREE.Material[] = [];
     private modelContainer: THREE.Group;
+
+    private firstPerson: boolean = false;
 
     constructor(gltf: any, handlingSetup?: any)
     {
@@ -38,9 +41,6 @@ export abstract class Vehicle extends THREE.Object3D
         handlingSetup.chassisConnectionPointLocal = new CANNON.Vec3(),
         handlingSetup.axleLocal = new CANNON.Vec3(-1, 0, 0);
         handlingSetup.directionLocal = new CANNON.Vec3(0, -1, 0);
-
-        this.modelContainer = new THREE.Group();
-        this.add(this.modelContainer);
 
         // Collision body
         this.collision = new CANNON.Body({
@@ -52,7 +52,11 @@ export abstract class Vehicle extends THREE.Object3D
 
         // Read GLTF
         this.readVehicleData(gltf);
-        this.setModel(gltf.scene);
+
+        this.modelContainer = new THREE.Group();
+        this.add(this.modelContainer);
+        this.modelContainer.add(gltf.scene);
+        // this.setModel(gltf.scene);
 
         // Raycast vehicle component
         this.rayCastVehicle = new CANNON.RaycastVehicle({
@@ -72,12 +76,12 @@ export abstract class Vehicle extends THREE.Object3D
         this.help = new THREE.AxesHelper(2);
     }
 
-    public setModel(model: any): void
-    {
-        this.modelContainer.remove(this.model);
-        this.model = model;
-        this.modelContainer.add(this.model);
-    }
+    // public setModel(model: any): void
+    // {
+    //     this.modelContainer.remove(this.model);
+    //     this.model = model;
+    //     this.modelContainer.add(this.model);
+    // }
 
     public update(timeStep: number): void
     {
@@ -239,32 +243,6 @@ export abstract class Vehicle extends THREE.Object3D
         return this.seats[0].entryPoint.position;
     }
 
-    public addToWorld(world: World): void
-    {
-        if (_.includes(world.vehicles, this))
-        {
-            console.warn('Adding character to a world in which it already exists.');
-        }
-        else if (this.rayCastVehicle === undefined)
-        {
-            console.error('Trying to create vehicle without raycastVehicleComponent');
-        }
-        else
-        {
-            this.world = world;
-            world.vehicles.push(this);
-            world.graphicsWorld.add(this);
-            // world.physicsWorld.addBody(this.collision);
-            this.rayCastVehicle.addToWorld(world.physicsWorld);
-            world.graphicsWorld.add(this.help);
-
-            this.wheels.forEach((wheel) =>
-            {
-                this.world.graphicsWorld.attach(wheel.wheelObject);
-            });
-        }
-    }
-
     public setPosition(x: number, y: number, z: number): void
     {
         this.collision.position.x = x;
@@ -302,6 +280,37 @@ export abstract class Vehicle extends THREE.Object3D
         });
     }
 
+    public addToWorld(world: World): void
+    {
+        if (_.includes(world.vehicles, this))
+        {
+            console.warn('Adding character to a world in which it already exists.');
+        }
+        else if (this.rayCastVehicle === undefined)
+        {
+            console.error('Trying to create vehicle without raycastVehicleComponent');
+        }
+        else
+        {
+            this.world = world;
+            world.vehicles.push(this);
+            world.graphicsWorld.add(this);
+            // world.physicsWorld.addBody(this.collision);
+            this.rayCastVehicle.addToWorld(world.physicsWorld);
+            world.graphicsWorld.add(this.help);
+
+            this.wheels.forEach((wheel) =>
+            {
+                this.world.graphicsWorld.attach(wheel.wheelObject);
+            });
+
+            this.materials.forEach((mat) =>
+            {
+                world.csm.setupMaterial(mat);
+            });
+        }
+    }
+
     public removeFromWorld(world: World): void
     {
         if (!_.includes(world.vehicles, this))
@@ -324,6 +333,11 @@ export abstract class Vehicle extends THREE.Object3D
             if (child.isMesh)
             {
                 Utils.setupMeshProperties(child);
+
+                if (child.material !== undefined)
+                {
+                    this.materials.push(child.material);
+                }
             }
 
             if (child.hasOwnProperty('userData'))
