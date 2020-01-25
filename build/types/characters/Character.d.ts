@@ -17,6 +17,7 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     height: number;
     tiltContainer: THREE.Group;
     modelContainer: THREE.Group;
+    materials: THREE.Material[];
     mixer: THREE.AnimationMixer;
     animations: any[];
     acceleration: THREE.Vector3;
@@ -96,7 +97,7 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     findVehicleToEnter(): void;
     enterVehicle(seat: VehicleSeat): void;
     teleportToVehicle(vehicle: Vehicle, seat: any): void;
-    startControllingVehicle(vehicle: any, seat: any): void;
+    startControllingVehicle(vehicle: IControllable, seat: any): void;
     exitVehicle(): void;
     physicsPreStep(body: CANNON.Body, character: Character): void;
     physicsPostStep(body: CANNON.Body, character: Character): void;

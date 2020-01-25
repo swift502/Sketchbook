@@ -15,17 +15,17 @@ export declare abstract class Vehicle extends THREE.Object3D {
     wheels: Wheel[];
     drive: string;
     camera: any;
-    private firstPerson;
-    model: any;
     world: World;
     help: THREE.AxesHelper;
     collision: CANNON.Body;
+    materials: THREE.Material[];
     private modelContainer;
+    private firstPerson;
     constructor(gltf: any, handlingSetup?: any);
-    setModel(model: any): void;
     update(timeStep: number): void;
     onInputChange(): void;
     resetControls(): void;
+    allowSleep(value: boolean): void;
     handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void;
     triggerAction(actionName: string, value: boolean): void;
     handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void;
@@ -34,11 +34,11 @@ export declare abstract class Vehicle extends THREE.Object3D {
     inputReceiverInit(): void;
     inputReceiverUpdate(timeStep: number): void;
     getMountPoint(character: Character): THREE.Vector3;
-    addToWorld(world: World): void;
     setPosition(x: number, y: number, z: number): void;
     setSteeringValue(val: number): void;
     applyEngineForce(force: number): void;
     setBrake(brakeForce: number, driveFilter?: string): void;
+    addToWorld(world: World): void;
     removeFromWorld(world: World): void;
     readVehicleData(gltf: any): void;
 }

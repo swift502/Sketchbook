@@ -1,8 +1,8 @@
-import { FollowTarget } from "./FollowTarget";
-import { ICharacterAI } from "../../interfaces/ICharacterAI";
-import { PathNode } from "../../objects/PathNode";
+import { FollowTarget } from './FollowTarget';
+import { ICharacterAI } from '../../interfaces/ICharacterAI';
+import { PathNode } from '../../objects/PathNode';
 export declare class FollowPath extends FollowTarget implements ICharacterAI {
-    nodeRadius: any;
+    nodeRadius: number;
     reverse: boolean;
     private targetNode;
     constructor(firstNode: PathNode, nodeRadius: number);

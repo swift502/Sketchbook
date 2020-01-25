@@ -37,4 +37,4 @@ export { World } from './core/World';
 export declare let THREE: typeof THREEImport;
 export declare let CANNON: typeof CANNONImport;
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-export { FBXLoader } from '../lib/utils/FBXLoader';
+export { LoadingManager } from './core/LoadingManager';

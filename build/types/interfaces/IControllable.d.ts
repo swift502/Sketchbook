@@ -8,4 +8,5 @@ export interface IControllable extends IInputReceiver {
     getMountPoint(character: Character): THREE.Vector3;
     triggerAction(actionName: string, value: boolean): void;
     resetControls(): void;
+    allowSleep(value: boolean): void;
 }

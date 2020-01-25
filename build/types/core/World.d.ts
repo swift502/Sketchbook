@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { CameraOperator } from './CameraOperator';
 import EffectComposer from '@johh/three-effectcomposer';
+import { default as CSM } from '../../lib/utils/three-csm.module.js';
 import { Stats } from '../../lib/utils/Stats';
 import { InputManager } from './InputManager';
 import { SBObject } from '../objects/SBObject';
@@ -9,9 +10,10 @@ import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import { Path } from '../objects/Path';
+import { LoadingManager } from './LoadingManager';
 export declare class World {
     renderer: THREE.WebGLRenderer;
-    camera: THREE.Camera;
+    camera: THREE.PerspectiveCamera;
     composer: EffectComposer;
     stats: Stats;
     graphicsWorld: THREE.Scene;
@@ -30,6 +32,8 @@ export declare class World {
     inputManager: InputManager;
     cameraOperator: CameraOperator;
     timeScaleTarget: number;
+    csm: CSM;
+    loadingManager: LoadingManager;
     objects: SBObject[];
     characters: Character[];
     balls: any[];
