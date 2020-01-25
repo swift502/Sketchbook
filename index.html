@@ -31,114 +31,18 @@
     <script>
         const SB = Sketchbook;
 
-        //
-        // 1. Initialization
-        //
-
-        // Instantiate loaders
-        const gltfLoader = new SB.GLTFLoader();
-        let loadingTracker = [];
-
         // Initialize sketchbook
         let world = new SB.World();
-        // world.addFloor();
 
         // Setup camera
-        world.cameraOperator.theta = 0;
+        world.cameraOperator.theta = 90;
         world.cameraOperator.phi = 10;
 
         // World
-        loadGLTF('build/assets/world.glb', function(gltf)
+        world.loadingManager.loadGLTF('build/assets/world.glb', function(gltf)
         {
             world.loadScene(gltf);
-
-                    // Player
-            loadGLTF('build/assets/boxman.glb', function(gltf)
-            {
-                let player = new SB.Character(gltf);
-                player.setPosition(0, 20, -5);
-                world.add(player);
-                player.takeControl();
-
-                // Car
-                loadGLTF('build/assets/car.glb', function(gltf)
-                {
-                    let car = new SB.Car(gltf);
-                    car.setPosition(0, 20, 0);
-                    world.add(car);
-
-                    
-                    player.teleportToVehicle(car, car.seats[0]);
-                    player.startControllingVehicle(car, car.seats[0]);
-                });
-            });
         });
-
-        // Helicopter
-        loadGLTF('build/assets/heli.glb', function(gltf)
-        {
-            let heli = new SB.Helicopter(gltf);
-            heli.setPosition(5, 20, 0);
-            world.add(heli);
-        });
-
-        // Airplane
-        loadGLTF('build/assets/airplane.glb', function(gltf)
-        {
-            let plane = new SB.Airplane(gltf);
-            plane.setPosition(-5, 15, 0);
-            world.add(plane);
-        });
-
-        //
-        // 2. Functions
-        //
-
-        function loadGLTF(path, onLoadingFinished)
-        {
-            startLoading(path);
-
-            gltfLoader.load(path,
-            function ( gltf ) {
-                onLoadingFinished(gltf);
-                doneLoading(path);
-            },
-            function ( xhr ) {
-                // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-            },
-            function ( error ) {
-                console.error(error);
-            });
-        }
-
-        function startLoading(path)
-        {
-            loadingTracker[path] = true;
-
-            document.getElementById('loader').style.display = 'flex';
-            document.getElementById('ui-container').style.display = 'none';
-        }
-
-        function doneLoading(path)
-        {
-            loadingTracker[path] = false;
-
-            let done = true;
-            for (const key in loadingTracker) {
-                if (loadingTracker.hasOwnProperty(key)) {
-                    const stillLoading = loadingTracker[key];
-                    if (stillLoading) done = false;
-                }
-            }
-
-            if(done)
-            {
-                // Hide loader
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('ui-container').style.display = 'block';
-            }
-        }
-        
     </script>
 </body>
 </html>

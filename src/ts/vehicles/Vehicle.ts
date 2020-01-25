@@ -9,6 +9,7 @@ import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
 import * as Utils from '../core/Utilities';
 import { Object3D } from 'three';
+import { CollisionGroups } from '../enums/CollisionGroups';
 
 export abstract class Vehicle extends THREE.Object3D
 {
@@ -27,6 +28,7 @@ export abstract class Vehicle extends THREE.Object3D
 
     // TODO: remake to a Sketchbook Object
     public collision: CANNON.Body;
+
     // public model: any;
     public materials: THREE.Material[] = [];
     private modelContainer: THREE.Group;
@@ -42,12 +44,12 @@ export abstract class Vehicle extends THREE.Object3D
         handlingSetup.axleLocal = new CANNON.Vec3(-1, 0, 0);
         handlingSetup.directionLocal = new CANNON.Vec3(0, -1, 0);
 
-        // Collision body
-        this.collision = new CANNON.Body({
-            mass: 50
-        });
+        // Physics mat
         let mat = new CANNON.Material('Mat');
         mat.friction = 0.01;
+
+        // Collision body
+        this.collision = new CANNON.Body({ mass: 50 });
         this.collision.material = mat;
 
         // Read GLTF
@@ -137,6 +139,11 @@ export abstract class Vehicle extends THREE.Object3D
         }
     }
 
+    public allowSleep(value: boolean): void
+    {
+        this.collision.allowSleep = value;
+    }
+
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
     {
         // Free camera
@@ -210,6 +217,7 @@ export abstract class Vehicle extends THREE.Object3D
 
     public inputReceiverInit(): void
     {
+        this.collision.allowSleep = false;
         this.world.cameraOperator.setRadius(3);
     }
 
@@ -412,6 +420,15 @@ export abstract class Vehicle extends THREE.Object3D
                             child.visible = false;
 
                             let phys = new CANNON.Box(new CANNON.Vec3(child.scale.x, child.scale.y, child.scale.z));
+                            phys.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+                            this.collision.addShape(phys, new CANNON.Vec3(child.position.x, child.position.y, child.position.z));
+                        }
+                        else if (child.userData.shape === 'sphere')
+                        {
+                            child.visible = false;
+
+                            let phys = new CANNON.Sphere(child.scale.x);
+                            phys.collisionFilterGroup = CollisionGroups.TrimeshColliders;
                             this.collision.addShape(phys, new CANNON.Vec3(child.position.x, child.position.y, child.position.z));
                         }
                     }

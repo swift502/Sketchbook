@@ -266,8 +266,8 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         body.velocity.y += (velLength1 * this.lastDrag + speedModifier) * forward.y * this.enginePower;
         body.velocity.z += (velLength1 * this.lastDrag + speedModifier) * forward.z * this.enginePower;
 
-        document.getElementById('car-debug').innerHTML = 'Speed: ' + Utils.round(currentSpeed, 2) + '';
-        document.getElementById('car-debug').innerHTML += '<br>' + 'Power output: ' + Utils.round(velLength1 * this.lastDrag, 2) + '';
+        // document.getElementById('car-debug').innerHTML = 'Speed: ' + Utils.round(currentSpeed, 2) + '';
+        // document.getElementById('car-debug').innerHTML += '<br>' + 'Power output: ' + Utils.round(velLength1 * this.lastDrag, 2) + '';
 
         // Drag
         let velLength2 = body.velocity.length();
@@ -284,8 +284,8 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         body.velocity.y += up.y * lift;
         body.velocity.z += up.z * lift;
 
-        document.getElementById('car-debug').innerHTML += '<br>' + 'Drag: ' + Utils.round(drag, 3) + '';
-        document.getElementById('car-debug').innerHTML += '<br>' + 'Lift: ' + Utils.round(lift, 3) + '';
+        // document.getElementById('car-debug').innerHTML += '<br>' + 'Drag: ' + Utils.round(drag, 3) + '';
+        // document.getElementById('car-debug').innerHTML += '<br>' + 'Lift: ' + Utils.round(lift, 3) + '';
 
         // Angular damping
         body.angularVelocity.x = THREE.Math.lerp(body.angularVelocity.x, body.angularVelocity.x * 0.98, flightModeInfluence);

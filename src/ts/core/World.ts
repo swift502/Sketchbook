@@ -25,6 +25,11 @@ import * as Utils from './Utilities';
 import { TrimeshPhysics } from '../objects/object_physics/TrimeshPhysics';
 import { Grass } from '../objects/Grass';
 import { Path } from '../objects/Path';
+import { CollisionGroups } from '../enums/CollisionGroups';
+import { LoadingManager } from './LoadingManager';
+import { Car } from '../vehicles/Car';
+import { Airplane } from '../vehicles/Airplane';
+import { Helicopter } from '../vehicles/Helicopter';
 
 export class World
 {
@@ -51,6 +56,7 @@ export class World
     public cameraOperator: CameraOperator;
     public timeScaleTarget: number;
     public csm: CSM;
+    public loadingManager: LoadingManager;
 
     public objects: SBObject[];
     public characters: Character[];
@@ -67,6 +73,8 @@ export class World
         {
             Detector.addGetWebGLMessage();
         }
+
+        this.loadingManager = new LoadingManager();
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer();
@@ -115,7 +123,7 @@ export class World
             far: 300,
             lightIntensity: 0.6,
             cascades: 4,
-            shadowMapSize: 2048,
+            shadowMapSize: 1024,
             camera: this.camera,
             parent: this.graphicsWorld,
             mode: 'custom',
@@ -137,6 +145,7 @@ export class World
         this.physicsWorld.gravity.set(0, -9.81, 0);
         this.physicsWorld.broadphase = new CANNON.SAPBroadphase(this.physicsWorld);
         this.physicsWorld.solver.iterations = 10;
+        this.physicsWorld.allowSleep = true;
 
         this.parallelPairs = [];
         this.physicsFrameRate = 60;
@@ -241,6 +250,23 @@ export class World
 
         this.csm.update(this.camera.matrix);
         this.csm.lightDirection = new THREE.Vector3(-this.sky.sun.position.x, -this.sky.sun.position.y, -this.sky.sun.position.z).normalize();
+
+        let awake = 0;
+        let sleepy = 0;
+        let asleep = 0;
+        this.physicsWorld.bodies.forEach((body) =>
+        {
+            if (body.sleepState === 0) awake++;
+            if (body.sleepState === 1) sleepy++;
+            if (body.sleepState === 2) asleep++;
+        });
+
+        document.getElementById('car-debug').innerHTML = '';
+        document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
+        document.getElementById('car-debug').innerHTML += '<br>';
+        document.getElementById('car-debug').innerHTML += 'sleepy: ' + sleepy;
+        document.getElementById('car-debug').innerHTML += '<br>';
+        document.getElementById('car-debug').innerHTML += 'asleep: ' + asleep;
     }
 
     public updatePhysics(timeStep: number): void
@@ -381,6 +407,10 @@ export class World
                                 phys2.physical.quaternion.copy(Utils.cannonQuat(child.quaternion));
                                 phys2.physical.computeAABB();
 
+                                phys2.physical.shapes.forEach((shape) => {
+                                    shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+                                });
+
                                 let SBobj = new SBObject();
                                 SBobj.setPhysics(phys2);
 
@@ -409,6 +439,51 @@ export class World
                         }
 
                         this.paths[pathName].addNode(child);
+                    }
+
+                    if (child.userData.data === 'spawn')
+                    {
+                        if (child.userData.type === 'car')
+                        {
+                            this.loadingManager.loadGLTF('build/assets/car.glb', (model: any) =>
+                            {
+                                let car = new Car(model);
+                                car.setPosition(child.position.x, child.position.y + 1, child.position.z);
+                                car.collision.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                this.add(car);
+                            });
+                        }
+                        else if (child.userData.type === 'airplane')
+                        {
+                            this.loadingManager.loadGLTF('build/assets/airplane.glb', (model: any) =>
+                            {
+                                let airplane = new Airplane(model);
+                                airplane.setPosition(child.position.x, child.position.y + 1, child.position.z);
+                                airplane.collision.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                this.add(airplane);
+                            });
+                        }
+                        else if (child.userData.type === 'heli')
+                        {
+                            this.loadingManager.loadGLTF('build/assets/heli.glb', (model: any) =>
+                            {
+                                let heli = new Helicopter(model);
+                                heli.setPosition(child.position.x, child.position.y + 1, child.position.z);
+                                heli.collision.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                this.add(heli);
+                            });
+                        }
+                        else if (child.userData.type === 'player')
+                        {
+                            this.loadingManager.loadGLTF('build/assets/boxman.glb', (model) =>
+                            {
+                                let player = new Character(model);
+                                player.setPosition(child.position.x, child.position.y, child.position.z);
+                                this.add(player);
+                                player.setOrientation(new THREE.Vector3(1, 0, 0), true);
+                                player.takeControl();
+                            });
+                        }
                     }
                 }
             }
@@ -519,11 +594,15 @@ export class World
             {
                 if (enabled)
                 {
-                    this.sky.sun.castShadow = true;
+                    this.csm.lights.forEach((light) => {
+                        light.castShadow = true;
+                    });
                 }
                 else
                 {
-                    this.sky.sun.castShadow = false;
+                    this.csm.lights.forEach((light) => {
+                        light.castShadow = false;
+                    });
                 }
             });
         graphicsFolder.add(this.params, 'FXAA');

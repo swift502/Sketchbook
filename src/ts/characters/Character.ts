@@ -21,6 +21,7 @@ import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
 import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
 import { Sitting } from './character_states/Sitting';
 import { Vehicle } from '../vehicles/Vehicle';
+import { CollisionGroups } from '../enums/CollisionGroups';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -135,6 +136,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
             segments: 8,
             friction: 0.1
         });
+        // capsulePhysics.physical.collisionFilterMask = ~CollisionGroups.Trimesh;
+        capsulePhysics.physical.shapes.forEach((shape) => {
+            shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+        });
+        capsulePhysics.physical.allowSleep = false;
         this.characterCapsule = new SBObject();
         this.characterCapsule.setPhysics(capsulePhysics);
 
@@ -662,9 +668,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.setState(new Sitting(this));
     }
 
-    public startControllingVehicle(vehicle: any, seat: any): void
+    public startControllingVehicle(vehicle: IControllable, seat: any): void
     {
         this.controlledObject = vehicle;
+        this.controlledObject.allowSleep(true);
         vehicle.inputReceiverInit();
 
         this.controlledObjectSeat = seat;
@@ -674,6 +681,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public exitVehicle(): void
     {
         this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
+        this.controlledObject.allowSleep(false);
         this.controlledObject.controllingCharacter = undefined;
         this.controlledObject.resetControls();
         this.controlledObject = undefined;
@@ -688,7 +696,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
         const end = new CANNON.Vec3(body.position.x, body.position.y - character.rayCastLength - character.raySafeOffset, body.position.z);
         // Raycast options
         const rayCastOptions = {
-            collisionFilterMask: ~2, /* cast against everything except second collision group (player) */
+            collisionFilterMask: CollisionGroups.Default,
             skipBackfaces: true      /* ignore back faces */
         };
         // Cast the ray

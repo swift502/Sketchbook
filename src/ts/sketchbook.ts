@@ -44,3 +44,4 @@ export { World } from './core/World';
 export let THREE = THREEImport;
 export let CANNON = CANNONImport;
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+export { LoadingManager } from './core/LoadingManager';

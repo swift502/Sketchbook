@@ -3,13 +3,14 @@ import { Noise } from '../../lib/utils/perlin.js';
 import { GrassShader } from '../../lib/shaders/GrassShader';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { World } from '../core/World';
+import { LOD } from 'three';
 
 export class Grass implements IWorldEntity
 {
     public groundMaterial: THREE.Material;
     public grassMaterial: THREE.Material;
 
-    private meshes: THREE.Mesh[] = [];
+    private meshes: any[] = [];
 
     constructor(transform: any)
     {
@@ -171,8 +172,15 @@ export class Grass implements IWorldEntity
         });
 
         let grassMesh = new THREE.Mesh(instanced_geometry, this.grassMaterial);
-        grassMesh.position.copy(transform.position);
-        this.meshes.push(grassMesh);
+        // grassMesh.position.copy(transform.position);
+
+        let grassLod = new THREE.LOD();
+        grassLod.addLevel(grassMesh, 0);
+        grassLod.addLevel(new THREE.Mesh(), 30);
+
+        grassLod.position.copy(transform.position);
+
+        this.meshes.push(grassLod);
     }
 
     public addToWorld(world: World): void

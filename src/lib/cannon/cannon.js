@@ -1,4 +1,4 @@
-// Mon, 30 Dec 2019 18:09:49 GMT
+// Sat, 25 Jan 2020 14:22:34 GMT
 
 /*
  * Copyright (c) 2015 cannon.js Authors
@@ -1392,6 +1392,10 @@ Ray.prototype.intersectBody = function (body, result) {
         var shape = body.shapes[i];
 
         if(checkCollisionResponse && !shape.collisionResponse){
+            continue; // Skip
+        }
+
+        if((this.collisionFilterGroup & shape.collisionFilterMask)===0 || (shape.collisionFilterGroup & this.collisionFilterMask)===0){
             continue; // Skip
         }
 
@@ -5609,7 +5613,7 @@ function Body(options){
      * @type {Number}
      * @default 0.1
      */
-    this.sleepSpeedLimit = typeof(options.sleepSpeedLimit) !== 'undefined' ? options.sleepSpeedLimit : 0.1;
+    this.sleepSpeedLimit = typeof(options.sleepSpeedLimit) !== 'undefined' ? options.sleepSpeedLimit : 0.03;
 
     /**
      * If the body has been sleepy for this sleepTimeLimit seconds, it is considered sleeping.
@@ -6494,6 +6498,9 @@ RaycastVehicle.prototype.getVehicleAxisWorld = function(axisIndex, result){
 };
 
 RaycastVehicle.prototype.updateVehicle = function(timeStep){
+
+    if (this.chassisBody.sleepState > 1) return;
+
     var wheelInfos = this.wheelInfos;
     var numWheels = wheelInfos.length;
     var chassisBody = this.chassisBody;
@@ -11912,7 +11919,11 @@ Narrowphase.prototype.getContacts = function(p1, p2, world, result, oldcontacts,
                 xj.vadd(bj.position, xj);
                 var sj = bj.shapes[j];
 
-                if(!((si.collisionFilterMask & sj.collisionFilterGroup) && (sj.collisionFilterMask & si.collisionFilterGroup))){
+                // if(!((si.collisionFilterMask & sj.collisionFilterGroup) && (sj.collisionFilterMask & si.collisionFilterGroup))){
+                //     continue;
+                // }
+
+                if((si.collisionFilterGroup & sj.collisionFilterMask)===0 || (sj.collisionFilterGroup & si.collisionFilterMask)===0){
                     continue;
                 }
 
