@@ -671,7 +671,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public startControllingVehicle(vehicle: IControllable, seat: any): void
     {
         this.controlledObject = vehicle;
-        this.controlledObject.allowSleep(true);
+        this.controlledObject.allowSleep(false);
         vehicle.inputReceiverInit();
 
         this.controlledObjectSeat = seat;
@@ -681,7 +681,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public exitVehicle(): void
     {
         this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
-        this.controlledObject.allowSleep(false);
+        this.controlledObject.allowSleep(true);
         this.controlledObject.controllingCharacter = undefined;
         this.controlledObject.resetControls();
         this.controlledObject = undefined;
@@ -848,7 +848,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
                 world.csm.setupMaterial(mat);
             });
 
-            world.graphicsWorld.add(this.help1);
+            // world.graphicsWorld.add(this.help1);
             // world.graphicsWorld.add(this.help2);
             // world.graphicsWorld.add(this.help3);
         }

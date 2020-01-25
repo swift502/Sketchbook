@@ -8,7 +8,6 @@ import { VehicleSeat } from './VehicleSeat';
 import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
 import * as Utils from '../core/Utilities';
-import { Object3D } from 'three';
 import { CollisionGroups } from '../enums/CollisionGroups';
 
 export abstract class Vehicle extends THREE.Object3D
@@ -142,6 +141,11 @@ export abstract class Vehicle extends THREE.Object3D
     public allowSleep(value: boolean): void
     {
         this.collision.allowSleep = value;
+
+        if (value === false)
+        {
+            this.collision.wakeUp();
+        }
     }
 
     public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
@@ -305,7 +309,7 @@ export abstract class Vehicle extends THREE.Object3D
             world.graphicsWorld.add(this);
             // world.physicsWorld.addBody(this.collision);
             this.rayCastVehicle.addToWorld(world.physicsWorld);
-            world.graphicsWorld.add(this.help);
+            // world.graphicsWorld.add(this.help);
 
             this.wheels.forEach((wheel) =>
             {
