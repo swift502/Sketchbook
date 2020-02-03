@@ -159,10 +159,10 @@ export class CameraOperator implements IInputReceiver
         // this.world.dirLight.target = this.world.camera;
     }
 
-    public inputReceiverUpdate(): void
+    public inputReceiverUpdate(timeStep: number): void
     {
         // Set fly speed
-        let speed = this.movementSpeed * (this.actions.fast.isPressed ? 10 : 1);
+        let speed = this.movementSpeed * (this.actions.fast.isPressed ? 600 : 60);
 
         const elements = this.world.cameraOperator.camera.matrix.elements;
         let up = new THREE.Vector3(elements[4], elements[5], elements[6]);
@@ -173,8 +173,8 @@ export class CameraOperator implements IInputReceiver
         this.forwardVelocity = THREE.Math.lerp(this.forwardVelocity, +this.actions.forward.isPressed - +this.actions.back.isPressed, 0.3);
         this.rightVelocity = THREE.Math.lerp(this.rightVelocity, +this.actions.right.isPressed - +this.actions.left.isPressed, 0.3);
 
-        this.world.cameraOperator.target.add(up.multiplyScalar(speed * this.upVelocity));
-        this.world.cameraOperator.target.add(forward.multiplyScalar(speed * this.forwardVelocity));
-        this.world.cameraOperator.target.add(right.multiplyScalar(speed * this.rightVelocity));
+        this.world.cameraOperator.target.add(up.multiplyScalar(speed * timeStep * this.upVelocity));
+        this.world.cameraOperator.target.add(forward.multiplyScalar(speed * timeStep * this.forwardVelocity));
+        this.world.cameraOperator.target.add(right.multiplyScalar(speed * timeStep * this.rightVelocity));
     }
 }

@@ -213,7 +213,7 @@ export let WaterShader = {
     float heightMapTracing(vec3 ori, vec3 dir, out vec3 p) {  
 
       vec3 oriComp = ori;
-      oriComp.y -= vWorldPosition.y;
+      oriComp.y -= vWorldPosition.y - SEA_HEIGHT;
 
       float tm = 0.0;
       float tx = 1000.0;

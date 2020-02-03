@@ -150,7 +150,7 @@ export class World
         this.parallelPairs = [];
         this.physicsFrameRate = 60;
         this.physicsFrameTime = 1 / this.physicsFrameRate;
-        this.physicsMaxPrediction = this.physicsFrameTime * 2;
+        this.physicsMaxPrediction = this.physicsFrameRate;
 
         // RenderLoop
         this.clock = new THREE.Clock();
