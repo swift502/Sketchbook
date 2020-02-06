@@ -83,7 +83,7 @@ export class CameraOperator implements IInputReceiver
     {
         if (this.followMode === true)
         {
-            this.camera.position.y = THREE.Math.clamp(this.camera.position.y, this.target.y, Number.POSITIVE_INFINITY);
+            this.camera.position.y = THREE.MathUtils.clamp(this.camera.position.y, this.target.y, Number.POSITIVE_INFINITY);
             this.camera.lookAt(this.target);
             let newPos = this.target.clone().add(new THREE.Vector3().subVectors(this.camera.position, this.target).normalize().multiplyScalar(this.targetRadius));
             this.camera.position.x = newPos.x;
@@ -92,7 +92,7 @@ export class CameraOperator implements IInputReceiver
         }
         else 
         {
-            this.radius = THREE.Math.lerp(this.radius, this.targetRadius, 0.1);
+            this.radius = THREE.MathUtils.lerp(this.radius, this.targetRadius, 0.1);
     
             this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
             this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 180);
@@ -169,9 +169,9 @@ export class CameraOperator implements IInputReceiver
         let forward = new THREE.Vector3(-elements[8], -elements[9], -elements[10]);
         let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
 
-        this.upVelocity = THREE.Math.lerp(this.upVelocity, +this.actions.up.isPressed - +this.actions.down.isPressed, 0.3);
-        this.forwardVelocity = THREE.Math.lerp(this.forwardVelocity, +this.actions.forward.isPressed - +this.actions.back.isPressed, 0.3);
-        this.rightVelocity = THREE.Math.lerp(this.rightVelocity, +this.actions.right.isPressed - +this.actions.left.isPressed, 0.3);
+        this.upVelocity = THREE.MathUtils.lerp(this.upVelocity, +this.actions.up.isPressed - +this.actions.down.isPressed, 0.3);
+        this.forwardVelocity = THREE.MathUtils.lerp(this.forwardVelocity, +this.actions.forward.isPressed - +this.actions.back.isPressed, 0.3);
+        this.rightVelocity = THREE.MathUtils.lerp(this.rightVelocity, +this.actions.right.isPressed - +this.actions.left.isPressed, 0.3);
 
         this.world.cameraOperator.target.add(up.multiplyScalar(speed * timeStep * this.upVelocity));
         this.world.cameraOperator.target.add(forward.multiplyScalar(speed * timeStep * this.forwardVelocity));

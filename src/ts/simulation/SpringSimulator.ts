@@ -42,8 +42,8 @@ export class SpringSimulator extends SimulatorBase
         this.generateFrames(timeStep);
 
         // Return values interpolated between cached frames
-        this.position = THREE.Math.lerp(this.cache[0].position, this.cache[1].position, this.offset / this.frameTime);
-        this.velocity = THREE.Math.lerp(this.cache[0].velocity, this.cache[1].velocity, this.offset / this.frameTime);
+        this.position = THREE.MathUtils.lerp(this.cache[0].position, this.cache[1].position, this.offset / this.frameTime);
+        this.velocity = THREE.MathUtils.lerp(this.cache[0].velocity, this.cache[1].velocity, this.offset / this.frameTime);
     }
 
     /**

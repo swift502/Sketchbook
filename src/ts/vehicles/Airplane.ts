@@ -181,10 +181,10 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
         // Rotation controls influence
         let flightModeInfluence = currentSpeed / 10;
-        flightModeInfluence = THREE.Math.clamp(flightModeInfluence, 0, 1);
+        flightModeInfluence = THREE.MathUtils.clamp(flightModeInfluence, 0, 1);
 
         let lowerMassInfluence = (currentSpeed - 7) / 3;
-        lowerMassInfluence = THREE.Math.clamp(lowerMassInfluence, 0, 1);
+        lowerMassInfluence = THREE.MathUtils.clamp(lowerMassInfluence, 0, 1);
         this.collision.mass = 50 * (1 - (lowerMassInfluence * 0.8));
 
         // Rotation stabilization
@@ -197,7 +197,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         rotStabVelocity.w *= 0.3;
         let rotStabEuler = new THREE.Euler().setFromQuaternion(rotStabVelocity);
 
-        let rotStabInfluence = THREE.Math.clamp(velLength1 - 1, 0, 1);  // Only with speed greater than 1 UPS
+        let rotStabInfluence = THREE.MathUtils.clamp(velLength1 - 1, 0, 1);  // Only with speed greater than 1 UPS
         rotStabInfluence *= (this.rayCastVehicle.numWheelsOnGround > 0 && currentSpeed < 0 ? 0 : 1);    // Reverse fix
         let loopFix = (this.actions.throttle.isPressed && currentSpeed > 0 ? 0 : 1);
         
@@ -279,7 +279,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
         // Lift
         let lift = Math.pow(velLength2, 1) * 0.01;
-        lift = THREE.Math.clamp(lift, 0, 0.1);
+        lift = THREE.MathUtils.clamp(lift, 0, 0.1);
         body.velocity.x += up.x * lift;
         body.velocity.y += up.y * lift;
         body.velocity.z += up.z * lift;
@@ -288,9 +288,9 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         // document.getElementById('car-debug').innerHTML += '<br>' + 'Lift: ' + Utils.round(lift, 3) + '';
 
         // Angular damping
-        body.angularVelocity.x = THREE.Math.lerp(body.angularVelocity.x, body.angularVelocity.x * 0.98, flightModeInfluence);
-        body.angularVelocity.y = THREE.Math.lerp(body.angularVelocity.y, body.angularVelocity.y * 0.98, flightModeInfluence);
-        body.angularVelocity.z = THREE.Math.lerp(body.angularVelocity.z, body.angularVelocity.z * 0.98, flightModeInfluence);
+        body.angularVelocity.x = THREE.MathUtils.lerp(body.angularVelocity.x, body.angularVelocity.x * 0.98, flightModeInfluence);
+        body.angularVelocity.y = THREE.MathUtils.lerp(body.angularVelocity.y, body.angularVelocity.y * 0.98, flightModeInfluence);
+        body.angularVelocity.z = THREE.MathUtils.lerp(body.angularVelocity.z, body.angularVelocity.z * 0.98, flightModeInfluence);
     }
 
     public onInputChange(): void

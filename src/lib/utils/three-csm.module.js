@@ -302,7 +302,7 @@ class CSM {
 
 	createLights() {
 		for(let i = 0; i < this.cascades; i++) {
-			let light = new DirectionalLight(0xffffff, this.lightIntensity);
+			let light = new DirectionalLight(0xfff8ed, this.lightIntensity);
 			light.castShadow = true;
 			light.shadow.mapSize.width = this.shadowMapSize;
 			light.shadow.mapSize.height = this.shadowMapSize;

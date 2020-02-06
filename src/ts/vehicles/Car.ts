@@ -113,17 +113,17 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
         // Steering
         const maxSteerVal = 0.8;
-        let speedFactor = THREE.Math.clamp(currentSpeed * 0.3, 1, Number.MAX_VALUE);
+        let speedFactor = THREE.MathUtils.clamp(currentSpeed * 0.3, 1, Number.MAX_VALUE);
 
         if (this.actions.right.isPressed)
         {
             let steering = Math.min(-maxSteerVal / speedFactor, -driftCorrection);
-            this.steeringSimulator.target = THREE.Math.clamp(steering, -maxSteerVal, maxSteerVal);
+            this.steeringSimulator.target = THREE.MathUtils.clamp(steering, -maxSteerVal, maxSteerVal);
         }
         else if (this.actions.left.isPressed)
         {
             let steering = Math.max(maxSteerVal / speedFactor, -driftCorrection);
-            this.steeringSimulator.target = THREE.Math.clamp(steering, -maxSteerVal, maxSteerVal);
+            this.steeringSimulator.target = THREE.MathUtils.clamp(steering, -maxSteerVal, maxSteerVal);
         }
         else this.steeringSimulator.target = 0;
         

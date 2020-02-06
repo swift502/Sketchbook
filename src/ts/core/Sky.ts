@@ -50,7 +50,7 @@ export class Sky extends THREE.Object3D
         this.attach(this.ambientLight);
 
         // Sun light with shadowmap
-        this.sun = new THREE.DirectionalLight(0xffffff, 0.6);
+        this.sun = new THREE.DirectionalLight(0xfff0c9);
         this.sun.castShadow = true;
 
         this.sun.shadow.mapSize.width = 2048;
