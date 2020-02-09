@@ -20,7 +20,7 @@ export class Sky extends THREE.Object3D
     private _theta: number = 225;
 
     private sunTarget: THREE.Object3D;
-    private ambientLight: THREE.AmbientLight;
+    // private ambientLight: THREE.AmbientLight;
     private skyMesh: THREE.Mesh;
     private skyMaterial: THREE.ShaderMaterial;
 
@@ -46,11 +46,17 @@ export class Sky extends THREE.Object3D
         this.attach(this.skyMesh);
 
         // Lighting
-        this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // soft white light
-        this.attach(this.ambientLight);
+        // this.ambientLight = new THREE.AmbientLight(0x8fa9c2); // soft white light
+        // this.attach(this.ambientLight);
+
+        let hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.8 );
+        hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
+        hemiLight.groundColor.setHSL( 0.095, 0.3, 0.75 );
+        hemiLight.position.set( 0, 50, 0 );
+        this.world.graphicsWorld.add( hemiLight );
 
         // Sun light with shadowmap
-        this.sun = new THREE.DirectionalLight(0xfff0c9);
+        this.sun = new THREE.DirectionalLight(0xffffff);
         this.sun.castShadow = true;
 
         this.sun.shadow.mapSize.width = 2048;

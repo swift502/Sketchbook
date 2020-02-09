@@ -81,7 +81,7 @@ export class World
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        // this.renderer.toneMappingExposure = 1.0;
+        this.renderer.toneMappingExposure = 1.0;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -122,9 +122,9 @@ export class World
         this.csm = new CSM({
             fov: 80,
             far: 300,
-            lightIntensity: 0.6,
+            lightIntensity: 3.0,
             cascades: 4,
-            shadowMapSize: 1024,
+            shadowMapSize: 2048,
             camera: this.camera,
             parent: this.graphicsWorld,
             mode: 'custom',
@@ -390,6 +390,8 @@ export class World
                             fragmentShader: WaterShader.fragmentShader,
                             vertexShader: WaterShader.vertexShader,
                         });
+
+                        child.material.transparent = true;
 
                         this['waterMat'] = child.material;
                     }

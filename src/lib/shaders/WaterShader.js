@@ -254,7 +254,7 @@ export let WaterShader = {
       // tracing
       vec3 p;
       heightMapTracing(cameraPos,dir,p);
-      vec3 dist = p - cameraPos;
+      vec3 dist = vWorldPosition - cameraPos;
       vec3 n = getNormal(
         p,
         dot(dist,dist) * EPSILON_NRM
@@ -268,7 +268,12 @@ export let WaterShader = {
       );
   
       // post
-      gl_FragColor = vec4(pow(color,vec3(0.75)), 1.0);
+      gl_FragColor = vec4(pow(color,vec3(0.8)), 1.0) * 1.2;
+
+      float fogfac = clamp(length(dist), 300.0, 600.0);
+      fogfac -= 300.0;
+      fogfac /= 300.0;
+      gl_FragColor.a = 1.0 - fogfac;
 
       #if defined( TONE_MAPPING )
         gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
