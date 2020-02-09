@@ -122,7 +122,7 @@ export class World
         this.csm = new CSM({
             fov: 80,
             far: 300,
-            lightIntensity: 3.0,
+            lightIntensity: 2.3,
             cascades: 4,
             shadowMapSize: 2048,
             camera: this.camera,

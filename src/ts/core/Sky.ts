@@ -16,8 +16,8 @@ export class Sky extends THREE.Object3D
         this.refreshSunPosition();
     }
 
-    private _phi: number = 60;
-    private _theta: number = 225;
+    private _phi: number = 50;
+    private _theta: number = 215;
 
     private sunTarget: THREE.Object3D;
     // private ambientLight: THREE.AmbientLight;
@@ -49,9 +49,9 @@ export class Sky extends THREE.Object3D
         // this.ambientLight = new THREE.AmbientLight(0x8fa9c2); // soft white light
         // this.attach(this.ambientLight);
 
-        let hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.8 );
+        let hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.9 );
         hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
-        hemiLight.groundColor.setHSL( 0.095, 0.3, 0.75 );
+        hemiLight.groundColor.setHSL( 0.095, 0.2, 0.75 );
         hemiLight.position.set( 0, 50, 0 );
         this.world.graphicsWorld.add( hemiLight );
 
