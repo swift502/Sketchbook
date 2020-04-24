@@ -7,6 +7,7 @@
 
 [![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
 [![badge](https://img.shields.io/travis/swift502/sketchbook?style=flat-square)](https://travis-ci.org/swift502/Sketchbook)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fswift502%2FSketchbook.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fswift502%2FSketchbook?ref=badge_shield)
 
 # Sketchbook
 
@@ -51,3 +52,7 @@ Check out the [Sketch](https://github.com/swift502/Sketch) template project to l
 6. Run `npm run build`
 7. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fswift502%2FSketchbook.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fswift502%2FSketchbook?ref=badge_large)
