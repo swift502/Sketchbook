@@ -11,6 +11,7 @@ import { Idle } from '../Idle';
 import { CloseVehicleDoorOutside } from './CloseVehicleDoorOutside';
 import * as Utils from '../../../core/Utilities';
 import { Vehicle } from 'src/ts/vehicles/Vehicle';
+import { Falling } from '../Falling';
 
 export class ExitingVehicle extends CharacterStateBase
 {
@@ -61,9 +62,15 @@ export class ExitingVehicle extends CharacterStateBase
             this.character.resetVelocity();
             this.character.resetOrientation();
             this.character.setPhysicsEnabled(true);
-            this.character.characterCapsule.physics.physical.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
 
-            if (this.anyDirection() || this.seat.door === undefined)
+            this.character.characterCapsule.physics.physical.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
+            this.character.feetRaycast();
+
+            if (!this.character.rayHasHit)
+            {
+                this.character.setState(new Falling(this.character));
+            }
+            else if (this.anyDirection() || this.seat.door === undefined)
             {
                 this.character.setState(new Idle(this.character));
             }
