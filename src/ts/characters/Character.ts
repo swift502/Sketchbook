@@ -134,7 +134,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
             height: 0.5,
             radius: 0.25,
             segments: 8,
-            friction: 0.1
+            friction: 0.0
         });
         // capsulePhysics.physical.collisionFilterMask = ~CollisionGroups.Trimesh;
         capsulePhysics.physical.shapes.forEach((shape) => {

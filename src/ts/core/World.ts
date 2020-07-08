@@ -122,7 +122,7 @@ export class World
         this.csm = new CSM({
             fov: 80,
             far: 300,
-            lightIntensity: 2.3,
+            lightIntensity: 2.5,
             cascades: 4,
             shadowMapSize: 2048,
             camera: this.camera,
@@ -636,7 +636,7 @@ export class World
             
         // Debug
         let skyFolder = gui.addFolder('Sky');
-        skyFolder.add(this.params, 'Phi', 0, 360).listen()
+        skyFolder.add(this.params, 'Phi', 0, 180).listen()
             .onChange((value) =>
             {
                 scope.sky.phi = value;
