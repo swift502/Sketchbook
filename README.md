@@ -10,8 +10,6 @@
 
 # Sketchbook
 
-:warning: Not in active development
-
 Simple web based game engine built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js) focused on third-person character controls and related gameplay mechanics.
 
 Mostly a playground for exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
@@ -51,3 +49,7 @@ Check out the [Sketch](https://github.com/swift502/Sketch) template project to l
 6. Run `npm run build`
 7. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
+Big thank you to the following github users for contributing to Sketcbook:
+
+- [aleqsunder](https://github.com/aleqsunder)
+- [danshuri](https://github.com/danshuri)
