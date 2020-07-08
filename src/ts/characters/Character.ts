@@ -808,6 +808,14 @@ export class Character extends THREE.Object3D implements IWorldEntity
             // Flatten velocity
             newVelocity.y = 0;
 
+            // Move on top of moving objects
+            if (character.rayResult.body.mass > 0)
+            {
+                let pointVelocity = new CANNON.Vec3();
+                character.rayResult.body.getVelocityAtWorldPoint(character.rayResult.hitPointWorld, pointVelocity);
+                newVelocity.add(Utils.threeVector(pointVelocity));
+            }
+
             // Measure the normal vector offset from direct "up" vector
             // and transform it into a matrix
             let up = new THREE.Vector3(0, 1, 0);
@@ -849,13 +857,14 @@ export class Character extends THREE.Object3D implements IWorldEntity
             {
                 // Flatten velocity
                 body.velocity.y = 0;
-
-                // Velocity needs to be at least as much as initJumpSpeed
-                if (body.velocity.lengthSquared() < character.initJumpSpeed ** 2)
-                {
-                    body.velocity.normalize();
-                    body.velocity.mult(character.initJumpSpeed, body.velocity);
-                }
+                let speed = Math.max(character.velocitySimulator.position.length() * 4, character.initJumpSpeed);
+                body.velocity = Utils.cannonVector(character.orientation.clone().multiplyScalar(speed));
+            }
+            else {
+                // Moving objects compensation
+                let add = new CANNON.Vec3();
+                character.rayResult.body.getVelocityAtWorldPoint(character.rayResult.hitPointWorld, add);
+                body.velocity.vsub(add, body.velocity);
             }
 
             // Add positive vertical velocity 
