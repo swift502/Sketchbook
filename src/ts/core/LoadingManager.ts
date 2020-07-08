@@ -1,17 +1,20 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SkeletonUtils } from '../../lib/utils/SkeletonUtils';
+import { WelcomeScreen} from "./WelcomeScreen";
 
 export class LoadingManager
 {
     public printProgress: boolean = false;
-
+    public welcomeScreen: WelcomeScreen;
     private gltfLoader: GLTFLoader;
-    private loadingTracker: {} = {}; 
+    private loadingTracker: {} = {};
+
     // private cache: {} = {};
 
     constructor()
     {
         this.gltfLoader = new GLTFLoader();
+        this.welcomeScreen = new WelcomeScreen();
     }
 
     public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
@@ -53,7 +56,6 @@ export class LoadingManager
     public startLoading(path: string): void
     {
         this.loadingTracker[path] = true;
-
         document.getElementById('loader').style.display = 'flex';
         document.getElementById('ui-container').style.display = 'none';
     }
@@ -61,7 +63,6 @@ export class LoadingManager
     public doneLoading(path: string): void
     {
         this.loadingTracker[path] = false;
-
         let done = true;
         for (const key in this.loadingTracker) {
             if (this.loadingTracker.hasOwnProperty(key)) {
@@ -75,6 +76,9 @@ export class LoadingManager
             // Hide loader
             document.getElementById('loader').style.display = 'none';
             document.getElementById('ui-container').style.display = 'block';
+
+            // Display Start Button
+            this.welcomeScreen.displayStartBtn();
         }
     }
 
