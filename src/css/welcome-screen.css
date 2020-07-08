@@ -1,0 +1,53 @@
+#welcome-screen {
+    position: absolute;
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    background: -webkit-linear-gradient(top, #568db5 0%, #ccdde8 100%);
+    background: -linear-gradient(top, #568db5 0%, #ccdde8 100%);
+    background: -moz-linear-gradient(top, #568db5 0%, #ccdde8 100%);
+}
+
+#text-wrapper {
+    width: 60%;
+}
+
+.welcome-title {
+    font-family: "Averia Sans Libre", cursive;
+    font-size: 4rem;
+    color: white;
+    margin: 0;
+}
+
+.welcome-description {
+    font-family: "Cutive Mono", monospace;
+    font-size: 1.4rem;
+    color: black;
+}
+
+#start-btn {
+    opacity: 0;
+    margin-top: 14px;
+    background: black;
+    font-family: "Cutive Mono", monospace;
+    font-size: 1.2rem;
+    border: none;
+    color: white;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+}
+
+#loader {
+    position: absolute;
+    margin-top: 80px;
+    z-index: 6;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-family: "Cutive Mono", monospace;
+    color: white;
+}

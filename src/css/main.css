@@ -136,24 +136,6 @@ body {
     transform: rotate(180deg);
 }
 
-#loader {
-    z-index: 6;
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    /* background: rgba(0,0,0,0.5); */
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-end;
-    padding: 20px;
-    font-size: 30px;
-    font-family: 'Averia Sans Libre', cursive;
-    color: white;
-    text-shadow: 0px 1px 1px black, 0px 0px 4px black;
-}
-
 #debug-menu
 {
     position: absolute;
