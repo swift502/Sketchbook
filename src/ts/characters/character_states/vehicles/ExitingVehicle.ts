@@ -9,6 +9,8 @@ import { IControllable } from '../../../interfaces/IControllable';
 import THREE = require('three');
 import { Idle } from '../Idle';
 import { CloseVehicleDoorOutside } from './CloseVehicleDoorOutside';
+import * as Utils from '../../../core/Utilities';
+import { Vehicle } from 'src/ts/vehicles/Vehicle';
 
 export class ExitingVehicle extends CharacterStateBase
 {
@@ -59,6 +61,7 @@ export class ExitingVehicle extends CharacterStateBase
             this.character.resetVelocity();
             this.character.resetOrientation();
             this.character.setPhysicsEnabled(true);
+            this.character.characterCapsule.physics.physical.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
 
             if (this.anyDirection() || this.seat.door === undefined)
             {
