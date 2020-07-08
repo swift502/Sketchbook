@@ -27,6 +27,7 @@ import { Grass } from '../objects/Grass';
 import { Path } from '../objects/Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { LoadingManager } from './LoadingManager';
+import { WelcomeScreen } from "./WelcomeScreen";
 import { Car } from '../vehicles/Car';
 import { Airplane } from '../vehicles/Airplane';
 import { Helicopter } from '../vehicles/Helicopter';
@@ -57,6 +58,7 @@ export class World
     public timeScaleTarget: number;
     public csm: CSM;
     public loadingManager: LoadingManager;
+    public welcomeScreen: WelcomeScreen;
 
     public objects: SBObject[];
     public characters: Character[];
@@ -75,6 +77,7 @@ export class World
         }
 
         this.loadingManager = new LoadingManager();
+        this.welcomeScreen = new WelcomeScreen();
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer();
