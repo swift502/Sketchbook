@@ -2,21 +2,22 @@ import * as CANNON from 'cannon';
 
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
-import { Wheel } from './Wheel';
-import _ = require('lodash');
-import { World } from '../core/World';
-import THREE = require('three');
+import * as THREE from 'three';
 import * as Utils from '../core/Utilities';
 import { SpringSimulator } from '../simulation/SpringSimulator';
+import { World } from '../core/World';
 
-export class Car extends Vehicle implements IControllable, IWorldEntity
-{
+export class Car extends Vehicle implements IControllable {
     public drive: string = 'awd';
+    get speed(): number {
+        return this._speed;
+    }
+    private _speed: number = 0;
 
     // private wheelsDebug: THREE.Mesh[] = [];
     private steeringWheel: THREE.Object3D;
+    private airSpinTimer: number = 0;
 
     private steeringSimulator: SpringSimulator;
     private gear: number = 1;
@@ -31,6 +32,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             radius: 0.25,
             suspensionStiffness: 20,
             suspensionRestLength: 0.35,
+            maxSuspensionTravel: 1,
             frictionSlip: 0.8,
             dampingRelaxation: 2,
             dampingCompression: 2,
@@ -38,8 +40,6 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         });
 
         this.readCarData(gltf);
-
-        this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
         this.actions = {
             'throttle': new KeyBinding('KeyW'),
@@ -57,14 +57,82 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
     {
         super.update(timeStep);
 
-        let quat = new THREE.Quaternion(
+        // @ts-ignore
+        const tiresHaveContact = this.rayCastVehicle.numWheelsOnGround > 0;
+        const quat = new THREE.Quaternion(
             this.collision.quaternion.x,
             this.collision.quaternion.y,
             this.collision.quaternion.z,
             this.collision.quaternion.w
         );
-        let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+        const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
+        const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
+
+        // Air spin
+        if (!tiresHaveContact) {
+
+            // Timer grows when car is off ground, resets once you touch the ground again
+            this.airSpinTimer += timeStep;
+        } else {
+            this.airSpinTimer = 0;
+        }
+
+        this._speed = this.collision.velocity.dot(Utils.cannonVector(forward));
+
+        // It takes 2 seconds until you have max spin air control since you leave the ground
+        let airSpinInfluence = THREE.MathUtils.clamp(this.airSpinTimer / 2, 0, 1);
+        airSpinInfluence *= THREE.MathUtils.clamp(this.speed, 0, 1);
+
+        // Flip over booster
         
+        const flipSpeedFactor = THREE.MathUtils.clamp(1 - this.speed, 0, 1);
+        const upFactor = (up.dot(new THREE.Vector3(0, -1, 0)) / 2) + 0.5;
+        const flipOverInfluence = flipSpeedFactor * upFactor * 3;
+
+        const maxAirSpinMagnitude = 2.0;
+        const airSpinAcceleration = 0.15;
+        const angVel = this.collision.angularVelocity;
+
+        const spinVectorForward = Utils.cannonVector(forward.clone());
+        const spinVectorRight = Utils.cannonVector(right.clone());
+
+        const effectiveSpinVectorForward = Utils.cannonVector(forward.clone().multiplyScalar(airSpinAcceleration * (airSpinInfluence + flipOverInfluence)));
+        const effectiveSpinVectorRight = Utils.cannonVector(right.clone().multiplyScalar(airSpinAcceleration * (airSpinInfluence)));
+
+        // Right
+        if (this.actions.right.isPressed && !this.actions.left.isPressed) {
+            if (angVel.dot(spinVectorForward) < maxAirSpinMagnitude) {
+                angVel.vadd(effectiveSpinVectorForward, angVel);
+            }
+        } else
+        // Left
+        if (this.actions.left.isPressed && !this.actions.right.isPressed) {
+            if (angVel.dot(spinVectorForward) > -maxAirSpinMagnitude) {
+                angVel.vsub(effectiveSpinVectorForward, angVel);
+            }
+        }
+
+        // Forwards
+        if (this.actions.throttle.isPressed && !this.actions.reverse.isPressed) {
+            if (angVel.dot(spinVectorRight) < maxAirSpinMagnitude) {
+                angVel.vadd(effectiveSpinVectorRight, angVel);
+            }
+        } else
+        // Backwards
+        if (this.actions.reverse.isPressed && !this.actions.throttle.isPressed) {
+            if (angVel.dot(spinVectorRight) > -maxAirSpinMagnitude) {
+                angVel.vsub(effectiveSpinVectorRight, angVel);
+            }
+        }
+        
+        // if (!this.actions.throttle.isPressed && !this.actions.reverse.isPressed)
+        // {
+        //     body.velocity.x *= 0.99;
+        //     body.velocity.y *= 0.99;
+        //     body.velocity.z *= 0.99;
+        // }
+
         const engineForce = 500;
         const maxGears = 5;
         const gearsMaxSpeeds = {
@@ -77,7 +145,6 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             '5': 22,
         };
         const velocity = new CANNON.Vec3().copy(this.collision.velocity);
-        const currentSpeed = velocity.dot(Utils.cannonVector(forward));
         velocity.normalize();
         let driftCorrection = Utils.getSignedAngleBetweenVectors(Utils.threeVector(velocity), forward);
 
@@ -92,14 +159,14 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
             // Transmission 
             if (this.actions.reverse.isPressed)
             {
-                const powerFactor = (gearsMaxSpeeds['R'] - currentSpeed) / Math.abs(gearsMaxSpeeds['R']);
+                const powerFactor = (gearsMaxSpeeds['R'] - this.speed) / Math.abs(gearsMaxSpeeds['R']);
                 const force = (engineForce / this.gear) * (Math.abs(powerFactor) ** 1);
 
                 this.applyEngineForce(force);
             }
             else
             {
-                const powerFactor = (gearsMaxSpeeds[this.gear] - currentSpeed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
+                const powerFactor = (gearsMaxSpeeds[this.gear] - this.speed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
 
                 if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
                 else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
@@ -113,7 +180,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
         // Steering
         const maxSteerVal = 0.8;
-        let speedFactor = THREE.MathUtils.clamp(currentSpeed * 0.3, 1, Number.MAX_VALUE);
+        let speedFactor = THREE.MathUtils.clamp(this.speed * 0.3, 1, Number.MAX_VALUE);
 
         if (this.actions.right.isPressed)
         {
@@ -129,12 +196,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         
         this.steeringSimulator.simulate(timeStep);
         this.setSteeringValue(this.steeringSimulator.position);
-        this.steeringWheel.rotation.z = -this.steeringSimulator.position * 2;
-
-        if (this.rayCastVehicle.numWheelsOnGround < 3 && Math.abs(this.collision.velocity.length()) < 0.1)
-        {
-            this.collision.quaternion.copy(this.collision.initQuaternion);
-        }
+        if (this.steeringWheel !== undefined) this.steeringWheel.rotation.z = -this.steeringSimulator.position * 2;
     }
 
     public shiftUp(): void
@@ -153,42 +215,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
         this.applyEngineForce(0);
     }
 
-    public physicsPreStep(body: CANNON.Body, car: Car): void
-    {
-        let quat = new THREE.Quaternion(
-            body.quaternion.x,
-            body.quaternion.y,
-            body.quaternion.z,
-            body.quaternion.w
-        );
-
-        let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
-        const tiresHaveContact = this.rayCastVehicle.numWheelsOnGround > 0;
-
-        // if (this.actions.right.isPressed && !tiresHaveContact)
-        // {
-        //     body.angularVelocity.x += forward.x * 0.2;
-        //     body.angularVelocity.y += forward.y * 0.2;
-        //     body.angularVelocity.z += forward.z * 0.2;
-        // }
-
-        // if (this.actions.left.isPressed && !tiresHaveContact)
-        // {
-        //     body.angularVelocity.x -= forward.x * 0.2;
-        //     body.angularVelocity.y -= forward.y * 0.2;
-        //     body.angularVelocity.z -= forward.z * 0.2;
-        // }
-
-        // if (!this.actions.throttle.isPressed && !this.actions.reverse.isPressed) 
-        // {
-        //     body.velocity.x *= 0.99;
-        //     body.velocity.y *= 0.99;
-        //     body.velocity.z *= 0.99;
-        // }
-    }
-
-    public onInputChange(): void
-    {
+    public onInputChange(): void {
         super.onInputChange();
 
         const brakeForce = 1000000;
@@ -237,7 +264,7 @@ export class Car extends Vehicle implements IControllable, IWorldEntity
 
     public readCarData(gltf: any): void
     {
-        gltf.scene.traverse((child) => {
+        gltf.scene.traverse((child: THREE.Object3D) => {
             if (child.hasOwnProperty('userData'))
             {
                 if (child.userData.hasOwnProperty('data'))
