@@ -60,14 +60,14 @@ export class EnteringVehicle extends CharacterStateBase
             this.character.startControllingVehicle(this.vehicle, this.seat);
             this.vehicle.onInputChange();
 
-            if (!this.vehicle.noDirectionPressed() || this.seat.door === undefined)
-            {
-                this.character.setState(new Driving(this.character, this.seat));
-            }
-            else
-            {
-                this.character.setState(new CloseVehicleDoorInside(this.character, this.seat));
-            }
+            // if (!this.vehicle.noDirectionPressed() || this.seat.door === undefined)
+            // {
+            this.character.setState(new Driving(this.character, this.seat));
+            // }
+            // else
+            // {
+            //     this.character.setState(new CloseVehicleDoorInside(this.character, this.seat));
+            // }
         }
 
         let factor = this.timer / this.animationLength;

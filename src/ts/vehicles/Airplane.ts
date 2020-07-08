@@ -53,12 +53,26 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
             'rollLeft': new KeyBinding('ArrowLeft', 'KeyA'),
             'rollRight': new KeyBinding('ArrowRight', 'KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
+            'view': new KeyBinding('KeyV'),
         };
 
         this.steeringSimulator = new SpringSimulator(60, 10, 0.6); 
         this.aileronSimulator = new SpringSimulator(60, 5, 0.6);
         this.elevatorSimulator = new SpringSimulator(60, 7, 0.6);
         this.rudderSimulator = new SpringSimulator(60, 10, 0.6);
+    }
+
+    public noDirectionPressed(): boolean
+    {
+        let result = 
+        !this.actions.throttle.isPressed &&
+        !this.actions.brake.isPressed &&
+        !this.actions.yawLeft.isPressed &&
+        !this.actions.yawRight.isPressed &&
+        !this.actions.rollLeft.isPressed &&
+        !this.actions.rollRight.isPressed;
+
+        return result;
     }
 
     public update(timeStep: number): void
@@ -306,6 +320,10 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         if (this.actions.wheelBrake.justReleased)
         {
             this.setBrake(0);
+        }
+        if (this.actions.view.justPressed)
+        {
+            this.toggleFirstPersonView();
         }
     }
 

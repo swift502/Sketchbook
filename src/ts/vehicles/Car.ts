@@ -48,9 +48,21 @@ export class Car extends Vehicle implements IControllable {
             'left': new KeyBinding('KeyA'),
             'right': new KeyBinding('KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
+            'view': new KeyBinding('KeyV'),
         };
 
         this.steeringSimulator = new SpringSimulator(60, 10, 0.6);
+    }
+
+    public noDirectionPressed(): boolean
+    {
+        let result = 
+        !this.actions.throttle.isPressed &&
+        !this.actions.reverse.isPressed &&
+        !this.actions.left.isPressed &&
+        !this.actions.right.isPressed;
+
+        return result;
     }
 
     public update(timeStep: number): void
@@ -231,6 +243,10 @@ export class Car extends Vehicle implements IControllable {
         if (this.actions.brake.justReleased)
         {
             this.setBrake(0, 'rwd');
+        }
+        if (this.actions.view.justPressed)
+        {
+            this.toggleFirstPersonView();
         }
     }
 

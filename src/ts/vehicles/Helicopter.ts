@@ -31,7 +31,17 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
             'rollLeft': new KeyBinding('ArrowLeft', 'KeyA'),
             'rollRight': new KeyBinding('ArrowRight', 'KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
+            'view': new KeyBinding('KeyV'),
         };
+    }
+
+    public noDirectionPressed(): boolean
+    {
+        let result = 
+        !this.actions.ascend.isPressed &&
+        !this.actions.descend.isPressed;
+
+        return result;
     }
 
     public update(timeStep: number): void
@@ -54,6 +64,16 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
         {
             rotor.rotateX(this.enginePower * timeStep * 30);
         });
+    }
+
+    public onInputChange(): void
+    {
+        super.onInputChange();
+
+        if (this.actions.view.justPressed)
+        {
+            this.toggleFirstPersonView();
+        }
     }
 
     public physicsPreStep(body: CANNON.Body, heli: Helicopter): void

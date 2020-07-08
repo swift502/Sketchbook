@@ -77,6 +77,11 @@ export abstract class Vehicle extends THREE.Object3D
         this.help = new THREE.AxesHelper(2);
     }
 
+    public noDirectionPressed(): boolean
+    {
+        return true;
+    }
+
     // public setModel(model: any): void
     // {
     //     this.modelContainer.remove(this.model);
@@ -157,12 +162,6 @@ export abstract class Vehicle extends THREE.Object3D
             this.world.cameraOperator.characterCaller = this.controllingCharacter;
             this.world.inputManager.setInputReceiver(this.world.cameraOperator);
         }
-        else if (code === 'KeyC')
-        {
-            this.firstPerson = true;
-            this.world.cameraOperator.setRadius(0, true);
-            this.controllingCharacter.modelContainer.visible = false;
-        }
         else
         {
             for (const action in this.actions) {
@@ -176,6 +175,26 @@ export abstract class Vehicle extends THREE.Object3D
                 }
             }
         }
+    }
+
+    public setFirstPersonView(value: boolean): void
+    {
+        this.firstPerson = value;
+        if (this.controllingCharacter !== undefined) this.controllingCharacter.modelContainer.visible = !value;
+
+        if (value)
+        {
+            this.world.cameraOperator.setRadius(0, true);
+        }
+        else
+        {
+            this.world.cameraOperator.setRadius(3, true);
+        }
+    }
+
+    public toggleFirstPersonView(): void
+    {
+        this.setFirstPersonView(!this.firstPerson);
     }
     
     public triggerAction(actionName: string, value: boolean): void
@@ -222,7 +241,7 @@ export abstract class Vehicle extends THREE.Object3D
     public inputReceiverInit(): void
     {
         this.collision.allowSleep = false;
-        this.world.cameraOperator.setRadius(3);
+        this.setFirstPersonView(false);
     }
 
     public inputReceiverUpdate(timeStep: number): void
@@ -248,17 +267,6 @@ export abstract class Vehicle extends THREE.Object3D
                 this.position.z
             );
         }
-    }
-
-    public noDirectionPressed(): boolean
-    {
-        let result = 
-        !this.actions.throttle.isPressed &&
-        !this.actions.reverse.isPressed &&
-        !this.actions.left.isPressed &&
-        !this.actions.right.isPressed;
-
-        return result;
     }
 
     public getMountPoint(character: Character): THREE.Vector3
