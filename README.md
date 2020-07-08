@@ -49,7 +49,7 @@ Check out the [Sketch](https://github.com/swift502/Sketch) template project to l
 6. Run `npm run build`
 7. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
-Big thank you to the following github users for contributing to Sketcbook:
+Big thank you to each of the following github users for contributing to Sketchbook:
 
 - [aleqsunder](https://github.com/aleqsunder)
 - [danshuri](https://github.com/danshuri)
