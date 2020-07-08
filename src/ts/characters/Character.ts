@@ -19,7 +19,7 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { VehicleSeat } from '../vehicles/VehicleSeat';
 import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
 import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
-import { Sitting } from './character_states/Sitting';
+import { Driving } from './character_states/vehicles/Driving';
 import { Vehicle } from '../vehicles/Vehicle';
 import { CollisionGroups } from '../enums/CollisionGroups';
 
@@ -665,17 +665,49 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.setPosition(seat.seatPoint.position.x, seat.seatPoint.position.y + 0.6, seat.seatPoint.position.z);
         this.quaternion.copy(seat.seatPoint.quaternion);
 
-        this.setState(new Sitting(this));
+        this.setState(new Driving(this, seat));
     }
 
     public startControllingVehicle(vehicle: IControllable, seat: any): void
     {
+        this.transferControls(vehicle);
+        this.resetControls();
+
         this.controlledObject = vehicle;
         this.controlledObject.allowSleep(false);
         vehicle.inputReceiverInit();
 
         this.controlledObjectSeat = seat;
         vehicle.controllingCharacter = this;
+    }
+
+    public transferControls(entity:IControllable): void
+    {
+        // This is horrible
+        // We're running through all actions of this character and the vehicle,
+        // comparing keycodes of actions and based on that triggering vehicle's actions
+        // Instead, vehicle should ask input manager what's the current state of the keyboard
+        // and read those values... TODO
+        for (const action1 in this.actions) {
+            if (this.actions.hasOwnProperty(action1)) {
+                for (const action2 in entity.actions) {
+                    if (entity.actions.hasOwnProperty(action2)) {
+
+                        let a1 = this.actions[action1];
+                        let a2 = entity.actions[action2];
+
+                        a1.eventCodes.forEach((code1) => {
+                            a2.eventCodes.forEach((code2) => {
+                                if (code1 === code2)
+                                {
+                                    entity.triggerAction(action2, a1.isPressed);
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+        }
     }
 
     public exitVehicle(): void

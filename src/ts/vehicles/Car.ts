@@ -70,8 +70,8 @@ export class Car extends Vehicle implements IControllable {
         const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 
         // Air spin
-        if (!tiresHaveContact) {
-
+        if (!tiresHaveContact)
+        {
             // Timer grows when car is off ground, resets once you touch the ground again
             this.airSpinTimer += timeStep;
         } else {

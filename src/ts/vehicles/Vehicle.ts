@@ -250,6 +250,17 @@ export abstract class Vehicle extends THREE.Object3D
         }
     }
 
+    public noDirectionPressed(): boolean
+    {
+        let result = 
+        !this.actions.throttle.isPressed &&
+        !this.actions.reverse.isPressed &&
+        !this.actions.left.isPressed &&
+        !this.actions.right.isPressed;
+
+        return result;
+    }
+
     public getMountPoint(character: Character): THREE.Vector3
     {
         return this.seats[0].entryPoint.position;

@@ -5,7 +5,7 @@ import
 import { Character } from '../../Character';
 import { IControllable } from '../../../interfaces/IControllable';
 import THREE = require('three');
-import { Sitting } from '../Sitting';
+import { Driving } from './Driving';
 import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { CloseVehicleDoorInside } from './CloseVehicleDoorInside';
@@ -58,10 +58,11 @@ export class EnteringVehicle extends CharacterStateBase
         {
             this.character.setPosition(this.endPosition.x, this.endPosition.y, this.endPosition.z);
             this.character.startControllingVehicle(this.vehicle, this.seat);
+            this.vehicle.onInputChange();
 
-            if (this.anyDirection() || this.seat.door === undefined)
+            if (!this.vehicle.noDirectionPressed() || this.seat.door === undefined)
             {
-                this.character.setState(new Sitting(this.character));
+                this.character.setState(new Driving(this.character, this.seat));
             }
             else
             {

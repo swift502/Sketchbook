@@ -5,7 +5,7 @@ import
 import { Character } from '../../Character';
 import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
-import { Sitting } from '../Sitting';
+import { Driving } from './Driving';
 
 export class CloseVehicleDoorInside extends CharacterStateBase
 {
@@ -40,7 +40,7 @@ export class CloseVehicleDoorInside extends CharacterStateBase
 
         if (this.timer > this.animationLength - timeStep)
         {
-            this.character.setState(new Sitting(this.character));
+            this.character.setState(new Driving(this.character, this.seat));
         }
     }
 }
