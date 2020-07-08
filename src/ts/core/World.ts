@@ -283,23 +283,8 @@ export class World
         {
             if (obj.physics.physical !== undefined)
             {
-                if (obj.physics.physical.position.y < -5)
-                {
-                    obj.physics.physical.position.x = 1.13;
-                    obj.physics.physical.position.y = 5;
-                    obj.physics.physical.position.z = -2.2;
-
-                    obj.physics.physical.interpolatedPosition.x = 1.13;
-                    obj.physics.physical.interpolatedPosition.y = 5;
-                    obj.physics.physical.interpolatedPosition.z = -2.2;
-                }
-
                 obj.position.copy(Utils.threeVector(obj.physics.physical.position));
                 obj.quaternion.copy(Utils.threeQuat(obj.physics.physical.quaternion));
-                
-                // entering vehicles
-                // obj.position.copy(obj.physics.physical.interpolatedPosition);
-                // obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
             }
         });
     }

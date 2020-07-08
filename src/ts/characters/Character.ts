@@ -722,18 +722,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
     public physicsPreStep(body: CANNON.Body, character: Character): void
     {
-        // // Player ray casting
-        // // Create ray
-        // const start = new CANNON.Vec3(body.position.x, body.position.y, body.position.z);
-        // const end = new CANNON.Vec3(body.position.x, body.position.y - character.rayCastLength - character.raySafeOffset, body.position.z);
-        // // Raycast options
-        // const rayCastOptions = {
-        //     collisionFilterMask: CollisionGroups.Default,
-        //     skipBackfaces: true      /* ignore back faces */
-        // };
-        // // Cast the ray
-        // character.rayHasHit = character.world.physicsWorld.raycastClosest(start, end, rayCastOptions, character.rayResult);
-
         character.feetRaycast();
 
         // Raycast debug
