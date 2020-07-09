@@ -54,27 +54,5 @@ export class ConvexCollider implements IPhysicsType
         physBox.material = mat;
 
         this.body = physBox;
-        // this.debugModel = this.getVisualModel({ visible: false, wireframe: true });
     }
-
-    // public getVisualModel(options: any): THREE.Mesh
-    // {
-    //     let defaults = {
-    //         visible: true,
-    //         wireframe: true
-    //     };
-    //     options = Utils.setDefaults(options, defaults);
-
-    //     let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
-    //     let visualBox = this.mesh.clone();
-    //     visualBox.material = material;
-    //     visualBox.visible = options.visible;
-    //     if (!options.wireframe)
-    //     {
-    //         visualBox.castShadow = true;
-    //         visualBox.receiveShadow = true;
-    //     }
-
-    //     return visualBox;
-    // }
 }

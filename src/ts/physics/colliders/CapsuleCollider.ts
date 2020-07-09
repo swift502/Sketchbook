@@ -42,27 +42,5 @@ export class CapsuleCollider implements IPhysicsType
         capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, -options.height / 2, 0));
 
         this.body = capsuleBody;
-        // this.visual = this.getVisualModel({ visible: false, wireframe: true });
     }
-
-    // public getVisualModel(options): THREE.Mesh
-    // {
-    //     let defaults = {
-    //         visible: true,
-    //         wireframe: true
-    //     };
-    //     options = Utils.setDefaults(options, defaults);
-
-    //     let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
-    //     let geometry = Utils.createCapsuleGeometry(this.options.radius, this.options.height, this.options.segments);
-    //     let visualCapsule = new THREE.Mesh(geometry, material);
-    //     visualCapsule.visible = options.visible;
-    //     if (!options.wireframe)
-    //     {
-    //         visualCapsule.castShadow = true;
-    //         visualCapsule.receiveShadow = true;
-    //     }
-
-    //     return visualCapsule;
-    // }
 }

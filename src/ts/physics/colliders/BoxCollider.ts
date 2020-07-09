@@ -40,27 +40,5 @@ export class BoxCollider implements IPhysicsType
         physBox.material = mat;
 
         this.body = physBox;
-        //this.visual = this.getVisualModel({ visible: false, wireframe: true });
     }
-
-    // public getVisualModel(options: any): THREE.Mesh
-    // {
-    //     let defaults = {
-    //         visible: true,
-    //         wireframe: true
-    //     };
-    //     options = Utils.setDefaults(options, defaults);
-
-    //     let geometry = new THREE.BoxGeometry(this.options.size.x * 2, this.options.size.y * 2, this.options.size.z * 2);
-    //     let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
-    //     let visualBox = new THREE.Mesh(geometry, material);
-    //     visualBox.visible = options.visible;
-    //     if (!options.wireframe)
-    //     {
-    //         visualBox.castShadow = true;
-    //         visualBox.receiveShadow = true;
-    //     }
-
-    //     return visualBox;
-    // }
 }

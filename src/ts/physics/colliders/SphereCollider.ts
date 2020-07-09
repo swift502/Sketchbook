@@ -35,28 +35,5 @@ export class SphereCollider implements IPhysicsType
         physSphere.material = mat;
 
         this.body = physSphere;
-        // this.debugModel = this.getVisualModel({ visible: false, wireframe: true });
     }
-
-    // public getVisualModel(options: any): THREE.Mesh
-    // {
-    //     let defaults = {
-    //         visible: true,
-    //         wireframe: true
-    //     };
-    //     options = Utils.setDefaults(options, defaults);
-
-    //     let geometry = new THREE.SphereGeometry(this.options.radius);
-    //     let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
-    //     let visualSphere = new THREE.Mesh(geometry, material);
-    //     visualSphere.visible = options.visible;
-
-    //     if (!options.wireframe)
-    //     {
-    //         visualSphere.castShadow = true;
-    //         visualSphere.receiveShadow = true;
-    //     }
-
-    //     return visualSphere;
-    // }
 }
