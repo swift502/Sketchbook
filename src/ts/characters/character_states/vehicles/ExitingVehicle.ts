@@ -30,7 +30,7 @@ export class ExitingVehicle extends CharacterStateBase
         this.vehicle = vehicle;
         this.seat = seat;
 
-        this.seat.openDoor();
+        this.seat.door?.open();
 
         this.startPosition.copy(this.character.position);
         this.endPosition.copy(seat.entryPoint.position);

@@ -639,7 +639,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     {
         this.resetControls();
 
-        if (seat.isDoorOpen())
+        if (seat.door?.rotation > 0.5)
         {
             this.setState(new EnteringVehicle(this, this.targetSeat));
         }

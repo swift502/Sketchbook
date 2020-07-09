@@ -12,6 +12,7 @@ import THREE = require('three');
 export class OpenVehicleDoor extends CharacterStateBase
 {
     private seat: VehicleSeat;
+    private hasOpenedDoor: boolean = false;
 
     constructor(character: Character, seat: VehicleSeat)
     {
@@ -40,9 +41,10 @@ export class OpenVehicleDoor extends CharacterStateBase
         let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
         this.character.setOrientation(forward);
 
-        if (this.timer > 0.3)
+        if (this.timer > 0.3 && !this.hasOpenedDoor)
         {
-            this.seat.openDoor();   
+            this.hasOpenedDoor = true;
+            this.seat.door?.open();   
         }
 
         if (this.timer > this.animationLength - timeStep)
