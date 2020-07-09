@@ -5,7 +5,7 @@ import { IControllable } from '../interfaces/IControllable';
 import { KeyBinding } from '../core/KeyBinding';
 import * as THREE from 'three';
 import * as Utils from '../core/Utilities';
-import { SpringSimulator } from '../simulation/SpringSimulator';
+import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { World } from '../core/World';
 
 export class Car extends Vehicle implements IControllable {

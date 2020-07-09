@@ -4,7 +4,7 @@ import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
-import { SpringSimulator } from '../simulation/SpringSimulator';
+import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { Euler } from 'three';
 import THREE = require('three');
 import * as Utils from '../core/Utilities';

@@ -1,6 +1,8 @@
 export interface IPhysicsType {
-    physical: CANNON.Body;
-    visual: THREE.Mesh;
+    body: CANNON.Body;
+    
+    // physical: CANNON.Body;
+    // visual: THREE.Mesh;
 
-    getVisualModel(options: any): THREE.Mesh;
+    // getVisualModel(options: any): THREE.Mesh;
 }

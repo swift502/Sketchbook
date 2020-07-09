@@ -1,16 +1,13 @@
 
 import * as Utils from '../core/Utilities';
-import { SBObject } from './SBObject';
 
-export class Item extends SBObject
+export class Item
 {
     public isItem: boolean;
     public health: any;
 
     constructor(options: {})
     {
-        super();
-
         let defaults = {
             health: 0,
         };

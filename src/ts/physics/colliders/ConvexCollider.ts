@@ -2,15 +2,17 @@ import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
 import { IPhysicsType } from '../../interfaces/IPhysicsType';
+import {Mesh, Vector3} from "three";
+import {Object3D} from "three";
 
-export class ConvexPhysics implements IPhysicsType
+export class ConvexCollider implements IPhysicsType
 {
     public mesh: any;
     public options: any;
-    public physical: CANNON.Body;
-    public visual: any;
+    public body: CANNON.Body;
+    public debugModel: any;
 
-    constructor(mesh, options)
+    constructor(mesh: Object3D, options: any)
     {
         this.mesh = mesh.clone();
 
@@ -31,11 +33,11 @@ export class ConvexPhysics implements IPhysicsType
             this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
         }
 
-        let cannonPoints = this.mesh.geometry.vertices.map((v) => {
+        let cannonPoints = this.mesh.geometry.vertices.map((v: Vector3) => {
             return new CANNON.Vec3( v.x, v.y, v.z );
         });
         
-        let cannonFaces = this.mesh.geometry.faces.map((f) => {
+        let cannonFaces = this.mesh.geometry.faces.map((f: any) => {
             return [f.a, f.b, f.c];
         });
 
@@ -51,28 +53,28 @@ export class ConvexPhysics implements IPhysicsType
 
         physBox.material = mat;
 
-        this.physical = physBox;
-        this.visual = this.getVisualModel({ visible: false, wireframe: true });
+        this.body = physBox;
+        // this.debugModel = this.getVisualModel({ visible: false, wireframe: true });
     }
 
-    public getVisualModel(options): THREE.Mesh
-    {
-        let defaults = {
-            visible: true,
-            wireframe: true
-        };
-        options = Utils.setDefaults(options, defaults);
+    // public getVisualModel(options: any): THREE.Mesh
+    // {
+    //     let defaults = {
+    //         visible: true,
+    //         wireframe: true
+    //     };
+    //     options = Utils.setDefaults(options, defaults);
 
-        let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
-        let visualBox = this.mesh.clone();
-        visualBox.material = material;
-        visualBox.visible = options.visible;
-        if (!options.wireframe)
-        {
-            visualBox.castShadow = true;
-            visualBox.receiveShadow = true;
-        }
+    //     let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
+    //     let visualBox = this.mesh.clone();
+    //     visualBox.material = material;
+    //     visualBox.visible = options.visible;
+    //     if (!options.wireframe)
+    //     {
+    //         visualBox.castShadow = true;
+    //         visualBox.receiveShadow = true;
+    //     }
 
-        return visualBox;
-    }
+    //     return visualBox;
+    // }
 }

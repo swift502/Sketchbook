@@ -16,13 +16,10 @@ import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
 import * as _ from 'lodash';
 import { InputManager } from './InputManager';
-import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
-import { BoxPhysics } from '../objects/object_physics/BoxPhysics';
 import * as Utils from './Utilities';
-import { TrimeshPhysics } from '../objects/object_physics/TrimeshPhysics';
 import { Grass } from '../objects/Grass';
 import { Path } from '../objects/Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
@@ -31,6 +28,8 @@ import { WelcomeScreen } from "./WelcomeScreen";
 import { Car } from '../vehicles/Car';
 import { Airplane } from '../vehicles/Airplane';
 import { Helicopter } from '../vehicles/Helicopter';
+import { BoxCollider } from '../physics/colliders/BoxCollider';
+import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 
 export class World
 {
@@ -60,7 +59,6 @@ export class World
     public loadingManager: LoadingManager;
     public welcomeScreen: WelcomeScreen;
 
-    public objects: SBObject[];
     public characters: Character[];
     public balls: any[];
     public vehicles: any[];
@@ -190,7 +188,6 @@ export class World
 
         // Initialization
         this.balls = [];
-        this.objects = [];
         this.characters = [];
         this.vehicles = [];
         this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
@@ -204,12 +201,6 @@ export class World
     public update(timeStep: number): void
     {
         this.updatePhysics(timeStep);
-
-        // Objects
-        this.objects.forEach((obj) =>
-        {
-            obj.update(timeStep);
-        });
 
         // Characters
         this.characters.forEach((char) =>
@@ -277,16 +268,6 @@ export class World
     {
         // Step the physics world
         this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
-
-        // Sync physics/visuals
-        this.objects.forEach((obj) =>
-        {
-            if (obj.physics.physical !== undefined)
-            {
-                obj.position.copy(Utils.threeVector(obj.physics.physical.position));
-                obj.quaternion.copy(Utils.threeQuat(obj.physics.physical.quaternion));
-            }
-        });
     }
 
     /**
@@ -393,28 +374,21 @@ export class World
                         {
                             if (child.userData.type === 'box')
                             {
-                                let phys2 = new BoxPhysics({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
-                                phys2.physical.position.copy(Utils.cannonVector(child.position));
-                                phys2.physical.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                phys2.physical.computeAABB();
+                                let phys2 = new BoxCollider({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
+                                phys2.body.position.copy(Utils.cannonVector(child.position));
+                                phys2.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                phys2.body.computeAABB();
 
-                                phys2.physical.shapes.forEach((shape) => {
+                                phys2.body.shapes.forEach((shape) => {
                                     shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
                                 });
 
-                                let SBobj = new SBObject();
-                                SBobj.setPhysics(phys2);
-
-                                this.add(SBobj);
+                                this.physicsWorld.addBody(phys2.body);
                             }
                             else if (child.userData.type === 'trimesh')
                             {
-                                let phys = new TrimeshPhysics(child, {});
-
-                                let SBobj = new SBObject();
-                                SBobj.setPhysics(phys);
-
-                                this.add(SBobj);
+                                let phys = new TrimeshCollider(child, {});
+                                this.physicsWorld.addBody(phys.body);
                             }
 
                             child.visible = false;
@@ -491,29 +465,6 @@ export class World
         // console.log(gltf);
         // console.log(this.paths);
         this.graphicsWorld.add(gltf.scene);
-    }
-
-    public addFloor(): void {
-        let SBobj = new SBObject();
-        let phys = new BoxPhysics({size: new THREE.Vector3(100, 1, 100)});
-        SBobj.setPhysics(phys);
-        SBobj.setModelFromPhysicsShape();
-        this.add(SBobj);
-
-        // Ramp
-        let SBobj2 = new SBObject();
-        let phys2 = new BoxPhysics({size: new THREE.Vector3(10, 1, 10)});
-        phys2.physical.position.z = 10;
-        phys2.physical.quaternion.setFromEuler(-0.3, 0, 0);
-        phys2.physical.computeAABB();
-        SBobj2.setPhysics(phys2);
-        SBobj2.setModelFromPhysicsShape();
-        this.add(SBobj2);
-
-        // Grid helper
-        let gridHelper = new THREE.GridHelper( 100, 50, 0x444444, 0xaaaaaa );
-        gridHelper.position.y = 1.01;
-        this.graphicsWorld.add( gridHelper );
     }
 
     public scrollTheTimeScale(scrollAmount: number): void

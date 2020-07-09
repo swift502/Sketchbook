@@ -13,19 +13,6 @@ export const CharacterAI = {
     RandomBehaviour,
 };
 
-import { BoxPhysics } from './objects/object_physics/BoxPhysics';
-import { CapsulePhysics } from './objects/object_physics/CapsulePhysics';
-import { ConvexPhysics } from './objects/object_physics/ConvexPhysics';
-import { SpherePhysics } from './objects/object_physics/SpherePhysics';
-import { TrimeshPhysics } from './objects/object_physics/TrimeshPhysics';
-export const ObjectPhysics = {
-    BoxPhysics,
-    CapsulePhysics,
-    ConvexPhysics,
-    SpherePhysics,
-    TrimeshPhysics,
-};
-
 export {Airplane} from './vehicles/Airplane';
 export {Car} from './vehicles/Car';
 export {Helicopter} from './vehicles/Helicopter';
@@ -38,7 +25,6 @@ export const CharacterStates = statesLibrary;
 
 export { Character } from './characters/Character';
 export { KeyBinding } from './core/KeyBinding';
-export { SBObject } from './objects/SBObject';
 export { World } from './core/World';
 
 export let THREE = THREEImport;

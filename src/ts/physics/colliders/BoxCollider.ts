@@ -3,13 +3,13 @@ import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
 import { IPhysicsType } from '../../interfaces/IPhysicsType';
 
-export class BoxPhysics implements IPhysicsType
+export class BoxCollider implements IPhysicsType
 {
     public options: any;
-    public physical: CANNON.Body;
-    public visual: THREE.Mesh;
+    public body: CANNON.Body;
+    public debugModel: THREE.Mesh;
     
-    constructor(options)
+    constructor(options: any)
     {
         let defaults = {
             mass: 0,
@@ -39,28 +39,28 @@ export class BoxPhysics implements IPhysicsType
         
         physBox.material = mat;
 
-        this.physical = physBox;
-        this.visual = this.getVisualModel({ visible: false, wireframe: true });
+        this.body = physBox;
+        //this.visual = this.getVisualModel({ visible: false, wireframe: true });
     }
 
-    public getVisualModel(options): THREE.Mesh
-    {
-        let defaults = {
-            visible: true,
-            wireframe: true
-        };
-        options = Utils.setDefaults(options, defaults);
+    // public getVisualModel(options: any): THREE.Mesh
+    // {
+    //     let defaults = {
+    //         visible: true,
+    //         wireframe: true
+    //     };
+    //     options = Utils.setDefaults(options, defaults);
 
-        let geometry = new THREE.BoxGeometry(this.options.size.x * 2, this.options.size.y * 2, this.options.size.z * 2);
-        let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
-        let visualBox = new THREE.Mesh(geometry, material);
-        visualBox.visible = options.visible;
-        if (!options.wireframe)
-        {
-            visualBox.castShadow = true;
-            visualBox.receiveShadow = true;
-        }
+    //     let geometry = new THREE.BoxGeometry(this.options.size.x * 2, this.options.size.y * 2, this.options.size.z * 2);
+    //     let material = new THREE.MeshLambertMaterial({ color: 0xcccccc, wireframe: options.wireframe });
+    //     let visualBox = new THREE.Mesh(geometry, material);
+    //     visualBox.visible = options.visible;
+    //     if (!options.wireframe)
+    //     {
+    //         visualBox.castShadow = true;
+    //         visualBox.receiveShadow = true;
+    //     }
 
-        return visualBox;
-    }
+    //     return visualBox;
+    // }
 }

@@ -5,11 +5,9 @@ import * as _ from 'lodash';
 import * as Utils from '../core/Utilities';
 
 import { KeyBinding } from '../core/KeyBinding';
-import { SBObject } from '../objects/SBObject';
-import { VectorSpringSimulator } from '../simulation/VectorSpringSimulator';
-import { RelativeSpringSimulator } from '../simulation/RelativeSpringSimulator';
+import { VectorSpringSimulator } from '../physics/spring_simulation/VectorSpringSimulator';
+import { RelativeSpringSimulator } from '../physics/spring_simulation/RelativeSpringSimulator';
 import { Idle } from './character_states/Idle';
-import { CapsulePhysics } from '../objects/object_physics/CapsulePhysics';
 import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
@@ -22,6 +20,7 @@ import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/
 import { Driving } from './character_states/vehicles/Driving';
 import { Vehicle } from '../vehicles/Vehicle';
 import { CollisionGroups } from '../enums/CollisionGroups';
+import { CapsuleCollider } from '../physics/colliders/CapsuleCollider';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -53,7 +52,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public rotationSimulator: RelativeSpringSimulator;
     public viewVector: THREE.Vector3;
     public actions: { [action: string]: KeyBinding };
-    public characterCapsule: SBObject;
+    public characterCapsule: CapsuleCollider;
 
     // Ray casting
     public rayResult: CANNON.RaycastResult = new CANNON.RaycastResult();
@@ -128,7 +127,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
         // Physics
         // Player Capsule
-        let capsulePhysics = new CapsulePhysics({
+        this.characterCapsule = new CapsuleCollider({
             mass: 1,
             position: new CANNON.Vec3(),
             height: 0.5,
@@ -137,19 +136,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
             friction: 0.0
         });
         // capsulePhysics.physical.collisionFilterMask = ~CollisionGroups.Trimesh;
-        capsulePhysics.physical.shapes.forEach((shape) => {
+        this.characterCapsule.body.shapes.forEach((shape) => {
             shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
         });
-        capsulePhysics.physical.allowSleep = false;
-        this.characterCapsule = new SBObject();
-        this.characterCapsule.setPhysics(capsulePhysics);
+        this.characterCapsule.body.allowSleep = false;
 
         // Move character to different collision group for raycasting
-        this.characterCapsule.physics.physical.collisionFilterGroup = 2;
+        this.characterCapsule.body.collisionFilterGroup = 2;
 
         // Disable character rotation
-        this.characterCapsule.physics.physical.fixedRotation = true;
-        this.characterCapsule.physics.physical.updateMassProperties();
+        this.characterCapsule.body.fixedRotation = true;
+        this.characterCapsule.body.updateMassProperties();
 
         // Ray cast debug
         const boxGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
@@ -160,8 +157,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.raycastBox.visible = false;
 
         // Physics pre/post step callback bindings
-        this.characterCapsule.physics.physical.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
-        this.characterCapsule.physics.physical.postStep = (body: CANNON.Body) => { this.physicsPostStep(body, this); };
+        this.characterCapsule.body.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
+        this.characterCapsule.body.postStep = (body: CANNON.Body) => { this.physicsPostStep(body, this); };
 
         // States
         this.setState(new Idle(this));
@@ -196,8 +193,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
     {
         if (this.physicsEnabled)
         {
-            this.characterCapsule.physics.physical.position = new CANNON.Vec3(x, y, z);
-            this.characterCapsule.physics.physical.interpolatedPosition = new CANNON.Vec3(x, y, z);
+            this.characterCapsule.body.position = new CANNON.Vec3(x, y, z);
+            this.characterCapsule.body.interpolatedPosition = new CANNON.Vec3(x, y, z);
         }
         else
         {
@@ -213,9 +210,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.velocity.y = 0;
         this.velocity.z = 0;
 
-        this.characterCapsule.physics.physical.velocity.x = 0;
-        this.characterCapsule.physics.physical.velocity.y = 0;
-        this.characterCapsule.physics.physical.velocity.z = 0;
+        this.characterCapsule.body.velocity.x = 0;
+        this.characterCapsule.body.velocity.y = 0;
+        this.characterCapsule.body.velocity.z = 0;
 
         this.velocitySimulator.init();
     }
@@ -257,11 +254,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
         if (value === true)
         {
-            this.world.physicsWorld.addBody(this.characterCapsule.physics.physical);
+            this.world.physicsWorld.addBody(this.characterCapsule.body);
         }
         else
         {
-            this.world.physicsWorld.remove(this.characterCapsule.physics.physical);
+            this.world.physicsWorld.remove(this.characterCapsule.body);
         }
     }
 
@@ -438,17 +435,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
         if (this.physicsEnabled)
         {
             this.position.set(
-                this.characterCapsule.physics.physical.interpolatedPosition.x,
-                this.characterCapsule.physics.physical.interpolatedPosition.y,
-                this.characterCapsule.physics.physical.interpolatedPosition.z
+                this.characterCapsule.body.interpolatedPosition.x,
+                this.characterCapsule.body.interpolatedPosition.y,
+                this.characterCapsule.body.interpolatedPosition.z
             );
         }
         else {
             let newPos = new THREE.Vector3();
             this.getWorldPosition(newPos);
 
-            this.characterCapsule.physics.physical.position.copy(Utils.cannonVector(newPos));
-            this.characterCapsule.physics.physical.interpolatedPosition.copy(Utils.cannonVector(newPos));
+            this.characterCapsule.body.position.copy(Utils.cannonVector(newPos));
+            this.characterCapsule.body.interpolatedPosition.copy(Utils.cannonVector(newPos));
         }
 
         // Debug
@@ -745,7 +742,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     {
         // Player ray casting
         // Create ray
-        let body = this.characterCapsule.physics.physical;
+        let body = this.characterCapsule.body;
         const start = new CANNON.Vec3(body.position.x, body.position.y, body.position.z);
         const end = new CANNON.Vec3(body.position.x, body.position.y - this.rayCastLength - this.raySafeOffset, body.position.z);
         // Raycast options
@@ -879,15 +876,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
             world.characters.push(this);
 
             // Register physics
-            world.physicsWorld.addBody(this.characterCapsule.physics.physical);
+            world.physicsWorld.addBody(this.characterCapsule.body);
 
             // Add to graphicsWorld
             world.graphicsWorld.add(this);
-            world.graphicsWorld.add(this.characterCapsule.physics.visual);
             world.graphicsWorld.add(this.raycastBox);
-
-            // Register characters physical capsule object
-            world.objects.push(this.characterCapsule);
 
             // Shadow cascades
             this.materials.forEach((mat) =>
@@ -915,15 +908,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
             _.pull(world.characters, this);
 
             // Remove physics
-            world.physicsWorld.remove(this.characterCapsule.physics.physical);
+            world.physicsWorld.remove(this.characterCapsule.body);
 
             // Remove visuals
             world.graphicsWorld.remove(this);
-            world.graphicsWorld.remove(this.characterCapsule.physics.visual);
             world.graphicsWorld.remove(this.raycastBox);
-
-            // Remove capsule object
-            _.pull(world.objects, this.characterCapsule);
         }
     }
 }

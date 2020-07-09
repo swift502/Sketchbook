@@ -63,7 +63,7 @@ export class ExitingVehicle extends CharacterStateBase
             this.character.resetOrientation();
             this.character.setPhysicsEnabled(true);
 
-            this.character.characterCapsule.physics.physical.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
+            this.character.characterCapsule.body.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
             this.character.feetRaycast();
 
             if (!this.character.rayHasHit)

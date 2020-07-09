@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
-import { SimulationFrame } from '../simulation/SimulationFrame';
+import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { World } from './World';
 
 export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
