@@ -382,7 +382,7 @@ export abstract class Vehicle extends THREE.Object3D
 
                         if (child.userData.hasOwnProperty('door_object')) 
                         {
-                            seat.door = new VehicleDoor(gltf.scene.getObjectByName(child.userData.door_object));
+                            seat.door = new VehicleDoor(this, gltf.scene.getObjectByName(child.userData.door_object));
                         }
 
                         if (child.userData.hasOwnProperty('door_side')) 

@@ -41,6 +41,8 @@ export class Car extends Vehicle implements IControllable {
 
         this.readCarData(gltf);
 
+        this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
+
         this.actions = {
             'throttle': new KeyBinding('KeyW'),
             'reverse': new KeyBinding('KeyS'),
@@ -82,6 +84,7 @@ export class Car extends Vehicle implements IControllable {
         const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 
         // Air spin
+        // TODO move into preStep?
         if (!tiresHaveContact)
         {
             // Timer grows when car is off ground, resets once you touch the ground again
@@ -225,6 +228,14 @@ export class Car extends Vehicle implements IControllable {
         this.shiftTimer = this.timeToShift;
 
         this.applyEngineForce(0);
+    }
+
+    public physicsPreStep(body: CANNON.Body, car: Car): void
+    {
+        // Update doors
+        this.seats.forEach((seat) => {
+            seat.door?.preStepCallback();
+        });
     }
 
     public onInputChange(): void {

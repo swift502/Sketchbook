@@ -23,9 +23,9 @@ export class Driving extends CharacterStateBase
     {
         super.update(timeStep);
 
-        if (this.seat.door?.isOpen() && this.seat.vehicle.noDirectionPressed())
-        {
-            this.character.setState(new CloseVehicleDoorInside(this.character, this.seat));
-        }
+        // if (this.seat.door?.isOpen() && this.seat.vehicle.noDirectionPressed())
+        // {
+        //     this.character.setState(new CloseVehicleDoorInside(this.character, this.seat));
+        // }
     }
 }
