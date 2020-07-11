@@ -39,7 +39,8 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 
 ## Usage
 
-Check out the [Sketch](https://github.com/swift502/Sketch) template project to learn about using Sketchbook.
+Sketchbook is packed as a library and can be used to create your own 3D scenes exposing all the Sketchbook gameplay mechanics.
+Check out the [Sketch](https://github.com/swift502/Sketch) template project to learn about using Sketchbook in this way.
 
 ## Contributing
 

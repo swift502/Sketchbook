@@ -54,7 +54,7 @@ export class World
     public params: any;
     public inputManager: InputManager;
     public cameraOperator: CameraOperator;
-    public timeScaleTarget: number;
+    public timeScaleTarget: number = 1;
     public csm: CSM;
     public loadingManager: LoadingManager;
     public welcomeScreen: WelcomeScreen;
@@ -73,9 +73,6 @@ export class World
         {
             Detector.addGetWebGLMessage();
         }
-
-        this.loadingManager = new LoadingManager();
-        this.welcomeScreen = new WelcomeScreen();
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer();
@@ -181,9 +178,6 @@ export class World
         let gui = this.getGUI(scope);
         gui.open();
 
-        // Changing time scale with scroll wheel
-        this.timeScaleTarget = 1;
-
         //#endregion
 
         // Initialization
@@ -192,6 +186,8 @@ export class World
         this.vehicles = [];
         this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
+        this.loadingManager = new LoadingManager(this);
+        this.welcomeScreen = this.loadingManager.welcomeScreen;
 
         this.render(this);
     }
@@ -317,6 +313,12 @@ export class World
             this.stats.end();
             this.justRendered = true;
         }
+    }
+
+    public setTimeScale(value: number): void
+    {
+        this.params.Time_Scale = value;
+        this.timeScaleTarget = value;
     }
 
     public add(object: IWorldEntity): void

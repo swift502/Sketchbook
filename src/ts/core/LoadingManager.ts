@@ -1,20 +1,26 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SkeletonUtils } from '../../lib/utils/SkeletonUtils';
 import { WelcomeScreen} from "./WelcomeScreen";
+import { World } from './World';
 
 export class LoadingManager
 {
     public printProgress: boolean = false;
     public welcomeScreen: WelcomeScreen;
+    
     private gltfLoader: GLTFLoader;
     private loadingTracker: {} = {};
+    private world: World;
 
     // private cache: {} = {};
 
-    constructor()
+    constructor(world: World)
     {
         this.gltfLoader = new GLTFLoader();
-        this.welcomeScreen = new WelcomeScreen();
+        this.welcomeScreen = new WelcomeScreen(world);
+
+        this.world = world;
+        this.world.setTimeScale(0);
     }
 
     public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
@@ -79,6 +85,7 @@ export class LoadingManager
 
             // Display Start Button
             this.welcomeScreen.displayStartBtn();
+            // this.world.setTimeScale(1);
         }
     }
 
