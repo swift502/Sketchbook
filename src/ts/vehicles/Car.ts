@@ -26,6 +26,8 @@ export class Car extends Vehicle implements IControllable {
     private shiftTimer: number;
     private timeToShift: number = 0.2;
 
+    private canTiltForwards: boolean = false;
+
     constructor(gltf: any)
     {
         super(gltf, {
@@ -89,7 +91,11 @@ export class Car extends Vehicle implements IControllable {
         {
             // Timer grows when car is off ground, resets once you touch the ground again
             this.airSpinTimer += timeStep;
-        } else {
+            if (!this.actions.throttle.isPressed) this.canTiltForwards = true;
+        }
+        else
+        {
+            this.canTiltForwards = false;
             this.airSpinTimer = 0;
         }
 
@@ -129,7 +135,7 @@ export class Car extends Vehicle implements IControllable {
         }
 
         // Forwards
-        if (this.actions.throttle.isPressed && !this.actions.reverse.isPressed) {
+        if (this.canTiltForwards && this.actions.throttle.isPressed && !this.actions.reverse.isPressed) {
             if (angVel.dot(spinVectorRight) < maxAirSpinMagnitude) {
                 angVel.vadd(effectiveSpinVectorRight, angVel);
             }

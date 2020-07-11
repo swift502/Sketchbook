@@ -19,6 +19,7 @@ export class TrimeshCollider implements IPhysicsType
         let defaults = {
             mass: 0,
             position: mesh.position,
+            rotation: mesh.quaternion,
             friction: 0.3
         };
         options = Utils.setDefaults(options, defaults);
@@ -35,6 +36,7 @@ export class TrimeshCollider implements IPhysicsType
         let physBox = new CANNON.Body({
             mass: options.mass,
             position: options.position,
+            quaternion: options.rotation,
             shape: shape
         });
 

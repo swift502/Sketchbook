@@ -18,7 +18,10 @@ export var CannonDebugRenderer = function(scene, world, options){
 
     this._meshes = [];
 
-    this._material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    this._boxMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
+    this._triMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+    this._sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+
     this._sphereGeometry = new THREE.SphereGeometry(1);
     this._boxGeometry = new THREE.BoxGeometry(1, 1, 1);
     this._planeGeometry = new THREE.PlaneGeometry( 10, 10, 10, 10 );
@@ -107,20 +110,23 @@ CannonDebugRenderer.prototype = {
 
     _createMesh: function(shape){
         var mesh;
-        var material = this._material;
+
+        var yellow = this._sphereMaterial;
+        var cyan = this._boxMaterial;
+        var purple = this._triMaterial;
 
         switch(shape.type){
 
         case CANNON.Shape.types.SPHERE:
-            mesh = new THREE.Mesh(this._sphereGeometry, material);
+            mesh = new THREE.Mesh(this._sphereGeometry, yellow);
             break;
 
         case CANNON.Shape.types.BOX:
-            mesh = new THREE.Mesh(this._boxGeometry, material);
+            mesh = new THREE.Mesh(this._boxGeometry, cyan);
             break;
 
         case CANNON.Shape.types.PLANE:
-            mesh = new THREE.Mesh(this._planeGeometry, material);
+            mesh = new THREE.Mesh(this._planeGeometry, yellow);
             break;
 
         case CANNON.Shape.types.CONVEXPOLYHEDRON:
@@ -147,7 +153,7 @@ CannonDebugRenderer.prototype = {
             geo.computeBoundingSphere();
             geo.computeFaceNormals();
 
-            mesh = new THREE.Mesh(geo, material);
+            mesh = new THREE.Mesh(geo, cyan);
             shape.geometryId = geo.id;
             break;
 
@@ -168,7 +174,7 @@ CannonDebugRenderer.prototype = {
             }
             geometry.computeBoundingSphere();
             geometry.computeFaceNormals();
-            mesh = new THREE.Mesh(geometry, material);
+            mesh = new THREE.Mesh(geometry, purple);
             shape.geometryId = geometry.id;
             break;
 
@@ -200,7 +206,7 @@ CannonDebugRenderer.prototype = {
             }
             geometry.computeBoundingSphere();
             geometry.computeFaceNormals();
-            mesh = new THREE.Mesh(geometry, material);
+            mesh = new THREE.Mesh(geometry, purple);
             shape.geometryId = geometry.id;
             break;
         }
