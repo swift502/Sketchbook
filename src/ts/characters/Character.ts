@@ -57,7 +57,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
     // Ray casting
     public rayResult: CANNON.RaycastResult = new CANNON.RaycastResult();
     public rayHasHit: boolean = false;
-    public rayCastLength: number = 0.60;
+    public rayCastLength: number = 0.57;
     public raySafeOffset: number = 0.03;
     public wantsToJump: boolean = false;
     public initJumpSpeed: number = -1;

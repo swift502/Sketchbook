@@ -283,6 +283,7 @@ export function setupMeshProperties(child: any): void
         mat.name = child.material.name;
         mat.map = child.material.map;
         mat.map.anisotropy = 4;
+        mat.aoMap = child.material.aoMap;
         mat.transparent = child.material.transparent;
         mat.skinning = child.material.skinning;
         // mat.map.encoding = THREE.LinearEncoding;

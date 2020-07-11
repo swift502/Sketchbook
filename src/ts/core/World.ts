@@ -30,6 +30,8 @@ import { Airplane } from '../vehicles/Airplane';
 import { Helicopter } from '../vehicles/Helicopter';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
+import { ConvexCollider } from '../physics/colliders/ConvexCollider';
+import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 
 export class World
 {
@@ -58,6 +60,7 @@ export class World
     public csm: CSM;
     public loadingManager: LoadingManager;
     public welcomeScreen: WelcomeScreen;
+    public cannonDebugRenderer: CannonDebugRenderer;
 
     public characters: Character[];
     public balls: any[];
@@ -252,6 +255,8 @@ export class World
             if (body.sleepState === 2) asleep++;
         });
 
+        if (this.params.Draw_Physics) this.cannonDebugRenderer.update();
+
         document.getElementById('car-debug').innerHTML = '';
         document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
         document.getElementById('car-debug').innerHTML += '<br>';
@@ -376,20 +381,38 @@ export class World
                         {
                             if (child.userData.type === 'box')
                             {
-                                let phys2 = new BoxCollider({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
-                                phys2.body.position.copy(Utils.cannonVector(child.position));
-                                phys2.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                phys2.body.computeAABB();
+                                let phys = new BoxCollider({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
+                                phys.body.position.copy(Utils.cannonVector(child.position));
+                                phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                phys.body.computeAABB();
 
-                                phys2.body.shapes.forEach((shape) => {
+                                phys.body.shapes.forEach((shape) => {
                                     shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
                                 });
 
-                                this.physicsWorld.addBody(phys2.body);
+                                this.physicsWorld.addBody(phys.body);
+                            }
+                            else if (child.userData.type === 'convex')
+                            {
+                                let phys = new ConvexCollider(child, {});
+                                // phys.body.position.copy(Utils.cannonVector(child.position));
+                                // phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                // phys.body.computeAABB();
+
+                                phys.body.shapes.forEach((shape) => {
+                                    shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+                                });
+
+                                this.physicsWorld.addBody(phys.body);
                             }
                             else if (child.userData.type === 'trimesh')
                             {
                                 let phys = new TrimeshCollider(child, {});
+
+                                phys.body.shapes.forEach((shape) => {
+                                    shape.collisionFilterMask = CollisionGroups.TrimeshColliders;
+                                });
+
                                 this.physicsWorld.addBody(phys.body);
                             }
 
@@ -556,14 +579,15 @@ export class World
         debugFolder.add(this.params, 'Draw_Physics')
             .onChange((enabled) =>
             {
-                scope.objects.forEach((obj) =>
+                if (enabled)
                 {
-                    if (obj.physics.visual !== undefined)
-                    {
-                        if (enabled) obj.physics.visual.visible = true;
-                        else obj.physics.visual.visible = false;
-                    }
-                });
+                    this.cannonDebugRenderer = new CannonDebugRenderer( this.graphicsWorld, this.physicsWorld );
+                }
+                else
+                {
+                    this.cannonDebugRenderer.clearMeshes();
+                    this.cannonDebugRenderer = undefined;
+                }
             });
         debugFolder.add(this.params, 'RayCast_Debug')
             .onChange((enabled) =>
