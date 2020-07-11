@@ -392,26 +392,27 @@ export class World
 
                                 this.physicsWorld.addBody(phys.body);
                             }
-                            else if (child.userData.type === 'convex')
-                            {
-                                let phys = new ConvexCollider(child, {});
-                                // phys.body.position.copy(Utils.cannonVector(child.position));
-                                // phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                // phys.body.computeAABB();
+                            // Convex doesn't work! Stick to boxes!
+                            // else if (child.userData.type === 'convex')
+                            // {
+                            //     let phys = new ConvexCollider(child, {});
+                            //     // phys.body.position.copy(Utils.cannonVector(child.position));
+                            //     // phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                            //     // phys.body.computeAABB();
 
-                                phys.body.shapes.forEach((shape) => {
-                                    shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
-                                });
+                            //     phys.body.shapes.forEach((shape) => {
+                            //         shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
+                            //     });
 
-                                this.physicsWorld.addBody(phys.body);
-                            }
+                            //     this.physicsWorld.addBody(phys.body);
+                            // }
                             else if (child.userData.type === 'trimesh')
                             {
                                 let phys = new TrimeshCollider(child, {});
 
-                                phys.body.shapes.forEach((shape) => {
-                                    shape.collisionFilterMask = CollisionGroups.TrimeshColliders;
-                                });
+                                // phys.body.shapes.forEach((shape) => {
+                                //     shape.collisionFilterMask = CollisionGroups.TrimeshColliders;
+                                // });
 
                                 this.physicsWorld.addBody(phys.body);
                             }
