@@ -70,12 +70,20 @@ export class LoadingManager
     {
         this.loadingTracker[path] = false;
         let done = true;
+        let total = 0;
+        let finished = 0;
         for (const key in this.loadingTracker) {
             if (this.loadingTracker.hasOwnProperty(key)) {
                 const stillLoading = this.loadingTracker[key];
+
+                total++;
                 if (stillLoading) done = false;
+                else finished++;
             }
         }
+
+        let percent = (finished / total) * 100;
+        document.getElementById('progress-bar').style.width = percent + '%';
 
         if (done)
         {
@@ -85,7 +93,6 @@ export class LoadingManager
 
             // Display Start Button
             this.welcomeScreen.displayStartBtn();
-            // this.world.setTimeScale(1);
         }
     }
 
