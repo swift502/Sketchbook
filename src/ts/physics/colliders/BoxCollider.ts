@@ -1,9 +1,9 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
-import { IPhysicsType } from '../../interfaces/IPhysicsType';
+import { ICollider } from '../../interfaces/ICollider';
 
-export class BoxCollider implements IPhysicsType
+export class BoxCollider implements ICollider
 {
     public options: any;
     public body: CANNON.Body;

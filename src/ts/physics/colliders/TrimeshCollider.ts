@@ -1,11 +1,11 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
-import {IPhysicsType} from '../../interfaces/IPhysicsType';
+import {ICollider} from '../../interfaces/ICollider';
 import {Object3D} from 'three';
 import { threeToCannon } from '../../../lib/utils/three-to-cannon';
 
-export class TrimeshCollider implements IPhysicsType
+export class TrimeshCollider implements ICollider
 {
     public mesh: any;
     public options: any;

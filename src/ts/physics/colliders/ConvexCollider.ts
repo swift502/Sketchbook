@@ -1,11 +1,11 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/Utilities';
-import { IPhysicsType } from '../../interfaces/IPhysicsType';
+import { ICollider } from '../../interfaces/ICollider';
 import {Mesh, Vector3} from "three";
 import {Object3D} from "three";
 
-export class ConvexCollider implements IPhysicsType
+export class ConvexCollider implements ICollider
 {
     public mesh: any;
     public options: any;

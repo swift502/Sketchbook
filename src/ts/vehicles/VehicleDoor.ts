@@ -118,15 +118,11 @@ export class VehicleDoor
     {
         this.achievingTargetRotation = true;
         this.targetRotation = 1;
-
-        console.log('open');
     }
 
     public close(): void
     {
         this.achievingTargetRotation = true;
         this.targetRotation = 0;
-
-        console.log('close');
     }
 }

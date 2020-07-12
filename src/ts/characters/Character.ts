@@ -28,7 +28,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
     public height: number = 0;
     public tiltContainer: THREE.Group;
     public modelContainer: THREE.Group;
-    // public model: any;
     public materials: THREE.Material[] = [];
     public mixer: THREE.AnimationMixer;
     public animations: any[];
@@ -102,7 +101,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.modelContainer.position.y = -0.57;
         this.tiltContainer.add(this.modelContainer);
         this.modelContainer.add(gltf.scene);
-        // this.model = gltf.scene;
 
         this.mixer = new THREE.AnimationMixer(gltf.scene);
 
@@ -663,6 +661,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.quaternion.copy(seat.seatPoint.quaternion);
 
         this.setState(new Driving(this, seat));
+
+        this.startControllingVehicle(vehicle, seat);
     }
 
     public startControllingVehicle(vehicle: IControllable, seat: any): void
