@@ -14,13 +14,17 @@ export class Sky extends THREE.Object3D
     set phi(value: number) {
         this._phi = value;
         this.refreshSunPosition();
+        this.refreshHemiIntensity();
     }
 
     private _phi: number = 50;
     private _theta: number = 215;
 
+    private hemiLight: THREE.HemisphereLight;
+    private maxHemiIntensity: number = 0.9;
+    private minHemiIntensity: number = 0.3;
+
     private sunTarget: THREE.Object3D;
-    // private ambientLight: THREE.AmbientLight;
     private skyMesh: THREE.Mesh;
     private skyMaterial: THREE.ShaderMaterial;
 
@@ -45,15 +49,12 @@ export class Sky extends THREE.Object3D
         );
         this.attach(this.skyMesh);
 
-        // Lighting
-        // this.ambientLight = new THREE.AmbientLight(0x8fa9c2); // soft white light
-        // this.attach(this.ambientLight);
-
-        let hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.9 );
-        hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
-        hemiLight.groundColor.setHSL( 0.095, 0.2, 0.75 );
-        hemiLight.position.set( 0, 50, 0 );
-        this.world.graphicsWorld.add( hemiLight );
+        this.hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.0 );
+        this.refreshHemiIntensity();
+        this.hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
+        this.hemiLight.groundColor.setHSL( 0.095, 0.2, 0.75 );
+        this.hemiLight.position.set( 0, 50, 0 );
+        this.world.graphicsWorld.add( this.hemiLight );
 
         // Sun light with shadowmap
         this.sun = new THREE.DirectionalLight(0xffffff);
@@ -68,8 +69,6 @@ export class Sky extends THREE.Object3D
         this.sun.shadow.camera.right = 15;
         this.sun.shadow.camera.bottom = -15;
         this.sun.shadow.camera.left = -15;
-
-        // this.attach(this.sun);
 
         this.sunTarget = new THREE.Object3D();
         this.sun.target = this.sunTarget;
@@ -94,5 +93,10 @@ export class Sky extends THREE.Object3D
 
         this.skyMaterial.uniforms.sunPosition.value.copy(this.sun.position);
         this.skyMaterial.uniforms.cameraPos.value.copy(this.world.camera.position);
+    }
+
+    public refreshHemiIntensity(): void
+    {
+        this.hemiLight.intensity = this.minHemiIntensity + Math.pow(1 - (Math.abs(this._phi - 90) / 90), 0.25) * (this.maxHemiIntensity - this.minHemiIntensity);
     }
 }

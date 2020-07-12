@@ -39,8 +39,6 @@ export class World
     public stats: Stats;
     public graphicsWorld: THREE.Scene;
     public sky: Sky;
-    // public sun: THREE.Vector3;
-    // public dirLight: THREE.DirectionalLight;
     public physicsWorld: CANNON.World;
     public parallelPairs: any[];
     public physicsFrameRate: number;
@@ -482,10 +480,10 @@ export class World
 
         this.graphicsWorld.add(gltf.scene);
 
-        this.scenarios[4].launch(this);
-        // this.scenarios.forEach((scenario) => {
-        //     if (scenario.default || scenario.spawnAlways) scenario.launch(this);
-        // });
+        // this.scenarios[4].launch(this);
+        this.scenarios.forEach((scenario) => {
+            if (scenario.default || scenario.spawnAlways) scenario.launch(this);
+        });
     }
 
     public scrollTheTimeScale(scrollAmount: number): void
@@ -527,7 +525,7 @@ export class World
         document.getElementById('controls-menu').innerHTML = html;
     }
 
-    private getGUI(scope: any): GUI
+    private getGUI(scope: World): GUI
     {
         const gui = new GUI.GUI();
 
@@ -541,7 +539,7 @@ export class World
         inputFolder.add(this.params, 'Mouse_Sensitivity', 0, 1)
             .onChange((value) =>
             {
-                scope.cameraController.setSensitivity(value, value * 0.8);
+                scope.cameraOperator.setSensitivity(value, value * 0.8);
             });
 
         // Graphics
