@@ -18,18 +18,12 @@ export abstract class Vehicle extends THREE.Object3D
     public seats: VehicleSeat[] = [];
     public wheels: Wheel[] = [];
     public drive: string;
-
     public camera: any;
-
     public world: World;
-
     public help: THREE.AxesHelper;
-
-    // TODO: remake to a Sketchbook Object
     public collision: CANNON.Body;
-
-    // public model: any;
     public materials: THREE.Material[] = [];
+    public spawnPoint: THREE.Object3D;
     private modelContainer: THREE.Group;
 
     private firstPerson: boolean = false;

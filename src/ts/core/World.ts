@@ -274,7 +274,10 @@ export class World
         this.vehicles.forEach((vehicle) => {
             if (this.isOutOfBounds(vehicle.rayCastVehicle.chassisBody.position))
             {
-                this.outOfBoundsRespawn(vehicle.rayCastVehicle.chassisBody);
+                let worldPos = new THREE.Vector3();
+                vehicle.spawnPoint.getWorldPosition(worldPos);
+                worldPos.y += 1;
+                this.outOfBoundsRespawn(vehicle.rayCastVehicle.chassisBody, Utils.cannonVector(worldPos));
             }
         });
     }
@@ -289,9 +292,9 @@ export class World
         return !inside && belowSeaLevel;
     }
 
-    public outOfBoundsRespawn(body: CANNON.Body): void
+    public outOfBoundsRespawn(body: CANNON.Body, position?: CANNON.Vec3): void
     {
-        let newPos = new CANNON.Vec3(0, 16, 0);
+        let newPos = position || new CANNON.Vec3(0, 16, 0);
         let newQuat = new CANNON.Quaternion(0, 0, 0, 1);
 
         body.position.copy(newPos);
@@ -479,7 +482,7 @@ export class World
 
         this.graphicsWorld.add(gltf.scene);
 
-        this.scenarios[0].launch(this);
+        this.scenarios[4].launch(this);
         // this.scenarios.forEach((scenario) => {
         //     if (scenario.default || scenario.spawnAlways) scenario.launch(this);
         // });
