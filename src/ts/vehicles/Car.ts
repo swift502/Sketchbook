@@ -218,6 +218,11 @@ export class Car extends Vehicle implements IControllable {
         this.steeringSimulator.simulate(timeStep);
         this.setSteeringValue(this.steeringSimulator.position);
         if (this.steeringWheel !== undefined) this.steeringWheel.rotation.z = -this.steeringSimulator.position * 2;
+
+        if (this.rayCastVehicle.numWheelsOnGround < 3 && Math.abs(this.collision.velocity.length()) < 0.5)	
+        {	
+            this.collision.quaternion.copy(this.collision.initQuaternion);	
+        }
     }
 
     public shiftUp(): void

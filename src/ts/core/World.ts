@@ -479,10 +479,9 @@ export class World
 
         this.graphicsWorld.add(gltf.scene);
 
-        this.scenarios[1].launch(this);
-        // this.scenarios.forEach((scenario) => {
-        //     if (scenario.default || scenario.spawnAlways) scenario.launch(this);
-        // });
+        this.scenarios.forEach((scenario) => {
+            if (scenario.default || scenario.spawnAlways) scenario.launch(this);
+        });
     }
 
     public scrollTheTimeScale(scrollAmount: number): void
