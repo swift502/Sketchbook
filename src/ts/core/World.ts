@@ -32,6 +32,7 @@ import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { ConvexCollider } from '../physics/colliders/ConvexCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
+import { Vehicle } from '../vehicles/Vehicle';
 
 export class World
 {
@@ -61,10 +62,8 @@ export class World
     public loadingManager: LoadingManager;
     public welcomeScreen: WelcomeScreen;
     public cannonDebugRenderer: CannonDebugRenderer;
-
     public characters: Character[];
-    public balls: any[];
-    public vehicles: any[];
+    public vehicles: Vehicle[];
     public paths: {[id: string]: Path} = {};
 
     constructor()
@@ -184,7 +183,6 @@ export class World
         //#endregion
 
         // Initialization
-        this.balls = [];
         this.characters = [];
         this.vehicles = [];
         this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
@@ -269,6 +267,43 @@ export class World
     {
         // Step the physics world
         this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
+
+        this.characters.forEach((char) => {
+            if (this.isOutOfBounds(char.characterCapsule.body.position))
+            {
+                this.outOfBoundsRespawn(char.characterCapsule.body);
+            }
+        });
+
+        this.vehicles.forEach((vehicle) => {
+            if (this.isOutOfBounds(vehicle.rayCastVehicle.chassisBody.position))
+            {
+                this.outOfBoundsRespawn(vehicle.rayCastVehicle.chassisBody);
+            }
+        });
+    }
+
+    public isOutOfBounds(position: CANNON.Vec3): boolean
+    {
+        let inside = position.x > -211.882 && position.x < 211.882 &&
+                     position.z > -153.232 && position.z < 169.098 &&
+                     position.y > 0.107;
+        let belowSeaLevel = position.y < 14.989;
+
+        return !inside && belowSeaLevel;
+    }
+
+    public outOfBoundsRespawn(body: CANNON.Body): void
+    {
+        let newPos = new CANNON.Vec3(0, 16, 0);
+        let newQuat = new CANNON.Quaternion(0, 0, 0, 1);
+
+        body.position.copy(newPos);
+        body.interpolatedPosition.copy(newPos);
+        body.quaternion.copy(newQuat);
+        body.interpolatedQuaternion.copy(newQuat);
+        body.velocity.setZero();
+        body.angularVelocity.setZero();
     }
 
     /**

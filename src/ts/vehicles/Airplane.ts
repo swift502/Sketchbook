@@ -43,15 +43,15 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
         this.actions = {
-            'throttle': new KeyBinding('KeyW'),
-            'brake': new KeyBinding('KeyS'),
-            'wheelBrake': new KeyBinding('Space'),
-            'pitchUp': new KeyBinding('ArrowDown'),
-            'pitchDown': new KeyBinding('ArrowUp'),
+            'throttle': new KeyBinding('Space'),
+            'brake': new KeyBinding('ShiftLeft'),
+            'wheelBrake': new KeyBinding('KeyB'),
+            'pitchUp': new KeyBinding('KeyS'),
+            'pitchDown': new KeyBinding('KeyW'),
             'yawLeft': new KeyBinding('KeyQ'),
             'yawRight': new KeyBinding('KeyE'),
-            'rollLeft': new KeyBinding('ArrowLeft', 'KeyA'),
-            'rollRight': new KeyBinding('ArrowRight', 'KeyD'),
+            'rollLeft': new KeyBinding('KeyA'),
+            'rollRight': new KeyBinding('KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
             'view': new KeyBinding('KeyV'),
         };
