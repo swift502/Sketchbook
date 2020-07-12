@@ -5,11 +5,12 @@ import
 import { Character } from '../../Character';
 import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
-import { Sitting } from '../Sitting';
+import { Driving } from './Driving';
 
 export class CloseVehicleDoorInside extends CharacterStateBase
 {
     private seat: VehicleSeat;
+    private hasClosedDoor: boolean = false;
 
     constructor(character: Character, seat: VehicleSeat)
     {
@@ -33,14 +34,15 @@ export class CloseVehicleDoorInside extends CharacterStateBase
     {
         super.update(timeStep);
 
-        if (this.timer > 0.3)
+        if (this.timer > 0.3 && !this.hasClosedDoor)
         {
-            this.seat.closeDoor();
+            this.hasClosedDoor = true;
+            this.seat.door?.close();
         }
 
         if (this.timer > this.animationLength - timeStep)
         {
-            this.character.setState(new Sitting(this.character));
+            this.character.setState(new Driving(this.character, this.seat));
         }
     }
 }

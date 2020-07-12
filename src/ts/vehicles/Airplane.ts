@@ -4,7 +4,7 @@ import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
-import { SpringSimulator } from '../simulation/SpringSimulator';
+import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { Euler } from 'three';
 import THREE = require('three');
 import * as Utils from '../core/Utilities';
@@ -43,22 +43,36 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
         this.actions = {
-            'throttle': new KeyBinding('KeyW'),
-            'brake': new KeyBinding('KeyS'),
-            'wheelBrake': new KeyBinding('Space'),
-            'pitchUp': new KeyBinding('ArrowDown'),
-            'pitchDown': new KeyBinding('ArrowUp'),
+            'throttle': new KeyBinding('Space'),
+            'brake': new KeyBinding('ShiftLeft'),
+            'wheelBrake': new KeyBinding('KeyB'),
+            'pitchUp': new KeyBinding('KeyS'),
+            'pitchDown': new KeyBinding('KeyW'),
             'yawLeft': new KeyBinding('KeyQ'),
             'yawRight': new KeyBinding('KeyE'),
-            'rollLeft': new KeyBinding('ArrowLeft', 'KeyA'),
-            'rollRight': new KeyBinding('ArrowRight', 'KeyD'),
+            'rollLeft': new KeyBinding('KeyA'),
+            'rollRight': new KeyBinding('KeyD'),
             'exitVehicle': new KeyBinding('KeyF'),
+            'view': new KeyBinding('KeyV'),
         };
 
         this.steeringSimulator = new SpringSimulator(60, 10, 0.6); 
         this.aileronSimulator = new SpringSimulator(60, 5, 0.6);
         this.elevatorSimulator = new SpringSimulator(60, 7, 0.6);
         this.rudderSimulator = new SpringSimulator(60, 10, 0.6);
+    }
+
+    public noDirectionPressed(): boolean
+    {
+        let result = 
+        !this.actions.throttle.isPressed &&
+        !this.actions.brake.isPressed &&
+        !this.actions.yawLeft.isPressed &&
+        !this.actions.yawRight.isPressed &&
+        !this.actions.rollLeft.isPressed &&
+        !this.actions.rollRight.isPressed;
+
+        return result;
     }
 
     public update(timeStep: number): void
@@ -306,6 +320,10 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
         if (this.actions.wheelBrake.justReleased)
         {
             this.setBrake(0);
+        }
+        if (this.actions.view.justPressed)
+        {
+            this.toggleFirstPersonView();
         }
     }
 

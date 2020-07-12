@@ -140,3 +140,23 @@ body {
 {
     position: absolute;
 }
+
+#progress
+{
+    width: 300px;
+    height: 30px;
+    background: black;
+}
+
+#progress-bar
+{
+    background: white;
+    width: 0%;
+    height: 100%;
+}
+
+#progress-text
+{
+    margin-top: -26px;
+    color: white;
+}

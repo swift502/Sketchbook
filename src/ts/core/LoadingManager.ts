@@ -1,20 +1,26 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SkeletonUtils } from '../../lib/utils/SkeletonUtils';
 import { WelcomeScreen} from "./WelcomeScreen";
+import { World } from './World';
 
 export class LoadingManager
 {
     public printProgress: boolean = false;
     public welcomeScreen: WelcomeScreen;
+    
     private gltfLoader: GLTFLoader;
     private loadingTracker: {} = {};
+    private world: World;
 
     // private cache: {} = {};
 
-    constructor()
+    constructor(world: World)
     {
         this.gltfLoader = new GLTFLoader();
-        this.welcomeScreen = new WelcomeScreen();
+        this.welcomeScreen = new WelcomeScreen(world);
+
+        this.world = world;
+        this.world.setTimeScale(0);
     }
 
     public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
@@ -64,12 +70,20 @@ export class LoadingManager
     {
         this.loadingTracker[path] = false;
         let done = true;
+        let total = 0;
+        let finished = 0;
         for (const key in this.loadingTracker) {
             if (this.loadingTracker.hasOwnProperty(key)) {
                 const stillLoading = this.loadingTracker[key];
+
+                total++;
                 if (stillLoading) done = false;
+                else finished++;
             }
         }
+
+        let percent = (finished / total) * 100;
+        document.getElementById('progress-bar').style.width = percent + '%';
 
         if (done)
         {

@@ -35,7 +35,7 @@
     "@types/stats": "^0.16.30",
     "css-loader": "^3.4.0",
     "file-loader": "^4.3.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.18",
     "style-loader": "^1.0.2",
     "three": "^0.113.2",
     "three-csm": "^1.0.1",
@@ -43,7 +43,7 @@
     "typescript": "^3.7.3",
     "webpack": "^4.41.3",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.0",
+    "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {}

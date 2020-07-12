@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
-import { SimulationFrame } from '../simulation/SimulationFrame';
+import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { World } from './World';
 
 export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
@@ -283,6 +283,7 @@ export function setupMeshProperties(child: any): void
         mat.name = child.material.name;
         mat.map = child.material.map;
         mat.map.anisotropy = 4;
+        mat.aoMap = child.material.aoMap;
         mat.transparent = child.material.transparent;
         mat.skinning = child.material.skinning;
         // mat.map.encoding = THREE.LinearEncoding;

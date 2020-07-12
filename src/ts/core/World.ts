@@ -16,21 +16,20 @@ import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
 import * as _ from 'lodash';
 import { InputManager } from './InputManager';
-import { SBObject } from '../objects/SBObject';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
-import { Sky } from './Sky';
-import { BoxPhysics } from '../objects/object_physics/BoxPhysics';
+import { Sky } from '../entities/Sky';
 import * as Utils from './Utilities';
-import { TrimeshPhysics } from '../objects/object_physics/TrimeshPhysics';
-import { Grass } from '../objects/Grass';
-import { Path } from '../objects/Path';
+import { Grass } from '../entities/Grass';
+import { Path } from '../data/Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { LoadingManager } from './LoadingManager';
 import { WelcomeScreen } from "./WelcomeScreen";
-import { Car } from '../vehicles/Car';
-import { Airplane } from '../vehicles/Airplane';
-import { Helicopter } from '../vehicles/Helicopter';
+import { BoxCollider } from '../physics/colliders/BoxCollider';
+import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
+import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
+import { Vehicle } from '../vehicles/Vehicle';
+import { Scenario } from '../data/Scenario';
 
 export class World
 {
@@ -40,8 +39,6 @@ export class World
     public stats: Stats;
     public graphicsWorld: THREE.Scene;
     public sky: Sky;
-    // public sun: THREE.Vector3;
-    // public dirLight: THREE.DirectionalLight;
     public physicsWorld: CANNON.World;
     public parallelPairs: any[];
     public physicsFrameRate: number;
@@ -55,15 +52,14 @@ export class World
     public params: any;
     public inputManager: InputManager;
     public cameraOperator: CameraOperator;
-    public timeScaleTarget: number;
+    public timeScaleTarget: number = 1;
     public csm: CSM;
     public loadingManager: LoadingManager;
     public welcomeScreen: WelcomeScreen;
-
-    public objects: SBObject[];
-    public characters: Character[];
-    public balls: any[];
-    public vehicles: any[];
+    public cannonDebugRenderer: CannonDebugRenderer;
+    public scenarios: Scenario[] = [];
+    public characters: Character[] = [];
+    public vehicles: Vehicle[] = [];
     public paths: {[id: string]: Path} = {};
 
     constructor()
@@ -75,9 +71,6 @@ export class World
         {
             Detector.addGetWebGLMessage();
         }
-
-        this.loadingManager = new LoadingManager();
-        this.welcomeScreen = new WelcomeScreen();
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer();
@@ -125,7 +118,7 @@ export class World
         this.csm = new CSM({
             fov: 80,
             far: 300,
-            lightIntensity: 2.3,
+            lightIntensity: 2.5,
             cascades: 4,
             shadowMapSize: 2048,
             camera: this.camera,
@@ -183,18 +176,13 @@ export class World
         let gui = this.getGUI(scope);
         gui.open();
 
-        // Changing time scale with scroll wheel
-        this.timeScaleTarget = 1;
-
         //#endregion
 
         // Initialization
-        this.balls = [];
-        this.objects = [];
-        this.characters = [];
-        this.vehicles = [];
         this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
+        this.loadingManager = new LoadingManager(this);
+        this.welcomeScreen = this.loadingManager.welcomeScreen;
 
         this.render(this);
     }
@@ -204,12 +192,6 @@ export class World
     public update(timeStep: number): void
     {
         this.updatePhysics(timeStep);
-
-        // Objects
-        this.objects.forEach((obj) =>
-        {
-            obj.update(timeStep);
-        });
 
         // Characters
         this.characters.forEach((char) =>
@@ -265,6 +247,8 @@ export class World
             if (body.sleepState === 2) asleep++;
         });
 
+        if (this.params.Draw_Physics) this.cannonDebugRenderer.update();
+
         document.getElementById('car-debug').innerHTML = '';
         document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
         document.getElementById('car-debug').innerHTML += '<br>';
@@ -278,30 +262,45 @@ export class World
         // Step the physics world
         this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
 
-        // Sync physics/visuals
-        this.objects.forEach((obj) =>
-        {
-            if (obj.physics.physical !== undefined)
+        this.characters.forEach((char) => {
+            if (this.isOutOfBounds(char.characterCapsule.body.position))
             {
-                if (obj.physics.physical.position.y < -5)
-                {
-                    obj.physics.physical.position.x = 1.13;
-                    obj.physics.physical.position.y = 5;
-                    obj.physics.physical.position.z = -2.2;
-
-                    obj.physics.physical.interpolatedPosition.x = 1.13;
-                    obj.physics.physical.interpolatedPosition.y = 5;
-                    obj.physics.physical.interpolatedPosition.z = -2.2;
-                }
-
-                obj.position.copy(Utils.threeVector(obj.physics.physical.position));
-                obj.quaternion.copy(Utils.threeQuat(obj.physics.physical.quaternion));
-                
-                // entering vehicles
-                // obj.position.copy(obj.physics.physical.interpolatedPosition);
-                // obj.quaternion.copy(obj.physics.physical.interpolatedQuaternion);
+                this.outOfBoundsRespawn(char.characterCapsule.body);
             }
         });
+
+        this.vehicles.forEach((vehicle) => {
+            if (this.isOutOfBounds(vehicle.rayCastVehicle.chassisBody.position))
+            {
+                let worldPos = new THREE.Vector3();
+                vehicle.spawnPoint.getWorldPosition(worldPos);
+                worldPos.y += 1;
+                this.outOfBoundsRespawn(vehicle.rayCastVehicle.chassisBody, Utils.cannonVector(worldPos));
+            }
+        });
+    }
+
+    public isOutOfBounds(position: CANNON.Vec3): boolean
+    {
+        let inside = position.x > -211.882 && position.x < 211.882 &&
+                     position.z > -153.232 && position.z < 169.098 &&
+                     position.y > 0.107;
+        let belowSeaLevel = position.y < 14.989;
+
+        return !inside && belowSeaLevel;
+    }
+
+    public outOfBoundsRespawn(body: CANNON.Body, position?: CANNON.Vec3): void
+    {
+        let newPos = position || new CANNON.Vec3(0, 16, 0);
+        let newQuat = new CANNON.Quaternion(0, 0, 0, 1);
+
+        body.position.copy(newPos);
+        body.interpolatedPosition.copy(newPos);
+        body.quaternion.copy(newQuat);
+        body.interpolatedQuaternion.copy(newQuat);
+        body.velocity.setZero();
+        body.angularVelocity.setZero();
     }
 
     /**
@@ -351,6 +350,12 @@ export class World
             this.stats.end();
             this.justRendered = true;
         }
+    }
+
+    public setTimeScale(value: number): void
+    {
+        this.params.Time_Scale = value;
+        this.timeScaleTarget = value;
     }
 
     public add(object: IWorldEntity): void
@@ -406,30 +411,24 @@ export class World
                     {
                         if (child.userData.hasOwnProperty('type')) 
                         {
+                            // Convex doesn't work! Stick to boxes!
                             if (child.userData.type === 'box')
                             {
-                                let phys2 = new BoxPhysics({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
-                                phys2.physical.position.copy(Utils.cannonVector(child.position));
-                                phys2.physical.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                phys2.physical.computeAABB();
+                                let phys = new BoxCollider({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
+                                phys.body.position.copy(Utils.cannonVector(child.position));
+                                phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
+                                phys.body.computeAABB();
 
-                                phys2.physical.shapes.forEach((shape) => {
+                                phys.body.shapes.forEach((shape) => {
                                     shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
                                 });
 
-                                let SBobj = new SBObject();
-                                SBobj.setPhysics(phys2);
-
-                                this.add(SBobj);
+                                this.physicsWorld.addBody(phys.body);
                             }
                             else if (child.userData.type === 'trimesh')
                             {
-                                let phys = new TrimeshPhysics(child, {});
-
-                                let SBobj = new SBObject();
-                                SBobj.setPhysics(phys);
-
-                                this.add(SBobj);
+                                let phys = new TrimeshCollider(child, {});
+                                this.physicsWorld.addBody(phys.body);
                             }
 
                             child.visible = false;
@@ -447,49 +446,21 @@ export class World
                         this.paths[pathName].addNode(child);
                     }
 
-                    if (child.userData.data === 'spawn')
+                    if (child.userData.data === 'scenario')
                     {
-                        if (child.userData.type === 'car')
+                        let scenario = new Scenario(child);
+
+                        if (child.userData.hasOwnProperty('default') && child.userData.default === 'true') 
                         {
-                            this.loadingManager.loadGLTF('build/assets/car.glb', (model: any) =>
-                            {
-                                let car = new Car(model);
-                                car.setPosition(child.position.x, child.position.y + 1, child.position.z);
-                                car.collision.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                this.add(car);
-                            });
+                            scenario.default = true;
                         }
-                        else if (child.userData.type === 'airplane')
+
+                        if (child.userData.hasOwnProperty('spawn_always') && child.userData.spawn_always === 'true') 
                         {
-                            this.loadingManager.loadGLTF('build/assets/airplane.glb', (model: any) =>
-                            {
-                                let airplane = new Airplane(model);
-                                airplane.setPosition(child.position.x, child.position.y + 1, child.position.z);
-                                airplane.collision.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                this.add(airplane);
-                            });
+                            scenario.spawnAlways = true;
                         }
-                        else if (child.userData.type === 'heli')
-                        {
-                            this.loadingManager.loadGLTF('build/assets/heli.glb', (model: any) =>
-                            {
-                                let heli = new Helicopter(model);
-                                heli.setPosition(child.position.x, child.position.y + 1, child.position.z);
-                                heli.collision.quaternion.copy(Utils.cannonQuat(child.quaternion));
-                                this.add(heli);
-                            });
-                        }
-                        else if (child.userData.type === 'player')
-                        {
-                            this.loadingManager.loadGLTF('build/assets/boxman.glb', (model) =>
-                            {
-                                let player = new Character(model);
-                                player.setPosition(child.position.x, child.position.y, child.position.z);
-                                this.add(player);
-                                player.setOrientation(new THREE.Vector3(1, 0, 0), true);
-                                player.takeControl();
-                            });
-                        }
+
+                        this.scenarios.push(scenario);
                     }
                 }
             }
@@ -503,32 +474,16 @@ export class World
             }
         }
 
-        // console.log(gltf);
-        // console.log(this.paths);
+        this.scenarios.forEach((scenario) => {
+            scenario.findSpawnPoints();
+        });
+
         this.graphicsWorld.add(gltf.scene);
-    }
 
-    public addFloor(): void {
-        let SBobj = new SBObject();
-        let phys = new BoxPhysics({size: new THREE.Vector3(100, 1, 100)});
-        SBobj.setPhysics(phys);
-        SBobj.setModelFromPhysicsShape();
-        this.add(SBobj);
-
-        // Ramp
-        let SBobj2 = new SBObject();
-        let phys2 = new BoxPhysics({size: new THREE.Vector3(10, 1, 10)});
-        phys2.physical.position.z = 10;
-        phys2.physical.quaternion.setFromEuler(-0.3, 0, 0);
-        phys2.physical.computeAABB();
-        SBobj2.setPhysics(phys2);
-        SBobj2.setModelFromPhysicsShape();
-        this.add(SBobj2);
-
-        // Grid helper
-        let gridHelper = new THREE.GridHelper( 100, 50, 0x444444, 0xaaaaaa );
-        gridHelper.position.y = 1.01;
-        this.graphicsWorld.add( gridHelper );
+        // this.scenarios[4].launch(this);
+        this.scenarios.forEach((scenario) => {
+            if (scenario.default || scenario.spawnAlways) scenario.launch(this);
+        });
     }
 
     public scrollTheTimeScale(scrollAmount: number): void
@@ -570,7 +525,7 @@ export class World
         document.getElementById('controls-menu').innerHTML = html;
     }
 
-    private getGUI(scope: any): GUI
+    private getGUI(scope: World): GUI
     {
         const gui = new GUI.GUI();
 
@@ -584,7 +539,7 @@ export class World
         inputFolder.add(this.params, 'Mouse_Sensitivity', 0, 1)
             .onChange((value) =>
             {
-                scope.cameraController.setSensitivity(value, value * 0.8);
+                scope.cameraOperator.setSensitivity(value, value * 0.8);
             });
 
         // Graphics
@@ -618,14 +573,15 @@ export class World
         debugFolder.add(this.params, 'Draw_Physics')
             .onChange((enabled) =>
             {
-                scope.objects.forEach((obj) =>
+                if (enabled)
                 {
-                    if (obj.physics.visual !== undefined)
-                    {
-                        if (enabled) obj.physics.visual.visible = true;
-                        else obj.physics.visual.visible = false;
-                    }
-                });
+                    this.cannonDebugRenderer = new CannonDebugRenderer( this.graphicsWorld, this.physicsWorld );
+                }
+                else
+                {
+                    this.cannonDebugRenderer.clearMeshes();
+                    this.cannonDebugRenderer = undefined;
+                }
             });
         debugFolder.add(this.params, 'RayCast_Debug')
             .onChange((enabled) =>
@@ -639,7 +595,7 @@ export class World
             
         // Debug
         let skyFolder = gui.addFolder('Sky');
-        skyFolder.add(this.params, 'Phi', 0, 360).listen()
+        skyFolder.add(this.params, 'Phi', 0, 180).listen()
             .onChange((value) =>
             {
                 scope.sky.phi = value;

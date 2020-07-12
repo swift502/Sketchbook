@@ -1,10 +1,12 @@
+import { World } from "./World";
 
 export class WelcomeScreen
 {
+    private world: World;
 
-    constructor()
+    constructor(world: World)
     {
-
+        this.world = world;
     }
 
     public displayStartBtn(): void
@@ -15,6 +17,7 @@ export class WelcomeScreen
     public hideWelcomeScreen(): void
     {
         document.getElementById('welcome-screen').style.display = 'none';
+        this.world.setTimeScale(1);
     }
 
 }
