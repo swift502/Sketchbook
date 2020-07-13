@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="http://jblaha.art"><img src="https://i.imgur.com/Y5YLgWR.png"></a>
+    <a href="https://jblaha.art/sketchbook"><img src="https://i.imgur.com/Y5YLgWR.png"></a>
     <br>
     Play it <a href="https://jblaha.art/sketchbook">here</a>!
     <br>
