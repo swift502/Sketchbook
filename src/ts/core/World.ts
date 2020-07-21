@@ -260,7 +260,7 @@ export class World
     public updatePhysics(timeStep: number): void
     {
         // Step the physics world
-        this.physicsWorld.step(this.physicsFrameTime, timeStep, this.physicsMaxPrediction);
+        this.physicsWorld.step(this.physicsFrameTime, timeStep);
 
         this.characters.forEach((char) => {
             if (this.isOutOfBounds(char.characterCapsule.body.position))
@@ -328,6 +328,7 @@ export class World
 
         // Getting timeStep
         let timeStep = (this.renderDelta + this.logicDelta) * this.params.Time_Scale;
+        timeStep = Math.min(timeStep, 1/30);    // min 15 fps
 
         // Logic
         world.update(timeStep);
@@ -480,10 +481,10 @@ export class World
 
         this.graphicsWorld.add(gltf.scene);
 
-        // this.scenarios[4].launch(this);
-        this.scenarios.forEach((scenario) => {
-            if (scenario.default || scenario.spawnAlways) scenario.launch(this);
-        });
+        this.scenarios[2].launch(this);
+        // this.scenarios.forEach((scenario) => {
+        //     if (scenario.default || scenario.spawnAlways) scenario.launch(this);
+        // });
     }
 
     public scrollTheTimeScale(scrollAmount: number): void

@@ -65,7 +65,7 @@ export class VehicleSpawnPoint implements ISpawnPoint
                                             
                                             if (node.object.name === this.firstAINode)
                                             {
-                                                character.setBehaviour(new FollowPath(node, 30));
+                                                character.setBehaviour(new FollowPath(node, 10));
                                                 nodeFound = true;
                                             }
                                         }
