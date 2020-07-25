@@ -34,5 +34,5 @@ export declare class CameraOperator implements IInputReceiver {
     handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void;
     handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void;
     inputReceiverInit(): void;
-    inputReceiverUpdate(): void;
+    inputReceiverUpdate(timeStep: number): void;
 }

@@ -1,15 +1,19 @@
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
-export declare class Car extends Vehicle implements IControllable, IWorldEntity {
+export declare class Car extends Vehicle implements IControllable {
     drive: string;
+    get speed(): number;
+    private _speed;
     private steeringWheel;
+    private airSpinTimer;
     private steeringSimulator;
     private gear;
     private shiftTimer;
     private timeToShift;
+    private canTiltForwards;
     constructor(gltf: any);
+    noDirectionPressed(): boolean;
     update(timeStep: number): void;
     shiftUp(): void;
     shiftDown(): void;

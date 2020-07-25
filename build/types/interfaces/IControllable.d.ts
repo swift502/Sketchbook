@@ -9,4 +9,6 @@ export interface IControllable extends IInputReceiver {
     triggerAction(actionName: string, value: boolean): void;
     resetControls(): void;
     allowSleep(value: boolean): void;
+    onInputChange(): void;
+    noDirectionPressed(): boolean;
 }
