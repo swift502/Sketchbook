@@ -1,4 +1,3 @@
-import '../css/dat.gui.css';
 import '../css/main.css';
 import * as THREEImport from 'three';
 import * as CANNONImport from 'cannon';

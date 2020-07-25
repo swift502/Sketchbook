@@ -1,0 +1,48 @@
+/* Base */
+
+body {
+    background-color: #ffffff;
+    overflow: hidden;
+    font-family: arial, serif;
+    margin: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+    transition: filter 3s ease;
+}
+
+.btn-primary {
+    opacity: 0;
+    background: black;
+    padding: 12px 15px 12px 15px;
+    font-family: "Cutive Mono", monospace;
+    font-size: 1.2rem;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.main-title {
+    font-family: "Averia Sans Libre", cursive;
+    font-size: 4rem;
+    color: white;
+    margin: 0;
+}
+
+.sub-title {
+    font-family: "Cutive Mono", monospace;
+    font-size: 1.4rem;
+    color: black;
+}
+
+
+
+
+

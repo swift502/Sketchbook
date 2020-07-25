@@ -1,0 +1,95 @@
+/* Debug styles */
+
+.info-box {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background: #0004;
+    border-radius: 0 5px 0 0;
+}
+
+.info-card {
+    z-index: 3;
+    color: #fff;
+    border-radius: 3px;
+    text-shadow: 1px 1px 1px #000, 0px 1px 3px #000;
+    background: #0000;
+    overflow: hidden;
+    top: 80px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: 10px;
+    font-family: 'Averia Sans Libre', cursive;
+    user-select: none;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    overflow: visible;
+}
+
+.info-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.info-row {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.info-card .keyboard {
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    height: 30px;
+}
+
+.info-card .mouse {
+    max-height: 34px;
+    margin: -2px 0px;
+}
+
+.info-card .key {
+    text-shadow: none;
+    font-weight: bold;
+    display: inline-block;
+    font-family: 'Cutive Mono', monospace;
+    padding: 2px 5px;
+    margin-right: 2px;
+    min-width: 10px;
+    text-align: center;
+    margin-left: 2px;
+    background: #eff0f2;
+    box-shadow: inset 0 0 25px #e8e8e8, 0 1px 0 #c3c3c3, 0 2px 0 #c9c9c9, 0 2px 3px #000;
+    color: #111;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.ctrl-desc {
+    margin-left: 5px;
+}
+
+.controls-card .menu-arrow {
+    position: absolute;
+    right: 8px;
+    height: 24px;
+    top: 14px;
+    transition: all 0.2s ease;
+    transform: rotate(180deg);
+}
+
+#debug-menu {
+    position: absolute;
+}
+
+/* .info-column{
+    height: 100vh;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+} */
