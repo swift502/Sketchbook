@@ -6,6 +6,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     text-align: center;
     height: 100%;
     width: 100%;
@@ -19,8 +20,11 @@
 }
 
 #loader {
-    position: absolute;
-    margin-top: 80px;
+    /* position: absolute; */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    /* margin-top: 80px; */
     z-index: 6;
     padding: 20px;
     font-size: 1.2rem;
@@ -44,6 +48,8 @@
 
 #progress-text
 {
-    margin-top: -26px;
-    color: white;
+    height: 21px;
+    width: 500px;
+    margin-top: 10px;
+    color: black;
 }

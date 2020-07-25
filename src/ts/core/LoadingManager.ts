@@ -1,16 +1,18 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SkeletonUtils } from '../../lib/utils/SkeletonUtils';
-import { WelcomeScreen} from "./WelcomeScreen";
+import { WelcomeScreen} from './WelcomeScreen';
 import { World } from './World';
+import { LoadingTrackerEntry } from './LoadingTrackerEntry';
+import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 
 export class LoadingManager
 {
-    public printProgress: boolean = false;
     public welcomeScreen: WelcomeScreen;
     
     private gltfLoader: GLTFLoader;
-    private loadingTracker: {} = {};
+    private loadingTracker: LoadingTrackerEntry[] = [];
     private world: World;
+    private progressBarSimulator: SpringSimulator;
 
     // private cache: {} = {};
 
@@ -18,6 +20,7 @@ export class LoadingManager
     {
         this.gltfLoader = new GLTFLoader();
         this.welcomeScreen = new WelcomeScreen(world);
+        this.progressBarSimulator = new SpringSimulator(60, 10, 0.6);
 
         this.world = world;
         this.world.setTimeScale(0);
@@ -25,6 +28,7 @@ export class LoadingManager
 
     public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
     {
+        // Experimental model caching
         // if (path in this.cache)
         // {
         //     let clone = SkeletonUtils.clone(this.cache[path]);
@@ -34,23 +38,19 @@ export class LoadingManager
         // }
         // else
         // {
-            this.startLoading(path);
+
+            // console.log("new entry! " + path);
+            let trackerEntry = this.addLoadingEntry(path);
 
             this.gltfLoader.load(path,
             (gltf)  =>
             {
-                // this.cache[path] = gltf;
-
                 onLoadingFinished(gltf);
-                this.doneLoading(path);
-                // console.log('new');
+                this.doneLoading(trackerEntry);
             },
             (xhr) =>
             {
-                if (this.printProgress)
-                {
-                    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-                }
+                trackerEntry.progress = xhr.loaded / xhr.total;
             },
             (error)  =>
             {
@@ -59,33 +59,22 @@ export class LoadingManager
         // }
     }
 
-    public startLoading(path: string): void
+    public addLoadingEntry(path: string): LoadingTrackerEntry
     {
-        this.loadingTracker[path] = true;
+        let entry = new LoadingTrackerEntry(path);
+        this.loadingTracker.push(entry);
+
         document.getElementById('loader').style.display = 'flex';
         document.getElementById('ui-container').style.display = 'none';
+
+        return entry;
     }
 
-    public doneLoading(path: string): void
+    public doneLoading(trackerEntry: LoadingTrackerEntry): void
     {
-        this.loadingTracker[path] = false;
-        let done = true;
-        let total = 0;
-        let finished = 0;
-        for (const key in this.loadingTracker) {
-            if (this.loadingTracker.hasOwnProperty(key)) {
-                const stillLoading = this.loadingTracker[key];
+        trackerEntry.finished = true;
 
-                total++;
-                if (stillLoading) done = false;
-                else finished++;
-            }
-        }
-
-        let percent = (finished / total) * 100;
-        document.getElementById('progress-bar').style.width = percent + '%';
-
-        if (done)
+        if (this.isLoadingDone())
         {
             // Hide loader
             document.getElementById('loader').style.display = 'none';
@@ -94,6 +83,48 @@ export class LoadingManager
             // Display Start Button
             this.welcomeScreen.displayStartBtn();
         }
+    }
+
+    public update(timeStep: number): void
+    {
+        let percentage = this.getLoadingPercentage();
+        this.progressBarSimulator.target = percentage;
+        this.progressBarSimulator.simulate(timeStep);
+
+        document.getElementById('progress-bar').style.width = this.progressBarSimulator.position + '%';
+
+        let text = '';
+
+        for (const item of this.loadingTracker)
+        {
+            text += item.path + (item.finished ? ' finished' : ' loading...') + '\n';
+        }
+
+        if (document.getElementById('progress-text').innerText !== text)
+        {
+            document.getElementById('progress-text').innerText = text;
+        }
+    }
+
+    private getLoadingPercentage(): number
+    {
+        let done = true;
+        let total = 0;
+        let finished = 0;
+
+        for (const item of this.loadingTracker)
+        {
+            total++;
+            finished += item.progress;
+            if (!item.finished) done = false;
+        }
+
+        return (finished / total) * 100;
+    }
+
+    private isLoadingDone(): boolean
+    {
+        return this.getLoadingPercentage() === 100;
     }
 
     // public cloneGltf(gltf)

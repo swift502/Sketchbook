@@ -189,7 +189,7 @@ export class World
 
     // Update
     // Handles all logic updates.
-    public update(timeStep: number): void
+    public update(timeStep: number, unscaledTimeStep: number): void
     {
         this.updatePhysics(timeStep);
 
@@ -206,6 +206,7 @@ export class World
         });
 
         this.inputManager.update(timeStep);
+        this.loadingManager.update(unscaledTimeStep);
 
         // Lerp parameters
         this.params.Time_Scale = THREE.MathUtils.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
@@ -327,11 +328,12 @@ export class World
         this.renderDelta = this.clock.getDelta();
 
         // Getting timeStep
-        let timeStep = (this.renderDelta + this.logicDelta) * this.params.Time_Scale;
+        let unscaledTimeStep = (this.renderDelta + this.logicDelta) ;
+        let timeStep = unscaledTimeStep * this.params.Time_Scale;
         timeStep = Math.min(timeStep, 1/30);    // min 15 fps
 
         // Logic
-        world.update(timeStep);
+        world.update(timeStep, unscaledTimeStep);
 
         // Measuring logic time
         this.logicDelta = this.clock.getDelta();
