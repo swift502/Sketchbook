@@ -11,7 +11,7 @@ export class WelcomeScreen
 
     public displayStartBtn(): void
     {
-        document.getElementById('start-btn').style.opacity = '1';
+        document.getElementById('start-btn').style.display = 'inline';
     }
 
     public hideWelcomeScreen(): void

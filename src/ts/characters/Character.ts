@@ -77,7 +77,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
     // Data for entering vehicles, should probably be
     // grouped together a little better e.g. as a class instance
     public isRunningTowardsVehicle: boolean = false;
-    public passengerSeat: VehicleSeat;
     public targetSeat: VehicleSeat;
 
     private physicsEnabled: boolean = true;
@@ -418,10 +417,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
             if (this.charState.canEnterVehicles && viewVector.length() < 0.2 && heightDifference < 2) {
                 this.enterVehicle(this.targetSeat);
             }
-            else if (this.charState.canEnterVehicles && viewVector.length() > 1.8 && viewVector.length() < 2 && heightDifference < 2) {
-                this.enterVehicle(this.passengerSeat);
-            }
-
         }
 
         if (this.charState !== undefined) {
@@ -631,7 +626,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
         {
             this.isRunningTowardsVehicle = true;
             this.targetSeat = bestVehicle.seats[0];
-            this.passengerSeat = bestVehicle.seats[2];
             this.triggerAction('up', true);
         }
         else {
@@ -921,21 +915,5 @@ export class Character extends THREE.Object3D implements IWorldEntity
             world.graphicsWorld.remove(this.raycastBox);
         }
     }
-
-    // public closestSeatToEnter() {
-    //
-    //     var distancePassengerSeat = this.passengerSeat.entryPoint.position.distanceTo(this.characterCapsule.position);
-    //     var distanceDriverSeat = this.driverSeat.entryPoint.position.distanceTo(this.characterCapsule.position);
-    //
-    //     if (distanceDriverSeat < distancePassengerSeat) {
-    //         console.log('closer to driver ->', distanceDriverSeat);
-    //         console.log('distance to passenger ->', distancePassengerSeat);
-    //         return this.targetSeat
-    //     } else {
-    //         console.log('closer to passenger ->', distancePassengerSeat);
-    //         console.log('distance to driver ->', distanceDriverSeat);
-    //         return this.passengerSeat
-    //     }
-    //
-    // }
 }
+
