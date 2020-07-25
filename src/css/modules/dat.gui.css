@@ -1,3 +1,5 @@
+/* Dat GUI */
+
 .dg ul {
     list-style: none;
     margin: 0;
@@ -412,3 +414,31 @@
 .dg .c .slider:hover .slider-fg {
     background: #44abda
 }
+
+
+/* Stats box */
+
+.statsBox {
+    position: fixed;
+    top: 15px;
+    height: 48px;
+    right: 15px;
+    opacity: 0.9;
+    z-index: 10000;
+    cursor: cell;
+}
+
+.statsBox,
+.dg.ac .dg.main.a .dg .title {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dg.ac {
+    top: 48px;
+    user-select: none;
+}
+
+.dg.ac .close-button.close-bottom {
+    display: none;
+}
+
