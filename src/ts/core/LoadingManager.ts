@@ -1,13 +1,13 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SkeletonUtils } from '../../lib/utils/SkeletonUtils';
-import { WelcomeScreen} from './WelcomeScreen';
+import { LoadingScreen} from './LoadingScreen';
 import { World } from './World';
 import { LoadingTrackerEntry } from './LoadingTrackerEntry';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 
 export class LoadingManager
 {
-    public welcomeScreen: WelcomeScreen;
+    public welcomeScreen: LoadingScreen;
     
     private gltfLoader: GLTFLoader;
     private loadingTracker: LoadingTrackerEntry[] = [];
@@ -19,7 +19,7 @@ export class LoadingManager
     constructor(world: World)
     {
         this.gltfLoader = new GLTFLoader();
-        this.welcomeScreen = new WelcomeScreen(world);
+        this.welcomeScreen = new LoadingScreen(world);
         this.progressBarSimulator = new SpringSimulator(60, 10, 0.6);
 
         this.world = world;

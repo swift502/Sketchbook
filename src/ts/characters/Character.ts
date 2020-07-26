@@ -453,7 +453,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.modelContainer.getWorldQuaternion(this.help2.quaternion);
         this.tiltContainer.getWorldPosition(this.help3.position);
         this.tiltContainer.getWorldQuaternion(this.help3.quaternion);
-        document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
+        // document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
     }
 
     public inputReceiverInit(): void

@@ -1,6 +1,7 @@
 /* Main */
 
 @import "modules/base.css";
-@import "modules/debug.css";
+@import "modules/github-corner.css";
+@import "modules/left-panel.css";
 @import "modules/dat.gui.css";
-@import "modules/welcome-screen.css";
+@import "modules/loading-screen.css";

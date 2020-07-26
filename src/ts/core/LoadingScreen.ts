@@ -1,6 +1,6 @@
 import { World } from "./World";
 
-export class WelcomeScreen
+export class LoadingScreen
 {
     private world: World;
 
@@ -16,7 +16,7 @@ export class WelcomeScreen
 
     public hideWelcomeScreen(): void
     {
-        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('loading-screen').style.display = 'none';
         this.world.setTimeScale(1);
     }
 

@@ -1,6 +1,6 @@
 /* Welcome screen */
 
-#welcome-screen {
+#loading-screen {
     position: absolute;
     z-index: 0;
     display: flex;
@@ -15,16 +15,10 @@
     background: -moz-linear-gradient(top, #568db5 0%, #ccdde8 100%);
 }
 
-#text-wrapper {
-    width: 60%;
-}
-
 #loader {
-    /* position: absolute; */
     display: flex;
     align-items: center;
     flex-direction: column;
-    /* margin-top: 80px; */
     z-index: 6;
     padding: 20px;
     font-size: 1.2rem;
@@ -51,5 +45,4 @@
     height: 21px;
     width: 500px;
     margin-top: 10px;
-    color: black;
 }

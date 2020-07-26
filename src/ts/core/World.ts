@@ -24,7 +24,7 @@ import { Grass } from '../entities/Grass';
 import { Path } from '../data/Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { LoadingManager } from './LoadingManager';
-import { WelcomeScreen } from "./WelcomeScreen";
+import { LoadingScreen } from "./LoadingScreen";
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
@@ -55,7 +55,7 @@ export class World
     public timeScaleTarget: number = 1;
     public csm: CSM;
     public loadingManager: LoadingManager;
-    public welcomeScreen: WelcomeScreen;
+    public loadingScreen: LoadingScreen;
     public cannonDebugRenderer: CannonDebugRenderer;
     public scenarios: Scenario[] = [];
     public characters: Character[] = [];
@@ -182,7 +182,7 @@ export class World
         this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
         this.loadingManager = new LoadingManager(this);
-        this.welcomeScreen = this.loadingManager.welcomeScreen;
+        this.loadingScreen = this.loadingManager.welcomeScreen;
 
         this.render(this);
     }
@@ -238,24 +238,24 @@ export class World
         this.csm.update(this.camera.matrix);
         this.csm.lightDirection = new THREE.Vector3(-this.sky.sun.position.x, -this.sky.sun.position.y, -this.sky.sun.position.z).normalize();
 
-        let awake = 0;
-        let sleepy = 0;
-        let asleep = 0;
-        this.physicsWorld.bodies.forEach((body) =>
-        {
-            if (body.sleepState === 0) awake++;
-            if (body.sleepState === 1) sleepy++;
-            if (body.sleepState === 2) asleep++;
-        });
+        // let awake = 0;
+        // let sleepy = 0;
+        // let asleep = 0;
+        // this.physicsWorld.bodies.forEach((body) =>
+        // {
+        //     if (body.sleepState === 0) awake++;
+        //     if (body.sleepState === 1) sleepy++;
+        //     if (body.sleepState === 2) asleep++;
+        // });
 
         if (this.params.Draw_Physics) this.cannonDebugRenderer.update();
 
-        document.getElementById('car-debug').innerHTML = '';
-        document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
-        document.getElementById('car-debug').innerHTML += '<br>';
-        document.getElementById('car-debug').innerHTML += 'sleepy: ' + sleepy;
-        document.getElementById('car-debug').innerHTML += '<br>';
-        document.getElementById('car-debug').innerHTML += 'asleep: ' + asleep;
+        // document.getElementById('car-debug').innerHTML = '';
+        // document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
+        // document.getElementById('car-debug').innerHTML += '<br>';
+        // document.getElementById('car-debug').innerHTML += 'sleepy: ' + sleepy;
+        // document.getElementById('car-debug').innerHTML += '<br>';
+        // document.getElementById('car-debug').innerHTML += 'asleep: ' + asleep;
     }
 
     public updatePhysics(timeStep: number): void
@@ -330,7 +330,7 @@ export class World
         // Getting timeStep
         let unscaledTimeStep = (this.renderDelta + this.logicDelta) ;
         let timeStep = unscaledTimeStep * this.params.Time_Scale;
-        timeStep = Math.min(timeStep, 1/30);    // min 15 fps
+        timeStep = Math.min(timeStep, 1 / 30);    // min 15 fps
 
         // Logic
         world.update(timeStep, unscaledTimeStep);
@@ -515,20 +515,20 @@ export class World
     public updateControls(controls: any): void
     {
         let html = '';
-        html += '<div class="info-title">Controls:</div>';
+        html += '<h3>Controls:</h3>';
 
         controls.forEach((row) =>
         {
-            html += '<div class="info-row">';
+            html += '<div class="ctrl-row">';
             row.keys.forEach((key) => {
                 if (key === '+' || key === 'and' || key === 'or' || key === '&') html += '&nbsp;' + key + '&nbsp;';
-                else html += '<span class="key">' + key + '</span>';
+                else html += '<span class="ctrl-key">' + key + '</span>';
             });
 
             html += '<span class="ctrl-desc">' + row.desc + '</span></div>';
         });
 
-        document.getElementById('controls-menu').innerHTML = html;
+        document.getElementById('controls').innerHTML = html;
     }
 
     private getGUI(scope: World): GUI
