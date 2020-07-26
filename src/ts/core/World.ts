@@ -30,6 +30,8 @@ import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from '../data/Scenario';
+import { CustomConsole } from '../ui/CustomConsole';
+import { times } from 'lodash';
 
 export class World
 {
@@ -56,6 +58,7 @@ export class World
     public csm: CSM;
     public loadingManager: LoadingManager;
     public loadingScreen: LoadingScreen;
+    public customConsole: CustomConsole;
     public cannonDebugRenderer: CannonDebugRenderer;
     public scenarios: Scenario[] = [];
     public characters: Character[] = [];
@@ -182,7 +185,10 @@ export class World
         this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
         this.inputManager = new InputManager(this, this.renderer.domElement);
         this.loadingManager = new LoadingManager(this);
-        this.loadingScreen = this.loadingManager.welcomeScreen;
+
+        // UI
+        this.loadingScreen = new LoadingScreen(this);
+        this.customConsole = new CustomConsole();
 
         this.render(this);
     }
@@ -238,6 +244,9 @@ export class World
         this.csm.update(this.camera.matrix);
         this.csm.lightDirection = new THREE.Vector3(-this.sky.sun.position.x, -this.sky.sun.position.y, -this.sky.sun.position.z).normalize();
 
+        // UI
+        this.customConsole.update(timeStep);
+
         // let awake = 0;
         // let sleepy = 0;
         // let asleep = 0;
@@ -284,7 +293,7 @@ export class World
     public isOutOfBounds(position: CANNON.Vec3): boolean
     {
         let inside = position.x > -211.882 && position.x < 211.882 &&
-                     position.z > -153.232 && position.z < 169.098 &&
+                     position.z > -169.098 && position.z < 153.232 &&
                      position.y > 0.107;
         let belowSeaLevel = position.y < 14.989;
 

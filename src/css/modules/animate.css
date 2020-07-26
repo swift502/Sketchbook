@@ -1051,7 +1051,7 @@
   100% {
     -webkit-transform: translateY(700px) scale(0.7);
     transform: translateY(700px) scale(0.7);
-    opacity: 0.7;
+    opacity: 0.0;
   }
 }
 @keyframes backOutDown {
