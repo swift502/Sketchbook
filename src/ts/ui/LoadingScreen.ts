@@ -1,4 +1,4 @@
-import { World } from "./World";
+import { World } from '../core/World';
 
 export class LoadingScreen
 {

@@ -7,7 +7,7 @@ import EffectComposer, {
     RenderPass,
     ShaderPass,
 } from '@johh/three-effectcomposer';
-import { default as CSM } from '../../lib/utils/three-csm.module.js';
+import { default as CSM } from 'three-csm';
 
 import { WaterShader } from '../../lib/shaders/WaterShader';
 
@@ -24,7 +24,7 @@ import { Grass } from '../entities/Grass';
 import { Path } from '../data/Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { LoadingManager } from './LoadingManager';
-import { LoadingScreen } from "./LoadingScreen";
+import { LoadingScreen } from '../ui/LoadingScreen';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';

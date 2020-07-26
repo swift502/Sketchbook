@@ -1,5 +1,6 @@
 /* Main */
 
+@import "modules/animate.css";
 @import "modules/base.css";
 @import "modules/github-corner.css";
 @import "modules/left-panel.css";

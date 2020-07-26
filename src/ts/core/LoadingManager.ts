@@ -1,6 +1,6 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SkeletonUtils } from '../../lib/utils/SkeletonUtils';
-import { LoadingScreen} from './LoadingScreen';
+import { LoadingScreen} from '../ui/LoadingScreen';
 import { World } from './World';
 import { LoadingTrackerEntry } from './LoadingTrackerEntry';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
