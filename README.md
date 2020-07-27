@@ -16,6 +16,8 @@ Simple web based game engine built on [three.js](https://github.com/mrdoob/three
 
 Mostly a playground for exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
 
+If you have any further questions about the project, feel free to stop by our discord server: https://discord.gg/kRjrd4b
+
 ## Features
 
 * World
@@ -46,22 +48,18 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 6. Run `npm run build`
 7. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
-#### Library usage
+## Library usage
 
 Sketchbook is packed as a library and can be used to create your own scenes utilising all the Sketchbook gameplay mechanics.
 Check out the [Sketch](https://github.com/swift502/Sketch) template project to learn about using Sketchbook in this way.
 
-#### Blender source files
+## Blender source files
 
-To not make this repository unnecessarily bloated, Blender source files and other graphical assets used by the main demo are kept separately from this repository: https://drive.google.com/drive/folders/1ZbziXLAW3yAn3e_s-6UO6jMIJWaglqDG?usp=sharing
+Blender source files and other graphical assets used by the main demo are kept separately from this repository: https://drive.google.com/drive/folders/1ZbziXLAW3yAn3e_s-6UO6jMIJWaglqDG?usp=sharing
 
-#### Contributors
+## Contributors
 
 Big thank you to each of the following github users for contributing to Sketchbook:
 
 - [aleqsunder](https://github.com/aleqsunder)
 - [danshuri](https://github.com/danshuri)
-
-#### Discord
-
-Feel free to stop by our discord server: https://discord.gg/kRjrd4b
