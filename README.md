@@ -10,7 +10,7 @@
 [![badge](https://img.shields.io/discord/730763393325334628?label=discord&logo=discord&style=flat-square)](https://discord.gg/kRjrd4b)
 
 
-# Sketchbook
+# 📒 Sketchbook
 
 Simple web based game engine built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js) focused on third-person character controls and related gameplay mechanics.
 
