@@ -16,7 +16,7 @@ Simple web based game engine built on [three.js](https://github.com/mrdoob/three
 
 Mostly a playground for exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
 
-If you have any further questions about the project, feel free to stop by our discord server: https://discord.gg/kRjrd4b
+If you have any further questions about the project, feel free create an issue or stop by our discord server https://discord.gg/kRjrd4b.
 
 ## Features
 
