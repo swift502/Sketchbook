@@ -284,8 +284,13 @@ export class Character extends THREE.Object3D implements IWorldEntity
         }
         else
         {
+            // Console debug
+            if (code === 'KeyT' && pressed === true)
+            {
+                this.world.customConsole.addMessage('This is a console message!');
+            } 
             // Free camera
-            if (code === 'KeyC' && pressed === true && event.shiftKey === true)
+            else if (code === 'KeyC' && pressed === true && event.shiftKey === true)
             {
                 this.resetControls();
                 this.world.cameraOperator.characterCaller = this;
@@ -453,7 +458,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
         this.modelContainer.getWorldQuaternion(this.help2.quaternion);
         this.tiltContainer.getWorldPosition(this.help3.position);
         this.tiltContainer.getWorldQuaternion(this.help3.quaternion);
-        document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
+        // document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
     }
 
     public inputReceiverInit(): void

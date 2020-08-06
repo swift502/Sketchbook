@@ -19,14 +19,18 @@ export declare abstract class Vehicle extends THREE.Object3D {
     help: THREE.AxesHelper;
     collision: CANNON.Body;
     materials: THREE.Material[];
+    spawnPoint: THREE.Object3D;
     private modelContainer;
     private firstPerson;
     constructor(gltf: any, handlingSetup?: any);
+    noDirectionPressed(): boolean;
     update(timeStep: number): void;
     onInputChange(): void;
     resetControls(): void;
     allowSleep(value: boolean): void;
     handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void;
+    setFirstPersonView(value: boolean): void;
+    toggleFirstPersonView(): void;
     triggerAction(actionName: string, value: boolean): void;
     handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void;
     handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void;

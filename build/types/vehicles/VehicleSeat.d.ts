@@ -12,7 +12,4 @@ export declare class VehicleSeat {
     doorSide: Side;
     constructor(object: THREE.Object3D);
     update(timeStep: number): void;
-    isDoorOpen(): boolean;
-    openDoor(): void;
-    closeDoor(): void;
 }

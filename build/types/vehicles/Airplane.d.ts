@@ -16,6 +16,7 @@ export declare class Airplane extends Vehicle implements IControllable, IWorldEn
     private enginePower;
     private lastDrag;
     constructor(gltf: any);
+    noDirectionPressed(): boolean;
     update(timeStep: number): void;
     physicsPreStep(body: CANNON.Body, plane: Airplane): void;
     onInputChange(): void;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { SimulationFrame } from '../simulation/SimulationFrame';
+import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 export declare function createCapsuleGeometry(radius?: number, height?: number, N?: number): THREE.Geometry;
 /**
  * Constructs a 2D matrix from first vector, replacing the Y axes with the global Y axis,

@@ -2,9 +2,8 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as Utils from '../core/Utilities';
 import { KeyBinding } from '../core/KeyBinding';
-import { SBObject } from '../objects/SBObject';
-import { VectorSpringSimulator } from '../simulation/VectorSpringSimulator';
-import { RelativeSpringSimulator } from '../simulation/RelativeSpringSimulator';
+import { VectorSpringSimulator } from '../physics/spring_simulation/VectorSpringSimulator';
+import { RelativeSpringSimulator } from '../physics/spring_simulation/RelativeSpringSimulator';
 import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
@@ -12,6 +11,7 @@ import { ICharacterState } from '../interfaces/ICharacterState';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { VehicleSeat } from '../vehicles/VehicleSeat';
 import { Vehicle } from '../vehicles/Vehicle';
+import { CapsuleCollider } from '../physics/colliders/CapsuleCollider';
 export declare class Character extends THREE.Object3D implements IWorldEntity {
     isCharacter: boolean;
     height: number;
@@ -39,7 +39,7 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     actions: {
         [action: string]: KeyBinding;
     };
-    characterCapsule: SBObject;
+    characterCapsule: CapsuleCollider;
     rayResult: CANNON.RaycastResult;
     rayHasHit: boolean;
     rayCastLength: number;
@@ -98,8 +98,10 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     enterVehicle(seat: VehicleSeat): void;
     teleportToVehicle(vehicle: Vehicle, seat: any): void;
     startControllingVehicle(vehicle: IControllable, seat: any): void;
+    transferControls(entity: IControllable): void;
     exitVehicle(): void;
     physicsPreStep(body: CANNON.Body, character: Character): void;
+    feetRaycast(): void;
     physicsPostStep(body: CANNON.Body, character: Character): void;
     addToWorld(world: World): void;
     removeFromWorld(world: World): void;

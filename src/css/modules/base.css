@@ -3,8 +3,11 @@
 body {
     background-color: #ffffff;
     overflow: hidden;
-    font-family: arial, serif;
     margin: 0;
+    font-family: 'Averia Libre', cursive;
+    font-size: larger;
+    color: white;
+    text-shadow: 1px 1px 1px #000, 0px 1px 3px #000;
 }
 
 html, body {
@@ -12,13 +15,22 @@ html, body {
     height: 100%;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
 #canvas {
     width: 100%;
     height: 100%;
-    transition: filter 3s ease;
+    /* transition: filter 3s ease; */
 }
 
-.btn-primary {
+#ui-container {
+    position: absolute;
+    height: 100vh;
+}
+
+.button {
     opacity: 0;
     background: black;
     padding: 12px 15px 12px 15px;
@@ -28,21 +40,3 @@ html, body {
     color: white;
     cursor: pointer;
 }
-
-.main-title {
-    font-family: "Averia Sans Libre", cursive;
-    font-size: 4rem;
-    color: white;
-    margin: 0;
-}
-
-.sub-title {
-    font-family: "Cutive Mono", monospace;
-    font-size: 1.4rem;
-    color: black;
-}
-
-
-
-
-

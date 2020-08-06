@@ -41,8 +41,6 @@ export class VehicleDoor
                     this.achievingTargetRotation = false;
                     // this.doorVelocity = 0;
                     this.physicsEnabled = this.rotation > 0;
-
-                    console.log(this.physicsEnabled);
                 }
             }
             else if (this.rotation > this.targetRotation)
@@ -55,8 +53,6 @@ export class VehicleDoor
                     this.achievingTargetRotation = false;
                     // this.doorVelocity = 0;
                     this.physicsEnabled = this.rotation > 0;
-
-                    console.log(this.physicsEnabled);
                 }
             }
         }
