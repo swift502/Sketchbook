@@ -2,27 +2,27 @@ import { CustomConsoleMessage } from './CustomConsoleMessage';
 
 export class CustomConsole
 {
-    public messages: CustomConsoleMessage[] = [];
-    public entranceAnimation: string = 'animate__slideInLeft';
-    public exitAnimation: string = 'animate__backOutDown';
+	public messages: CustomConsoleMessage[] = [];
+	public entranceAnimation: string = 'animate__slideInLeft';
+	public exitAnimation: string = 'animate__backOutDown';
 
-    public messageDuration: number = 3;
+	public messageDuration: number = 3;
 
-    public addMessage(text: string): void
-    {
-        let messageElement = document.createElement('div');
-        messageElement.classList.add('console-message', 'animate__animated', this.entranceAnimation);
-        messageElement.style.setProperty('--animate-duration', '0.3s');
-        let textElement = document.createTextNode(text);
-        messageElement.appendChild(textElement);
-        document.getElementById('console').prepend(messageElement);
-        this.messages.push(new CustomConsoleMessage(this, messageElement));
-    }
+	public addMessage(text: string): void
+	{
+		let messageElement = document.createElement('div');
+		messageElement.classList.add('console-message', 'animate__animated', this.entranceAnimation);
+		messageElement.style.setProperty('--animate-duration', '0.3s');
+		let textElement = document.createTextNode(text);
+		messageElement.appendChild(textElement);
+		document.getElementById('console').prepend(messageElement);
+		this.messages.push(new CustomConsoleMessage(this, messageElement));
+	}
 
-    public update(timeStep: number): void
-    {
-        for (const message of this.messages) {
-            message.update(timeStep);
-        }
-    }
+	public update(timeStep: number): void
+	{
+		for (const message of this.messages) {
+			message.update(timeStep);
+		}
+	}
 }

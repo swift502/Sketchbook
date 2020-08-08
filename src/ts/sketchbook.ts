@@ -7,9 +7,9 @@ import { FollowPath } from './characters/character_ai/FollowPath';
 import { RandomBehaviour } from './characters/character_ai/RandomBehaviour';
 
 export const CharacterAI = {
-    FollowTarget,
-    FollowPath,
-    RandomBehaviour,
+	FollowTarget,
+	FollowPath,
+	RandomBehaviour,
 };
 
 export {Airplane} from './vehicles/Airplane';
