@@ -7,8 +7,8 @@ export class Scenario
 {
 	public id: string;
 	public name: string;
-	public spawnAlways: boolean;
-	public default: boolean;
+	public spawnAlways: boolean = false;
+	public default: boolean = false;
 
 	private rootNode: THREE.Object3D;
 	private spawnPoints: ISpawnPoint[] = [];
@@ -80,13 +80,18 @@ export class Scenario
 
 	public createLaunchLink(): void
 	{
-		let launchLink = document.createElement('li');
-		launchLink.innerText = this.name;
-		launchLink.onclick = () =>
-		{
-			this.world.launchScenario(this.id);
-		};
-		document.getElementById('scenarios').prepend(launchLink);
+		let li = document.createElement('li');
+		let a = document.createElement('a');
+		// a.onclick = () =>
+		// {
+		// 	this.world.launchScenario(this.id);
+		// };
+		a.setAttribute('onclick', `world.launchScenario('${this.id}');`);
+		a.innerText = this.name;
+		li.appendChild(a);
+
+		// let html = `<li><a onclick="world.launchScenario(${this.id});">${this.name}</a></li>`;
+		document.getElementById('scenarios').append(li);
 	}
 
 	public launch(world: World): void

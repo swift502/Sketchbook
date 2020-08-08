@@ -70,9 +70,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public behaviour: ICharacterAI;
 	public world: World;
 
-	public help1: THREE.AxesHelper;
-	public help2: THREE.AxesHelper;
-	public help3: THREE.AxesHelper;
+	// public help1: THREE.AxesHelper;
+	// public help2: THREE.AxesHelper;
+	// public help3: THREE.AxesHelper;
 
 	// Data for entering vehicles, should probably be
 	// grouped together a little better e.g. as a class instance
@@ -88,9 +88,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.readCharacterData(gltf);
 		this.setAnimations(gltf.animations);
 
-		this.help1 = new THREE.AxesHelper(1);
-		this.help2 = new THREE.AxesHelper(2);
-		this.help3 = new THREE.AxesHelper(3);
+		// this.help1 = new THREE.AxesHelper(1);
+		// this.help2 = new THREE.AxesHelper(2);
+		// this.help3 = new THREE.AxesHelper(3);
 
 		// The visuals group is centered for easy character tilting
 		this.tiltContainer = new THREE.Group();
@@ -452,12 +452,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 
 		// Debug
-		this.help1.position.copy(this.position);
-		this.help1.quaternion.copy(this.quaternion);
-		this.modelContainer.getWorldPosition(this.help2.position);
-		this.modelContainer.getWorldQuaternion(this.help2.quaternion);
-		this.tiltContainer.getWorldPosition(this.help3.position);
-		this.tiltContainer.getWorldQuaternion(this.help3.quaternion);
+		// this.help1.position.copy(this.position);
+		// this.help1.quaternion.copy(this.quaternion);
+		// this.modelContainer.getWorldPosition(this.help2.position);
+		// this.modelContainer.getWorldQuaternion(this.help2.quaternion);
+		// this.tiltContainer.getWorldPosition(this.help3.position);
+		// this.tiltContainer.getWorldQuaternion(this.help3.quaternion);
 		// document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
 	}
 

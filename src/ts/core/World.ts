@@ -466,7 +466,6 @@ export class World
 		for (const scenario of this.scenarios) {
 			if (scenario.default || scenario.spawnAlways) {
 				scenario.launch(this);
-				break;
 			}
 		}
 	}
@@ -479,7 +478,6 @@ export class World
 		for (const scenario of this.scenarios) {
 			if (scenario.id === scenarioID || scenario.spawnAlways) {
 				scenario.launch(this);
-				break;
 			}
 		}
 	}

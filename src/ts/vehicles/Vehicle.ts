@@ -325,7 +325,7 @@ export abstract class Vehicle extends THREE.Object3D
 
 			this.wheels.forEach((wheel) =>
 			{
-				this.world.graphicsWorld.attach(wheel.wheelObject);
+				world.graphicsWorld.attach(wheel.wheelObject);
 			});
 
 			this.materials.forEach((mat) =>
@@ -346,7 +346,13 @@ export abstract class Vehicle extends THREE.Object3D
 			this.world = undefined;
 			_.pull(world.vehicles, this);
 			world.graphicsWorld.remove(this);
-			world.physicsWorld.remove(this.collision);
+			// world.physicsWorld.remove(this.collision);
+			this.rayCastVehicle.removeFromWorld(world.physicsWorld);
+
+			this.wheels.forEach((wheel) =>
+			{
+				world.graphicsWorld.remove(wheel.wheelObject);
+			});
 		}
 	}
 
