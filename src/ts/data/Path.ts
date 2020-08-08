@@ -3,13 +3,29 @@ import { PathNode } from './PathNode';
 export class Path
 {
 	public nodes: {[nodeName: string]: PathNode} = {};
+	private rootNode: THREE.Object3D;
+
+	constructor(root: THREE.Object3D)
+	{
+		this.rootNode = root;
+
+		this.rootNode.traverse((child) => {
+			this.addNode(child);
+		});
+
+		this.connectNodes();
+	}
 
 	public addNode(child: any): void
 	{
-		let node = new PathNode();
-		node.object = child;
-		node.path = this;
-		this.nodes[child.name] = node;
+		if (child.hasOwnProperty('userData') && child.userData.hasOwnProperty('data'))
+		{
+			if (child.userData.data === 'pathNode')
+			{
+				let node = new PathNode(child, this);
+				this.nodes[child.name] = node;
+			}
+		}
 	}
 
 	public connectNodes(): void
@@ -23,10 +39,5 @@ export class Path
 				node.previousNode = this.nodes[node.object.userData.previousNode];
 			}
 		}
-	}
-
-	public firstNode(): PathNode
-	{
-		return this.nodes[Object.keys(this.nodes)[6]];
 	}
 }

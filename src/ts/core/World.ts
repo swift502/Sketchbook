@@ -63,7 +63,7 @@ export class World
 	public scenarios: Scenario[] = [];
 	public characters: Character[] = [];
 	public vehicles: Vehicle[] = [];
-	public paths: {[id: string]: Path} = {};
+	public paths: Path[] = [];
 
 	constructor()
 	{
@@ -293,8 +293,8 @@ export class World
 	public isOutOfBounds(position: CANNON.Vec3): boolean
 	{
 		let inside = position.x > -211.882 && position.x < 211.882 &&
-					 position.z > -169.098 && position.z < 153.232 &&
-					 position.y > 0.107;
+					position.z > -169.098 && position.z < 153.232 &&
+					position.y > 0.107;
 		let belowSeaLevel = position.y < 14.989;
 
 		return !inside && belowSeaLevel;
@@ -447,47 +447,17 @@ export class World
 						}
 					}
 
-					if (child.userData.data === 'pathNode')
+					if (child.userData.data === 'path')
 					{
-						let pathName = child.userData.path;
-						if (!this.paths.hasOwnProperty(pathName))
-						{
-							this.paths[pathName] = new Path();
-						}
-
-						this.paths[pathName].addNode(child);
+						this.paths.push(new Path(child));
 					}
 
 					if (child.userData.data === 'scenario')
 					{
-						let scenario = new Scenario(child);
-
-						if (child.userData.hasOwnProperty('default') && child.userData.default === 'true') 
-						{
-							scenario.default = true;
-						}
-
-						if (child.userData.hasOwnProperty('spawn_always') && child.userData.spawn_always === 'true') 
-						{
-							scenario.spawnAlways = true;
-						}
-
-						this.scenarios.push(scenario);
+						this.scenarios.push(new Scenario(child, this));
 					}
 				}
 			}
-		});
-
-		// Initialize paths
-		for (const pathName in this.paths) {
-			if (this.paths.hasOwnProperty(pathName)) {
-				const path = this.paths[pathName];
-				path.connectNodes();
-			}
-		}
-
-		this.scenarios.forEach((scenario) => {
-			scenario.findSpawnPoints();
 		});
 
 		this.graphicsWorld.add(gltf.scene);
@@ -501,14 +471,27 @@ export class World
 		}
 	}
 	
-	public launchScenario(): void
+	public launchScenario(scenarioID: string): void
 	{
+		this.clearEntities();
+
 		// Launch default scenario
 		for (const scenario of this.scenarios) {
-			if (scenario.default || scenario.spawnAlways) {
+			if (scenario.id === scenarioID || scenario.spawnAlways) {
 				scenario.launch(this);
 				break;
 			}
+		}
+	}
+
+	public clearEntities(): void
+	{
+		for (const char of this.characters) {
+			this.remove(char);
+		}
+
+		for (const vehicle of this.vehicles) {
+			this.remove(vehicle);
 		}
 	}
 

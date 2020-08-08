@@ -7,4 +7,10 @@ export class PathNode
 	public path: Path;
 	public nextNode: PathNode;
 	public previousNode: PathNode;
+
+	constructor(child: THREE.Object3D, path: Path)
+	{
+		this.object = child;
+		this.path = path;
+	}
 }

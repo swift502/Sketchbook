@@ -5,21 +5,45 @@ import { World } from '../core/World';
 
 export class Scenario
 {
+	public id: string;
+	public name: string;
 	public spawnAlways: boolean;
 	public default: boolean;
 
 	private rootNode: THREE.Object3D;
 	private spawnPoints: ISpawnPoint[] = [];
+	private invisible: boolean = false;
+	private world: World;
 
-	constructor(root: THREE.Object3D)
+	constructor(root: THREE.Object3D, world: World)
 	{
 		this.rootNode = root;
-	}
+		this.world = world;
+		this.id = root.name;
 
-	public findSpawnPoints(): void
-	{
-		this.rootNode.traverse((child) => {
-			if (child.hasOwnProperty('userData'))
+		// Scenario
+		if (root.userData.hasOwnProperty('name')) 
+		{
+			this.name = root.userData.name;
+		}
+		if (root.userData.hasOwnProperty('default') && root.userData.default === 'true') 
+		{
+			this.default = true;
+		}
+		if (root.userData.hasOwnProperty('spawn_always') && root.userData.spawn_always === 'true') 
+		{
+			this.spawnAlways = true;
+		}
+		if (root.userData.hasOwnProperty('invisible') && root.userData.invisible === 'true') 
+		{
+			this.invisible = true;
+		}
+
+		if (!this.invisible) this.createLaunchLink();
+
+		// Find all scenario spawns and enitites
+		root.traverse((child) => {
+			if (child.hasOwnProperty('userData') && child.userData.hasOwnProperty('data'))
 			{
 				if (child.userData.data === 'spawn')
 				{
@@ -54,9 +78,19 @@ export class Scenario
 		});
 	}
 
+	public createLaunchLink(): void
+	{
+		let launchLink = document.createElement('li');
+		launchLink.innerText = this.name;
+		launchLink.onclick = () =>
+		{
+			this.world.launchScenario(this.id);
+		};
+		document.getElementById('scenarios').prepend(launchLink);
+	}
+
 	public launch(world: World): void
 	{
-		// this.world.clearEntities();
 		this.spawnPoints.forEach((sp) => {
 			sp.spawn(world);
 		});
