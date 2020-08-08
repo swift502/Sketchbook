@@ -484,12 +484,14 @@ export class World
 
 	public clearEntities(): void
 	{
-		for (const char of this.characters) {
-			this.remove(char);
+		for (let i = 0; i < this.characters.length; i++) {
+			this.remove(this.characters[i]);
+			i--;
 		}
 
-		for (const vehicle of this.vehicles) {
-			this.remove(vehicle);
+		for (let i = 0; i < this.vehicles.length; i++) {
+			this.remove(this.vehicles[i]);
+			i--;
 		}
 	}
 

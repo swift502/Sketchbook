@@ -903,6 +903,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 		else
 		{
+			if (world.inputManager.inputReceiver === this)
+			{
+				world.inputManager.inputReceiver = undefined;
+			}
+
 			this.world = undefined;
 
 			// Remove from characters
