@@ -24,4 +24,4 @@ export declare let THREE: typeof THREEImport;
 export declare let CANNON: typeof CANNONImport;
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 export { LoadingManager } from './core/LoadingManager';
-export { WelcomeScreen } from './core/WelcomeScreen';
+export { LoadingScreen as WelcomeScreen } from './ui/LoadingScreen';

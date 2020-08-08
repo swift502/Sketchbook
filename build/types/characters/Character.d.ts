@@ -53,9 +53,6 @@ export declare class Character extends THREE.Object3D implements IWorldEntity {
     charState: ICharacterState;
     behaviour: ICharacterAI;
     world: World;
-    help1: THREE.AxesHelper;
-    help2: THREE.AxesHelper;
-    help3: THREE.AxesHelper;
     isRunningTowardsVehicle: boolean;
     targetSeat: VehicleSeat;
     private physicsEnabled;

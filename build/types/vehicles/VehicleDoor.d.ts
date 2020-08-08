@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Vehicle } from "./Vehicle";
+import { Vehicle } from './Vehicle';
 export declare class VehicleDoor {
     vehicle: Vehicle;
     doorObject: THREE.Object3D;

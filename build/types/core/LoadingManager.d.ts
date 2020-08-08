@@ -1,13 +1,16 @@
-import { WelcomeScreen } from "./WelcomeScreen";
 import { World } from './World';
+import { LoadingTrackerEntry } from './LoadingTrackerEntry';
 export declare class LoadingManager {
-    printProgress: boolean;
-    welcomeScreen: WelcomeScreen;
     private gltfLoader;
     private loadingTracker;
     private world;
+    private progressBarSimulator;
+    private firstLoad;
     constructor(world: World);
     loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void;
-    startLoading(path: string): void;
-    doneLoading(path: string): void;
+    addLoadingEntry(path: string): LoadingTrackerEntry;
+    doneLoading(trackerEntry: LoadingTrackerEntry): void;
+    update(timeStep: number): void;
+    private getLoadingPercentage;
+    private isLoadingDone;
 }
