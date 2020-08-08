@@ -6,13 +6,12 @@ import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 
 export class LoadingManager
 {
+	public firstLoad: boolean = true;
+
 	private gltfLoader: GLTFLoader;
 	private loadingTracker: LoadingTrackerEntry[] = [];
 	private world: World;
 	private progressBarSimulator: SpringSimulator;
-
-	private firstLoad: boolean = true;
-
 	// private cache: {} = {};
 
 	constructor(world: World)
@@ -78,11 +77,7 @@ export class LoadingManager
 
 		if (this.isLoadingDone())
 		{
-			if (this.firstLoad)
-			{
-				this.firstLoad = false;
-			}
-			else
+			if (!this.firstLoad)
 			{
 				document.getElementById('ui-container').style.display = 'block';
 				document.getElementById('loading-screen').style.display = 'none';

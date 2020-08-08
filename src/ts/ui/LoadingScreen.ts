@@ -19,5 +19,6 @@ export class LoadingScreen
 		document.getElementById('ui-container').style.display = 'block';
 		document.getElementById('loading-screen').style.display = 'none';
 		this.world.setTimeScale(1);
+		this.world.loadingManager.firstLoad = false;
 	}
 }
