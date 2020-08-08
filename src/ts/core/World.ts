@@ -90,8 +90,8 @@ export class World
         // Auto window resize
         function onWindowResize(): void
         {
-            scope.camera['aspect'] = window.innerWidth / window.innerHeight;
-            scope.camera['updateProjectionMatrix']();
+            scope.camera.aspect = window.innerWidth / window.innerHeight;
+            scope.camera.updateProjectionMatrix();
             scope.renderer.setSize(window.innerWidth, window.innerHeight);
             effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
             scope.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
