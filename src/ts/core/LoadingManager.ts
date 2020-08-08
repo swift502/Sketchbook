@@ -11,6 +11,8 @@ export class LoadingManager
 	private world: World;
 	private progressBarSimulator: SpringSimulator;
 
+	private firstLoad: boolean = true;
+
 	// private cache: {} = {};
 
 	constructor(world: World)
@@ -19,7 +21,8 @@ export class LoadingManager
 		this.progressBarSimulator = new SpringSimulator(60, 10, 0.6);
 
 		this.world = world;
-		this.world.setTimeScale(0);
+
+		document.getElementById('loading-screen').style.display = 'flex';
 	}
 
 	public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
@@ -57,6 +60,9 @@ export class LoadingManager
 
 	public addLoadingEntry(path: string): LoadingTrackerEntry
 	{
+		this.world.setTimeScale(0);
+		document.getElementById('start-btn').style.opacity = '0';
+
 		let entry = new LoadingTrackerEntry(path);
 		this.loadingTracker.push(entry);
 
@@ -72,10 +78,19 @@ export class LoadingManager
 
 		if (this.isLoadingDone())
 		{
-			// Hide loader
-			document.getElementById('loader').style.display = 'none';
-			document.getElementById('ui-container').style.display = 'block';
+			if (this.firstLoad)
+			{
+				this.firstLoad = false;
+			}
+			else
+			{
+				document.getElementById('ui-container').style.display = 'block';
+				document.getElementById('loading-screen').style.display = 'none';
+				this.world.setTimeScale(1);
+			}
 
+			this.loadingTracker = [];
+			document.getElementById('loader').style.display = 'none';
 			// Display Start Button
 			this.world.loadingScreen.displayStartBtn();
 		}

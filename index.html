@@ -12,7 +12,7 @@
     <div id="loading-screen">
         <div class="text-block">
             <h1>Sketchbook</h1>
-            <p>Welcome to sketchbook v0.4!</p>
+            <p>Welcome to sketchbook v0.4 Alpha!</p>
         </div>
         <div id="loader">
             <div id="progress">
@@ -28,15 +28,8 @@
 
         <div class="left-panel">
             <div class="panel-segment">
-                <h3>Scenarios:</h3>
-                <ol id="scenarios">
-                    <!-- <li onclick="world.launchScenario(0);">Free roam</li>
-                    <li>Tunnel race</li>
-                    <li>Oval race</li>
-                    <li>Figure 8 race</li>
-                    <li>Loop</li>
-                    <li>Mega ramp</li> -->
-                </ol>
+                <h3>Scenarios (click to launch):</h3>
+                <ol id="scenarios"></ol>
             </div>
             <div id="console" class="panel-segment"></div>
             <div id="controls" class="panel-segment flex-bottom"></div>
@@ -49,10 +42,6 @@
 
         // Initialize sketchbook
         let world = new SB.World();
-
-        // Setup camera
-        world.cameraOperator.theta = 90;
-        world.cameraOperator.phi = 10;
 
         // World
         world.loadingManager.loadGLTF('build/assets/world.glb', function(gltf)

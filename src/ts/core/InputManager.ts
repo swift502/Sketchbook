@@ -52,7 +52,7 @@ export class InputManager
 		document.addEventListener('keyup', this.boundOnKeyUp, false);
 	}
 
-	public update(timestep: number): void
+	public update(timestep: number, unscaledTimeStep: number): void
 	{
 		if (this.inputReceiver === undefined) 
 		{
@@ -64,7 +64,7 @@ export class InputManager
 
 		if (this.inputReceiver !== undefined) 
 		{
-			this.inputReceiver.inputReceiverUpdate(timestep);
+			this.inputReceiver.inputReceiverUpdate(unscaledTimeStep);
 		}
 	}
 

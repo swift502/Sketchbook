@@ -47,3 +47,8 @@
 .ctrl-desc {
     margin-left: 5px;
 }
+
+#scenarios li:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}

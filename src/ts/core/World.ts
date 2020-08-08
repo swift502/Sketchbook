@@ -211,7 +211,7 @@ export class World
 			// vehicle.updateMatrixWorld();
 		});
 
-		this.inputManager.update(timeStep);
+		this.inputManager.update(timeStep, unscaledTimeStep);
 		this.loadingManager.update(unscaledTimeStep);
 
 		// Lerp parameters

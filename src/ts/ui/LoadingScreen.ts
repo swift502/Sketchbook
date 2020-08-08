@@ -16,8 +16,8 @@ export class LoadingScreen
 
 	public hideWelcomeScreen(): void
 	{
+		document.getElementById('ui-container').style.display = 'block';
 		document.getElementById('loading-screen').style.display = 'none';
 		this.world.setTimeScale(1);
 	}
-
 }

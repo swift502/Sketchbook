@@ -81,16 +81,9 @@ export class Scenario
 	public createLaunchLink(): void
 	{
 		let li = document.createElement('li');
-		let a = document.createElement('a');
-		// a.onclick = () =>
-		// {
-		// 	this.world.launchScenario(this.id);
-		// };
-		a.setAttribute('onclick', `world.launchScenario('${this.id}');`);
-		a.innerText = this.name;
-		li.appendChild(a);
-
-		// let html = `<li><a onclick="world.launchScenario(${this.id});">${this.name}</a></li>`;
+		li.innerText = this.name;
+		li.setAttribute('onclick', `world.launchScenario('${this.id}');`);
+		
 		document.getElementById('scenarios').append(li);
 	}
 
