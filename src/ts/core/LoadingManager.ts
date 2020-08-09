@@ -48,7 +48,10 @@ export class LoadingManager
 			},
 			(xhr) =>
 			{
-				trackerEntry.progress = xhr.loaded / xhr.total;
+				if ( xhr.lengthComputable )
+				{
+					trackerEntry.progress = xhr.loaded / xhr.total;
+				}
 			},
 			(error)  =>
 			{
@@ -74,6 +77,7 @@ export class LoadingManager
 	public doneLoading(trackerEntry: LoadingTrackerEntry): void
 	{
 		trackerEntry.finished = true;
+		trackerEntry.progress = 1;
 
 		if (this.isLoadingDone())
 		{
@@ -130,7 +134,10 @@ export class LoadingManager
 
 	private isLoadingDone(): boolean
 	{
-		return this.getLoadingPercentage() === 100;
+		for (const entry of this.loadingTracker) {
+			if (!entry.finished) return false;
+		}
+		return true;
 	}
 
 	// public cloneGltf(gltf)
