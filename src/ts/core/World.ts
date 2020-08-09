@@ -65,6 +65,8 @@ export class World
 	public vehicles: Vehicle[] = [];
 	public paths: Path[] = [];
 
+	private lastScenarioID: string;
+
 	constructor()
 	{
 		const scope = this;
@@ -104,7 +106,7 @@ export class World
 
 		// Three.js scene
 		this.graphicsWorld = new THREE.Scene();
-		this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 610);
+		this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1010);
 		this.sky = new Sky(this);
 		this.graphicsWorld.add(this.sky);
 
@@ -472,6 +474,8 @@ export class World
 	
 	public launchScenario(scenarioID: string): void
 	{
+		this.lastScenarioID = scenarioID;
+
 		this.clearEntities();
 
 		// Launch default scenario
@@ -480,6 +484,12 @@ export class World
 				scenario.launch(this);
 			}
 		}
+	}
+
+	public restartScenario(): void
+	{
+		if (this.lastScenarioID !== undefined) this.launchScenario(this.lastScenarioID);
+		else console.warn('Can\'t restart scenario. Last scenarioID is undefined.');
 	}
 
 	public clearEntities(): void

@@ -22,8 +22,8 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 		this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
 		this.actions = {
-			'ascend': new KeyBinding('Space'),
-			'descend': new KeyBinding('ShiftLeft'),
+			'ascend': new KeyBinding('ShiftLeft'),
+			'descend': new KeyBinding('Space'),
 			'pitchUp': new KeyBinding('KeyS'),
 			'pitchDown': new KeyBinding('KeyW'),
 			'yawLeft': new KeyBinding('KeyQ'),
@@ -216,28 +216,40 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 
 		this.world.updateControls([
 			{
-				keys: ['W'],
+				keys: ['Shift'],
 				desc: 'Ascend'
 			},
 			{
-				keys: ['S'],
+				keys: ['Space'],
 				desc: 'Descend'
 			},
 			{
-				keys: ['↑', '↓'],
+				keys: ['W', 'S'],
 				desc: 'Pitch'
-			},
-			{
-				keys: ['←', '→', 'or', 'A', 'D'],
-				desc: 'Roll'
 			},
 			{
 				keys: ['Q', 'E'],
 				desc: 'Yaw'
 			},
 			{
+				keys: ['A', 'D'],
+				desc: 'Roll'
+			},
+			{
+				keys: ['V'],
+				desc: 'View select'
+			},
+			{
 				keys: ['F'],
 				desc: 'Exit vehicle'
+			},
+			{
+				keys: ['Shift', '+', 'R'],
+				desc: 'Respawn'
+			},
+			{
+				keys: ['Shift', '+', 'C'],
+				desc: 'Free camera'
 			},
 		]);
 	}

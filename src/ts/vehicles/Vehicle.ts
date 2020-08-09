@@ -156,6 +156,10 @@ export abstract class Vehicle extends THREE.Object3D
 			this.world.cameraOperator.characterCaller = this.controllingCharacter;
 			this.world.inputManager.setInputReceiver(this.world.cameraOperator);
 		}
+		else if (code === 'KeyR' && pressed === true && event.shiftKey === true)
+		{
+			this.world.restartScenario();
+		}
 		else
 		{
 			for (const action in this.actions) {

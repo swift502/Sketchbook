@@ -43,8 +43,8 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
 		this.actions = {
-			'throttle': new KeyBinding('Space'),
-			'brake': new KeyBinding('ShiftLeft'),
+			'throttle': new KeyBinding('ShiftLeft'),
+			'brake': new KeyBinding('Space'),
 			'wheelBrake': new KeyBinding('KeyB'),
 			'pitchUp': new KeyBinding('KeyS'),
 			'pitchDown': new KeyBinding('KeyW'),
@@ -371,19 +371,19 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 		this.world.updateControls([
 			{
-				keys: ['W'],
-				desc: 'Increase rotor RPM'
+				keys: ['Shift'],
+				desc: 'Speed up'
 			},
 			{
-				keys: ['S'],
-				desc: 'Decrease rotor RPM'
+				keys: ['Space'],
+				desc: 'Slow down'
 			},
 			{
-				keys: ['↑', '↓'],
+				keys: ['W', 'S'],
 				desc: 'Elevators'
 			},
 			{
-				keys: ['←', '→', 'or', 'A', 'D'],
+				keys: ['A', 'D'],
 				desc: 'Ailerons'
 			},
 			{
@@ -391,12 +391,24 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 				desc: 'Rudder / Steering'
 			},
 			{
-				keys: ['Space'],
+				keys: ['B'],
 				desc: 'Brake'
+			},
+			{
+				keys: ['V'],
+				desc: 'View select'
 			},
 			{
 				keys: ['F'],
 				desc: 'Exit vehicle'
+			},
+			{
+				keys: ['Shift', '+', 'R'],
+				desc: 'Respawn'
+			},
+			{
+				keys: ['Shift', '+', 'C'],
+				desc: 'Free camera'
 			},
 		]);
 	}

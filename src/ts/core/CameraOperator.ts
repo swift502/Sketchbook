@@ -157,6 +157,25 @@ export class CameraOperator implements IInputReceiver
 		this.target.copy(this.camera.position);
 		this.setRadius(0, true);
 		// this.world.dirLight.target = this.world.camera;
+
+		this.world.updateControls([
+			{
+				keys: ['W', 'S', 'A', 'D'],
+				desc: 'Move around'
+			},
+			{
+				keys: ['E', 'Q'],
+				desc: 'Move up/down'
+			},
+			{
+				keys: ['Shift'],
+				desc: 'Speed up'
+			},
+			{
+				keys: ['Shift', '+', 'C'],
+				desc: 'Exit free camera mode'
+			},
+		]);
 	}
 
 	public inputReceiverUpdate(timeStep: number): void

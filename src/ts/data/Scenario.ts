@@ -29,6 +29,7 @@ export class Scenario
 		if (root.userData.hasOwnProperty('default') && root.userData.default === 'true') 
 		{
 			this.default = true;
+			this.name += ' (default)';
 		}
 		if (root.userData.hasOwnProperty('spawn_always') && root.userData.spawn_always === 'true') 
 		{

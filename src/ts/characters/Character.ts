@@ -296,6 +296,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				this.world.cameraOperator.characterCaller = this;
 				this.world.inputManager.setInputReceiver(this.world.cameraOperator);
 			}
+			else if (code === 'KeyR' && pressed === true && event.shiftKey === true)
+			{
+				this.world.restartScenario();
+			}
 			else
 			{
 				for (const action in this.actions) {
@@ -489,6 +493,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			{
 				keys: ['F'],
 				desc: 'Enter vehicle'
+			},
+			{
+				keys: ['Shift', '+', 'R'],
+				desc: 'Respawn'
 			},
 			{
 				keys: ['Shift', '+', 'C'],

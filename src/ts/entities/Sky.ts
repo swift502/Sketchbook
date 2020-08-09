@@ -40,11 +40,11 @@ export class Sky extends THREE.Object3D
 			uniforms: THREE.UniformsUtils.clone(SkyShader.uniforms),
 			fragmentShader: SkyShader.fragmentShader,
 			vertexShader: SkyShader.vertexShader,
-			side: THREE.BackSide,
+			side: THREE.BackSide
 		});
 
 		this.skyMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(600, 32, 15),
+			new THREE.SphereBufferGeometry(1000, 24, 12),
 			this.skyMaterial
 		);
 		this.attach(this.skyMesh);
