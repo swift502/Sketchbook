@@ -45,6 +45,7 @@ export declare class World {
     characters: Character[];
     vehicles: Vehicle[];
     paths: Path[];
+    private lastScenarioID;
     constructor();
     update(timeStep: number, unscaledTimeStep: number): void;
     updatePhysics(timeStep: number): void;
@@ -62,6 +63,7 @@ export declare class World {
     remove(object: IWorldEntity): void;
     loadScene(gltf: any): void;
     launchScenario(scenarioID: string): void;
+    restartScenario(): void;
     clearEntities(): void;
     scrollTheTimeScale(scrollAmount: number): void;
     updateControls(controls: any): void;
