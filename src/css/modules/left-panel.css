@@ -9,7 +9,6 @@
 }
 
 .left-panel .panel-segment {
-    flex-grow: 1;
     flex-basis: 100px;
     padding: 20px;
     overflow: hidden;

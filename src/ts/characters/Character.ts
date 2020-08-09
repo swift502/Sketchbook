@@ -285,12 +285,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		else
 		{
 			// Console debug
-			if (code === 'KeyT' && pressed === true)
-			{
-				this.world.customConsole.addMessage('This is a console message!');
-			} 
+			// if (code === 'KeyT' && pressed === true)
+			// {
+			// 	this.world.customConsole.addMessage('This is a console message!');
+			// } 
 			// Free camera
-			else if (code === 'KeyC' && pressed === true && event.shiftKey === true)
+			if (code === 'KeyC' && pressed === true && event.shiftKey === true)
 			{
 				this.resetControls();
 				this.world.cameraOperator.characterCaller = this;
@@ -483,12 +483,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				desc: 'Movement'
 			},
 			{
-				keys: ['Space'],
-				desc: 'Jump'
-			},
-			{
 				keys: ['Shift'],
 				desc: 'Sprint'
+			},
+			{
+				keys: ['Space'],
+				desc: 'Jump'
 			},
 			{
 				keys: ['F'],

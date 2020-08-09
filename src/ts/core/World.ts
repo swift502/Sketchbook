@@ -467,6 +467,7 @@ export class World
 		// Launch default scenario
 		for (const scenario of this.scenarios) {
 			if (scenario.default || scenario.spawnAlways) {
+				if (scenario.default) this.lastScenarioID = scenario.id;
 				scenario.launch(this);
 			}
 		}

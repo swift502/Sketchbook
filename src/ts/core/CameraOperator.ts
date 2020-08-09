@@ -165,7 +165,7 @@ export class CameraOperator implements IInputReceiver
 			},
 			{
 				keys: ['E', 'Q'],
-				desc: 'Move up/down'
+				desc: 'Move up / down'
 			},
 			{
 				keys: ['Shift'],
