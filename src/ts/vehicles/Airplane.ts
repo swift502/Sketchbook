@@ -250,15 +250,15 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		// Roll
 		if (plane.actions.rollLeft.isPressed)
 		{
-			body.angularVelocity.x -= forward.x * 0.06 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.y -= forward.y * 0.06 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.z -= forward.z * 0.06 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.x -= forward.x * 0.055 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.y -= forward.y * 0.055 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.z -= forward.z * 0.055 * flightModeInfluence * this.enginePower;
 		}
 		if (plane.actions.rollRight.isPressed)
 		{
-			body.angularVelocity.x += forward.x * 0.06 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.y += forward.y * 0.06 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.z += forward.z * 0.06 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.x += forward.x * 0.055 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.y += forward.y * 0.055 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.z += forward.z * 0.055 * flightModeInfluence * this.enginePower;
 		}
 
 		// Thrust
@@ -285,14 +285,14 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 		// Drag
 		let velLength2 = body.velocity.length();
-		const drag = Math.pow(velLength2, 1) * 0.003;
+		const drag = Math.pow(velLength2, 1) * 0.003 * this.enginePower;
 		body.velocity.x -= body.velocity.x * drag;
 		body.velocity.y -= body.velocity.y * drag;
 		body.velocity.z -= body.velocity.z * drag;
 		this.lastDrag = drag;
 
 		// Lift
-		let lift = Math.pow(velLength2, 1) * 0.005;
+		let lift = Math.pow(velLength2, 1) * 0.005 * this.enginePower;
 		lift = THREE.MathUtils.clamp(lift, 0, 0.05);
 		body.velocity.x += up.x * lift;
 		body.velocity.y += up.y * lift;
