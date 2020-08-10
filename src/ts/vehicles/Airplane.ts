@@ -195,7 +195,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 		// Rotation controls influence
 		let flightModeInfluence = currentSpeed / 10;
-		flightModeInfluence = THREE.MathUtils.clamp(flightModeInfluence, 0, 1.1);
+		flightModeInfluence = THREE.MathUtils.clamp(flightModeInfluence, 0, 1);
 
 		let lowerMassInfluence = currentSpeed / 10;
 		lowerMassInfluence = THREE.MathUtils.clamp(lowerMassInfluence, 0, 1);
