@@ -222,15 +222,15 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		// Pitch
 		if (plane.actions.pitchUp.isPressed)
 		{
-			body.angularVelocity.x -= right.x * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.y -= right.y * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.z -= right.z * 0.05 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.x -= right.x * 0.04 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.y -= right.y * 0.04 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.z -= right.z * 0.04 * flightModeInfluence * this.enginePower;
 		}
 		if (plane.actions.pitchDown.isPressed)
 		{
-			body.angularVelocity.x += right.x * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.y += right.y * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.z += right.z * 0.05 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.x += right.x * 0.04 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.y += right.y * 0.04 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.z += right.z * 0.04 * flightModeInfluence * this.enginePower;
 		}
 
 		// Yaw
@@ -250,15 +250,15 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		// Roll
 		if (plane.actions.rollLeft.isPressed)
 		{
-			body.angularVelocity.x -= forward.x * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.y -= forward.y * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.z -= forward.z * 0.05 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.x -= forward.x * 0.06 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.y -= forward.y * 0.06 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.z -= forward.z * 0.06 * flightModeInfluence * this.enginePower;
 		}
 		if (plane.actions.rollRight.isPressed)
 		{
-			body.angularVelocity.x += forward.x * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.y += forward.y * 0.05 * flightModeInfluence * this.enginePower;
-			body.angularVelocity.z += forward.z * 0.05 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.x += forward.x * 0.06 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.y += forward.y * 0.06 * flightModeInfluence * this.enginePower;
+			body.angularVelocity.z += forward.z * 0.06 * flightModeInfluence * this.enginePower;
 		}
 
 		// Thrust
