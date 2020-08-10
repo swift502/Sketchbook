@@ -195,11 +195,11 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 		// Rotation controls influence
 		let flightModeInfluence = currentSpeed / 10;
-		flightModeInfluence = THREE.MathUtils.clamp(flightModeInfluence, 0, 1);
+		flightModeInfluence = THREE.MathUtils.clamp(flightModeInfluence, 0, 1.1);
 
-		let lowerMassInfluence = (currentSpeed - 7) / 3;
+		let lowerMassInfluence = currentSpeed / 10;
 		lowerMassInfluence = THREE.MathUtils.clamp(lowerMassInfluence, 0, 1);
-		this.collision.mass = 50 * (1 - (lowerMassInfluence * 0.8));
+		this.collision.mass = 50 * (1 - (lowerMassInfluence * 0.6));
 
 		// Rotation stabilization
 		let lookVelocity = body.velocity.clone();
@@ -211,7 +211,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		rotStabVelocity.w *= 0.3;
 		let rotStabEuler = new THREE.Euler().setFromQuaternion(rotStabVelocity);
 
-		let rotStabInfluence = THREE.MathUtils.clamp(velLength1 - 1, 0, 1);  // Only with speed greater than 1 UPS
+		let rotStabInfluence = THREE.MathUtils.clamp(velLength1 - 1, 0, 0.1);  // Only with speed greater than 1 UPS
 		rotStabInfluence *= (this.rayCastVehicle.numWheelsOnGround > 0 && currentSpeed < 0 ? 0 : 1);    // Reverse fix
 		let loopFix = (this.actions.throttle.isPressed && currentSpeed > 0 ? 0 : 1);
 		
@@ -265,7 +265,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		let speedModifier = 0.02;
 		if (plane.actions.throttle.isPressed && !plane.actions.brake.isPressed)
 		{
-			speedModifier = 0.05;
+			speedModifier = 0.06;
 		}
 		else if (!plane.actions.throttle.isPressed && plane.actions.brake.isPressed)
 		{
@@ -285,18 +285,21 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 		// Drag
 		let velLength2 = body.velocity.length();
-		const drag = Math.pow(velLength2, 1) * 0.005;
+		const drag = Math.pow(velLength2, 1) * 0.003;
 		body.velocity.x -= body.velocity.x * drag;
 		body.velocity.y -= body.velocity.y * drag;
 		body.velocity.z -= body.velocity.z * drag;
 		this.lastDrag = drag;
 
 		// Lift
-		let lift = Math.pow(velLength2, 1) * 0.01;
-		lift = THREE.MathUtils.clamp(lift, 0, 0.1);
+		let lift = Math.pow(velLength2, 1) * 0.005;
+		lift = THREE.MathUtils.clamp(lift, 0, 0.05);
 		body.velocity.x += up.x * lift;
 		body.velocity.y += up.y * lift;
 		body.velocity.z += up.z * lift;
+
+		// Gravity
+		// body.velocity.y -= 0.1;
 
 		// document.getElementById('car-debug').innerHTML += '<br>' + 'Drag: ' + Utils.round(drag, 3) + '';
 		// document.getElementById('car-debug').innerHTML += '<br>' + 'Lift: ' + Utils.round(lift, 3) + '';
