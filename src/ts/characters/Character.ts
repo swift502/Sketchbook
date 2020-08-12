@@ -25,6 +25,7 @@ import { VehicleEntryInstance } from './VehicleEntryInstance';
 import { times } from 'lodash';
 import { SeatType } from '../enums/SeatType';
 import { GroundImpactData } from './GroundImpactData';
+import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -586,64 +587,57 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public findVehicleToEnter(wantsToDrive: boolean): void
 	{
 		// Find best vehicle
-		let bestVehicle: IControllable;
-		let bestVehicleDistance = Number.POSITIVE_INFINITY;
-		let maxDistance = 10;
-
+		let vehicleFinder = new ClosestObjectFinder<Vehicle>(this.position, 10);
 		this.world.vehicles.forEach((vehicle) =>
 		{
-			let distance = new THREE.Vector3().subVectors(this.position, vehicle.position).lengthSq();
-
-			if (distance < maxDistance && distance < bestVehicleDistance)
-			{
-				bestVehicleDistance = distance;
-				bestVehicle = vehicle;
-			}
+			vehicleFinder.consider(vehicle, vehicle.position);
 		});
 
-		if (bestVehicle !== undefined)
+		if (vehicleFinder.closestObject !== undefined)
 		{
 			let instance = new VehicleEntryInstance(this);
 			instance.wantsToTransitionToDriverSeat = wantsToDrive;
 
 			// Find best seat
-			let bestSeat: SeatPoint;
-			let bestSeatDistance: number = Number.POSITIVE_INFINITY;
-
-			for (const seat of bestVehicle.seats)
+			let seatFinder = new ClosestObjectFinder<SeatPoint>(this.position);
+			for (const seat of vehicleFinder.closestObject.seats)
 			{
 				if (wantsToDrive)
 				{
+					// Consider driver seats
 					if (seat.type === SeatType.Driver)
 					{
-						// consider seat
+						seatFinder.consider(seat, seat.seatPoint.position);
 					}
-					else
+					// Consider passenger seats connected to driver seats
+					else if (seat.type === SeatType.Passenger)
 					{
-						
+						for (const connSeat of seat.connectedSeats)
+						{
+							if (connSeat.type === SeatType.Driver)
+							{
+								seatFinder.consider(seat, seat.seatPoint.position);
+								break;
+							}
+						}
 					}
 				}
 				else
 				{
+					// Skip driver seats
 					if (seat.type === SeatType.Driver) continue;
-					else if (seat.type === SeatType.Passenger)
+
+					// Consider passenger seats
+					if (seat.type === SeatType.Passenger)
 					{
-						// consider seat
+						seatFinder.consider(seat, seat.seatPoint.position);
 					}
 				}
-
-				// let distance = new THREE.Vector3().subVectors(seat.seatPoint.position, this.position).length();
-
-				// if (distance < bestSeatDistance)
-				// {
-				// 	bestSeatDistance = distance;
-				// 	bestSeat = seat;
-				// }
 			}
 
-			if (bestSeat !== undefined)
+			if (seatFinder.closestObject !== undefined)
 			{
-				instance.targetSeat = bestVehicle.seats[0];
+				instance.targetSeat = seatFinder.closestObject;
 				this.triggerAction('up', true);
 			}
 		}
