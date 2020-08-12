@@ -1,4 +1,4 @@
-import * as Utils from '../../core/Utilities';
+import * as Utils from '../../core/HelperFunctions';
 import
 {
 	CharacterStateBase,

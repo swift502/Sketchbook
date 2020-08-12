@@ -1,4 +1,4 @@
-import * as Utils from '../../core/Utilities';
+import * as Utils from '../../core/HelperFunctions';
 import {
 	DropIdle,
 	DropRolling,
@@ -56,16 +56,23 @@ export abstract class CharacterStateBase implements ICharacterState
 	{
 		if (this.canFindVehiclesToEnter && this.character.actions.enter.justPressed)
 		{
-				this.character.findVehicleToEnter();
+			if (this.character.actions.enter.justPressed)
+			{
+				this.character.findVehicleToEnter(true);
+			}
+			// else if (this.character.actions.enterAsPassenger.justPressed)
+			// {
+			// 	this.character.findVehicleToEnter(false);
+			// }
 		}
-		else if (this.character.isRunningTowardsVehicle === true)
+		else if (this.character.vehicleEntryInstance !== null)
 		{
 			if (this.character.actions.up.justPressed ||
 				this.character.actions.down.justPressed ||
 				this.character.actions.left.justPressed ||
 				this.character.actions.right.justPressed)
 				{
-					this.character.isRunningTowardsVehicle = false;
+					this.character.vehicleEntryInstance = null;
 					this.character.actions.up.isPressed = false;
 				}
 		}

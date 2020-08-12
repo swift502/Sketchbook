@@ -7,7 +7,7 @@ import { KeyBinding } from '../core/KeyBinding';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { Euler } from 'three';
 import THREE = require('three');
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/HelperFunctions';
 
 export class Airplane extends Vehicle implements IControllable, IWorldEntity
 {

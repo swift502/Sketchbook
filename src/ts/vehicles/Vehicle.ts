@@ -4,10 +4,10 @@ import * as CANNON from 'cannon';
 import { World } from '../core/World';
 import _ = require('lodash');
 import { KeyBinding } from '../core/KeyBinding';
-import { VehicleSeat } from './VehicleSeat';
+import { SeatPoint } from '../data/SeatPoint';
 import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/HelperFunctions';
 import { CollisionGroups } from '../enums/CollisionGroups';
 
 export abstract class Vehicle extends THREE.Object3D
@@ -15,7 +15,7 @@ export abstract class Vehicle extends THREE.Object3D
 	public controllingCharacter: Character;
 	public actions: { [action: string]: KeyBinding; } = {};
 	public rayCastVehicle: CANNON.RaycastVehicle;
-	public seats: VehicleSeat[] = [];
+	public seats: SeatPoint[] = [];
 	public wheels: Wheel[] = [];
 	public drive: string;
 	public camera: any;
@@ -101,7 +101,7 @@ export abstract class Vehicle extends THREE.Object3D
 			this.collision.interpolatedQuaternion.w
 		);
 
-		this.seats.forEach((seat: VehicleSeat) => {
+		this.seats.forEach((seat: SeatPoint) => {
 			seat.update(timeStep);
 		});
 
@@ -380,7 +380,7 @@ export abstract class Vehicle extends THREE.Object3D
 				{
 					if (child.userData.data === 'seat')
 					{
-						let seat = new VehicleSeat(child);
+						let seat = new SeatPoint(child);
 						seat.vehicle = this;
 
 						if (child.userData.hasOwnProperty('door_object')) 

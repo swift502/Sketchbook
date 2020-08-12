@@ -247,10 +247,6 @@ export function springV(source: THREE.Vector3, dest: THREE.Vector3, velocity: TH
 	source.add(velocity);
 }
 
-export class GroundImpactData {
-	public velocity: THREE.Vector3 = new THREE.Vector3();
-}
-
 export function threeVector(vec: CANNON.Vec3): THREE.Vector3
 {
 	return new THREE.Vector3(vec.x, vec.y, vec.z);

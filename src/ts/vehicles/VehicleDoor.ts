@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/HelperFunctions';
 
 export class VehicleDoor
 {

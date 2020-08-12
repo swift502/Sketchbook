@@ -16,7 +16,7 @@ export {Airplane} from './vehicles/Airplane';
 export {Car} from './vehicles/Car';
 export {Helicopter} from './vehicles/Helicopter';
 export {Wheel} from './vehicles/Wheel';
-export {VehicleSeat} from './vehicles/VehicleSeat';
+export {SeatPoint as VehicleSeat} from './data/SeatPoint';
 export {VehicleDoor} from './vehicles/VehicleDoor';
 
 import * as statesLibrary from './characters/character_states/_stateLibrary';

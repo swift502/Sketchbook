@@ -1,6 +1,6 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import * as Utils from '../../core/Utilities';
+import * as Utils from '../../core/HelperFunctions';
 import { ICollider } from '../../interfaces/ICollider';
 
 export class CapsuleCollider implements ICollider

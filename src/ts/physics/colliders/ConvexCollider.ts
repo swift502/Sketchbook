@@ -1,6 +1,6 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import * as Utils from '../../core/Utilities';
+import * as Utils from '../../core/HelperFunctions';
 import { ICollider } from '../../interfaces/ICollider';
 import {Mesh, Vector3} from 'three';
 import {Object3D} from 'three';

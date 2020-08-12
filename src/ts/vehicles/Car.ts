@@ -4,7 +4,7 @@ import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { KeyBinding } from '../core/KeyBinding';
 import * as THREE from 'three';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/HelperFunctions';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { World } from '../core/World';
 

@@ -6,19 +6,19 @@ import { Character } from '../../Character';
 import { IControllable } from '../../../interfaces/IControllable';
 import THREE = require('three');
 import { Driving } from './Driving';
-import { VehicleSeat } from '../../../vehicles/VehicleSeat';
+import { SeatPoint } from '../../../data/SeatPoint';
 import { Side } from '../../../enums/Side';
 
 export class EnteringVehicle extends CharacterStateBase
 {
 	private vehicle: IControllable;
-	private seat: VehicleSeat;
+	private seat: SeatPoint;
 	private startPosition: THREE.Vector3 = new THREE.Vector3();
 	private endPosition: THREE.Vector3 = new THREE.Vector3();
 	private startRotation: THREE.Quaternion = new THREE.Quaternion();
 	private endRotation: THREE.Quaternion = new THREE.Quaternion();
 
-	constructor(character: Character, seat: VehicleSeat)
+	constructor(character: Character, seat: SeatPoint)
 	{
 		super(character);
 

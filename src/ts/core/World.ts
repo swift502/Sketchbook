@@ -19,7 +19,7 @@ import { InputManager } from './InputManager';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from '../entities/Sky';
-import * as Utils from './Utilities';
+import * as Utils from './HelperFunctions';
 import { Grass } from '../entities/Grass';
 import { Path } from '../data/Path';
 import { CollisionGroups } from '../enums/CollisionGroups';

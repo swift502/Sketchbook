@@ -4,7 +4,7 @@ import
 } from '../_stateLibrary';
 import { Character } from '../../Character';
 import { Side } from '../../../enums/Side';
-import { VehicleSeat } from '../../../vehicles/VehicleSeat';
+import { SeatPoint } from '../../../data/SeatPoint';
 import { IControllable } from '../../../interfaces/IControllable';
 import THREE = require('three');
 import { Idle } from '../Idle';
@@ -15,13 +15,13 @@ import { Falling } from '../Falling';
 export class ExitingVehicle extends CharacterStateBase
 {
 	private vehicle: IControllable;
-	private seat: VehicleSeat;
+	private seat: SeatPoint;
 	private startPosition: THREE.Vector3 = new THREE.Vector3();
 	private endPosition: THREE.Vector3 = new THREE.Vector3();
 	private startRotation: THREE.Quaternion = new THREE.Quaternion();
 	private endRotation: THREE.Quaternion = new THREE.Quaternion();
 
-	constructor(character: Character, vehicle: IControllable, seat: VehicleSeat)
+	constructor(character: Character, vehicle: IControllable, seat: SeatPoint)
 	{
 		super(character);
 

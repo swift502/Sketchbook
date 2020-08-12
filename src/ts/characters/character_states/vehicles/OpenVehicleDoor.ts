@@ -3,7 +3,7 @@ import
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { VehicleSeat } from '../../../vehicles/VehicleSeat';
+import { SeatPoint } from '../../../data/SeatPoint';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 import { EnteringVehicle } from './EnteringVehicle';
@@ -11,10 +11,10 @@ import THREE = require('three');
 
 export class OpenVehicleDoor extends CharacterStateBase
 {
-	private seat: VehicleSeat;
+	private seat: SeatPoint;
 	private hasOpenedDoor: boolean = false;
 
-	constructor(character: Character, seat: VehicleSeat)
+	constructor(character: Character, seat: SeatPoint)
 	{
 		super(character);
 
