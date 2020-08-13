@@ -28,13 +28,15 @@ export class CloseVehicleDoorInside extends CharacterStateBase
 		{
 			this.animationLength = this.character.setAnimation('close_door_sitting_right', 0.1);
 		}
+		
+		this.seat.door?.open();
 	}
 
 	public update(timeStep: number): void
 	{
 		super.update(timeStep);
 
-		if (this.timer > 0.3 && !this.hasClosedDoor)
+		if (this.timer > 0.4 && !this.hasClosedDoor)
 		{
 			this.hasClosedDoor = true;
 			this.seat.door?.close();

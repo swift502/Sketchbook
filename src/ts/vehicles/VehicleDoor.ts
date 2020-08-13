@@ -53,7 +53,6 @@ export class VehicleDoor
 				{
 					this.rotation = this.targetRotation;
 					this.achievingTargetRotation = false;
-					// this.doorVelocity = 0;
 					this.physicsEnabled = this.rotation > 0;
 				}
 			}
@@ -65,7 +64,6 @@ export class VehicleDoor
 				{
 					this.rotation = this.targetRotation;
 					this.achievingTargetRotation = false;
-					// this.doorVelocity = 0;
 					this.physicsEnabled = this.rotation > 0;
 				}
 			}

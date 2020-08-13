@@ -38,7 +38,7 @@ export class Car extends Vehicle implements IControllable {
 			frictionSlip: 0.8,
 			dampingRelaxation: 2,
 			dampingCompression: 2,
-			rollInfluence: 0.9
+			rollInfluence: 0.8
 		});
 
 		this.readCarData(gltf);

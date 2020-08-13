@@ -669,22 +669,22 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.vehicleEntryInstance = null;
 	}
 
-	public teleportToVehicle(vehicle: Vehicle, seat: any): void
+	public teleportToVehicle(vehicle: Vehicle, seat: SeatPoint): void
 	{
 		this.resetVelocity();
 		this.rotateModel();
 		this.setPhysicsEnabled(false);
 		(vehicle as unknown as THREE.Object3D).attach(this);
 
-		this.setPosition(seat.seatPoint.position.x, seat.seatPoint.position.y + 0.6, seat.seatPoint.position.z);
-		this.quaternion.copy(seat.seatPoint.quaternion);
+		this.setPosition(seat.seatPointObject.position.x, seat.seatPointObject.position.y + 0.6, seat.seatPointObject.position.z);
+		this.quaternion.copy(seat.seatPointObject.quaternion);
 
 		this.setState(new Driving(this, seat));
 
 		this.startControllingVehicle(vehicle, seat);
 	}
 
-	public startControllingVehicle(vehicle: IControllable, seat: any): void
+	public startControllingVehicle(vehicle: IControllable, seat: SeatPoint): void
 	{
 		this.transferControls(vehicle);
 		this.resetControls();
