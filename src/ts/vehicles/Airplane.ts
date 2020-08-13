@@ -314,7 +314,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 	{
 		super.onInputChange();
 
-		const brakeForce = 1000;
+		const brakeForce = 100;
 
 		if (this.actions.wheelBrake.justPressed)
 		{

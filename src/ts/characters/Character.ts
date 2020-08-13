@@ -699,10 +699,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public transferControls(entity:IControllable): void
 	{
-		// This is horrible
-		// We're running through all actions of this character and the vehicle,
+		// Currently running through all actions of this character and the vehicle,
 		// comparing keycodes of actions and based on that triggering vehicle's actions
-		// Instead, vehicle should ask input manager what's the current state of the keyboard
+		// Maybe we should ask input manager what's the current state of the keyboard
 		// and read those values... TODO
 		for (const action1 in this.actions) {
 			if (this.actions.hasOwnProperty(action1)) {
