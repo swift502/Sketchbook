@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
-import * as Utils from '../core/HelperFunctions';
+import * as Utils from '../core/FunctionLibrary';
 import { SeatPoint } from '../data/SeatPoint';
 import { Side } from '../enums/Side';
 

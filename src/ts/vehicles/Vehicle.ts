@@ -7,7 +7,7 @@ import { KeyBinding } from '../core/KeyBinding';
 import { SeatPoint } from '../data/SeatPoint';
 import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
-import * as Utils from '../core/HelperFunctions';
+import * as Utils from '../core/FunctionLibrary';
 import { CollisionGroups } from '../enums/CollisionGroups';
 
 export abstract class Vehicle extends THREE.Object3D

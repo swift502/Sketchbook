@@ -1,5 +1,5 @@
 import * as CANNON from 'cannon';
-import * as Utils from '../core/HelperFunctions';
+import * as Utils from '../core/FunctionLibrary';
 
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';

@@ -1,6 +1,6 @@
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import * as Utils from '../../core/HelperFunctions';
+import * as Utils from '../../core/FunctionLibrary';
 import {ICollider} from '../../interfaces/ICollider';
 import {Object3D} from 'three';
 import { threeToCannon } from '../../../lib/utils/three-to-cannon';

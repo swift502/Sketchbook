@@ -163,7 +163,7 @@ export function getAngleBetweenVectors(v1: THREE.Vector3, v2: THREE.Vector3, dot
 		// Dot too close to -1
 		if (dot < -1 + dotTreshold)
 		{
-			angle = Math.PI / 2;
+			angle = Math.PI;
 		}
 		else
 		{

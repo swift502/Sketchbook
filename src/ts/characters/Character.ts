@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 
-import * as Utils from '../core/HelperFunctions';
+import * as Utils from '../core/FunctionLibrary';
 
 import { KeyBinding } from '../core/KeyBinding';
 import { VectorSpringSimulator } from '../physics/spring_simulation/VectorSpringSimulator';

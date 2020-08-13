@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import * as Utils from '../../core/HelperFunctions';
+import * as Utils from '../../core/FunctionLibrary';
 import { Object3D } from 'three';
 import { Vehicle } from '../../vehicles/Vehicle';
 import { Character } from '../Character';

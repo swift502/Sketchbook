@@ -4,7 +4,7 @@ import { World } from '../core/World';
 import { Helicopter } from '../vehicles/Helicopter';
 import { Airplane } from '../vehicles/Airplane';
 import { Car } from '../vehicles/Car';
-import * as Utils from '../core/HelperFunctions';
+import * as Utils from '../core/FunctionLibrary';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Character } from '../characters/Character';
 import { FollowPath } from '../characters/character_ai/FollowPath';

@@ -1,4 +1,4 @@
-import * as Utils from '../../core/HelperFunctions';
+import * as Utils from '../../core/FunctionLibrary';
 import {
 	DropIdle,
 	DropRolling,
