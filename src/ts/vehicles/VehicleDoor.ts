@@ -2,10 +2,13 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
 import * as Utils from '../core/HelperFunctions';
+import { SeatPoint } from '../data/SeatPoint';
+import { Side } from '../enums/Side';
 
 export class VehicleDoor
 {
 	public vehicle: Vehicle;
+	public seat: SeatPoint;
 	public doorObject: THREE.Object3D;
 	public doorVelocity: number = 0;
 	public doorWorldPos: THREE.Vector3 = new THREE.Vector3();
@@ -21,9 +24,20 @@ export class VehicleDoor
 	public lastVehicleVel: THREE.Vector3 = new THREE.Vector3();
 	public lastVehiclePos: THREE.Vector3 = new THREE.Vector3();
 
-	constructor(vehicle: Vehicle, object: THREE.Object3D)
+	get sideMultiplier(): number
 	{
-		this.vehicle = vehicle;
+		switch (this.seat.doorSide)
+		{
+			case Side.Right: return 1;
+			case Side.Left: return -1;
+			default: return 0;
+		}
+	}
+
+	constructor(seat: SeatPoint, object: THREE.Object3D)
+	{
+		this.seat = seat;
+		this.vehicle = seat.vehicle as Vehicle;
 		this.doorObject = object;
 	}
 
@@ -57,7 +71,7 @@ export class VehicleDoor
 			}
 		}
 
-		this.doorObject.setRotationFromEuler(new THREE.Euler(0, -this.rotation, 0));
+		this.doorObject.setRotationFromEuler(new THREE.Euler(0, this.sideMultiplier * this.rotation, 0));
 	}
 
 	public preStepCallback(): void
@@ -77,7 +91,7 @@ export class VehicleDoor
 			const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 
 			// Get imaginary positions
-			let trailerPos = back.clone().applyAxisAngle(up, -this.rotation).add(this.doorWorldPos);
+			let trailerPos = back.clone().applyAxisAngle(up, this.sideMultiplier * this.rotation).add(this.doorWorldPos);
 			let trailerPushedPos = trailerPos.clone().sub(vehicleVelDiff);
 
 			// Update last values
@@ -90,19 +104,19 @@ export class VehicleDoor
 			let angle = Utils.getSignedAngleBetweenVectors(v1, v2, up);
 
 			// Apply door velocity
-			this.doorVelocity -= angle * 0.05;
+			this.doorVelocity += this.sideMultiplier * angle * 0.05;
 			this.rotation += this.doorVelocity;
 
 			// Bounce door when it reaches rotation limit
 			if (this.rotation < 0)
 			{
 				this.rotation = 0;
-				this.doorVelocity = -this.doorVelocity;
+				this.doorVelocity = -this.doorVelocity / 2;
 			}
 			if (this.rotation > 1)
 			{
 				this.rotation = 1;
-				this.doorVelocity = -this.doorVelocity;
+				this.doorVelocity = -this.doorVelocity / 2;
 			}
 
 			// Damping

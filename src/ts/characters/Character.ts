@@ -555,8 +555,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public setCameraRelativeOrientationTarget(): void
 	{
-		// if (this.vehicleEntryInstance === null)
-		// {
+		if (this.vehicleEntryInstance === null)
+		{
 			let moveVector = this.getCameraRelativeMovementVector();
 	
 			if (moveVector.x === 0 && moveVector.y === 0 && moveVector.z === 0)
@@ -567,7 +567,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			{
 				this.setOrientation(moveVector);
 			}
-		// }
+		}
 	}
 
 	public rotateModel(): void
@@ -595,8 +595,18 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 		if (vehicleFinder.closestObject !== undefined)
 		{
-			let instance = new VehicleEntryInstance(this);
-			instance.wantsToTransitionToDriverSeat = wantsToDrive;
+			let vehicle = vehicleFinder.closestObject;
+			this.vehicleEntryInstance = new VehicleEntryInstance(this);
+			this.vehicleEntryInstance.wantsToTransitionToDriverSeat = wantsToDrive;
+
+			// Get seats' world positions
+			let seatsWorldPositions = {};
+			for (const seat of vehicle.seats)
+			{
+				let worldPos = new THREE.Vector3();
+				seat.seatPointObject.getWorldPosition(worldPos);
+				seatsWorldPositions[seat.seatPointObject.name] = worldPos;
+			}
 
 			// Find best seat
 			let seatFinder = new ClosestObjectFinder<SeatPoint>(this.position);
@@ -607,7 +617,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 					// Consider driver seats
 					if (seat.type === SeatType.Driver)
 					{
-						seatFinder.consider(seat, seat.seatPoint.position);
+						seatFinder.consider(seat, seatsWorldPositions[seat.seatPointObject.name]);
 					}
 					// Consider passenger seats connected to driver seats
 					else if (seat.type === SeatType.Passenger)
@@ -616,7 +626,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 						{
 							if (connSeat.type === SeatType.Driver)
 							{
-								seatFinder.consider(seat, seat.seatPoint.position);
+								seatFinder.consider(seat, seatsWorldPositions[seat.seatPointObject.name]);
 								break;
 							}
 						}
@@ -630,14 +640,14 @@ export class Character extends THREE.Object3D implements IWorldEntity
 					// Consider passenger seats
 					if (seat.type === SeatType.Passenger)
 					{
-						seatFinder.consider(seat, seat.seatPoint.position);
+						seatFinder.consider(seat, seatsWorldPositions[seat.seatPointObject.name]);
 					}
 				}
 			}
 
 			if (seatFinder.closestObject !== undefined)
 			{
-				instance.targetSeat = seatFinder.closestObject;
+				this.vehicleEntryInstance.targetSeat = seatFinder.closestObject;
 				this.triggerAction('up', true);
 			}
 		}

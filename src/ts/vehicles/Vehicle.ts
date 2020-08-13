@@ -380,42 +380,7 @@ export abstract class Vehicle extends THREE.Object3D
 				{
 					if (child.userData.data === 'seat')
 					{
-						let seat = new SeatPoint(child);
-						seat.vehicle = this;
-
-						if (child.userData.hasOwnProperty('door_object')) 
-						{
-							seat.door = new VehicleDoor(this, gltf.scene.getObjectByName(child.userData.door_object));
-						}
-
-						if (child.userData.hasOwnProperty('door_side')) 
-						{
-							seat.doorSide = child.userData.door_side;
-						}
-						else
-						{
-							console.error('Seat object ' + child + ' has no doorSide property.');
-						}
-
-						if (child.userData.hasOwnProperty('entry_point')) 
-						{
-							seat.entryPoint = gltf.scene.getObjectByName(child.userData.entry_point);
-						}
-						else
-						{
-							console.error('Seat object ' + child + ' has no entry point reference property.');
-						}
-
-						if (child.userData.hasOwnProperty('seat_type')) 
-						{
-							seat.type = child.userData.seat_type;
-						}
-						else
-						{
-							console.error('Seat object ' + child + ' has no seat type property.');
-						}
-
-						this.seats.push(seat);
+						this.seats.push(new SeatPoint(this, child, gltf));
 					}
 					if (child.userData.data === 'camera')
 					{
@@ -423,21 +388,7 @@ export abstract class Vehicle extends THREE.Object3D
 					}
 					if (child.userData.data === 'wheel')
 					{
-						let wheel = new Wheel(child);
-
-						wheel.position = child.position;
-
-						if (child.userData.hasOwnProperty('steering')) 
-						{
-							wheel.steering = (child.userData.steering === 'true');
-						}
-
-						if (child.userData.hasOwnProperty('drive')) 
-						{
-							wheel.drive = child.userData.drive;
-						}
-
-						this.wheels.push(wheel);
+						this.wheels.push(new Wheel(child));
 					}
 					if (child.userData.data === 'collision')
 					{
@@ -473,6 +424,38 @@ export abstract class Vehicle extends THREE.Object3D
 		if (this.seats.length === 0)
 		{
 			console.warn('Vehicle ' + typeof(this) + ' has no seats.');
+		}
+		else
+		{
+			this.connectSeats();
+		}
+	}
+
+	private connectSeats(): void
+	{
+		for (const firstSeat of this.seats)
+		{
+			if (firstSeat.connectedSeatsString !== undefined)
+			{
+				// Get list of connected seat names
+				let conn_seat_names = firstSeat.connectedSeatsString.split(';');
+				for (const conn_seat_name of conn_seat_names)
+				{
+					// If name not empty
+					if (conn_seat_name.length > 0)
+					{
+						// Run through seat list and connect seats to this seat,
+						// based on this seat's connected seats list
+						for (const secondSeat of this.seats)
+						{
+							if (secondSeat.seatPointObject.name === conn_seat_name) 
+							{
+								firstSeat.connectedSeats.push(secondSeat);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
