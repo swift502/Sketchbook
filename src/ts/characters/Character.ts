@@ -611,8 +611,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		if (vehicleFinder.closestObject !== undefined)
 		{
 			let vehicle = vehicleFinder.closestObject;
-			this.vehicleEntryInstance = new VehicleEntryInstance(this);
-			this.vehicleEntryInstance.wantsToDrive = wantsToDrive;
+			let vehicleEntryInstance = new VehicleEntryInstance(this);
+			vehicleEntryInstance.wantsToDrive = wantsToDrive;
 
 			// Find best seat
 			let seatFinder = new ClosestObjectFinder<SeatPoint>(this.position);
@@ -642,9 +642,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				}
 				else
 				{
-					// Skip driver seats
-					if (seat.type === SeatType.Driver) continue;
-
 					// Consider passenger seats
 					if (seat.type === SeatType.Passenger)
 					{
@@ -657,7 +654,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			if (seatFinder.closestObject !== undefined)
 			{
 				let targetSeat = seatFinder.closestObject;
-				this.vehicleEntryInstance.targetSeat = targetSeat;
+				vehicleEntryInstance.targetSeat = targetSeat;
 
 				let entryPointFinder = new ClosestObjectFinder<Object3D>(this.position);
 
@@ -668,8 +665,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 				if (entryPointFinder.closestObject !== undefined)
 				{
-					this.vehicleEntryInstance.entryPoint = entryPointFinder.closestObject;
+					vehicleEntryInstance.entryPoint = entryPointFinder.closestObject;
 					this.triggerAction('up', true);
+					this.vehicleEntryInstance = vehicleEntryInstance;
 				}
 			}
 		}
