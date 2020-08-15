@@ -4,6 +4,7 @@ import { Side } from '../enums/Side';
 import { IControllable } from '../interfaces/IControllable';
 import { VehicleDoor } from '../vehicles/VehicleDoor';
 import { Vehicle } from '../vehicles/Vehicle';
+import { Character } from '../characters/Character';
 
 export class SeatPoint
 {
@@ -21,7 +22,7 @@ export class SeatPoint
 	public door: VehicleDoor;
 	public doorSide: Side;
 
-	public occupied: boolean = false;
+	public occupiedBy: Character = null;
 
 	constructor(vehicle: IControllable, object: THREE.Object3D, gltf: any)
 	{

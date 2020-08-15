@@ -52,6 +52,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 			'rollLeft': new KeyBinding('KeyA'),
 			'rollRight': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'view': new KeyBinding('KeyV'),
 		};
 

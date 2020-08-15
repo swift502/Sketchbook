@@ -26,6 +26,7 @@ import { times } from 'lodash';
 import { SeatType } from '../enums/SeatType';
 import { GroundImpactData } from './GroundImpactData';
 import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
+import { Object3D } from 'three';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -68,12 +69,14 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public groundImpactData: GroundImpactData = new GroundImpactData();
 
 	public controlledObject: IControllable;
-	public controlledObjectSeat: SeatPoint;
 
 	public raycastBox: THREE.Mesh;
 	public charState: ICharacterState;
 	public behaviour: ICharacterAI;
 	public world: World;
+
+	// Vehicles
+	public occupyingSeat: SeatPoint = null;
 	public vehicleEntryInstance: VehicleEntryInstance = null;
 
 	private physicsEnabled: boolean = true;
@@ -112,6 +115,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			'jump': new KeyBinding('Space'),
 			'use': new KeyBinding('KeyE'),
 			'enter': new KeyBinding('KeyF'),
+			'enter_passenger': new KeyBinding('KeyG'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'primary': new KeyBinding('Mouse0'),
 			'secondary': new KeyBinding('Mouse1'),
 		};
@@ -406,7 +411,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	{
 		this.behaviour?.update(timeStep);
 		this.vehicleEntryInstance?.update(timeStep);
-		// console.log(this.charState);
+		// console.log(this.occupyingSeat);
 		this.charState?.update(timeStep);
 
 		// this.visuals.position.copy(this.modelOffset);
@@ -484,9 +489,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			// Look in camera's direction
 			this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
 
-			// TODO: Make global property
-			let globalPos = new THREE.Vector3();
-			this.getWorldPosition(globalPos);
+			this.updateMatrixWorld();
+			if (this.vehicleEntryInstance !== null) (this.vehicleEntryInstance.targetSeat.vehicle as unknown as Object3D).updateMatrixWorld();
+			else if (this.occupyingSeat !== null) (this.occupyingSeat.vehicle as unknown as Object3D).updateMatrixWorld();
 
 			this.getWorldPosition(this.world.cameraOperator.target);
 		}
@@ -684,6 +689,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.setPosition(seat.seatPointObject.position.x, seat.seatPointObject.position.y + 0.6, seat.seatPointObject.position.z);
 		this.quaternion.copy(seat.seatPointObject.quaternion);
 
+		this.occupySeat(seat);
 		this.setState(new Driving(this, seat));
 
 		this.startControllingVehicle(vehicle, seat);
@@ -698,11 +704,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.controlledObject.allowSleep(false);
 		vehicle.inputReceiverInit();
 
-		this.controlledObjectSeat = seat;
 		vehicle.controllingCharacter = this;
 	}
 
-	public transferControls(entity:IControllable): void
+	public transferControls(entity: IControllable): void
 	{
 		// Currently running through all actions of this character and the vehicle,
 		// comparing keycodes of actions and based on that triggering vehicle's actions
@@ -730,14 +735,37 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
+	public stopControllingVehicle(): void
+	{
+		if (this.controlledObject?.controllingCharacter === this)
+		{
+			this.controlledObject.allowSleep(true);
+			this.controlledObject.controllingCharacter = undefined;
+			this.controlledObject.resetControls();
+			this.controlledObject = undefined;
+			this.inputReceiverInit();
+		}
+	}
+
 	public exitVehicle(): void
 	{
-		this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
-		this.controlledObject.allowSleep(true);
-		this.controlledObject.controllingCharacter = undefined;
-		this.controlledObject.resetControls();
-		this.controlledObject = undefined;
-		this.inputReceiverInit();
+		this.setState(new ExitingVehicle(this, this.occupyingSeat));
+		this.stopControllingVehicle();
+	}
+
+	public occupySeat(seat: SeatPoint): void
+	{
+		this.occupyingSeat = seat;
+		seat.occupiedBy = this;
+	}
+
+	public leaveSeat(): void
+	{
+		if (this.occupyingSeat !== null)
+		{
+			this.occupyingSeat.occupiedBy = null;
+			this.occupyingSeat = null;
+		}
 	}
 
 	public physicsPreStep(body: CANNON.Body, character: Character): void

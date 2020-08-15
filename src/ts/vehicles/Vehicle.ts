@@ -9,6 +9,7 @@ import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
 import * as Utils from '../core/FunctionLibrary';
 import { CollisionGroups } from '../enums/CollisionGroups';
+import { SwitchingSeats } from '../characters/character_states/vehicles/SwitchingSeats';
 
 export abstract class Vehicle extends THREE.Object3D
 {
@@ -125,6 +126,18 @@ export abstract class Vehicle extends THREE.Object3D
 		{
 			this.controllingCharacter.modelContainer.visible = true;
 			this.controllingCharacter.exitVehicle();
+		}
+		if (this.actions.seat_switch.justPressed &&
+			this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
+		{
+			this.controllingCharacter.setState(
+				new SwitchingSeats(
+					this.controllingCharacter,
+					this.controllingCharacter.occupyingSeat,
+					this.controllingCharacter.occupyingSeat.connectedSeats[0]
+				)
+			);
+			this.controllingCharacter.stopControllingVehicle();
 		}
 	}
 

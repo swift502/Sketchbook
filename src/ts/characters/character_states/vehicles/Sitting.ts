@@ -26,29 +26,36 @@ export class Sitting extends CharacterStateBase
 	{
 		super.update(timeStep);
 
-		console.log("hello 4");
-
 		if (!this.seat.door?.achievingTargetRotation && this.seat.door?.rotation > 0 && this.noDirection())
 		{
-			console.log("hello 5");
 			this.character.setState(new CloseVehicleDoorInside(this.character, this.seat));
 		}
 		else if (this.character.vehicleEntryInstance !== null)
 		{
-			console.log("hello 1");
 			if (this.character.vehicleEntryInstance.wantsToDrive)
 			{
-				console.log("hello 2");
 				for (const possibleDriverSeat of this.seat.connectedSeats)
 				{
 					if (possibleDriverSeat.type === SeatType.Driver)
 					{
-						console.log("hello 3");
 						this.character.setState(new SwitchingSeats(this.character, this.seat, possibleDriverSeat));
 						break;
 					}
 				}
 			}
+		}
+	}
+
+	public onInputChange(): void
+	{
+		if (this.character.actions.seat_switch.justPressed && this.seat.connectedSeats.length > 0)
+		{
+			this.character.setState(new SwitchingSeats(this.character, this.seat, this.seat.connectedSeats[0]));
+		}
+
+		if (this.character.actions.enter.justPressed || this.character.actions.enter_passenger.justPressed)
+		{
+			this.character.exitVehicle();
 		}
 	}
 }

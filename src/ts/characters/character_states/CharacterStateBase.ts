@@ -56,14 +56,11 @@ export abstract class CharacterStateBase implements ICharacterState
 	{
 		if (this.canFindVehiclesToEnter && this.character.actions.enter.justPressed)
 		{
-			if (this.character.actions.enter.justPressed)
-			{
-				this.character.findVehicleToEnter(true);
-			}
-			// else if (this.character.actions.enterAsPassenger.justPressed)
-			// {
-			// 	this.character.findVehicleToEnter(false);
-			// }
+			this.character.findVehicleToEnter(true);
+		}
+		else if (this.canFindVehiclesToEnter && this.character.actions.enter_passenger.justPressed)
+		{
+			this.character.findVehicleToEnter(false);
 		}
 		else if (this.canEnterVehicles && this.character.vehicleEntryInstance !== null)
 		{

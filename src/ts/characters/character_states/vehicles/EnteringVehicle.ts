@@ -58,6 +58,7 @@ export class EnteringVehicle extends CharacterStateBase
 
 		if (this.animationEnded(timeStep))
 		{
+			this.character.occupySeat(this.seat);
 			this.character.setPosition(this.endPosition.x, this.endPosition.y, this.endPosition.z);
 
 			if (this.seat.type === SeatType.Driver)

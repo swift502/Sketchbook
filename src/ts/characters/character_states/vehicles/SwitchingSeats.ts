@@ -27,12 +27,12 @@ export class SwitchingSeats extends CharacterStateBase
 		this.canFindVehiclesToEnter = false;
 		this.canLeaveVehicles = false;
 
+		character.leaveSeat();
+		this.character.occupySeat(toSeat);
+
 		const elements = fromSeat.seatPointObject.matrix.elements;
 		let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
 		const viewVector = toSeat.seatPointObject.position.clone().sub(fromSeat.seatPointObject.position).normalize();
-		// console.log(viewVector);
-		// console.log(right);
-		// console.log("---");
 		const side = right.dot(viewVector) > 0 ? Side.Left : Side.Right;
 
 		if (side === Side.Left)

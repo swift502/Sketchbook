@@ -52,6 +52,7 @@ export class Car extends Vehicle implements IControllable {
 			'left': new KeyBinding('KeyA'),
 			'right': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'view': new KeyBinding('KeyV'),
 		};
 

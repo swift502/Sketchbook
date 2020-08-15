@@ -54,18 +54,12 @@ export class InputManager
 
 	public update(timestep: number, unscaledTimeStep: number): void
 	{
-		if (this.inputReceiver === undefined) 
+		if (this.inputReceiver === undefined && this.world !== undefined && this.world.cameraOperator !== undefined)
 		{
-			if (this.world !== undefined && this.world.cameraOperator !== undefined)
-			{
-				this.setInputReceiver(this.world.cameraOperator);
-			}
+			this.setInputReceiver(this.world.cameraOperator);
 		}
 
-		if (this.inputReceiver !== undefined) 
-		{
-			this.inputReceiver.inputReceiverUpdate(unscaledTimeStep);
-		}
+		this.inputReceiver?.inputReceiverUpdate(unscaledTimeStep);
 	}
 
 	public setInputReceiver(receiver: IInputReceiver): void

@@ -21,13 +21,13 @@ export class ExitingVehicle extends CharacterStateBase
 	private startRotation: THREE.Quaternion = new THREE.Quaternion();
 	private endRotation: THREE.Quaternion = new THREE.Quaternion();
 
-	constructor(character: Character, vehicle: IControllable, seat: SeatPoint)
+	constructor(character: Character, seat: SeatPoint)
 	{
 		super(character);
 
 		this.canFindVehiclesToEnter = false;
-		this.vehicle = vehicle;
 		this.seat = seat;
+		this.vehicle = seat.vehicle;
 
 		this.seat.door?.open();
 
@@ -55,8 +55,6 @@ export class ExitingVehicle extends CharacterStateBase
 		if (this.animationEnded(timeStep))
 		{
 			this.character.controlledObject = undefined;
-			this.character.controlledObjectSeat = undefined;
-			this.vehicle.controllingCharacter = undefined;
 			this.character.world.graphicsWorld.attach(this.character);
 			this.character.resetVelocity();
 			this.character.resetOrientation();
@@ -68,10 +66,12 @@ export class ExitingVehicle extends CharacterStateBase
 			if (!this.character.rayHasHit)
 			{
 				this.character.setState(new Falling(this.character));
+				this.character.leaveSeat();
 			}
 			else if (this.anyDirection() || this.seat.door === undefined)
 			{
 				this.character.setState(new Idle(this.character));
+				this.character.leaveSeat();
 			}
 			else
 			{

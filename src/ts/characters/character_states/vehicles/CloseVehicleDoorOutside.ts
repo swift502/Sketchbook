@@ -42,6 +42,7 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 		if (this.animationEnded(timeStep))
 		{
 			this.character.setState(new Idle(this.character));
+			this.character.leaveSeat();
 		}
 	}
 }
