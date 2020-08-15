@@ -280,11 +280,6 @@ export abstract class Vehicle extends THREE.Object3D
 		}
 	}
 
-	public getMountPoint(character: Character): THREE.Vector3
-	{
-		return this.seats[0].entryPoint.position;
-	}
-
 	public setPosition(x: number, y: number, z: number): void
 	{
 		this.collision.position.x = x;

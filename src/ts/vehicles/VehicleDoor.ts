@@ -37,7 +37,7 @@ export class VehicleDoor
 	constructor(seat: SeatPoint, object: THREE.Object3D)
 	{
 		this.seat = seat;
-		this.vehicle = seat.vehicle as Vehicle;
+		this.vehicle = seat.vehicle as unknown as Vehicle;
 		this.doorObject = object;
 	}
 

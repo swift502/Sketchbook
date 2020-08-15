@@ -18,7 +18,7 @@ export class SeatPoint
 	public connectedSeats: SeatPoint[] = [];
 
 	public type: SeatType;
-	public entryPoint: THREE.Object3D;
+	public entryPoints: THREE.Object3D[] = [];
 	public door: VehicleDoor;
 	public doorSide: Side;
 
@@ -52,7 +52,7 @@ export class SeatPoint
 				{
 					if (entry_point.length > 0)
 					{
-						this.entryPoint = gltf.scene.getObjectByName(entry_point);
+						this.entryPoints.push(gltf.scene.getObjectByName(entry_point));
 					}
 				}
 			}

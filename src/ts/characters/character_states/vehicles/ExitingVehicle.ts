@@ -32,11 +32,11 @@ export class ExitingVehicle extends CharacterStateBase
 		this.seat.door?.open();
 
 		this.startPosition.copy(this.character.position);
-		this.endPosition.copy(seat.entryPoint.position);
+		this.endPosition.copy(seat.entryPoints[0].position);
 		this.endPosition.y += 0.6;
 
 		this.startRotation.copy(this.character.quaternion);
-		this.endRotation.copy(seat.entryPoint.quaternion);
+		this.endRotation.copy(seat.entryPoints[0].quaternion);
 
 		if (seat.doorSide === Side.Left)
 		{
@@ -60,7 +60,7 @@ export class ExitingVehicle extends CharacterStateBase
 			this.character.resetOrientation();
 			this.character.setPhysicsEnabled(true);
 
-			this.character.characterCapsule.body.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
+			this.character.characterCapsule.body.velocity.copy((this.vehicle as unknown as Vehicle).rayCastVehicle.chassisBody.velocity);
 			this.character.feetRaycast();
 
 			if (!this.character.rayHasHit)

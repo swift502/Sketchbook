@@ -12,14 +12,16 @@ import { EnteringVehicle } from './EnteringVehicle';
 export class OpenVehicleDoor extends CharacterStateBase
 {
 	private seat: SeatPoint;
+	private entryPoint: THREE.Object3D;
 	private hasOpenedDoor: boolean = false;
 
-	constructor(character: Character, seat: SeatPoint)
+	constructor(character: Character, seat: SeatPoint, entryPoint: THREE.Object3D)
 	{
 		super(character);
 
 		this.canFindVehiclesToEnter = false;
 		this.seat = seat;
+		this.entryPoint = entryPoint;
 
 		if (seat.doorSide === Side.Left)
 		{
@@ -37,7 +39,7 @@ export class OpenVehicleDoor extends CharacterStateBase
 	{
 		super.update(timeStep);
 
-		const elements = this.seat.entryPoint.matrixWorld.elements;
+		const elements = this.entryPoint.matrixWorld.elements;
 		let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
 		this.character.setOrientation(forward);
 

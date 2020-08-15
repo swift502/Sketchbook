@@ -490,8 +490,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
 
 			this.updateMatrixWorld();
-			if (this.vehicleEntryInstance !== null) (this.vehicleEntryInstance.targetSeat.vehicle as unknown as Object3D).updateMatrixWorld();
-			else if (this.occupyingSeat !== null) (this.occupyingSeat.vehicle as unknown as Object3D).updateMatrixWorld();
+			if (this.vehicleEntryInstance !== null) (this.vehicleEntryInstance.targetSeat.vehicle as unknown as THREE.Object3D).updateMatrixWorld();
+			else if (this.occupyingSeat !== null) (this.occupyingSeat.vehicle as unknown as THREE.Object3D).updateMatrixWorld();
 
 			this.getWorldPosition(this.world.cameraOperator.target);
 		}
@@ -598,6 +598,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public findVehicleToEnter(wantsToDrive: boolean): void
 	{
+		// reusable world position variable
+		let worldPos = new THREE.Vector3();
+
 		// Find best vehicle
 		let vehicleFinder = new ClosestObjectFinder<Vehicle>(this.position, 10);
 		this.world.vehicles.forEach((vehicle) =>
@@ -611,25 +614,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			this.vehicleEntryInstance = new VehicleEntryInstance(this);
 			this.vehicleEntryInstance.wantsToDrive = wantsToDrive;
 
-			// Get seats' world positions
-			let seatsWorldPositions = {};
-			for (const seat of vehicle.seats)
-			{
-				let worldPos = new THREE.Vector3();
-				seat.seatPointObject.getWorldPosition(worldPos);
-				seatsWorldPositions[seat.seatPointObject.name] = worldPos;
-			}
-
 			// Find best seat
 			let seatFinder = new ClosestObjectFinder<SeatPoint>(this.position);
-			for (const seat of vehicleFinder.closestObject.seats)
+			for (const seat of vehicle.seats)
 			{
 				if (wantsToDrive)
 				{
 					// Consider driver seats
 					if (seat.type === SeatType.Driver)
 					{
-						seatFinder.consider(seat, seatsWorldPositions[seat.seatPointObject.name]);
+						seat.seatPointObject.getWorldPosition(worldPos);
+						seatFinder.consider(seat, worldPos);
 					}
 					// Consider passenger seats connected to driver seats
 					else if (seat.type === SeatType.Passenger)
@@ -638,7 +633,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 						{
 							if (connSeat.type === SeatType.Driver)
 							{
-								seatFinder.consider(seat, seatsWorldPositions[seat.seatPointObject.name]);
+								seat.seatPointObject.getWorldPosition(worldPos);
+								seatFinder.consider(seat, worldPos);
 								break;
 							}
 						}
@@ -652,20 +648,34 @@ export class Character extends THREE.Object3D implements IWorldEntity
 					// Consider passenger seats
 					if (seat.type === SeatType.Passenger)
 					{
-						seatFinder.consider(seat, seatsWorldPositions[seat.seatPointObject.name]);
+						seat.seatPointObject.getWorldPosition(worldPos);
+						seatFinder.consider(seat, worldPos);
 					}
 				}
 			}
 
 			if (seatFinder.closestObject !== undefined)
 			{
-				this.vehicleEntryInstance.targetSeat = seatFinder.closestObject;
-				this.triggerAction('up', true);
+				let targetSeat = seatFinder.closestObject;
+				this.vehicleEntryInstance.targetSeat = targetSeat;
+
+				let entryPointFinder = new ClosestObjectFinder<Object3D>(this.position);
+
+				for (const point of targetSeat.entryPoints) {
+					point.getWorldPosition(worldPos);
+					entryPointFinder.consider(point, worldPos);
+				}
+
+				if (entryPointFinder.closestObject !== undefined)
+				{
+					this.vehicleEntryInstance.entryPoint = entryPointFinder.closestObject;
+					this.triggerAction('up', true);
+				}
 			}
 		}
 	}
 
-	public enterVehicle(seat: SeatPoint): void
+	public enterVehicle(seat: SeatPoint, entryPoint: THREE.Object3D): void
 	{
 		this.resetControls();
 
@@ -675,7 +685,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 		else
 		{
-			this.setState(new OpenVehicleDoor(this, seat));
+			this.setState(new OpenVehicleDoor(this, seat, entryPoint));
 		}
 	}
 
