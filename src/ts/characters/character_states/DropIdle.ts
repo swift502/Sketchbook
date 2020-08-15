@@ -17,7 +17,7 @@ export class DropIdle extends CharacterStateBase implements ICharacterState
 		this.character.velocitySimulator.mass = 7;
 
 		this.character.setArcadeVelocityTarget(0);
-		this.animationLength = this.character.setAnimation('drop_idle', 0.1);
+		this.playAnimation('drop_idle', 0.1);
 
 		if (this.anyDirection())
 		{

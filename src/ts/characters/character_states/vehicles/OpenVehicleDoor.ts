@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import
 {
 	CharacterStateBase,
@@ -7,7 +8,6 @@ import { SeatPoint } from '../../../data/SeatPoint';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 import { EnteringVehicle } from './EnteringVehicle';
-import THREE = require('three');
 
 export class OpenVehicleDoor extends CharacterStateBase
 {
@@ -23,11 +23,11 @@ export class OpenVehicleDoor extends CharacterStateBase
 
 		if (seat.doorSide === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('open_door_standing_right', 0.1);
+			this.playAnimation('open_door_standing_right', 0.1);
 		}
 		else if (seat.doorSide === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('open_door_standing_left', 0.1);
+			this.playAnimation('open_door_standing_left', 0.1);
 		}
 
 		this.character.resetVelocity();
@@ -47,7 +47,7 @@ export class OpenVehicleDoor extends CharacterStateBase
 			this.seat.door?.open();   
 		}
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
 			if (this.anyDirection())
 			{

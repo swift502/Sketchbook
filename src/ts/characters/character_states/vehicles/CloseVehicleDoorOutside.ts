@@ -21,11 +21,11 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 
 		if (seat.doorSide === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('close_door_standing_right', 0.1);
+			this.playAnimation('close_door_standing_right', 0.1);
 		}
 		else if (seat.doorSide === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('close_door_standing_left', 0.1);
+			this.playAnimation('close_door_standing_left', 0.1);
 		}
 	}
 
@@ -39,7 +39,7 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 			this.seat.door.close();   
 		}
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
 			this.character.setState(new Idle(this.character));
 		}

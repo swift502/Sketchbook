@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import
 {
 	CharacterStateBase,
@@ -6,7 +7,6 @@ import { Character } from '../../Character';
 import { Side } from '../../../enums/Side';
 import { SeatPoint } from '../../../data/SeatPoint';
 import { IControllable } from '../../../interfaces/IControllable';
-import THREE = require('three');
 import { Idle } from '../Idle';
 import { CloseVehicleDoorOutside } from './CloseVehicleDoorOutside';
 import { Vehicle } from 'src/ts/vehicles/Vehicle';
@@ -40,11 +40,11 @@ export class ExitingVehicle extends CharacterStateBase
 
 		if (seat.doorSide === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('stand_up_left', 0.1);
+			this.playAnimation('stand_up_left', 0.1);
 		}
 		else if (seat.doorSide === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('stand_up_right', 0.1);
+			this.playAnimation('stand_up_right', 0.1);
 		}
 	}
 
@@ -52,7 +52,7 @@ export class ExitingVehicle extends CharacterStateBase
 	{
 		super.update(timeStep);
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
 			this.character.controlledObject = undefined;
 			this.character.controlledObjectSeat = undefined;

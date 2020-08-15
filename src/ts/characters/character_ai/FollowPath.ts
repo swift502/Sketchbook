@@ -1,7 +1,7 @@
+import * as THREE from 'three';
 import { FollowTarget } from './FollowTarget';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
 import { PathNode } from '../../data/PathNode';
-import THREE = require('three');
 
 export class FollowPath extends FollowTarget implements ICharacterAI
 {

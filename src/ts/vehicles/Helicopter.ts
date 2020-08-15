@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as Utils from '../core/FunctionLibrary';
 
@@ -5,7 +6,6 @@ import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
-import THREE = require('three');
 import { World } from '../core/World';
 
 export class Helicopter extends Vehicle implements IControllable, IWorldEntity

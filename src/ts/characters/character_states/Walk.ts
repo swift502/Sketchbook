@@ -16,7 +16,7 @@ export class Walk extends CharacterStateBase
 
 		this.canEnterVehicles = true;
 		this.character.setArcadeVelocityTarget(0.8);
-		this.character.setAnimation('run', 0.1);
+		this.playAnimation('run', 0.1);
 	}
 
 	public update(timeStep: number): void

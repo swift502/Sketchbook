@@ -6,6 +6,8 @@ import { Character } from '../../Character';
 import { SeatPoint } from '../../../data/SeatPoint';
 import { Side } from '../../../enums/Side';
 import { Driving } from './Driving';
+import { SeatType } from '../../../enums/SeatType';
+import { Sitting } from './Sitting';
 
 export class CloseVehicleDoorInside extends CharacterStateBase
 {
@@ -22,11 +24,11 @@ export class CloseVehicleDoorInside extends CharacterStateBase
 
 		if (seat.doorSide === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('close_door_sitting_left', 0.1);
+			this.playAnimation('close_door_sitting_left', 0.1);
 		}
 		else if (seat.doorSide === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('close_door_sitting_right', 0.1);
+			this.playAnimation('close_door_sitting_right', 0.1);
 		}
 		
 		this.seat.door?.open();
@@ -42,9 +44,16 @@ export class CloseVehicleDoorInside extends CharacterStateBase
 			this.seat.door?.close();
 		}
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
-			this.character.setState(new Driving(this.character, this.seat));
+			if (this.seat.type === SeatType.Driver)
+			{
+				this.character.setState(new Driving(this.character, this.seat));
+			}
+			else if (this.seat.type === SeatType.Passenger)
+			{
+				this.character.setState(new Sitting(this.character, this.seat));
+			}
 		}
 	}
 }

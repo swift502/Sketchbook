@@ -1,4 +1,4 @@
-import THREE = require('three');
+import * as THREE from 'three';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { World } from '../core/World';
 export declare class Grass implements IWorldEntity {

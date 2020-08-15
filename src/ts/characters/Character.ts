@@ -406,6 +406,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	{
 		this.behaviour?.update(timeStep);
 		this.vehicleEntryInstance?.update(timeStep);
+		// console.log(this.charState);
 		this.charState?.update(timeStep);
 
 		// this.visuals.position.copy(this.modelOffset);
@@ -492,7 +493,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		
 	}
 
-	public setAnimation(clipName: string, fadeIn: number): void
+	public setAnimation(clipName: string, fadeIn: number): number
 	{
 		if (this.mixer !== undefined)
 		{
@@ -500,11 +501,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			let clip = THREE.AnimationClip.findByName( this.animations, clipName );
 
 			let action = this.mixer.clipAction(clip);
+			if (action === null)
+			{
+				console.error(`Animation ${clipName} not found!`);
+				return 0;
+			}
+
 			this.mixer.stopAllAction();
 			action.fadeIn(fadeIn);
 			action.play();
 
-			return action['_clip'].duration;
+			return action.getClip().duration;
 		}
 	}
 
@@ -597,7 +604,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		{
 			let vehicle = vehicleFinder.closestObject;
 			this.vehicleEntryInstance = new VehicleEntryInstance(this);
-			this.vehicleEntryInstance.wantsToTransitionToDriverSeat = wantsToDrive;
+			this.vehicleEntryInstance.wantsToDrive = wantsToDrive;
 
 			// Get seats' world positions
 			let seatsWorldPositions = {};
@@ -665,8 +672,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		{
 			this.setState(new OpenVehicleDoor(this, seat));
 		}
-
-		this.vehicleEntryInstance = null;
 	}
 
 	public teleportToVehicle(vehicle: Vehicle, seat: SeatPoint): void

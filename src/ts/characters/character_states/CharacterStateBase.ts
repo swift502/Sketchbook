@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import * as Utils from '../../core/FunctionLibrary';
 import {
 	DropIdle,
@@ -15,7 +16,6 @@ import {
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
 import { KeyBinding } from '../../core/KeyBinding';
-import THREE = require('three');
 
 export abstract class CharacterStateBase implements ICharacterState
 {
@@ -65,7 +65,7 @@ export abstract class CharacterStateBase implements ICharacterState
 			// 	this.character.findVehicleToEnter(false);
 			// }
 		}
-		else if (this.character.vehicleEntryInstance !== null)
+		else if (this.canEnterVehicles && this.character.vehicleEntryInstance !== null)
 		{
 			if (this.character.actions.up.justPressed ||
 				this.character.actions.down.justPressed ||
@@ -165,5 +165,10 @@ export abstract class CharacterStateBase implements ICharacterState
 		{
 			this.character.setState(new StartWalkForward(this.character));
 		}
+	}
+
+	protected playAnimation(animName: string, fadeIn: number): void
+	{
+		this.animationLength = this.character.setAnimation(animName, fadeIn);
 	}
 }

@@ -1,13 +1,16 @@
+import * as THREE from 'three';
 import
 {
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
 import { IControllable } from '../../../interfaces/IControllable';
-import THREE = require('three');
 import { Driving } from './Driving';
 import { SeatPoint } from '../../../data/SeatPoint';
 import { Side } from '../../../enums/Side';
+import { Sitting } from './Sitting';
+import { SwitchingSeats } from './SwitchingSeats';
+import { SeatType } from '../../../enums/SeatType';
 
 export class EnteringVehicle extends CharacterStateBase
 {
@@ -26,14 +29,14 @@ export class EnteringVehicle extends CharacterStateBase
 		this.vehicle = seat.vehicle;
 		this.seat = seat;
 
-		this.animationLength = 1;
+		// this.animationLength = 1;
 		if (seat.doorSide === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('sit_down_right', 0.1);
+			this.playAnimation('sit_down_right', 0.1);
 		}
 		else if (seat.doorSide === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('sit_down_left', 0.1);
+			this.playAnimation('sit_down_left', 0.1);
 		}
 
 		this.character.resetVelocity();
@@ -53,21 +56,28 @@ export class EnteringVehicle extends CharacterStateBase
 	{
 		super.update(timeStep);
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
 			this.character.setPosition(this.endPosition.x, this.endPosition.y, this.endPosition.z);
-			this.character.startControllingVehicle(this.vehicle, this.seat);
-			this.vehicle.onInputChange();
 
-			this.character.setState(new Driving(this.character, this.seat));
+			if (this.seat.type === SeatType.Driver)
+			{
+				this.character.setState(new Driving(this.character, this.seat));
+			}
+			else if (this.seat.type === SeatType.Passenger)
+			{
+				this.character.setState(new Sitting(this.character, this.seat));
+			}
 		}
-
-		let factor = this.timer / this.animationLength;
-		let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
-
-		let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
-		this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
-
-		THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, sineFactor);
+		else
+		{
+			let factor = this.timer / this.animationLength;
+			let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
+	
+			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
+			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
+	
+			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, sineFactor);
+		}
 	}
 }

@@ -6,7 +6,7 @@ export class VehicleEntryInstance
 {
 	public character: Character;
 	public targetSeat: SeatPoint;
-	public wantsToTransitionToDriverSeat: boolean = false;
+	public wantsToDrive: boolean = false;
 
 	constructor(character: Character)
 	{

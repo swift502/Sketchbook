@@ -1,4 +1,4 @@
-import THREE = require('three');
+import * as THREE from 'three';
 import { Noise } from '../../lib/utils/perlin.js';
 import { GrassShader } from '../../lib/shaders/GrassShader';
 import { IWorldEntity } from '../interfaces/IWorldEntity';

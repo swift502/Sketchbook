@@ -1,7 +1,7 @@
+import * as THREE from 'three';
 import { SeatType } from '../enums/SeatType';
 import { Side } from '../enums/Side';
 import { IControllable } from '../interfaces/IControllable';
-import THREE = require('three');
 import { VehicleDoor } from '../vehicles/VehicleDoor';
 import { Vehicle } from '../vehicles/Vehicle';
 
@@ -13,13 +13,15 @@ export class SeatPoint
 	// String of names of connected seats
 	public connectedSeatsString: string;
 	// Actual seatPoint objects, need to be identified
-	// by parsing connectedSeatsString after all seats are imported
+	// by parsing connectedSeatsString *after* all seats are imported
 	public connectedSeats: SeatPoint[] = [];
 
 	public type: SeatType;
 	public entryPoint: THREE.Object3D;
 	public door: VehicleDoor;
 	public doorSide: Side;
+
+	public occupied: boolean = false;
 
 	constructor(vehicle: IControllable, object: THREE.Object3D, gltf: any)
 	{

@@ -15,7 +15,7 @@ export class JumpRunning extends CharacterStateBase implements ICharacterState
 		super(character);
 
 		this.character.velocitySimulator.mass = 100;
-		this.animationLength = this.character.setAnimation('jump_running', 0.03);
+		this.playAnimation('jump_running', 0.03);
 		this.alreadyJumped = false;
 	}
 
@@ -44,7 +44,7 @@ export class JumpRunning extends CharacterStateBase implements ICharacterState
 		{
 			this.setAppropriateDropState();
 		}
-		else if (this.timer > this.animationLength - timeStep)
+		else if (this.animationEnded(timeStep))
 		{
 			this.character.setState(new Falling(this.character));
 		}
