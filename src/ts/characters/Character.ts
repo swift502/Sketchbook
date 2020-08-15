@@ -677,13 +677,13 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	{
 		this.resetControls();
 
-		if (seat.door?.rotation > 0.5)
+		if (seat.door?.rotation < 0.5)
 		{
-			this.setState(new EnteringVehicle(this, seat));
+			this.setState(new OpenVehicleDoor(this, seat, entryPoint));
 		}
 		else
 		{
-			this.setState(new OpenVehicleDoor(this, seat, entryPoint));
+			this.setState(new EnteringVehicle(this, seat));
 		}
 	}
 
