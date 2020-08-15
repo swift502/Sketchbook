@@ -1,6 +1,6 @@
 import * as CANNON from 'cannon';
 import { ICollider } from '../../interfaces/ICollider';
-import { Object3D } from "three";
+import { Object3D } from 'three';
 export declare class ConvexCollider implements ICollider {
     mesh: any;
     options: any;

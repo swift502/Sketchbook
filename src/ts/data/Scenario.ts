@@ -5,60 +5,93 @@ import { World } from '../core/World';
 
 export class Scenario
 {
-    public spawnAlways: boolean;
-    public default: boolean;
+	public id: string;
+	public name: string;
+	public spawnAlways: boolean = false;
+	public default: boolean = false;
 
-    private rootNode: THREE.Object3D;
-    private spawnPoints: ISpawnPoint[] = [];
+	private rootNode: THREE.Object3D;
+	private spawnPoints: ISpawnPoint[] = [];
+	private invisible: boolean = false;
+	private world: World;
 
-    constructor(root: THREE.Object3D)
-    {
-        this.rootNode = root;
-    }
+	constructor(root: THREE.Object3D, world: World)
+	{
+		this.rootNode = root;
+		this.world = world;
+		this.id = root.name;
 
-    public findSpawnPoints(): void
-    {
-        this.rootNode.traverse((child) => {
-            if (child.hasOwnProperty('userData'))
-            {
-                if (child.userData.data === 'spawn')
-                {
-                    if (child.userData.type === 'car' || child.userData.type === 'airplane' || child.userData.type === 'heli')
-                    {
-                        let sp = new VehicleSpawnPoint(child);
+		// Scenario
+		if (root.userData.hasOwnProperty('name')) 
+		{
+			this.name = root.userData.name;
+		}
+		if (root.userData.hasOwnProperty('default') && root.userData.default === 'true') 
+		{
+			this.default = true;
+			this.name += ' (default)';
+		}
+		if (root.userData.hasOwnProperty('spawn_always') && root.userData.spawn_always === 'true') 
+		{
+			this.spawnAlways = true;
+		}
+		if (root.userData.hasOwnProperty('invisible') && root.userData.invisible === 'true') 
+		{
+			this.invisible = true;
+		}
 
-                        if (child.userData.hasOwnProperty('type')) 
-                        {
-                            sp.type = child.userData.type;
-                        }
+		if (!this.invisible) this.createLaunchLink();
 
-                        if (child.userData.hasOwnProperty('driver')) 
-                        {
-                            sp.driver = child.userData.driver;
+		// Find all scenario spawns and enitites
+		root.traverse((child) => {
+			if (child.hasOwnProperty('userData') && child.userData.hasOwnProperty('data'))
+			{
+				if (child.userData.data === 'spawn')
+				{
+					if (child.userData.type === 'car' || child.userData.type === 'airplane' || child.userData.type === 'heli')
+					{
+						let sp = new VehicleSpawnPoint(child);
 
-                            if (child.userData.driver === 'ai' && child.userData.hasOwnProperty('first_node'))
-                            {
-                                sp.firstAINode = child.userData.first_node;
-                            }
-                        }
+						if (child.userData.hasOwnProperty('type')) 
+						{
+							sp.type = child.userData.type;
+						}
 
-                        this.spawnPoints.push(sp);
-                    }
-                    else if (child.userData.type === 'player')
-                    {
-                        let sp = new CharacterSpawnPoint(child);
-                        this.spawnPoints.push(sp);
-                    }
-                }
-            }
-        });
-    }
+						if (child.userData.hasOwnProperty('driver')) 
+						{
+							sp.driver = child.userData.driver;
 
-    public launch(world: World): void
-    {
-        // this.world.clearEntities();
-        this.spawnPoints.forEach((sp) => {
-            sp.spawn(world);
-        });
-    }
+							if (child.userData.driver === 'ai' && child.userData.hasOwnProperty('first_node'))
+							{
+								sp.firstAINode = child.userData.first_node;
+							}
+						}
+
+						this.spawnPoints.push(sp);
+					}
+					else if (child.userData.type === 'player')
+					{
+						let sp = new CharacterSpawnPoint(child);
+						this.spawnPoints.push(sp);
+					}
+				}
+			}
+		});
+	}
+
+	public createLaunchLink(): void
+	{
+		let li = document.createElement('li');
+		li.innerText = this.name;
+		li.setAttribute('onclick', `world.launchScenario('${this.id}');`);
+		
+		document.getElementById('scenarios').append(li);
+	}
+
+	public launch(world: World): void
+	{
+		this.spawnPoints.forEach((sp) => {
+			sp.spawn(world);
+		});
+	}
 }

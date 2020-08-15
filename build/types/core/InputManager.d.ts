@@ -15,7 +15,7 @@ export declare class InputManager {
     boundOnKeyDown: (evt: any) => void;
     boundOnKeyUp: (evt: any) => void;
     constructor(world: World, domElement: HTMLElement);
-    update(timestep: number): void;
+    update(timestep: number, unscaledTimeStep: number): void;
     setInputReceiver(receiver: IInputReceiver): void;
     setPointerLock(enabled: boolean): void;
     onPointerlockChange(event: MouseEvent): void;

@@ -1,4 +1,4 @@
 export enum SeatType {
-    Driver = "driver",
-    Passenger = "passenger",
+	Driver = 'driver',
+	Passenger = 'passenger',
 }

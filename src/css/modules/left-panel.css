@@ -9,7 +9,6 @@
 }
 
 .left-panel .panel-segment {
-    flex-grow: 1;
     flex-basis: 100px;
     padding: 20px;
     overflow: hidden;
@@ -46,4 +45,9 @@
 
 .ctrl-desc {
     margin-left: 5px;
+}
+
+#scenarios li:hover {
+	text-decoration: underline;
+	cursor: pointer;
 }

@@ -6,7 +6,9 @@
     "jsRules": {},
     "rules": {
         "one-line": false,
-        "no-console": false,
+		"no-console": false,
+		"indent": [true, "tabs"],
+		"object-literal-shorthand": false,
         "quotemark": [true, "single"],
         "prefer-const": false,
         "eofline": false,
