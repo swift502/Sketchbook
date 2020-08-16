@@ -9,6 +9,7 @@ import { Side } from '../../../enums/Side';
 import { SeatType } from '../../../enums/SeatType';
 import { Driving } from './Driving';
 import { Sitting } from './Sitting';
+import * as Utils from '../../../core/FunctionLibrary';
 
 export class SwitchingSeats extends CharacterStateBase
 {
@@ -71,7 +72,7 @@ export class SwitchingSeats extends CharacterStateBase
 		else
 		{
 			let factor = this.timer / this.animationLength;
-			let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
+			let sineFactor = Utils.easeInOutSine(factor);
 	
 			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
 			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);

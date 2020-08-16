@@ -70,7 +70,7 @@ export class EnteringVehicle extends CharacterStateBase
 		else
 		{
 			let factor = THREE.MathUtils.clamp(this.timer / (this.animationLength - this.animData.end_early), 0, 1);
-			let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
+			let sineFactor = Utils.easeInOutSine(factor);
 	
 			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
 			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);

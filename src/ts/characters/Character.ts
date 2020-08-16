@@ -27,6 +27,8 @@ import { SeatType } from '../enums/SeatType';
 import { GroundImpactData } from './GroundImpactData';
 import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 import { Object3D } from 'three';
+import { EntityType } from '../enums/EntityType';
+import { ExitingAirplane } from './character_states/vehicles/ExitingAirplane';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -757,8 +759,19 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public exitVehicle(): void
 	{
-		this.setState(new ExitingVehicle(this, this.occupyingSeat));
-		this.stopControllingVehicle();
+		if (this.controlledObject !== null)
+		{
+			if (this.controlledObject.entityType === EntityType.Airplane)
+			{
+				this.setState(new ExitingAirplane(this, this.occupyingSeat));
+			}
+			else
+			{
+				this.setState(new ExitingVehicle(this, this.occupyingSeat));
+			}
+			
+			this.stopControllingVehicle();
+		}
 	}
 
 	public occupySeat(seat: VehicleSeat): void

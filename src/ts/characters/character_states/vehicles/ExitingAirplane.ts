@@ -14,14 +14,12 @@ import { CloseVehicleDoorOutside } from './CloseVehicleDoorOutside';
 import { Vehicle } from 'src/ts/vehicles/Vehicle';
 import { Falling } from '../Falling';
 
-export class ExitingVehicle extends CharacterStateBase
+export class ExitingAirplane extends CharacterStateBase
 {
 	private vehicle: IControllable;
 	private seat: VehicleSeat;
 	private startPosition: THREE.Vector3 = new THREE.Vector3();
 	private endPosition: THREE.Vector3 = new THREE.Vector3();
-	private startRotation: THREE.Quaternion = new THREE.Quaternion();
-	private endRotation: THREE.Quaternion = new THREE.Quaternion();
 
 	constructor(character: Character, seat: VehicleSeat)
 	{
@@ -31,26 +29,13 @@ export class ExitingVehicle extends CharacterStateBase
 		this.seat = seat;
 		this.vehicle = seat.vehicle;
 
-		const exitPoint = seat.entryPoints[0];
-
 		this.seat.door?.open();
 
 		this.startPosition.copy(this.character.position);
-		this.endPosition.copy(exitPoint.position);
-		this.endPosition.y += 0.52;
+		this.endPosition.copy(this.startPosition);
+		this.endPosition.y += 1;
 
-		this.startRotation.copy(this.character.quaternion);
-		this.endRotation.copy(exitPoint.quaternion);
-
-		const side = Utils.detectRelativeSide(seat.seatPointObject, exitPoint);
-		if (side === Side.Left)
-		{
-			this.playAnimation('stand_up_left', 0.1);
-		}
-		else if (side === Side.Right)
-		{
-			this.playAnimation('stand_up_right', 0.1);
-		}
+		this.playAnimation('jump_idle', 0.1);
 	}
 
 	public update(timeStep: number): void
@@ -66,31 +51,22 @@ export class ExitingVehicle extends CharacterStateBase
 			this.character.setPhysicsEnabled(true);
 
 			this.character.characterCapsule.body.velocity.copy((this.vehicle as unknown as Vehicle).rayCastVehicle.chassisBody.velocity);
-			this.character.feetRaycast();
 
-			if (!this.character.rayHasHit)
-			{
-				this.character.setState(new Falling(this.character));
-				this.character.leaveSeat();
-			}
-			else if (this.anyDirection() || this.seat.door === undefined)
-			{
-				this.character.setState(new Idle(this.character));
-				this.character.leaveSeat();
-			}
-			else
-			{
-				this.character.setState(new CloseVehicleDoorOutside(this.character, this.seat));
-			}
+			this.character.setState(new Falling(this.character));
+			this.character.leaveSeat();
 		}
 		else
 		{
-			let factor = this.timer / this.animationLength;
-			let sineFactor = Utils.easeInOutSine(factor);
-			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
+			let beginningCutoff = 0.3;
+			let factor = THREE.MathUtils.clamp(((this.timer / this.animationLength) - beginningCutoff) * (1 / (1 - beginningCutoff)), 0, 1);
+			let smoothFactor = this.easeOutQuad(factor);
+			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, smoothFactor);
 			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
-
-			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, sineFactor);
 		}
+	}
+
+	private easeOutQuad(x: number): number
+	{
+		return 1 - (1 - x) * (1 - x);
 	}
 }

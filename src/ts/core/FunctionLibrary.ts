@@ -298,4 +298,14 @@ export function detectRelativeSide(from: Object3D, to: Object3D): Side
 	return right.dot(viewVector) > 0 ? Side.Left : Side.Right;
 }
 
+export function easeInOutSine(x: number): number
+{
+	return -(Math.cos(Math.PI * x) - 1) / 2;
+}
+
+export function easeOutQuad(x: number): number
+{
+	return 1 - (1 - x) * (1 - x);
+}
+
 //#endregion
