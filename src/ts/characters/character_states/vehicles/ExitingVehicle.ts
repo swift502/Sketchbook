@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import * as Utils from '../../../core/FunctionLibrary';
+
 import
 {
 	CharacterStateBase,
@@ -29,20 +31,23 @@ export class ExitingVehicle extends CharacterStateBase
 		this.seat = seat;
 		this.vehicle = seat.vehicle;
 
+		const exitPoint = seat.entryPoints[0];
+
 		this.seat.door?.open();
 
 		this.startPosition.copy(this.character.position);
-		this.endPosition.copy(seat.entryPoints[0].position);
-		this.endPosition.y += 0.6;
+		this.endPosition.copy(exitPoint.position);
+		this.endPosition.y += 0.52;
 
 		this.startRotation.copy(this.character.quaternion);
-		this.endRotation.copy(seat.entryPoints[0].quaternion);
+		this.endRotation.copy(exitPoint.quaternion);
 
-		if (seat.doorSide === Side.Left)
+		const side = Utils.detectRelativeSide(seat.seatPointObject, exitPoint);
+		if (side === Side.Left)
 		{
 			this.playAnimation('stand_up_left', 0.1);
 		}
-		else if (seat.doorSide === Side.Right)
+		else if (side === Side.Right)
 		{
 			this.playAnimation('stand_up_right', 0.1);
 		}

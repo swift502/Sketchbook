@@ -3,6 +3,8 @@ import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { World } from './World';
+import { Side } from '../enums/Side';
+import { Object3D } from 'three';
 
 export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
 {
@@ -285,6 +287,15 @@ export function setupMeshProperties(child: any): void
 		// mat.map.encoding = THREE.LinearEncoding;
 		child.material = mat;
 	}
+}
+
+export function detectRelativeSide(from: Object3D, to: Object3D): Side
+{
+	const elements = from.matrix.elements;
+	let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
+	const viewVector = to.position.clone().sub(from.position).normalize();
+
+	return right.dot(viewVector) > 0 ? Side.Left : Side.Right;
 }
 
 //#endregion

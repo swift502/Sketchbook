@@ -683,7 +683,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 		else
 		{
-			this.setState(new EnteringVehicle(this, seat));
+			this.setState(new EnteringVehicle(this, seat, entryPoint));
 		}
 	}
 

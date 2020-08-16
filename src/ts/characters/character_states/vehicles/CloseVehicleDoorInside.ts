@@ -8,6 +8,7 @@ import { Side } from '../../../enums/Side';
 import { Driving } from './Driving';
 import { SeatType } from '../../../enums/SeatType';
 import { Sitting } from './Sitting';
+import * as Utils from '../../../core/FunctionLibrary';
 
 export class CloseVehicleDoorInside extends CharacterStateBase
 {
@@ -22,11 +23,12 @@ export class CloseVehicleDoorInside extends CharacterStateBase
 		this.canFindVehiclesToEnter = false;
 		this.canLeaveVehicles = false;
 
-		if (seat.doorSide === Side.Left)
+		const side = Utils.detectRelativeSide(seat.seatPointObject, seat.door.doorObject);
+		if (side === Side.Left)
 		{
 			this.playAnimation('close_door_sitting_left', 0.1);
 		}
-		else if (seat.doorSide === Side.Right)
+		else if (side === Side.Right)
 		{
 			this.playAnimation('close_door_sitting_right', 0.1);
 		}

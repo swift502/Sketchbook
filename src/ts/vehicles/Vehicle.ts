@@ -10,9 +10,12 @@ import { VehicleDoor } from './VehicleDoor';
 import * as Utils from '../core/FunctionLibrary';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { SwitchingSeats } from '../characters/character_states/vehicles/SwitchingSeats';
+import { EntityType } from '../enums/EntityType';
 
 export abstract class Vehicle extends THREE.Object3D
 {
+	public abstract entityType: EntityType;
+	
 	public controllingCharacter: Character;
 	public actions: { [action: string]: KeyBinding; } = {};
 	public rayCastVehicle: CANNON.RaycastVehicle;

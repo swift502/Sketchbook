@@ -7,9 +7,11 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import * as Utils from '../core/FunctionLibrary';
+import { EntityType } from '../enums/EntityType';
 
 export class Airplane extends Vehicle implements IControllable, IWorldEntity
 {
+	public entityType: EntityType = EntityType.Airplane;
 	public rotor: THREE.Object3D;
 	public leftAileron: THREE.Object3D;
 	public rightAileron: THREE.Object3D;

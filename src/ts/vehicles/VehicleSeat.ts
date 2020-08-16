@@ -20,7 +20,6 @@ export class VehicleSeat
 	public type: SeatType;
 	public entryPoints: THREE.Object3D[] = [];
 	public door: VehicleDoor;
-	public doorSide: Side;
 
 	public occupiedBy: Character = null;
 
@@ -34,15 +33,6 @@ export class VehicleSeat
 			if (object.userData.hasOwnProperty('door_object')) 
 			{
 				this.door = new VehicleDoor(this, gltf.scene.getObjectByName(object.userData.door_object));
-			}
-
-			if (object.userData.hasOwnProperty('door_side')) 
-			{
-				this.doorSide = object.userData.door_side;
-			}
-			else
-			{
-				console.error('Seat object ' + object + ' has no doorSide property.');
 			}
 
 			if (object.userData.hasOwnProperty('entry_points')) 

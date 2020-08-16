@@ -7,9 +7,11 @@ import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
 import { World } from '../core/World';
+import { EntityType } from '../enums/EntityType';
 
 export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 {
+	public entityType: EntityType = EntityType.Helicopter;
 	public rotors: THREE.Object3D[] = [];
 	private enginePower: number = 0;
 

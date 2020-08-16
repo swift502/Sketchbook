@@ -7,8 +7,11 @@ import * as THREE from 'three';
 import * as Utils from '../core/FunctionLibrary';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { World } from '../core/World';
+import { EntityType } from '../enums/EntityType';
 
-export class Car extends Vehicle implements IControllable {
+export class Car extends Vehicle implements IControllable
+{
+	public entityType: EntityType = EntityType.Car;
 	public drive: string = 'awd';
 	get speed(): number {
 		return this._speed;

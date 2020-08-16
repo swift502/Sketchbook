@@ -8,6 +8,7 @@ import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 import { EnteringVehicle } from './EnteringVehicle';
+import * as Utils from '../../../core/FunctionLibrary';
 
 export class OpenVehicleDoor extends CharacterStateBase
 {
@@ -23,13 +24,14 @@ export class OpenVehicleDoor extends CharacterStateBase
 		this.seat = seat;
 		this.entryPoint = entryPoint;
 
-		if (seat.doorSide === Side.Left)
-		{
-			this.playAnimation('open_door_standing_right', 0.1);
-		}
-		else if (seat.doorSide === Side.Right)
+		const side = Utils.detectRelativeSide(entryPoint, seat.seatPointObject);
+		if (side === Side.Left)
 		{
 			this.playAnimation('open_door_standing_left', 0.1);
+		}
+		else if (side === Side.Right)
+		{
+			this.playAnimation('open_door_standing_right', 0.1);
 		}
 
 		this.character.resetVelocity();
@@ -57,7 +59,7 @@ export class OpenVehicleDoor extends CharacterStateBase
 			}
 			else
 			{
-				this.character.setState(new EnteringVehicle(this.character, this.seat));
+				this.character.setState(new EnteringVehicle(this.character, this.seat, this.entryPoint));
 			}
 		}
 	}

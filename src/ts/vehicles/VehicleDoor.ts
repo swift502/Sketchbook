@@ -24,21 +24,18 @@ export class VehicleDoor
 	public lastVehicleVel: THREE.Vector3 = new THREE.Vector3();
 	public lastVehiclePos: THREE.Vector3 = new THREE.Vector3();
 
-	get sideMultiplier(): number
-	{
-		switch (this.seat.doorSide)
-		{
-			case Side.Right: return 1;
-			case Side.Left: return -1;
-			default: return 0;
-		}
-	}
+	private sideMultiplier: number;
 
 	constructor(seat: VehicleSeat, object: THREE.Object3D)
 	{
 		this.seat = seat;
 		this.vehicle = seat.vehicle as unknown as Vehicle;
 		this.doorObject = object;
+
+		const side = Utils.detectRelativeSide(this.seat.seatPointObject, this.doorObject);
+		if (side === Side.Left) this.sideMultiplier = -1;
+		else if (side === Side.Right) this.sideMultiplier = 1;
+		else this.sideMultiplier = 0;
 	}
 
 	public update(timestep: number): void
@@ -52,8 +49,9 @@ export class VehicleDoor
 				if (this.rotation > this.targetRotation)
 				{
 					this.rotation = this.targetRotation;
+					// this.resetPhysTrailer();
 					this.achievingTargetRotation = false;
-					this.physicsEnabled = this.rotation > 0;
+					this.physicsEnabled = true;
 				}
 			}
 			else if (this.rotation > this.targetRotation)
@@ -63,8 +61,9 @@ export class VehicleDoor
 				if (this.rotation < this.targetRotation)
 				{
 					this.rotation = this.targetRotation;
+					// this.resetPhysTrailer();
 					this.achievingTargetRotation = false;
-					this.physicsEnabled = this.rotation > 0;
+					this.physicsEnabled = false;
 				}
 			}
 		}
@@ -109,7 +108,16 @@ export class VehicleDoor
 			if (this.rotation < 0)
 			{
 				this.rotation = 0;
-				this.doorVelocity = -this.doorVelocity / 2;
+
+				if (this.doorVelocity < -0.08)
+				{
+					this.close();
+					this.doorVelocity = 0;
+				}
+				else
+				{
+					this.doorVelocity = -this.doorVelocity / 2;
+				}
 			}
 			if (this.rotation > 1)
 			{
@@ -124,6 +132,7 @@ export class VehicleDoor
 
 	public open(): void
 	{
+		// this.resetPhysTrailer();
 		this.achievingTargetRotation = true;
 		this.targetRotation = 1;
 	}
@@ -132,5 +141,19 @@ export class VehicleDoor
 	{
 		this.achievingTargetRotation = true;
 		this.targetRotation = 0;
+	}
+
+	public resetPhysTrailer(): void
+	{
+		// Door world position
+		this.doorObject.getWorldPosition(this.doorWorldPos);
+
+		// Get acceleration
+		this.lastVehicleVel = new THREE.Vector3();
+
+		// Get vectors
+		const quat = Utils.threeQuat(this.vehicle.rayCastVehicle.chassisBody.quaternion);
+		const back = new THREE.Vector3(0, 0, -1).applyQuaternion(quat);
+		this.lastTrailerPos.copy(back.add(this.doorWorldPos));
 	}
 }
