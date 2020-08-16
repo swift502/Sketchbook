@@ -1,6 +1,6 @@
 import { SkyShader } from '../../lib/shaders/SkyShader';
 import * as THREE from 'three';
-import { World } from '../core/World';
+import { World } from './World';
 
 export class Sky extends THREE.Object3D
 {

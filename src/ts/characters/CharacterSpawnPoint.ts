@@ -1,7 +1,7 @@
 import { ISpawnPoint } from '../interfaces/ISpawnPoint';
 import * as THREE from 'three';
 import { World } from '../core/World';
-import { Character } from '../characters/Character';
+import { Character } from './Character';
 
 export class CharacterSpawnPoint implements ISpawnPoint
 {

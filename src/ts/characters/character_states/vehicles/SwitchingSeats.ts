@@ -4,7 +4,7 @@ import
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { SeatPoint } from '../../../data/SeatPoint';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { SeatType } from '../../../enums/SeatType';
 import { Driving } from './Driving';
@@ -12,14 +12,14 @@ import { Sitting } from './Sitting';
 
 export class SwitchingSeats extends CharacterStateBase
 {
-	private toSeat: SeatPoint;
+	private toSeat: VehicleSeat;
 
 	private startPosition: THREE.Vector3 = new THREE.Vector3();
 	private endPosition: THREE.Vector3 = new THREE.Vector3();
 	private startRotation: THREE.Quaternion = new THREE.Quaternion();
 	private endRotation: THREE.Quaternion = new THREE.Quaternion();
 
-	constructor(character: Character, fromSeat: SeatPoint, toSeat: SeatPoint)
+	constructor(character: Character, fromSeat: VehicleSeat, toSeat: VehicleSeat)
 	{
 		super(character);
 

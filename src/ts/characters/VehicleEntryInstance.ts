@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { SeatPoint } from '../data/SeatPoint';
+import { VehicleSeat } from '../vehicles/VehicleSeat';
 import { Character } from './Character';
 
 export class VehicleEntryInstance
 {
 	public character: Character;
-	public targetSeat: SeatPoint;
+	public targetSeat: VehicleSeat;
 	public entryPoint: THREE.Object3D;
 	public wantsToDrive: boolean = false;
 

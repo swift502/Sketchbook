@@ -3,16 +3,16 @@ import
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { SeatPoint } from '../../../data/SeatPoint';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 
 export class CloseVehicleDoorOutside extends CharacterStateBase
 {
-	private seat: SeatPoint;
+	private seat: VehicleSeat;
 	private hasClosedDoor: boolean = false;
 
-	constructor(character: Character, seat: SeatPoint)
+	constructor(character: Character, seat: VehicleSeat)
 	{
 		super(character);
 

@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
 import * as Utils from '../core/FunctionLibrary';
-import { SeatPoint } from '../data/SeatPoint';
+import { VehicleSeat } from './VehicleSeat';
 import { Side } from '../enums/Side';
 
 export class VehicleDoor
 {
 	public vehicle: Vehicle;
-	public seat: SeatPoint;
+	public seat: VehicleSeat;
 	public doorObject: THREE.Object3D;
 	public doorVelocity: number = 0;
 	public doorWorldPos: THREE.Vector3 = new THREE.Vector3();
@@ -34,7 +34,7 @@ export class VehicleDoor
 		}
 	}
 
-	constructor(seat: SeatPoint, object: THREE.Object3D)
+	constructor(seat: VehicleSeat, object: THREE.Object3D)
 	{
 		this.seat = seat;
 		this.vehicle = seat.vehicle as unknown as Vehicle;

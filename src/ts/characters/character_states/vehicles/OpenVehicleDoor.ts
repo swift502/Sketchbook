@@ -4,18 +4,18 @@ import
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { SeatPoint } from '../../../data/SeatPoint';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 import { EnteringVehicle } from './EnteringVehicle';
 
 export class OpenVehicleDoor extends CharacterStateBase
 {
-	private seat: SeatPoint;
+	private seat: VehicleSeat;
 	private entryPoint: THREE.Object3D;
 	private hasOpenedDoor: boolean = false;
 
-	constructor(character: Character, seat: SeatPoint, entryPoint: THREE.Object3D)
+	constructor(character: Character, seat: VehicleSeat, entryPoint: THREE.Object3D)
 	{
 		super(character);
 

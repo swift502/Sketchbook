@@ -14,7 +14,7 @@ import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
 import { EnteringVehicle } from './character_states/vehicles/EnteringVehicle';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
-import { SeatPoint } from '../data/SeatPoint';
+import { VehicleSeat } from '../vehicles/VehicleSeat';
 import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
 import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
 import { Driving } from './character_states/vehicles/Driving';
@@ -76,7 +76,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public world: World;
 
 	// Vehicles
-	public occupyingSeat: SeatPoint = null;
+	public occupyingSeat: VehicleSeat = null;
 	public vehicleEntryInstance: VehicleEntryInstance = null;
 
 	private physicsEnabled: boolean = true;
@@ -615,7 +615,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			vehicleEntryInstance.wantsToDrive = wantsToDrive;
 
 			// Find best seat
-			let seatFinder = new ClosestObjectFinder<SeatPoint>(this.position);
+			let seatFinder = new ClosestObjectFinder<VehicleSeat>(this.position);
 			for (const seat of vehicle.seats)
 			{
 				if (wantsToDrive)
@@ -673,7 +673,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public enterVehicle(seat: SeatPoint, entryPoint: THREE.Object3D): void
+	public enterVehicle(seat: VehicleSeat, entryPoint: THREE.Object3D): void
 	{
 		this.resetControls();
 
@@ -687,7 +687,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public teleportToVehicle(vehicle: Vehicle, seat: SeatPoint): void
+	public teleportToVehicle(vehicle: Vehicle, seat: VehicleSeat): void
 	{
 		this.resetVelocity();
 		this.rotateModel();
@@ -703,7 +703,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.startControllingVehicle(vehicle, seat);
 	}
 
-	public startControllingVehicle(vehicle: IControllable, seat: SeatPoint): void
+	public startControllingVehicle(vehicle: IControllable, seat: VehicleSeat): void
 	{
 		this.transferControls(vehicle);
 		this.resetControls();
@@ -761,7 +761,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.stopControllingVehicle();
 	}
 
-	public occupySeat(seat: SeatPoint): void
+	public occupySeat(seat: VehicleSeat): void
 	{
 		this.occupyingSeat = seat;
 		seat.occupiedBy = this;

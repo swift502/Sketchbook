@@ -3,16 +3,16 @@ import
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { SeatPoint } from 'src/ts/data/SeatPoint';
+import { VehicleSeat } from 'src/ts/vehicles/VehicleSeat';
 import { CloseVehicleDoorInside } from './CloseVehicleDoorInside';
 import { SeatType } from '../../../enums/SeatType';
 import { SwitchingSeats } from './SwitchingSeats';
 
 export class Sitting extends CharacterStateBase
 {
-	private seat: SeatPoint;
+	private seat: VehicleSeat;
 
-	constructor(character: Character, seat: SeatPoint)
+	constructor(character: Character, seat: VehicleSeat)
 	{
 		super(character);
 

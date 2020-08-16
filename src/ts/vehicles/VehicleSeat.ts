@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { SeatType } from '../enums/SeatType';
 import { Side } from '../enums/Side';
 import { IControllable } from '../interfaces/IControllable';
-import { VehicleDoor } from '../vehicles/VehicleDoor';
-import { Vehicle } from '../vehicles/Vehicle';
+import { VehicleDoor } from './VehicleDoor';
+import { Vehicle } from './Vehicle';
 import { Character } from '../characters/Character';
 
-export class SeatPoint
+export class VehicleSeat
 {
 	public vehicle: IControllable;
 	public seatPointObject: THREE.Object3D;
@@ -15,7 +15,7 @@ export class SeatPoint
 	public connectedSeatsString: string;
 	// Actual seatPoint objects, need to be identified
 	// by parsing connectedSeatsString *after* all seats are imported
-	public connectedSeats: SeatPoint[] = [];
+	public connectedSeats: VehicleSeat[] = [];
 
 	public type: SeatType;
 	public entryPoints: THREE.Object3D[] = [];

@@ -6,22 +6,21 @@ import
 import { Character } from '../../Character';
 import { IControllable } from '../../../interfaces/IControllable';
 import { Driving } from './Driving';
-import { SeatPoint } from '../../../data/SeatPoint';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Sitting } from './Sitting';
-import { SwitchingSeats } from './SwitchingSeats';
 import { SeatType } from '../../../enums/SeatType';
 
 export class EnteringVehicle extends CharacterStateBase
 {
 	private vehicle: IControllable;
-	private seat: SeatPoint;
+	private seat: VehicleSeat;
 	private startPosition: THREE.Vector3 = new THREE.Vector3();
 	private endPosition: THREE.Vector3 = new THREE.Vector3();
 	private startRotation: THREE.Quaternion = new THREE.Quaternion();
 	private endRotation: THREE.Quaternion = new THREE.Quaternion();
 
-	constructor(character: Character, seat: SeatPoint)
+	constructor(character: Character, seat: VehicleSeat)
 	{
 		super(character);
 
@@ -29,14 +28,13 @@ export class EnteringVehicle extends CharacterStateBase
 		this.vehicle = seat.vehicle;
 		this.seat = seat;
 
-		// this.animationLength = 1;
 		if (seat.doorSide === Side.Left)
 		{
-			this.playAnimation('sit_down_right', 0.1);
+			this.playAnimation('enter_airplane_right', 0.1);
 		}
 		else if (seat.doorSide === Side.Right)
 		{
-			this.playAnimation('sit_down_left', 0.1);
+			this.playAnimation('enter_airplane_left', 0.1);
 		}
 
 		this.character.resetVelocity();
@@ -72,7 +70,7 @@ export class EnteringVehicle extends CharacterStateBase
 		}
 		else
 		{
-			let factor = this.timer / this.animationLength;
+			let factor = THREE.MathUtils.clamp(this.timer / (this.animationLength - 0.3), 0, 1);
 			let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
 	
 			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);

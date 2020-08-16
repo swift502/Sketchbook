@@ -1,10 +1,10 @@
 import { Character } from '../characters/Character';
 import { IInputReceiver } from './IInputReceiver';
-import { SeatPoint } from '../data/SeatPoint';
+import { VehicleSeat } from '../vehicles/VehicleSeat';
 
 export interface IControllable extends IInputReceiver
 {
-	seats: SeatPoint[];
+	seats: VehicleSeat[];
 	position: THREE.Vector3;
 	controllingCharacter: Character;
 

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Noise } from '../../lib/utils/perlin.js';
 import { GrassShader } from '../../lib/shaders/GrassShader';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
-import { World } from '../core/World';
+import { World } from './World';
 import { LOD } from 'three';
 
 export class Grass implements IWorldEntity

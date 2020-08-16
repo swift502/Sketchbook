@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { ISpawnPoint } from '../interfaces/ISpawnPoint';
 import { World } from '../core/World';
-import { Helicopter } from '../vehicles/Helicopter';
-import { Airplane } from '../vehicles/Airplane';
-import { Car } from '../vehicles/Car';
+import { Helicopter } from './Helicopter';
+import { Airplane } from './Airplane';
+import { Car } from './Car';
 import * as Utils from '../core/FunctionLibrary';
-import { Vehicle } from '../vehicles/Vehicle';
+import { Vehicle } from './Vehicle';
 import { Character } from '../characters/Character';
 import { FollowPath } from '../characters/character_ai/FollowPath';
 

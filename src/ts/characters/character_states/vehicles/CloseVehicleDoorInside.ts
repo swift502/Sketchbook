@@ -3,7 +3,7 @@ import
 	CharacterStateBase,
 } from '../_stateLibrary';
 import { Character } from '../../Character';
-import { SeatPoint } from '../../../data/SeatPoint';
+import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Driving } from './Driving';
 import { SeatType } from '../../../enums/SeatType';
@@ -11,10 +11,10 @@ import { Sitting } from './Sitting';
 
 export class CloseVehicleDoorInside extends CharacterStateBase
 {
-	private seat: SeatPoint;
+	private seat: VehicleSeat;
 	private hasClosedDoor: boolean = false;
 
-	constructor(character: Character, seat: SeatPoint)
+	constructor(character: Character, seat: VehicleSeat)
 	{
 		super(character);
 
