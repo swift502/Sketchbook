@@ -64,16 +64,18 @@ export class ExitingVehicle extends CharacterStateBase
 			this.character.resetVelocity();
 			this.character.resetOrientation();
 			this.character.setPhysicsEnabled(true);
+			this.character.setPosition(this.character.position.x, this.character.position.y, this.character.position.z);
 
 			this.character.characterCapsule.body.velocity.copy((this.vehicle as unknown as Vehicle).rayCastVehicle.chassisBody.velocity);
 			this.character.feetRaycast();
+			this.seat.door.physicsEnabled = true;
 
 			if (!this.character.rayHasHit)
 			{
 				this.character.setState(new Falling(this.character));
 				this.character.leaveSeat();
 			}
-			else if (this.anyDirection() || this.seat.door === undefined)
+			else if (this.anyDirection() || this.seat.door === undefined || (this.vehicle as unknown as Vehicle).collision.velocity.length() > 1)
 			{
 				this.character.setState(new Idle(this.character));
 				this.character.leaveSeat();
@@ -85,6 +87,11 @@ export class ExitingVehicle extends CharacterStateBase
 		}
 		else
 		{
+			if (this.seat.door)
+			{
+				this.seat.door.physicsEnabled = false;
+			}
+
 			let factor = this.timer / this.animationLength;
 			let sineFactor = Utils.easeInOutSine(factor);
 			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);

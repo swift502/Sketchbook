@@ -9,12 +9,20 @@ import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
 import { EnteringVehicle } from './EnteringVehicle';
 import * as Utils from '../../../core/FunctionLibrary';
+import { SpringSimulator } from '../../../physics/spring_simulation/SpringSimulator';
 
 export class OpenVehicleDoor extends CharacterStateBase
 {
 	private seat: VehicleSeat;
 	private entryPoint: THREE.Object3D;
 	private hasOpenedDoor: boolean = false;
+
+	private startPosition: THREE.Vector3 = new THREE.Vector3();
+	private endPosition: THREE.Vector3 = new THREE.Vector3();
+	private startRotation: THREE.Quaternion = new THREE.Quaternion();
+	private endRotation: THREE.Quaternion = new THREE.Quaternion();
+
+	private factorSimluator: SpringSimulator;
 
 	constructor(character: Character, seat: VehicleSeat, entryPoint: THREE.Object3D)
 	{
@@ -35,15 +43,26 @@ export class OpenVehicleDoor extends CharacterStateBase
 		}
 
 		this.character.resetVelocity();
+		this.character.rotateModel();
+		this.character.setPhysicsEnabled(false);
+
+		this.character.setPhysicsEnabled(false);
+		(this.seat.vehicle as unknown as THREE.Object3D).attach(this.character);
+
+		this.startPosition.copy(this.character.position);
+		this.endPosition.copy(this.entryPoint.position);
+		this.endPosition.y += 0.53;
+
+		this.startRotation.copy(this.character.quaternion);
+		this.endRotation.copy(this.entryPoint.quaternion);
+
+		this.factorSimluator = new SpringSimulator(60, 10, 0.5);
+		this.factorSimluator.target = 1;
 	}
 
 	public update(timeStep: number): void
 	{
 		super.update(timeStep);
-
-		const elements = this.entryPoint.matrixWorld.elements;
-		let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
-		this.character.setOrientation(forward);
 
 		if (this.timer > 0.3 && !this.hasOpenedDoor)
 		{
@@ -55,12 +74,23 @@ export class OpenVehicleDoor extends CharacterStateBase
 		{
 			if (this.anyDirection())
 			{
+				this.character.world.graphicsWorld.attach(this.character);
+				this.character.setPhysicsEnabled(true);
 				this.character.setState(new Idle(this.character));
 			}
 			else
 			{
 				this.character.setState(new EnteringVehicle(this.character, this.seat, this.entryPoint));
 			}
+		}
+		else
+		{
+			this.factorSimluator.simulate(timeStep);
+
+			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, this.factorSimluator.position);
+			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
+	
+			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, this.factorSimluator.position);
 		}
 	}
 }

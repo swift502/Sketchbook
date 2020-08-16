@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
-
 import * as Utils from '../core/FunctionLibrary';
 
 import { KeyBinding } from '../core/KeyBinding';
@@ -135,6 +134,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		});
 		// capsulePhysics.physical.collisionFilterMask = ~CollisionGroups.Trimesh;
 		this.characterCapsule.body.shapes.forEach((shape) => {
+			// tslint:disable-next-line: no-bitwise
 			shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
 		});
 		this.characterCapsule.body.allowSleep = false;
@@ -191,6 +191,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	{
 		if (this.physicsEnabled)
 		{
+			this.characterCapsule.body.previousPosition = new CANNON.Vec3(x, y, z);
 			this.characterCapsule.body.position = new CANNON.Vec3(x, y, z);
 			this.characterCapsule.body.interpolatedPosition = new CANNON.Vec3(x, y, z);
 		}
@@ -235,7 +236,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public resetOrientation(): void
 	{
-		const elements = this.matrix.elements;
+		const elements = this.matrixWorld.elements;
 		let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
 
 		this.setOrientation(forward, true);

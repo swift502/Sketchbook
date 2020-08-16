@@ -29,6 +29,7 @@ export abstract class Vehicle extends THREE.Object3D
 	public materials: THREE.Material[] = [];
 	public spawnPoint: THREE.Object3D;
 	private modelContainer: THREE.Group;
+	private characterWantsToExit: boolean = false;
 
 	private firstPerson: boolean = false;
 
@@ -80,18 +81,8 @@ export abstract class Vehicle extends THREE.Object3D
 		return true;
 	}
 
-	// public setModel(model: any): void
-	// {
-	//     this.modelContainer.remove(this.model);
-	//     this.model = model;
-	//     this.modelContainer.add(this.model);
-	// }
-
 	public update(timeStep: number): void
 	{
-		this.help.position.copy(Utils.threeVector(this.collision.interpolatedPosition));
-		this.help.quaternion.copy(Utils.threeQuat(this.collision.interpolatedQuaternion));
-
 		this.position.set(
 			this.collision.interpolatedPosition.x,
 			this.collision.interpolatedPosition.y,
@@ -121,15 +112,34 @@ export abstract class Vehicle extends THREE.Object3D
 			let upAxisWorld = new CANNON.Vec3();
 			this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
 		}
+
+		if (this.characterWantsToExit && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+		{
+			let speed = this.collision.velocity.length();
+			console.log(speed);
+			if (speed > 0.1 && speed < 4) this.triggerAction('brake', true);
+			else this.forceCharacterOut();
+		}
+	}
+
+	public forceCharacterOut(): void
+	{
+		this.controllingCharacter.modelContainer.visible = true;
+		this.controllingCharacter.exitVehicle();
 	}
 
 	public onInputChange(): void
 	{
-		if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+		if (this.actions.exitVehicle.justPressed)
 		{
-			this.controllingCharacter.modelContainer.visible = true;
-			this.controllingCharacter.exitVehicle();
+			this.characterWantsToExit = true;
 		}
+		if (this.actions.exitVehicle.justReleased)
+		{
+			this.characterWantsToExit = false;
+			this.triggerAction('brake', false);
+		}
+
 		if (this.actions.seat_switch.justPressed &&
 			this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
 		{
