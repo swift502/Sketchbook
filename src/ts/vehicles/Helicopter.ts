@@ -73,6 +73,10 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 	{
 		super.onInputChange();
 
+		if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined)
+		{
+			this.forceCharacterOut();
+		}
 		if (this.actions.view.justPressed)
 		{
 			this.toggleFirstPersonView();

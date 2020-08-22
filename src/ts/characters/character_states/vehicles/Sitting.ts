@@ -18,9 +18,19 @@ export class Sitting extends CharacterStateBase
 
 		this.seat = seat;
 		this.canFindVehiclesToEnter = false;
+
+		this.character.world.updateControls([
+			{
+				keys: ['F'],
+				desc: 'Leave seat',
+			},
+			{
+				keys: ['X'],
+				desc: 'Switch seats',
+			}
+		]);
 		
 		this.playAnimation('sitting', 0.1);
-		this.character.vehicleEntryInstance = null;
 	}
 
 	public update(timeStep: number): void
@@ -44,6 +54,10 @@ export class Sitting extends CharacterStateBase
 					}
 				}
 			}
+			else
+			{
+				this.character.vehicleEntryInstance = null;
+			}
 		}
 	}
 
@@ -54,9 +68,10 @@ export class Sitting extends CharacterStateBase
 			this.character.setState(new SwitchingSeats(this.character, this.seat, this.seat.connectedSeats[0]));
 		}
 
-		if (this.character.actions.enter.justPressed || this.character.actions.enter_passenger.justPressed)
+		if (this.character.actions.enter.justPressed)
 		{
 			this.character.exitVehicle();
+			this.character.displayControls();
 		}
 	}
 }

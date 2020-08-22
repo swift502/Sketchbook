@@ -450,6 +450,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.world.cameraOperator.followMode = false;
 		// this.world.dirLight.target = this;
 
+		this.displayControls();
+	}
+
+	public displayControls(): void
+	{
 		this.world.updateControls([
 			{
 				keys: ['W', 'A', 'S', 'D'],
@@ -464,7 +469,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				desc: 'Jump'
 			},
 			{
-				keys: ['F'],
+				keys: ['F', 'or', 'G'],
 				desc: 'Enter vehicle'
 			},
 			{
@@ -585,7 +590,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public rotateModel(): void
 	{
 		this.lookAt(this.position.x + this.orientation.x, this.position.y + this.orientation.y, this.position.z + this.orientation.z);
-
 		this.tiltContainer.rotation.z = (-this.angularVelocity * 2.3 * this.velocity.length());
 		this.tiltContainer.position.setY((Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2) - 0.5);
 	}

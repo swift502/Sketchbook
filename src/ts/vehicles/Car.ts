@@ -30,6 +30,7 @@ export class Car extends Vehicle implements IControllable
 	private timeToShift: number = 0.2;
 
 	private canTiltForwards: boolean = false;
+	private characterWantsToExit: boolean = false;
 
 	constructor(gltf: any)
 	{
@@ -143,6 +144,21 @@ export class Car extends Vehicle implements IControllable
 		{	
 			this.collision.quaternion.copy(this.collision.initQuaternion);	
 		}
+
+		// Getting out
+		if (this.characterWantsToExit && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+		{
+			let speed = this.collision.velocity.length();
+
+			if (speed > 0.1 && speed < 4)
+			{
+				this.triggerAction('brake', true);
+			}
+			else
+			{
+				this.forceCharacterOut();
+			}
+		}
 	}
 
 	public shiftUp(): void
@@ -248,6 +264,15 @@ export class Car extends Vehicle implements IControllable
 
 		const brakeForce = 1000000;
 
+		if (this.actions.exitVehicle.justPressed)
+		{
+			this.characterWantsToExit = true;
+		}
+		if (this.actions.exitVehicle.justReleased)
+		{
+			this.characterWantsToExit = false;
+			this.triggerAction('brake', false);
+		}
 		if (this.actions.throttle.justReleased || this.actions.reverse.justReleased)
 		{
 			this.applyEngineForce(0);

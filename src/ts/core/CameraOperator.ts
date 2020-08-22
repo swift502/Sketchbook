@@ -186,7 +186,7 @@ export class CameraOperator implements IInputReceiver
 
 		const up = Utils.getUp(this.camera);
 		const right = Utils.getRight(this.camera);
-		const forward = Utils.getForward(this.camera);
+		const forward = Utils.getBack(this.camera);
 
 		this.upVelocity = THREE.MathUtils.lerp(this.upVelocity, +this.actions.up.isPressed - +this.actions.down.isPressed, 0.3);
 		this.forwardVelocity = THREE.MathUtils.lerp(this.forwardVelocity, +this.actions.forward.isPressed - +this.actions.back.isPressed, 0.3);

@@ -312,6 +312,10 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 		const brakeForce = 100;
 
+		if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined)
+		{
+			this.forceCharacterOut();
+		}
 		if (this.actions.wheelBrake.justPressed)
 		{
 			this.setBrake(brakeForce);

@@ -29,7 +29,6 @@ export abstract class Vehicle extends THREE.Object3D
 	public materials: THREE.Material[] = [];
 	public spawnPoint: THREE.Object3D;
 	private modelContainer: THREE.Group;
-	private characterWantsToExit: boolean = false;
 
 	private firstPerson: boolean = false;
 
@@ -112,27 +111,6 @@ export abstract class Vehicle extends THREE.Object3D
 			let upAxisWorld = new CANNON.Vec3();
 			this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
 		}
-
-		if (this.characterWantsToExit && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
-		{
-			let speed = this.collision.velocity.length();
-
-			if (this.entityType === EntityType.Car)
-			{
-				if (speed > 0.1 && speed < 4)
-				{
-					this.triggerAction('brake', true);
-				}
-				else
-				{
-					this.forceCharacterOut();
-				}
-			}
-			else
-			{
-				this.forceCharacterOut();
-			}
-		}
 	}
 
 	public forceCharacterOut(): void
@@ -143,16 +121,6 @@ export abstract class Vehicle extends THREE.Object3D
 
 	public onInputChange(): void
 	{
-		if (this.actions.exitVehicle.justPressed)
-		{
-			this.characterWantsToExit = true;
-		}
-		if (this.actions.exitVehicle.justReleased)
-		{
-			this.characterWantsToExit = false;
-			this.triggerAction('brake', false);
-		}
-
 		if (this.actions.seat_switch.justPressed &&
 			this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
 		{
