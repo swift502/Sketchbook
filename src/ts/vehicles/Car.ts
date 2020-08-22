@@ -164,12 +164,7 @@ export class Car extends Vehicle implements IControllable
 	public physicsPreStep(body: CANNON.Body, car: Car): void
 	{
 		// Constants
-		const quat = new THREE.Quaternion(
-			this.collision.quaternion.x,
-			this.collision.quaternion.y,
-			this.collision.quaternion.z,
-			this.collision.quaternion.w
-		);
+		const quat = Utils.threeQuat(body.quaternion);
 		const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
 		const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
 		const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);

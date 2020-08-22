@@ -5,6 +5,7 @@ import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { World } from './World';
 import { Side } from '../enums/Side';
 import { Object3D } from 'three';
+import { Space } from '../enums/Space';
 
 export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
 {
@@ -291,8 +292,7 @@ export function setupMeshProperties(child: any): void
 
 export function detectRelativeSide(from: Object3D, to: Object3D): Side
 {
-	const elements = from.matrix.elements;
-	let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
+	const right = getRight(from);
 	const viewVector = to.position.clone().sub(from.position).normalize();
 
 	return right.dot(viewVector) > 0 ? Side.Left : Side.Right;
@@ -306,6 +306,55 @@ export function easeInOutSine(x: number): number
 export function easeOutQuad(x: number): number
 {
 	return 1 - (1 - x) * (1 - x);
+}
+
+export function getRight(obj: THREE.Object3D, space: Space = Space.Global): THREE.Vector3
+{
+	const matrix = getMatrix(obj, space);
+	return new THREE.Vector3(
+		matrix.elements[0],
+		matrix.elements[1],
+		matrix.elements[2]
+		);
+}
+
+export function getUp(obj: THREE.Object3D, space: Space = Space.Global): THREE.Vector3
+{
+	const matrix = getMatrix(obj, space);
+	return new THREE.Vector3(
+		matrix.elements[4],
+		matrix.elements[5],
+		matrix.elements[6]
+		);
+}
+
+export function getForward(obj: THREE.Object3D, space: Space = Space.Global): THREE.Vector3
+{
+	const matrix = getMatrix(obj, space);
+	return new THREE.Vector3(
+		matrix.elements[8],
+		matrix.elements[9],
+		matrix.elements[10]
+		);
+}
+
+export function getBack(obj: THREE.Object3D, space: Space = Space.Global): THREE.Vector3
+{
+	const matrix = getMatrix(obj, space);
+	return new THREE.Vector3(
+		-matrix.elements[8],
+		-matrix.elements[9],
+		-matrix.elements[10]
+		);
+}
+
+function getMatrix(obj: THREE.Object3D, space: Space): THREE.Matrix4
+{
+	switch (space)
+	{
+		case Space.Local: return obj.matrix;
+		case Space.Global: return obj.matrixWorld;
+	}
 }
 
 //#endregion

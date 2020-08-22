@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as Utils from './FunctionLibrary';
 import { World } from './World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
@@ -183,10 +184,9 @@ export class CameraOperator implements IInputReceiver
 		// Set fly speed
 		let speed = this.movementSpeed * (this.actions.fast.isPressed ? timeStep * 600 : timeStep * 60);
 
-		const elements = this.world.cameraOperator.camera.matrix.elements;
-		let up = new THREE.Vector3(elements[4], elements[5], elements[6]);
-		let forward = new THREE.Vector3(-elements[8], -elements[9], -elements[10]);
-		let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
+		const up = Utils.getUp(this.camera);
+		const right = Utils.getRight(this.camera);
+		const forward = Utils.getForward(this.camera);
 
 		this.upVelocity = THREE.MathUtils.lerp(this.upVelocity, +this.actions.up.isPressed - +this.actions.down.isPressed, 0.3);
 		this.forwardVelocity = THREE.MathUtils.lerp(this.forwardVelocity, +this.actions.forward.isPressed - +this.actions.back.isPressed, 0.3);

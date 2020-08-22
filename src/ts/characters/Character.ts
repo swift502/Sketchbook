@@ -235,9 +235,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public resetOrientation(): void
 	{
-		const elements = this.matrixWorld.elements;
-		let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
-
+		const forward = Utils.getForward(this);
 		this.setOrientation(forward, true);
 	}
 

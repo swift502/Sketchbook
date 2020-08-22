@@ -31,8 +31,7 @@ export class SwitchingSeats extends CharacterStateBase
 		character.leaveSeat();
 		this.character.occupySeat(toSeat);
 
-		const elements = fromSeat.seatPointObject.matrix.elements;
-		let right = new THREE.Vector3(elements[0], elements[1], elements[2]);
+		const right = Utils.getRight(fromSeat.seatPointObject);
 		const viewVector = toSeat.seatPointObject.position.clone().sub(fromSeat.seatPointObject.position).normalize();
 		const side = right.dot(viewVector) > 0 ? Side.Left : Side.Right;
 

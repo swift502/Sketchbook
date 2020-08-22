@@ -180,13 +180,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 	public physicsPreStep(body: CANNON.Body, plane: Airplane): void
 	{
-		let quat = new THREE.Quaternion(
-			body.quaternion.x,
-			body.quaternion.y,
-			body.quaternion.z,
-			body.quaternion.w
-		);
-
+		let quat = Utils.threeQuat(body.quaternion);
 		let right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
 		let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 		let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);

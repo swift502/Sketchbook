@@ -15,7 +15,6 @@ import {
 } from './_stateLibrary';
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
-import { KeyBinding } from '../../core/KeyBinding';
 
 export abstract class CharacterStateBase implements ICharacterState
 {
