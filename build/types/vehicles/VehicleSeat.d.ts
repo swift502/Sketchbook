@@ -1,7 +1,7 @@
+import * as THREE from 'three';
 import { SeatType } from '../enums/SeatType';
 import { Side } from '../enums/Side';
 import { IControllable } from '../interfaces/IControllable';
-import THREE = require('three');
 import { VehicleDoor } from './VehicleDoor';
 export declare class VehicleSeat {
     vehicle: IControllable;

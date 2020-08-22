@@ -20,7 +20,7 @@ export class Sprint extends CharacterStateBase
 		this.character.rotationSimulator.mass = 50;
 
 		this.character.setArcadeVelocityTarget(1.4);
-		this.character.setAnimation('sprint', 0.1);
+		this.playAnimation('sprint', 0.1);
 	}
 
 	public update(timeStep: number): void

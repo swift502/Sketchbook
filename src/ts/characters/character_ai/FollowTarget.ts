@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import * as Utils from '../../core/Utilities';
-import { Object3D } from 'three';
+import * as Utils from '../../core/FunctionLibrary';
 import { Vehicle } from '../../vehicles/Vehicle';
 import { Character } from '../Character';
 
@@ -46,7 +45,7 @@ export class FollowTarget implements ICharacterAI
 				this.isTargetReached = true;
 			}
 
-			let forward = new THREE.Vector3(0, 0, 1).applyQuaternion((this.character.controlledObject as unknown as Object3D).quaternion);
+			let forward = new THREE.Vector3(0, 0, 1).applyQuaternion((this.character.controlledObject as unknown as THREE.Object3D).quaternion);
 			viewVector.normalize();
 			let angle = Utils.getSignedAngleBetweenVectors(forward, viewVector);
 

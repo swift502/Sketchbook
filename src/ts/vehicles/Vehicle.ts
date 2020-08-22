@@ -7,11 +7,15 @@ import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';
 import { Wheel } from './Wheel';
 import { VehicleDoor } from './VehicleDoor';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/FunctionLibrary';
 import { CollisionGroups } from '../enums/CollisionGroups';
+import { SwitchingSeats } from '../characters/character_states/vehicles/SwitchingSeats';
+import { EntityType } from '../enums/EntityType';
 
 export abstract class Vehicle extends THREE.Object3D
 {
+	public abstract entityType: EntityType;
+	
 	public controllingCharacter: Character;
 	public actions: { [action: string]: KeyBinding; } = {};
 	public rayCastVehicle: CANNON.RaycastVehicle;
@@ -76,18 +80,8 @@ export abstract class Vehicle extends THREE.Object3D
 		return true;
 	}
 
-	// public setModel(model: any): void
-	// {
-	//     this.modelContainer.remove(this.model);
-	//     this.model = model;
-	//     this.modelContainer.add(this.model);
-	// }
-
 	public update(timeStep: number): void
 	{
-		this.help.position.copy(Utils.threeVector(this.collision.interpolatedPosition));
-		this.help.quaternion.copy(Utils.threeQuat(this.collision.interpolatedQuaternion));
-
 		this.position.set(
 			this.collision.interpolatedPosition.x,
 			this.collision.interpolatedPosition.y,
@@ -119,12 +113,25 @@ export abstract class Vehicle extends THREE.Object3D
 		}
 	}
 
+	public forceCharacterOut(): void
+	{
+		this.controllingCharacter.modelContainer.visible = true;
+		this.controllingCharacter.exitVehicle();
+	}
+
 	public onInputChange(): void
 	{
-		if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+		if (this.actions.seat_switch.justPressed &&
+			this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
 		{
-			this.controllingCharacter.modelContainer.visible = true;
-			this.controllingCharacter.exitVehicle();
+			this.controllingCharacter.setState(
+				new SwitchingSeats(
+					this.controllingCharacter,
+					this.controllingCharacter.occupyingSeat,
+					this.controllingCharacter.occupyingSeat.connectedSeats[0]
+				)
+			);
+			this.controllingCharacter.stopControllingVehicle();
 		}
 	}
 
@@ -267,11 +274,6 @@ export abstract class Vehicle extends THREE.Object3D
 		}
 	}
 
-	public getMountPoint(character: Character): THREE.Vector3
-	{
-		return this.seats[0].entryPoint.position;
-	}
-
 	public setPosition(x: number, y: number, z: number): void
 	{
 		this.collision.position.x = x;
@@ -380,42 +382,7 @@ export abstract class Vehicle extends THREE.Object3D
 				{
 					if (child.userData.data === 'seat')
 					{
-						let seat = new VehicleSeat(child);
-						seat.vehicle = this;
-
-						if (child.userData.hasOwnProperty('door_object')) 
-						{
-							seat.door = new VehicleDoor(this, gltf.scene.getObjectByName(child.userData.door_object));
-						}
-
-						if (child.userData.hasOwnProperty('door_side')) 
-						{
-							seat.doorSide = child.userData.door_side;
-						}
-						else
-						{
-							console.error('Seat object ' + child + ' has no doorSide property.');
-						}
-
-						if (child.userData.hasOwnProperty('entry_point')) 
-						{
-							seat.entryPoint = gltf.scene.getObjectByName(child.userData.entry_point);
-						}
-						else
-						{
-							console.error('Seat object ' + child + ' has no entry point reference property.');
-						}
-
-						if (child.userData.hasOwnProperty('seat_type')) 
-						{
-							seat.type = child.userData.seat_type;
-						}
-						else
-						{
-							console.error('Seat object ' + child + ' has no seat type property.');
-						}
-
-						this.seats.push(seat);
+						this.seats.push(new VehicleSeat(this, child, gltf));
 					}
 					if (child.userData.data === 'camera')
 					{
@@ -423,21 +390,7 @@ export abstract class Vehicle extends THREE.Object3D
 					}
 					if (child.userData.data === 'wheel')
 					{
-						let wheel = new Wheel(child);
-
-						wheel.position = child.position;
-
-						if (child.userData.hasOwnProperty('steering')) 
-						{
-							wheel.steering = (child.userData.steering === 'true');
-						}
-
-						if (child.userData.hasOwnProperty('drive')) 
-						{
-							wheel.drive = child.userData.drive;
-						}
-
-						this.wheels.push(wheel);
+						this.wheels.push(new Wheel(child));
 					}
 					if (child.userData.data === 'collision')
 					{
@@ -473,6 +426,38 @@ export abstract class Vehicle extends THREE.Object3D
 		if (this.seats.length === 0)
 		{
 			console.warn('Vehicle ' + typeof(this) + ' has no seats.');
+		}
+		else
+		{
+			this.connectSeats();
+		}
+	}
+
+	private connectSeats(): void
+	{
+		for (const firstSeat of this.seats)
+		{
+			if (firstSeat.connectedSeatsString !== undefined)
+			{
+				// Get list of connected seat names
+				let conn_seat_names = firstSeat.connectedSeatsString.split(';');
+				for (const conn_seat_name of conn_seat_names)
+				{
+					// If name not empty
+					if (conn_seat_name.length > 0)
+					{
+						// Run through seat list and connect seats to this seat,
+						// based on this seat's connected seats list
+						for (const secondSeat of this.seats)
+						{
+							if (secondSeat.seatPointObject.name === conn_seat_name) 
+							{
+								firstSeat.connectedSeats.push(secondSeat);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

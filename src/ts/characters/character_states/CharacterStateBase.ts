@@ -1,4 +1,5 @@
-import * as Utils from '../../core/Utilities';
+import * as THREE from 'three';
+import * as Utils from '../../core/FunctionLibrary';
 import {
 	DropIdle,
 	DropRolling,
@@ -14,8 +15,6 @@ import {
 } from './_stateLibrary';
 import { Character } from '../Character';
 import { ICharacterState } from '../../interfaces/ICharacterState';
-import { KeyBinding } from '../../core/KeyBinding';
-import THREE = require('three');
 
 export abstract class CharacterStateBase implements ICharacterState
 {
@@ -56,16 +55,20 @@ export abstract class CharacterStateBase implements ICharacterState
 	{
 		if (this.canFindVehiclesToEnter && this.character.actions.enter.justPressed)
 		{
-				this.character.findVehicleToEnter();
+			this.character.findVehicleToEnter(true);
 		}
-		else if (this.character.isRunningTowardsVehicle === true)
+		else if (this.canFindVehiclesToEnter && this.character.actions.enter_passenger.justPressed)
+		{
+			this.character.findVehicleToEnter(false);
+		}
+		else if (this.canEnterVehicles && this.character.vehicleEntryInstance !== null)
 		{
 			if (this.character.actions.up.justPressed ||
 				this.character.actions.down.justPressed ||
 				this.character.actions.left.justPressed ||
 				this.character.actions.right.justPressed)
 				{
-					this.character.isRunningTowardsVehicle = false;
+					this.character.vehicleEntryInstance = null;
 					this.character.actions.up.isPressed = false;
 				}
 		}
@@ -158,5 +161,10 @@ export abstract class CharacterStateBase implements ICharacterState
 		{
 			this.character.setState(new StartWalkForward(this.character));
 		}
+	}
+
+	protected playAnimation(animName: string, fadeIn: number): void
+	{
+		this.animationLength = this.character.setAnimation(animName, fadeIn);
 	}
 }

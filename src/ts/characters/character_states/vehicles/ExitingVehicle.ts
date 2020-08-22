@@ -1,50 +1,35 @@
-import
-{
-	CharacterStateBase,
-} from '../_stateLibrary';
+import * as THREE from 'three';
+import * as Utils from '../../../core/FunctionLibrary';
+
 import { Character } from '../../Character';
 import { Side } from '../../../enums/Side';
 import { VehicleSeat } from '../../../vehicles/VehicleSeat';
-import { IControllable } from '../../../interfaces/IControllable';
-import THREE = require('three');
 import { Idle } from '../Idle';
 import { CloseVehicleDoorOutside } from './CloseVehicleDoorOutside';
 import { Vehicle } from 'src/ts/vehicles/Vehicle';
 import { Falling } from '../Falling';
+import { DropRolling } from '../DropRolling';
+import { ExitingStateBase } from './ExitingStateBase';
 
-export class ExitingVehicle extends CharacterStateBase
+export class ExitingVehicle extends ExitingStateBase
 {
-	private vehicle: IControllable;
-	private seat: VehicleSeat;
-	private startPosition: THREE.Vector3 = new THREE.Vector3();
-	private endPosition: THREE.Vector3 = new THREE.Vector3();
-	private startRotation: THREE.Quaternion = new THREE.Quaternion();
-	private endRotation: THREE.Quaternion = new THREE.Quaternion();
-
-	constructor(character: Character, vehicle: IControllable, seat: VehicleSeat)
+	constructor(character: Character, seat: VehicleSeat)
 	{
-		super(character);
+		super(character, seat);
 
-		this.canFindVehiclesToEnter = false;
-		this.vehicle = vehicle;
-		this.seat = seat;
+		this.exitPoint = seat.entryPoints[0];
 
-		this.seat.door?.open();
+		this.endPosition.copy(this.exitPoint.position);
+		this.endPosition.y += 0.52;
 
-		this.startPosition.copy(this.character.position);
-		this.endPosition.copy(seat.entryPoint.position);
-		this.endPosition.y += 0.6;
-
-		this.startRotation.copy(this.character.quaternion);
-		this.endRotation.copy(seat.entryPoint.quaternion);
-
-		if (seat.doorSide === Side.Left)
+		const side = Utils.detectRelativeSide(seat.seatPointObject, this.exitPoint);
+		if (side === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('stand_up_left', 0.1);
+			this.playAnimation('stand_up_left', 0.1);
 		}
-		else if (seat.doorSide === Side.Right)
+		else if (side === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('stand_up_right', 0.1);
+			this.playAnimation('stand_up_right', 0.1);
 		}
 	}
 
@@ -52,26 +37,26 @@ export class ExitingVehicle extends CharacterStateBase
 	{
 		super.update(timeStep);
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
-			this.character.controlledObject = undefined;
-			this.character.controlledObjectSeat = undefined;
-			this.vehicle.controllingCharacter = undefined;
-			this.character.world.graphicsWorld.attach(this.character);
-			this.character.resetVelocity();
-			this.character.resetOrientation();
-			this.character.setPhysicsEnabled(true);
+			this.detachCharacterFromVehicle();
 
-			this.character.characterCapsule.body.velocity.copy((this.vehicle as Vehicle).rayCastVehicle.chassisBody.velocity);
-			this.character.feetRaycast();
+			this.seat.door.physicsEnabled = true;
 
 			if (!this.character.rayHasHit)
 			{
 				this.character.setState(new Falling(this.character));
+				this.character.leaveSeat();
+			}
+			else if ((this.vehicle as unknown as Vehicle).collision.velocity.length() > 1)
+			{
+				this.character.setState(new DropRolling(this.character));
+				this.character.leaveSeat();
 			}
 			else if (this.anyDirection() || this.seat.door === undefined)
 			{
 				this.character.setState(new Idle(this.character));
+				this.character.leaveSeat();
 			}
 			else
 			{
@@ -80,12 +65,21 @@ export class ExitingVehicle extends CharacterStateBase
 		}
 		else
 		{
+			// Door
+			if (this.seat.door)
+			{
+				this.seat.door.physicsEnabled = false;
+			}
+
+			// Position
 			let factor = this.timer / this.animationLength;
-			let sineFactor = 1 - ((Math.cos(factor * Math.PI) * 0.5) + 0.5);
-			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, sineFactor);
+			let smoothFactor = Utils.easeInOutSine(factor);
+			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition, this.endPosition, smoothFactor);
 			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
 
-			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, sineFactor);
+			// Rotation
+			this.updateEndRotation();
+			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, smoothFactor);
 		}
 	}
 }

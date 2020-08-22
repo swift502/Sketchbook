@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/FunctionLibrary';
+import { VehicleSeat } from './VehicleSeat';
+import { Side } from '../enums/Side';
 
 export class VehicleDoor
 {
 	public vehicle: Vehicle;
+	public seat: VehicleSeat;
 	public doorObject: THREE.Object3D;
 	public doorVelocity: number = 0;
 	public doorWorldPos: THREE.Vector3 = new THREE.Vector3();
@@ -21,10 +24,18 @@ export class VehicleDoor
 	public lastVehicleVel: THREE.Vector3 = new THREE.Vector3();
 	public lastVehiclePos: THREE.Vector3 = new THREE.Vector3();
 
-	constructor(vehicle: Vehicle, object: THREE.Object3D)
+	private sideMultiplier: number;
+
+	constructor(seat: VehicleSeat, object: THREE.Object3D)
 	{
-		this.vehicle = vehicle;
+		this.seat = seat;
+		this.vehicle = seat.vehicle as unknown as Vehicle;
 		this.doorObject = object;
+
+		const side = Utils.detectRelativeSide(this.seat.seatPointObject, this.doorObject);
+		if (side === Side.Left) this.sideMultiplier = -1;
+		else if (side === Side.Right) this.sideMultiplier = 1;
+		else this.sideMultiplier = 0;
 	}
 
 	public update(timestep: number): void
@@ -38,9 +49,9 @@ export class VehicleDoor
 				if (this.rotation > this.targetRotation)
 				{
 					this.rotation = this.targetRotation;
+					// this.resetPhysTrailer();
 					this.achievingTargetRotation = false;
-					// this.doorVelocity = 0;
-					this.physicsEnabled = this.rotation > 0;
+					this.physicsEnabled = true;
 				}
 			}
 			else if (this.rotation > this.targetRotation)
@@ -50,14 +61,14 @@ export class VehicleDoor
 				if (this.rotation < this.targetRotation)
 				{
 					this.rotation = this.targetRotation;
+					// this.resetPhysTrailer();
 					this.achievingTargetRotation = false;
-					// this.doorVelocity = 0;
-					this.physicsEnabled = this.rotation > 0;
+					this.physicsEnabled = false;
 				}
 			}
 		}
 
-		this.doorObject.setRotationFromEuler(new THREE.Euler(0, -this.rotation, 0));
+		this.doorObject.setRotationFromEuler(new THREE.Euler(0, this.sideMultiplier * this.rotation, 0));
 	}
 
 	public preStepCallback(): void
@@ -77,7 +88,7 @@ export class VehicleDoor
 			const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 
 			// Get imaginary positions
-			let trailerPos = back.clone().applyAxisAngle(up, -this.rotation).add(this.doorWorldPos);
+			let trailerPos = back.clone().applyAxisAngle(up, this.sideMultiplier * this.rotation).add(this.doorWorldPos);
 			let trailerPushedPos = trailerPos.clone().sub(vehicleVelDiff);
 
 			// Update last values
@@ -90,19 +101,28 @@ export class VehicleDoor
 			let angle = Utils.getSignedAngleBetweenVectors(v1, v2, up);
 
 			// Apply door velocity
-			this.doorVelocity -= angle * 0.05;
+			this.doorVelocity += this.sideMultiplier * angle * 0.05;
 			this.rotation += this.doorVelocity;
 
 			// Bounce door when it reaches rotation limit
 			if (this.rotation < 0)
 			{
 				this.rotation = 0;
-				this.doorVelocity = -this.doorVelocity;
+
+				if (this.doorVelocity < -0.08)
+				{
+					this.close();
+					this.doorVelocity = 0;
+				}
+				else
+				{
+					this.doorVelocity = -this.doorVelocity / 2;
+				}
 			}
 			if (this.rotation > 1)
 			{
 				this.rotation = 1;
-				this.doorVelocity = -this.doorVelocity;
+				this.doorVelocity = -this.doorVelocity / 2;
 			}
 
 			// Damping
@@ -112,6 +132,7 @@ export class VehicleDoor
 
 	public open(): void
 	{
+		// this.resetPhysTrailer();
 		this.achievingTargetRotation = true;
 		this.targetRotation = 1;
 	}
@@ -120,5 +141,19 @@ export class VehicleDoor
 	{
 		this.achievingTargetRotation = true;
 		this.targetRotation = 0;
+	}
+
+	public resetPhysTrailer(): void
+	{
+		// Door world position
+		this.doorObject.getWorldPosition(this.doorWorldPos);
+
+		// Get acceleration
+		this.lastVehicleVel = new THREE.Vector3();
+
+		// Get vectors
+		const quat = Utils.threeQuat(this.vehicle.rayCastVehicle.chassisBody.quaternion);
+		const back = new THREE.Vector3(0, 0, -1).applyQuaternion(quat);
+		this.lastTrailerPos.copy(back.add(this.doorWorldPos));
 	}
 }

@@ -1,26 +1,32 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
-
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/FunctionLibrary';
 
 import { KeyBinding } from '../core/KeyBinding';
 import { VectorSpringSimulator } from '../physics/spring_simulation/VectorSpringSimulator';
 import { RelativeSpringSimulator } from '../physics/spring_simulation/RelativeSpringSimulator';
 import { Idle } from './character_states/Idle';
+import { EnteringVehicle } from './character_states/vehicles/EnteringVehicle';
+import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
+import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
+import { Driving } from './character_states/vehicles/Driving';
+import { ExitingAirplane } from './character_states/vehicles/ExitingAirplane';
 import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
-import { EnteringVehicle } from './character_states/vehicles/EnteringVehicle';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { VehicleSeat } from '../vehicles/VehicleSeat';
-import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
-import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
-import { Driving } from './character_states/vehicles/Driving';
 import { Vehicle } from '../vehicles/Vehicle';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { CapsuleCollider } from '../physics/colliders/CapsuleCollider';
+import { VehicleEntryInstance } from './VehicleEntryInstance';
+import { SeatType } from '../enums/SeatType';
+import { GroundImpactData } from './GroundImpactData';
+import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
+import { Object3D } from 'three';
+import { EntityType } from '../enums/EntityType';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -60,24 +66,18 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public raySafeOffset: number = 0.03;
 	public wantsToJump: boolean = false;
 	public initJumpSpeed: number = -1;
-	public groundImpactData: Utils.GroundImpactData = new Utils.GroundImpactData();
+	public groundImpactData: GroundImpactData = new GroundImpactData();
 
 	public controlledObject: IControllable;
-	public controlledObjectSeat: VehicleSeat;
 
 	public raycastBox: THREE.Mesh;
 	public charState: ICharacterState;
 	public behaviour: ICharacterAI;
 	public world: World;
 
-	// public help1: THREE.AxesHelper;
-	// public help2: THREE.AxesHelper;
-	// public help3: THREE.AxesHelper;
-
-	// Data for entering vehicles, should probably be
-	// grouped together a little better e.g. as a class instance
-	public isRunningTowardsVehicle: boolean = false;
-	public targetSeat: VehicleSeat;
+	// Vehicles
+	public occupyingSeat: VehicleSeat = null;
+	public vehicleEntryInstance: VehicleEntryInstance = null;
 
 	private physicsEnabled: boolean = true;
 
@@ -87,10 +87,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 		this.readCharacterData(gltf);
 		this.setAnimations(gltf.animations);
-
-		// this.help1 = new THREE.AxesHelper(1);
-		// this.help2 = new THREE.AxesHelper(2);
-		// this.help3 = new THREE.AxesHelper(3);
 
 		// The visuals group is centered for easy character tilting
 		this.tiltContainer = new THREE.Group();
@@ -119,6 +115,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			'jump': new KeyBinding('Space'),
 			'use': new KeyBinding('KeyE'),
 			'enter': new KeyBinding('KeyF'),
+			'enter_passenger': new KeyBinding('KeyG'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'primary': new KeyBinding('Mouse0'),
 			'secondary': new KeyBinding('Mouse1'),
 		};
@@ -135,6 +133,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		});
 		// capsulePhysics.physical.collisionFilterMask = ~CollisionGroups.Trimesh;
 		this.characterCapsule.body.shapes.forEach((shape) => {
+			// tslint:disable-next-line: no-bitwise
 			shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
 		});
 		this.characterCapsule.body.allowSleep = false;
@@ -191,6 +190,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	{
 		if (this.physicsEnabled)
 		{
+			this.characterCapsule.body.previousPosition = new CANNON.Vec3(x, y, z);
 			this.characterCapsule.body.position = new CANNON.Vec3(x, y, z);
 			this.characterCapsule.body.interpolatedPosition = new CANNON.Vec3(x, y, z);
 		}
@@ -235,9 +235,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public resetOrientation(): void
 	{
-		const elements = this.matrix.elements;
-		let forward = new THREE.Vector3(elements[8], elements[9], elements[10]);
-
+		const forward = Utils.getForward(this);
 		this.setOrientation(forward, true);
 	}
 
@@ -411,26 +409,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public update(timeStep: number): void
 	{
-		if (this.behaviour !== undefined) {
-			this.behaviour.update(timeStep);
-		}
-
-		if (this.isRunningTowardsVehicle === true) {
-			let entryPoint = new THREE.Vector3();
-			this.targetSeat.entryPoint.getWorldPosition(entryPoint);
-			let viewVector = new THREE.Vector3().subVectors(entryPoint, this.position);
-			this.setOrientation(viewVector);
-
-			let heightDifference = viewVector.y;
-			viewVector.y = 0;
-			if (this.charState.canEnterVehicles && viewVector.length() < 0.2 && heightDifference < 2) {
-				this.enterVehicle(this.targetSeat);
-			}
-		}
-
-		if (this.charState !== undefined) {
-			this.charState.update(timeStep);
-		}
+		this.behaviour?.update(timeStep);
+		this.vehicleEntryInstance?.update(timeStep);
+		// console.log(this.occupyingSeat);
+		this.charState?.update(timeStep);
 
 		// this.visuals.position.copy(this.modelOffset);
 		if (this.physicsEnabled) this.springMovement(timeStep);
@@ -454,15 +436,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			this.characterCapsule.body.position.copy(Utils.cannonVector(newPos));
 			this.characterCapsule.body.interpolatedPosition.copy(Utils.cannonVector(newPos));
 		}
-
-		// Debug
-		// this.help1.position.copy(this.position);
-		// this.help1.quaternion.copy(this.quaternion);
-		// this.modelContainer.getWorldPosition(this.help2.position);
-		// this.modelContainer.getWorldQuaternion(this.help2.quaternion);
-		// this.tiltContainer.getWorldPosition(this.help3.position);
-		// this.tiltContainer.getWorldQuaternion(this.help3.quaternion);
-		// document.getElementById('state-debug').innerHTML = this.charState['constructor'].name;
 	}
 
 	public inputReceiverInit(): void
@@ -477,6 +450,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.world.cameraOperator.followMode = false;
 		// this.world.dirLight.target = this;
 
+		this.displayControls();
+	}
+
+	public displayControls(): void
+	{
 		this.world.updateControls([
 			{
 				keys: ['W', 'A', 'S', 'D'],
@@ -491,7 +469,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				desc: 'Jump'
 			},
 			{
-				keys: ['F'],
+				keys: ['F', 'or', 'G'],
 				desc: 'Enter vehicle'
 			},
 			{
@@ -516,16 +494,16 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			// Look in camera's direction
 			this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
 
-			// TODO: Make global property
-			let globalPos = new THREE.Vector3();
-			this.getWorldPosition(globalPos);
+			this.updateMatrixWorld();
+			if (this.vehicleEntryInstance !== null) (this.vehicleEntryInstance.targetSeat.vehicle as unknown as THREE.Object3D).updateMatrixWorld();
+			else if (this.occupyingSeat !== null) (this.occupyingSeat.vehicle as unknown as THREE.Object3D).updateMatrixWorld();
 
 			this.getWorldPosition(this.world.cameraOperator.target);
 		}
 		
 	}
 
-	public setAnimation(clipName: string, fadeIn: number): void
+	public setAnimation(clipName: string, fadeIn: number): number
 	{
 		if (this.mixer !== undefined)
 		{
@@ -533,11 +511,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			let clip = THREE.AnimationClip.findByName( this.animations, clipName );
 
 			let action = this.mixer.clipAction(clip);
+			if (action === null)
+			{
+				console.error(`Animation ${clipName} not found!`);
+				return 0;
+			}
+
 			this.mixer.stopAllAction();
 			action.fadeIn(fadeIn);
 			action.play();
 
-			return action['_clip'].duration;
+			return action.getClip().duration;
 		}
 	}
 
@@ -588,7 +572,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public setCameraRelativeOrientationTarget(): void
 	{
-		if (this.isRunningTowardsVehicle === false)
+		if (this.vehicleEntryInstance === null)
 		{
 			let moveVector = this.getCameraRelativeMovementVector();
 	
@@ -606,7 +590,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public rotateModel(): void
 	{
 		this.lookAt(this.position.x + this.orientation.x, this.position.y + this.orientation.y, this.position.z + this.orientation.z);
-
 		this.tiltContainer.rotation.z = (-this.angularVelocity * 2.3 * this.velocity.length());
 		this.tiltContainer.position.setY((Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2) - 0.5);
 	}
@@ -617,86 +600,133 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.initJumpSpeed = initJumpSpeed;
 	}
 
-	public findVehicleToEnter(): void
+	public findVehicleToEnter(wantsToDrive: boolean): void
 	{
-		// TODO follow a path (generated using a navmesh?)
-		// TODO identify a seat to get into
-		let bestVehicle: IControllable;
-		let bestDistance = Number.POSITIVE_INFINITY;
-		let maxDistance = 10;
+		// reusable world position variable
+		let worldPos = new THREE.Vector3();
 
-		this.world.vehicles.forEach((vehicle) => {
-		   
-			let distance = new THREE.Vector3().subVectors(this.position, vehicle.position).lengthSq();
-
-			if (distance < maxDistance && distance < bestDistance)
-			{
-				bestVehicle = vehicle;
-			}
+		// Find best vehicle
+		let vehicleFinder = new ClosestObjectFinder<Vehicle>(this.position, 10);
+		this.world.vehicles.forEach((vehicle) =>
+		{
+			vehicleFinder.consider(vehicle, vehicle.position);
 		});
 
-		if (bestVehicle !== undefined)
+		if (vehicleFinder.closestObject !== undefined)
 		{
-			this.isRunningTowardsVehicle = true;
-			this.targetSeat = bestVehicle.seats[0];
-			this.triggerAction('up', true);
-		}
-		else {
-			console.error('World has no vehicles');
+			let vehicle = vehicleFinder.closestObject;
+			let vehicleEntryInstance = new VehicleEntryInstance(this);
+			vehicleEntryInstance.wantsToDrive = wantsToDrive;
+
+			// Find best seat
+			let seatFinder = new ClosestObjectFinder<VehicleSeat>(this.position);
+			for (const seat of vehicle.seats)
+			{
+				if (wantsToDrive)
+				{
+					// Consider driver seats
+					if (seat.type === SeatType.Driver)
+					{
+						seat.seatPointObject.getWorldPosition(worldPos);
+						seatFinder.consider(seat, worldPos);
+					}
+					// Consider passenger seats connected to driver seats
+					else if (seat.type === SeatType.Passenger)
+					{
+						for (const connSeat of seat.connectedSeats)
+						{
+							if (connSeat.type === SeatType.Driver)
+							{
+								seat.seatPointObject.getWorldPosition(worldPos);
+								seatFinder.consider(seat, worldPos);
+								break;
+							}
+						}
+					}
+				}
+				else
+				{
+					// Consider passenger seats
+					if (seat.type === SeatType.Passenger)
+					{
+						seat.seatPointObject.getWorldPosition(worldPos);
+						seatFinder.consider(seat, worldPos);
+					}
+				}
+			}
+
+			if (seatFinder.closestObject !== undefined)
+			{
+				let targetSeat = seatFinder.closestObject;
+				vehicleEntryInstance.targetSeat = targetSeat;
+
+				let entryPointFinder = new ClosestObjectFinder<Object3D>(this.position);
+
+				for (const point of targetSeat.entryPoints) {
+					point.getWorldPosition(worldPos);
+					entryPointFinder.consider(point, worldPos);
+				}
+
+				if (entryPointFinder.closestObject !== undefined)
+				{
+					vehicleEntryInstance.entryPoint = entryPointFinder.closestObject;
+					this.triggerAction('up', true);
+					this.vehicleEntryInstance = vehicleEntryInstance;
+				}
+			}
 		}
 	}
 
-	public enterVehicle(seat: VehicleSeat): void
+	public enterVehicle(seat: VehicleSeat, entryPoint: THREE.Object3D): void
 	{
 		this.resetControls();
 
-		if (seat.door?.rotation > 0.5)
+		if (seat.door?.rotation < 0.5)
 		{
-			this.setState(new EnteringVehicle(this, this.targetSeat));
+			this.setState(new OpenVehicleDoor(this, seat, entryPoint));
 		}
 		else
 		{
-			this.setState(new OpenVehicleDoor(this, seat));
+			this.setState(new EnteringVehicle(this, seat, entryPoint));
 		}
-
-		this.isRunningTowardsVehicle = false;
-		this.targetSeat = undefined;
 	}
 
-	public teleportToVehicle(vehicle: Vehicle, seat: any): void
+	public teleportToVehicle(vehicle: Vehicle, seat: VehicleSeat): void
 	{
 		this.resetVelocity();
 		this.rotateModel();
 		this.setPhysicsEnabled(false);
 		(vehicle as unknown as THREE.Object3D).attach(this);
 
-		this.setPosition(seat.seatPoint.position.x, seat.seatPoint.position.y + 0.6, seat.seatPoint.position.z);
-		this.quaternion.copy(seat.seatPoint.quaternion);
+		this.setPosition(seat.seatPointObject.position.x, seat.seatPointObject.position.y + 0.6, seat.seatPointObject.position.z);
+		this.quaternion.copy(seat.seatPointObject.quaternion);
 
+		this.occupySeat(seat);
 		this.setState(new Driving(this, seat));
 
 		this.startControllingVehicle(vehicle, seat);
 	}
 
-	public startControllingVehicle(vehicle: IControllable, seat: any): void
+	public startControllingVehicle(vehicle: IControllable, seat: VehicleSeat): void
 	{
-		this.transferControls(vehicle);
-		this.resetControls();
-
-		this.controlledObject = vehicle;
-		this.controlledObject.allowSleep(false);
-		vehicle.inputReceiverInit();
-
-		this.controlledObjectSeat = seat;
-		vehicle.controllingCharacter = this;
+		if (this.controlledObject !== vehicle)
+		{
+			this.transferControls(vehicle);
+			this.resetControls();
+	
+			this.controlledObject = vehicle;
+			this.controlledObject.allowSleep(false);
+			vehicle.inputReceiverInit();
+	
+			vehicle.controllingCharacter = this;
+		}
 	}
 
-	public transferControls(entity:IControllable): void
+	public transferControls(entity: IControllable): void
 	{
-		// This is horrible
-		// We're running through all actions of this character and the vehicle,
+		// Currently running through all actions of this character and the vehicle,
 		// comparing keycodes of actions and based on that triggering vehicle's actions
-		// Instead, vehicle should ask input manager what's the current state of the keyboard
+		// Maybe we should ask input manager what's the current state of the keyboard
 		// and read those values... TODO
 		for (const action1 in this.actions) {
 			if (this.actions.hasOwnProperty(action1)) {
@@ -720,14 +750,48 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
+	public stopControllingVehicle(): void
+	{
+		if (this.controlledObject?.controllingCharacter === this)
+		{
+			this.controlledObject.allowSleep(true);
+			this.controlledObject.controllingCharacter = undefined;
+			this.controlledObject.resetControls();
+			this.controlledObject = undefined;
+			this.inputReceiverInit();
+		}
+	}
+
 	public exitVehicle(): void
 	{
-		this.setState(new ExitingVehicle(this, this.controlledObject, this.controlledObjectSeat));
-		this.controlledObject.allowSleep(true);
-		this.controlledObject.controllingCharacter = undefined;
-		this.controlledObject.resetControls();
-		this.controlledObject = undefined;
-		this.inputReceiverInit();
+		if (this.occupyingSeat !== null)
+		{
+			if (this.occupyingSeat.vehicle.entityType === EntityType.Airplane)
+			{
+				this.setState(new ExitingAirplane(this, this.occupyingSeat));
+			}
+			else
+			{
+				this.setState(new ExitingVehicle(this, this.occupyingSeat));
+			}
+			
+			this.stopControllingVehicle();
+		}
+	}
+
+	public occupySeat(seat: VehicleSeat): void
+	{
+		this.occupyingSeat = seat;
+		seat.occupiedBy = this;
+	}
+
+	public leaveSeat(): void
+	{
+		if (this.occupyingSeat !== null)
+		{
+			this.occupyingSeat.occupiedBy = null;
+			this.occupyingSeat = null;
+		}
 	}
 
 	public physicsPreStep(body: CANNON.Body, character: Character): void

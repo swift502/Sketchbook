@@ -17,7 +17,7 @@ export class Falling extends CharacterStateBase implements ICharacterState
 		this.character.arcadeVelocityIsAdditive = true;
 		this.character.setArcadeVelocityInfluence(0.05, 0, 0.05);
 
-		this.character.setAnimation('falling', 0.3);
+		this.playAnimation('falling', 0.3);
 	}
 
 	public update(timeStep: number): void

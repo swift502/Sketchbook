@@ -1,15 +1,17 @@
+import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/FunctionLibrary';
 
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
-import THREE = require('three');
 import { World } from '../core/World';
+import { EntityType } from '../enums/EntityType';
 
 export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 {
+	public entityType: EntityType = EntityType.Helicopter;
 	public rotors: THREE.Object3D[] = [];
 	private enginePower: number = 0;
 
@@ -31,6 +33,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 			'rollLeft': new KeyBinding('KeyA'),
 			'rollRight': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'view': new KeyBinding('KeyV'),
 		};
 	}
@@ -70,6 +73,10 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 	{
 		super.onInputChange();
 
+		if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined)
+		{
+			this.forceCharacterOut();
+		}
 		if (this.actions.view.justPressed)
 		{
 			this.toggleFirstPersonView();
@@ -78,13 +85,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 
 	public physicsPreStep(body: CANNON.Body, heli: Helicopter): void
 	{
-		let quat = new THREE.Quaternion(
-			body.quaternion.x,
-			body.quaternion.y,
-			body.quaternion.z,
-			body.quaternion.w
-		);
-
+		let quat = Utils.threeQuat(body.quaternion);
 		let right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
 		let globalUp = new THREE.Vector3(0, 1, 0);
 		let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
@@ -112,14 +113,9 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 		let dot = globalUp.dot(up);
 		gravityCompensation *= Math.sqrt(THREE.MathUtils.clamp(dot, 0, 1));
 
-		let vertDamping = Utils.threeVector(body.velocity);
-		vertDamping.x *= up.x;
-		vertDamping.y *= up.y;
-		vertDamping.z *= up.z;
-		vertDamping.multiplyScalar(-0.01);
-
+		let vertDamping = new THREE.Vector3(0, body.velocity.y, 0).multiplyScalar(-0.01);
 		let vertStab = up.clone();
-		vertStab.multiplyScalar((gravityCompensation));
+		vertStab.multiplyScalar(gravityCompensation);
 		vertStab.multiplyScalar(Math.pow(heli.enginePower, 3));
 		vertStab.add(vertDamping);
 
@@ -128,8 +124,8 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 		body.velocity.z += vertStab.z;
 
 		// Positional damping
-		body.velocity.x *= 0.99;
-		body.velocity.z *= 0.99;
+		body.velocity.x *= 0.995;
+		body.velocity.z *= 0.995;
 
 		// Rotation stabilization
 		if (this.controllingCharacter !== undefined)
@@ -149,43 +145,43 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 		// Pitch
 		if (heli.actions.pitchUp.isPressed)
 		{
-			body.angularVelocity.x -= right.x * 0.1 * this.enginePower;
-			body.angularVelocity.y -= right.y * 0.1 * this.enginePower;
-			body.angularVelocity.z -= right.z * 0.1 * this.enginePower;
+			body.angularVelocity.x -= right.x * 0.07 * this.enginePower;
+			body.angularVelocity.y -= right.y * 0.07 * this.enginePower;
+			body.angularVelocity.z -= right.z * 0.07 * this.enginePower;
 		}
 		if (heli.actions.pitchDown.isPressed)
 		{
-			body.angularVelocity.x += right.x * 0.1 * this.enginePower;
-			body.angularVelocity.y += right.y * 0.1 * this.enginePower;
-			body.angularVelocity.z += right.z * 0.1 * this.enginePower;
+			body.angularVelocity.x += right.x * 0.07 * this.enginePower;
+			body.angularVelocity.y += right.y * 0.07 * this.enginePower;
+			body.angularVelocity.z += right.z * 0.07 * this.enginePower;
 		}
 
 		// Yaw
 		if (heli.actions.yawLeft.isPressed)
 		{
-			body.angularVelocity.x += up.x * 0.1 * this.enginePower;
-			body.angularVelocity.y += up.y * 0.1 * this.enginePower;
-			body.angularVelocity.z += up.z * 0.1 * this.enginePower;
+			body.angularVelocity.x += up.x * 0.07 * this.enginePower;
+			body.angularVelocity.y += up.y * 0.07 * this.enginePower;
+			body.angularVelocity.z += up.z * 0.07 * this.enginePower;
 		}
 		if (heli.actions.yawRight.isPressed)
 		{
-			body.angularVelocity.x -= up.x * 0.1 * this.enginePower;
-			body.angularVelocity.y -= up.y * 0.1 * this.enginePower;
-			body.angularVelocity.z -= up.z * 0.1 * this.enginePower;
+			body.angularVelocity.x -= up.x * 0.07 * this.enginePower;
+			body.angularVelocity.y -= up.y * 0.07 * this.enginePower;
+			body.angularVelocity.z -= up.z * 0.07 * this.enginePower;
 		}
 
 		// Roll
 		if (heli.actions.rollLeft.isPressed)
 		{
-			body.angularVelocity.x -= forward.x * 0.1 * this.enginePower;
-			body.angularVelocity.y -= forward.y * 0.1 * this.enginePower;
-			body.angularVelocity.z -= forward.z * 0.1 * this.enginePower;
+			body.angularVelocity.x -= forward.x * 0.07 * this.enginePower;
+			body.angularVelocity.y -= forward.y * 0.07 * this.enginePower;
+			body.angularVelocity.z -= forward.z * 0.07 * this.enginePower;
 		}
 		if (heli.actions.rollRight.isPressed)
 		{
-			body.angularVelocity.x += forward.x * 0.1 * this.enginePower;
-			body.angularVelocity.y += forward.y * 0.1 * this.enginePower;
-			body.angularVelocity.z += forward.z * 0.1 * this.enginePower;
+			body.angularVelocity.x += forward.x * 0.07 * this.enginePower;
+			body.angularVelocity.y += forward.y * 0.07 * this.enginePower;
+			body.angularVelocity.z += forward.z * 0.07 * this.enginePower;
 		}
 
 		// Angular damping

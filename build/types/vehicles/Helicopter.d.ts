@@ -1,8 +1,8 @@
+import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
-import THREE = require('three');
 export declare class Helicopter extends Vehicle implements IControllable, IWorldEntity {
     rotors: THREE.Object3D[];
     private enginePower;

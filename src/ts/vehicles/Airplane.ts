@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 import { Vehicle } from './Vehicle';
@@ -5,12 +6,12 @@ import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
-import { Euler } from 'three';
-import THREE = require('three');
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/FunctionLibrary';
+import { EntityType } from '../enums/EntityType';
 
 export class Airplane extends Vehicle implements IControllable, IWorldEntity
 {
+	public entityType: EntityType = EntityType.Airplane;
 	public rotor: THREE.Object3D;
 	public leftAileron: THREE.Object3D;
 	public rightAileron: THREE.Object3D;
@@ -53,6 +54,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 			'rollLeft': new KeyBinding('KeyA'),
 			'rollRight': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'view': new KeyBinding('KeyV'),
 		};
 
@@ -178,13 +180,7 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 
 	public physicsPreStep(body: CANNON.Body, plane: Airplane): void
 	{
-		let quat = new THREE.Quaternion(
-			body.quaternion.x,
-			body.quaternion.y,
-			body.quaternion.z,
-			body.quaternion.w
-		);
-
+		let quat = Utils.threeQuat(body.quaternion);
 		let right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
 		let up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 		let forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
@@ -314,8 +310,12 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 	{
 		super.onInputChange();
 
-		const brakeForce = 1000;
+		const brakeForce = 100;
 
+		if (this.actions.exitVehicle.justPressed && this.controllingCharacter !== undefined)
+		{
+			this.forceCharacterOut();
+		}
 		if (this.actions.wheelBrake.justPressed)
 		{
 			this.setBrake(brakeForce);

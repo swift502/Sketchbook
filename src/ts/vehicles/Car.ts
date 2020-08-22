@@ -4,11 +4,14 @@ import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { KeyBinding } from '../core/KeyBinding';
 import * as THREE from 'three';
-import * as Utils from '../core/Utilities';
+import * as Utils from '../core/FunctionLibrary';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import { World } from '../core/World';
+import { EntityType } from '../enums/EntityType';
 
-export class Car extends Vehicle implements IControllable {
+export class Car extends Vehicle implements IControllable
+{
+	public entityType: EntityType = EntityType.Car;
 	public drive: string = 'awd';
 	get speed(): number {
 		return this._speed;
@@ -27,6 +30,7 @@ export class Car extends Vehicle implements IControllable {
 	private timeToShift: number = 0.2;
 
 	private canTiltForwards: boolean = false;
+	private characterWantsToExit: boolean = false;
 
 	constructor(gltf: any)
 	{
@@ -38,7 +42,7 @@ export class Car extends Vehicle implements IControllable {
 			frictionSlip: 0.8,
 			dampingRelaxation: 2,
 			dampingCompression: 2,
-			rollInfluence: 0.9
+			rollInfluence: 0.8
 		});
 
 		this.readCarData(gltf);
@@ -52,6 +56,7 @@ export class Car extends Vehicle implements IControllable {
 			'left': new KeyBinding('KeyA'),
 			'right': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
+			'seat_switch': new KeyBinding('KeyX'),
 			'view': new KeyBinding('KeyV'),
 		};
 
@@ -73,20 +78,9 @@ export class Car extends Vehicle implements IControllable {
 	{
 		super.update(timeStep);
 
-		// @ts-ignore
 		const tiresHaveContact = this.rayCastVehicle.numWheelsOnGround > 0;
-		const quat = new THREE.Quaternion(
-			this.collision.quaternion.x,
-			this.collision.quaternion.y,
-			this.collision.quaternion.z,
-			this.collision.quaternion.w
-		);
-		const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
-		const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
-		const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
 
 		// Air spin
-		// TODO move into preStep?
 		if (!tiresHaveContact)
 		{
 			// Timer grows when car is off ground, resets once you touch the ground again
@@ -99,13 +93,105 @@ export class Car extends Vehicle implements IControllable {
 			this.airSpinTimer = 0;
 		}
 
+		// Engine
+		const engineForce = 500;
+		const maxGears = 5;
+		const gearsMaxSpeeds = {
+			'R': -4,
+			'0': 0,
+			'1': 5,
+			'2': 9,
+			'3': 13,
+			'4': 17,
+			'5': 22,
+		};
+
+		if (this.shiftTimer > 0)
+		{
+			this.shiftTimer -= timeStep;
+			if (this.shiftTimer < 0) this.shiftTimer = 0;
+		}
+		else
+		{
+			// Transmission 
+			if (this.actions.reverse.isPressed)
+			{
+				const powerFactor = (gearsMaxSpeeds['R'] - this.speed) / Math.abs(gearsMaxSpeeds['R']);
+				const force = (engineForce / this.gear) * (Math.abs(powerFactor) ** 1);
+
+				this.applyEngineForce(force);
+			}
+			else
+			{
+				const powerFactor = (gearsMaxSpeeds[this.gear] - this.speed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
+
+				if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
+				else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
+				else if (this.actions.throttle.isPressed)
+				{
+					const force = (engineForce / this.gear) * (powerFactor ** 1);
+					this.applyEngineForce(-force);
+				}
+			}
+		}
+
+		// Steering
+		this.steeringSimulator.simulate(timeStep);
+		this.setSteeringValue(this.steeringSimulator.position);
+		if (this.steeringWheel !== undefined) this.steeringWheel.rotation.z = -this.steeringSimulator.position * 2;
+
+		if (this.rayCastVehicle.numWheelsOnGround < 3 && Math.abs(this.collision.velocity.length()) < 0.5)	
+		{	
+			this.collision.quaternion.copy(this.collision.initQuaternion);	
+		}
+
+		// Getting out
+		if (this.characterWantsToExit && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
+		{
+			let speed = this.collision.velocity.length();
+
+			if (speed > 0.1 && speed < 4)
+			{
+				this.triggerAction('brake', true);
+			}
+			else
+			{
+				this.forceCharacterOut();
+			}
+		}
+	}
+
+	public shiftUp(): void
+	{
+		this.gear++;
+		this.shiftTimer = this.timeToShift;
+
+		this.applyEngineForce(0);
+	}
+
+	public shiftDown(): void
+	{
+		this.gear--;
+		this.shiftTimer = this.timeToShift;
+
+		this.applyEngineForce(0);
+	}
+
+	public physicsPreStep(body: CANNON.Body, car: Car): void
+	{
+		// Constants
+		const quat = Utils.threeQuat(body.quaternion);
+		const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+		const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
+		const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
+
+		// Measure speed
 		this._speed = this.collision.velocity.dot(Utils.cannonVector(forward));
 
+		// Air spin
 		// It takes 2 seconds until you have max spin air control since you leave the ground
 		let airSpinInfluence = THREE.MathUtils.clamp(this.airSpinTimer / 2, 0, 1);
 		airSpinInfluence *= THREE.MathUtils.clamp(this.speed, 0, 1);
-
-		// Flip over booster
 		
 		const flipSpeedFactor = THREE.MathUtils.clamp(1 - this.speed, 0, 1);
 		const upFactor = (up.dot(new THREE.Vector3(0, -1, 0)) / 2) + 0.5;
@@ -146,60 +232,12 @@ export class Car extends Vehicle implements IControllable {
 				angVel.vsub(effectiveSpinVectorRight, angVel);
 			}
 		}
-		
-		// if (!this.actions.throttle.isPressed && !this.actions.reverse.isPressed)
-		// {
-		//     body.velocity.x *= 0.99;
-		//     body.velocity.y *= 0.99;
-		//     body.velocity.z *= 0.99;
-		// }
 
-		const engineForce = 500;
-		const maxGears = 5;
-		const gearsMaxSpeeds = {
-			'R': -4,
-			'0': 0,
-			'1': 5,
-			'2': 9,
-			'3': 13,
-			'4': 17,
-			'5': 22,
-		};
+		// Steering
 		const velocity = new CANNON.Vec3().copy(this.collision.velocity);
 		velocity.normalize();
 		let driftCorrection = Utils.getSignedAngleBetweenVectors(Utils.threeVector(velocity), forward);
 
-		// Engine
-		if (this.shiftTimer > 0)
-		{
-			this.shiftTimer -= timeStep;
-			if (this.shiftTimer < 0) this.shiftTimer = 0;
-		}
-		else
-		{
-			// Transmission 
-			if (this.actions.reverse.isPressed)
-			{
-				const powerFactor = (gearsMaxSpeeds['R'] - this.speed) / Math.abs(gearsMaxSpeeds['R']);
-				const force = (engineForce / this.gear) * (Math.abs(powerFactor) ** 1);
-
-				this.applyEngineForce(force);
-			}
-			else
-			{
-				const powerFactor = (gearsMaxSpeeds[this.gear] - this.speed) / (gearsMaxSpeeds[this.gear] - gearsMaxSpeeds[this.gear - 1]);
-
-				if (powerFactor < 0.1 && this.gear < maxGears) this.shiftUp();
-				else if (this.gear > 1 && powerFactor > 1.2) this.shiftDown();
-				else if (this.actions.throttle.isPressed)
-				{
-					const force = (engineForce / this.gear) * (powerFactor ** 1);
-					this.applyEngineForce(-force);
-				}
-			}
-		}
-
-		// Steering
 		const maxSteerVal = 0.8;
 		let speedFactor = THREE.MathUtils.clamp(this.speed * 0.3, 1, Number.MAX_VALUE);
 
@@ -214,35 +252,7 @@ export class Car extends Vehicle implements IControllable {
 			this.steeringSimulator.target = THREE.MathUtils.clamp(steering, -maxSteerVal, maxSteerVal);
 		}
 		else this.steeringSimulator.target = 0;
-		
-		this.steeringSimulator.simulate(timeStep);
-		this.setSteeringValue(this.steeringSimulator.position);
-		if (this.steeringWheel !== undefined) this.steeringWheel.rotation.z = -this.steeringSimulator.position * 2;
 
-		if (this.rayCastVehicle.numWheelsOnGround < 3 && Math.abs(this.collision.velocity.length()) < 0.5)	
-		{	
-			this.collision.quaternion.copy(this.collision.initQuaternion);	
-		}
-	}
-
-	public shiftUp(): void
-	{
-		this.gear++;
-		this.shiftTimer = this.timeToShift;
-
-		this.applyEngineForce(0);
-	}
-
-	public shiftDown(): void
-	{
-		this.gear--;
-		this.shiftTimer = this.timeToShift;
-
-		this.applyEngineForce(0);
-	}
-
-	public physicsPreStep(body: CANNON.Body, car: Car): void
-	{
 		// Update doors
 		this.seats.forEach((seat) => {
 			seat.door?.preStepCallback();
@@ -254,6 +264,15 @@ export class Car extends Vehicle implements IControllable {
 
 		const brakeForce = 1000000;
 
+		if (this.actions.exitVehicle.justPressed)
+		{
+			this.characterWantsToExit = true;
+		}
+		if (this.actions.exitVehicle.justReleased)
+		{
+			this.characterWantsToExit = false;
+			this.triggerAction('brake', false);
+		}
 		if (this.actions.throttle.justReleased || this.actions.reverse.justReleased)
 		{
 			this.applyEngineForce(0);

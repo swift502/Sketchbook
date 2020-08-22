@@ -6,6 +6,7 @@ import { Character } from '../../Character';
 import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Side } from '../../../enums/Side';
 import { Idle } from '../Idle';
+import * as Utils from '../../../core/FunctionLibrary';
 
 export class CloseVehicleDoorOutside extends CharacterStateBase
 {
@@ -19,13 +20,14 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 		this.seat = seat;
 		this.canFindVehiclesToEnter = false;
 
-		if (seat.doorSide === Side.Left)
+		const side = Utils.detectRelativeSide(seat.seatPointObject, seat.door.doorObject);
+		if (side === Side.Left)
 		{
-			this.animationLength = this.character.setAnimation('close_door_standing_right', 0.1);
+			this.playAnimation('close_door_standing_right', 0.1);
 		}
-		else if (seat.doorSide === Side.Right)
+		else if (side === Side.Right)
 		{
-			this.animationLength = this.character.setAnimation('close_door_standing_left', 0.1);
+			this.playAnimation('close_door_standing_left', 0.1);
 		}
 	}
 
@@ -39,9 +41,10 @@ export class CloseVehicleDoorOutside extends CharacterStateBase
 			this.seat.door.close();   
 		}
 
-		if (this.timer > this.animationLength - timeStep)
+		if (this.animationEnded(timeStep))
 		{
 			this.character.setState(new Idle(this.character));
+			this.character.leaveSeat();
 		}
 	}
 }

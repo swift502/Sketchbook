@@ -21,7 +21,7 @@ export class IdleRotateLeft extends CharacterStateBase implements ICharacterStat
 		this.character.velocitySimulator.mass = 10;
 
 		this.character.setArcadeVelocityTarget(0);
-		this.animationLength = this.character.setAnimation('rotate_left', 0.1);
+		this.playAnimation('rotate_left', 0.1);
 	}
 
 	public update(timeStep: number): void

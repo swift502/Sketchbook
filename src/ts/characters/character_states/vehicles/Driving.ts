@@ -15,7 +15,12 @@ export class Driving extends CharacterStateBase
 		super(character);
 
 		this.seat = seat;
-		this.character.setAnimation('driving', 0.1);
+		this.canFindVehiclesToEnter = false;
+		this.playAnimation('driving', 0.1);
+
+		this.character.startControllingVehicle(seat.vehicle, this.seat);
+		this.seat.vehicle.onInputChange();
+		this.character.vehicleEntryInstance = null;
 	}
 
 	public update(timeStep: number): void
