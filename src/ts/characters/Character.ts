@@ -7,27 +7,26 @@ import { KeyBinding } from '../core/KeyBinding';
 import { VectorSpringSimulator } from '../physics/spring_simulation/VectorSpringSimulator';
 import { RelativeSpringSimulator } from '../physics/spring_simulation/RelativeSpringSimulator';
 import { Idle } from './character_states/Idle';
+import { EnteringVehicle } from './character_states/vehicles/EnteringVehicle';
+import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
+import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
+import { Driving } from './character_states/vehicles/Driving';
+import { ExitingAirplane } from './character_states/vehicles/ExitingAirplane';
 import { ICharacterAI } from '../interfaces/ICharacterAI';
 import { World } from '../core/World';
 import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
-import { EnteringVehicle } from './character_states/vehicles/EnteringVehicle';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { VehicleSeat } from '../vehicles/VehicleSeat';
-import { ExitingVehicle } from './character_states/vehicles/ExitingVehicle';
-import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/OpenVehicleDoor';
-import { Driving } from './character_states/vehicles/Driving';
 import { Vehicle } from '../vehicles/Vehicle';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { CapsuleCollider } from '../physics/colliders/CapsuleCollider';
 import { VehicleEntryInstance } from './VehicleEntryInstance';
-import { times } from 'lodash';
 import { SeatType } from '../enums/SeatType';
 import { GroundImpactData } from './GroundImpactData';
 import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 import { Object3D } from 'three';
 import { EntityType } from '../enums/EntityType';
-import { ExitingAirplane } from './character_states/vehicles/ExitingAirplane';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -708,14 +707,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public startControllingVehicle(vehicle: IControllable, seat: VehicleSeat): void
 	{
-		this.transferControls(vehicle);
-		this.resetControls();
-
-		this.controlledObject = vehicle;
-		this.controlledObject.allowSleep(false);
-		vehicle.inputReceiverInit();
-
-		vehicle.controllingCharacter = this;
+		if (this.controlledObject !== vehicle)
+		{
+			this.transferControls(vehicle);
+			this.resetControls();
+	
+			this.controlledObject = vehicle;
+			this.controlledObject.allowSleep(false);
+			vehicle.inputReceiverInit();
+	
+			vehicle.controllingCharacter = this;
+		}
 	}
 
 	public transferControls(entity: IControllable): void

@@ -60,9 +60,9 @@ export class ExitingVehicle extends CharacterStateBase
 		if (this.animationEnded(timeStep))
 		{
 			this.character.controlledObject = undefined;
+			this.character.resetOrientation();
 			this.character.world.graphicsWorld.attach(this.character);
 			this.character.resetVelocity();
-			this.character.resetOrientation();
 			this.character.setPhysicsEnabled(true);
 			this.character.setPosition(this.character.position.x, this.character.position.y, this.character.position.z);
 

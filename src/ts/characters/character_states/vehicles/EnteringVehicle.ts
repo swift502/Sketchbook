@@ -70,7 +70,7 @@ export class EnteringVehicle extends CharacterStateBase
 
 			if (this.seat.type === SeatType.Driver)
 			{
-				this.seat.door.physicsEnabled = true;
+				if (this.seat.door) this.seat.door.physicsEnabled = true;
 				this.character.setState(new Driving(this.character, this.seat));
 			}
 			else if (this.seat.type === SeatType.Passenger)
@@ -114,6 +114,6 @@ export class EnteringVehicle extends CharacterStateBase
 					[Side.Right]: 'sit_down_right',
 					end_early: 0.0
 				};
-		};
+		}
 	}
 }

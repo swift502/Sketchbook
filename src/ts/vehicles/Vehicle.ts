@@ -116,9 +116,22 @@ export abstract class Vehicle extends THREE.Object3D
 		if (this.characterWantsToExit && this.controllingCharacter !== undefined && this.controllingCharacter.charState.canLeaveVehicles)
 		{
 			let speed = this.collision.velocity.length();
-			console.log(speed);
-			if (speed > 0.1 && speed < 4) this.triggerAction('brake', true);
-			else this.forceCharacterOut();
+
+			if (this.entityType === EntityType.Car)
+			{
+				if (speed > 0.1 && speed < 4)
+				{
+					this.triggerAction('brake', true);
+				}
+				else
+				{
+					this.forceCharacterOut();
+				}
+			}
+			else
+			{
+				this.forceCharacterOut();
+			}
 		}
 	}
 

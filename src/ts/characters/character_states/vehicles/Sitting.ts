@@ -20,6 +20,7 @@ export class Sitting extends CharacterStateBase
 		this.canFindVehiclesToEnter = false;
 		
 		this.playAnimation('sitting', 0.1);
+		this.character.vehicleEntryInstance = null;
 	}
 
 	public update(timeStep: number): void
