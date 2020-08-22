@@ -5,6 +5,7 @@ import { Character } from '../../Character';
 import { VehicleSeat } from '../../../vehicles/VehicleSeat';
 import { Falling } from '../Falling';
 import { ExitingStateBase } from './ExitingStateBase';
+import { Vehicle } from '../../../vehicles/Vehicle';
 
 export class ExitingAirplane extends ExitingStateBase
 {
@@ -16,7 +17,10 @@ export class ExitingAirplane extends ExitingStateBase
 		this.endPosition.copy(this.startPosition);
 		this.endPosition.y += 1;
 
+		const quat = Utils.threeQuat((seat.vehicle as unknown as Vehicle).collision.quaternion);
+		const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
 		this.exitPoint = new THREE.Object3D();
+		this.exitPoint.lookAt(forward);
 		this.exitPoint.position.copy(this.endPosition);
 
 		this.playAnimation('jump_idle', 0.1);
