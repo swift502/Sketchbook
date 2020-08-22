@@ -1,7 +1,9 @@
 import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
+import { EntityType } from '../enums/EntityType';
 export declare class Car extends Vehicle implements IControllable {
+    entityType: EntityType;
     drive: string;
     get speed(): number;
     private _speed;
@@ -12,6 +14,7 @@ export declare class Car extends Vehicle implements IControllable {
     private shiftTimer;
     private timeToShift;
     private canTiltForwards;
+    private characterWantsToExit;
     constructor(gltf: any);
     noDirectionPressed(): boolean;
     update(timeStep: number): void;

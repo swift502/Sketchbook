@@ -5,7 +5,9 @@ import { World } from '../core/World';
 import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';
 import { Wheel } from './Wheel';
+import { EntityType } from '../enums/EntityType';
 export declare abstract class Vehicle extends THREE.Object3D {
+    abstract entityType: EntityType;
     controllingCharacter: Character;
     actions: {
         [action: string]: KeyBinding;
@@ -25,6 +27,7 @@ export declare abstract class Vehicle extends THREE.Object3D {
     constructor(gltf: any, handlingSetup?: any);
     noDirectionPressed(): boolean;
     update(timeStep: number): void;
+    forceCharacterOut(): void;
     onInputChange(): void;
     resetControls(): void;
     allowSleep(value: boolean): void;
@@ -37,7 +40,6 @@ export declare abstract class Vehicle extends THREE.Object3D {
     handleMouseWheel(event: WheelEvent, value: number): void;
     inputReceiverInit(): void;
     inputReceiverUpdate(timeStep: number): void;
-    getMountPoint(character: Character): THREE.Vector3;
     setPosition(x: number, y: number, z: number): void;
     setSteeringValue(val: number): void;
     applyEngineForce(force: number): void;
@@ -45,4 +47,5 @@ export declare abstract class Vehicle extends THREE.Object3D {
     addToWorld(world: World): void;
     removeFromWorld(world: World): void;
     readVehicleData(gltf: any): void;
+    private connectSeats;
 }

@@ -6,12 +6,15 @@ export declare class Sky extends THREE.Object3D {
     set phi(value: number);
     private _phi;
     private _theta;
+    private hemiLight;
+    private maxHemiIntensity;
+    private minHemiIntensity;
     private sunTarget;
-    private ambientLight;
     private skyMesh;
     private skyMaterial;
     private world;
     constructor(world: World);
     update(): void;
     refreshSunPosition(): void;
+    refreshHemiIntensity(): void;
 }

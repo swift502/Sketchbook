@@ -3,7 +3,9 @@ import * as CANNON from 'cannon';
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { EntityType } from '../enums/EntityType';
 export declare class Airplane extends Vehicle implements IControllable, IWorldEntity {
+    entityType: EntityType;
     rotor: THREE.Object3D;
     leftAileron: THREE.Object3D;
     rightAileron: THREE.Object3D;

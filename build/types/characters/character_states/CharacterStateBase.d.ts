@@ -16,4 +16,5 @@ export declare abstract class CharacterStateBase implements ICharacterState {
     animationEnded(timeStep: number): boolean;
     setAppropriateDropState(): void;
     setAppropriateStartWalkState(): void;
+    protected playAnimation(animName: string, fadeIn: number): void;
 }

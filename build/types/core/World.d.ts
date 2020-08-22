@@ -7,13 +7,13 @@ import { Stats } from '../../lib/utils/Stats';
 import { InputManager } from './InputManager';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
-import { Sky } from '../entities/Sky';
-import { Path } from '../data/Path';
+import { Sky } from './Sky';
+import { Path } from './Path';
 import { LoadingManager } from './LoadingManager';
 import { LoadingScreen } from '../ui/LoadingScreen';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
-import { Scenario } from '../data/Scenario';
+import { Scenario } from './Scenario';
 import { CustomConsole } from '../ui/CustomConsole';
 export declare class World {
     renderer: THREE.WebGLRenderer;
