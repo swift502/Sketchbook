@@ -10,6 +10,7 @@ import { SeatType } from '../../../enums/SeatType';
 import { Driving } from './Driving';
 import { Sitting } from './Sitting';
 import * as Utils from '../../../core/FunctionLibrary';
+import { Space } from '../../../enums/Space';
 
 export class SwitchingSeats extends CharacterStateBase
 {
@@ -31,7 +32,7 @@ export class SwitchingSeats extends CharacterStateBase
 		character.leaveSeat();
 		this.character.occupySeat(toSeat);
 
-		const right = Utils.getRight(fromSeat.seatPointObject);
+		const right = Utils.getRight(fromSeat.seatPointObject, Space.Local);
 		const viewVector = toSeat.seatPointObject.position.clone().sub(fromSeat.seatPointObject.position).normalize();
 		const side = right.dot(viewVector) > 0 ? Side.Left : Side.Right;
 
