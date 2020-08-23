@@ -8,6 +8,7 @@ import { KeyBinding } from '../core/KeyBinding';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
 import * as Utils from '../core/FunctionLibrary';
 import { EntityType } from '../enums/EntityType';
+import { World } from '../core/World';
 
 export class Airplane extends Vehicle implements IControllable, IWorldEntity
 {
@@ -26,9 +27,9 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 	private enginePower: number = 0;
 	private lastDrag: number = 0;
 
-	constructor(gltf: any)
+	constructor(gltf: any, materialLibrary: {[mat: string]: THREE.Material})
 	{
-		super(gltf, {
+		super(gltf, materialLibrary, {
 			radius: 0.12,
 			suspensionStiffness: 150,
 			suspensionRestLength: 0.25,

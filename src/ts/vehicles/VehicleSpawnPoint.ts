@@ -26,7 +26,7 @@ export class VehicleSpawnPoint implements ISpawnPoint
 	{
 		world.loadingManager.loadGLTF('build/assets/' + this.type + '.glb', (model: any) =>
 		{
-			let vehicle = this.getNewVehicleByType(model, this.type);
+			let vehicle = this.getNewVehicleByType(model, this.type, world.materialLibrary);
 			vehicle.spawnPoint = this.object;
 
 			let worldPos = new THREE.Vector3();
@@ -42,7 +42,7 @@ export class VehicleSpawnPoint implements ISpawnPoint
 			{
 				world.loadingManager.loadGLTF('build/assets/boxman.glb', (charModel) =>
 				{
-					let character = new Character(charModel);
+					let character = new Character(charModel, world.materialLibrary);
 					world.add(character);
 					character.teleportToVehicle(vehicle, vehicle.seats[0]);
 
@@ -84,13 +84,13 @@ export class VehicleSpawnPoint implements ISpawnPoint
 		});
 	}
 
-	private getNewVehicleByType(model: any, type: string): Vehicle
+	private getNewVehicleByType(model: any, type: string, materialLibrary: {[mat: string]: THREE.Material}): Vehicle
 	{
 		switch (type)
 		{
-			case 'car': return new Car(model);
-			case 'heli': return new Helicopter(model);
-			case 'airplane': return new Airplane(model);
+			case 'car': return new Car(model, materialLibrary);
+			case 'heli': return new Helicopter(model, materialLibrary);
+			case 'airplane': return new Airplane(model, materialLibrary);
 		}
 	}
 }

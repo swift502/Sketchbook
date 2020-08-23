@@ -32,9 +32,9 @@ export class Car extends Vehicle implements IControllable
 	private canTiltForwards: boolean = false;
 	private characterWantsToExit: boolean = false;
 
-	constructor(gltf: any)
+	constructor(gltf: any, materialLibrary: {[mat: string]: THREE.Material})
 	{
-		super(gltf, {
+		super(gltf, materialLibrary, {
 			radius: 0.25,
 			suspensionStiffness: 20,
 			suspensionRestLength: 0.35,

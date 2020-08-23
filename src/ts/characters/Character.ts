@@ -81,11 +81,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	private physicsEnabled: boolean = true;
 
-	constructor(gltf: any)
+	constructor(gltf: any, materialLibrary: {[mat: string]: THREE.Material})
 	{
 		super();
 
-		this.readCharacterData(gltf);
+		this.readCharacterData(gltf, materialLibrary);
 		this.setAnimations(gltf.animations);
 
 		// The visuals group is centered for easy character tilting
@@ -258,13 +258,13 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public readCharacterData(gltf: any): void
+	public readCharacterData(gltf: any, materialLibrary: {[mat: string]: THREE.Material}): void
 	{
 		gltf.scene.traverse((child) => {
 
 			if (child.isMesh)
 			{
-				Utils.setupMeshProperties(child);
+				Utils.setupMeshProperties(child, materialLibrary);
 
 				if (child.material !== undefined)
 				{

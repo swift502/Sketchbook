@@ -32,7 +32,7 @@ export abstract class Vehicle extends THREE.Object3D
 
 	private firstPerson: boolean = false;
 
-	constructor(gltf: any, handlingSetup?: any)
+	constructor(gltf: any, materialLibrary: {[mat: string]: THREE.Material}, handlingSetup?: any)
 	{
 		super();
 
@@ -50,7 +50,7 @@ export abstract class Vehicle extends THREE.Object3D
 		this.collision.material = mat;
 
 		// Read GLTF
-		this.readVehicleData(gltf);
+		this.readVehicleData(gltf, materialLibrary);
 
 		this.modelContainer = new THREE.Group();
 		this.add(this.modelContainer);
@@ -362,13 +362,13 @@ export abstract class Vehicle extends THREE.Object3D
 		}
 	}
 
-	public readVehicleData(gltf: any): void
+	public readVehicleData(gltf: any, materialLibrary: {[mat: string]: THREE.Material}): void
 	{
 		gltf.scene.traverse((child) => {
 
 			if (child.isMesh)
 			{
-				Utils.setupMeshProperties(child);
+				Utils.setupMeshProperties(child, materialLibrary);
 
 				if (child.material !== undefined)
 				{

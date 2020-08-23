@@ -15,9 +15,9 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 	public rotors: THREE.Object3D[] = [];
 	private enginePower: number = 0;
 
-	constructor(gltf: any)
+	constructor(gltf: any, materialLibrary: {[mat: string]: THREE.Material})
 	{
-		super(gltf);
+		super(gltf, materialLibrary);
 
 		this.readHelicopterData(gltf);
 

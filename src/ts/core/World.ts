@@ -31,7 +31,6 @@ import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { CustomConsole } from '../ui/CustomConsole';
-import { times } from 'lodash';
 
 export class World
 {
@@ -40,6 +39,7 @@ export class World
 	public composer: EffectComposer;
 	public stats: Stats;
 	public graphicsWorld: THREE.Scene;
+	public materialLibrary: {[mat: string]: THREE.Material} = {};
 	public sky: Sky;
 	public physicsWorld: CANNON.World;
 	public parallelPairs: any[];
@@ -389,7 +389,7 @@ export class World
 			{
 				if (child.type === 'Mesh')
 				{
-					Utils.setupMeshProperties(child);
+					Utils.setupMeshProperties(child, this.materialLibrary);
 					this.csm.setupMaterial(child.material);
 
 					if (child.material.name === 'grass')

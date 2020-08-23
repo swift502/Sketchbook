@@ -270,23 +270,34 @@ export function cannonQuat(quat: THREE.Quaternion): CANNON.Quaternion
 	return new CANNON.Quaternion(quat.x, quat.y, quat.z, quat.w);
 }
 
-export function setupMeshProperties(child: any): void
+export function setupMeshProperties(child: any, materialLibrary: {[mat: string]: THREE.Material}): void
 {
 	child.castShadow = true;
 	child.receiveShadow = true;
 
+	console.log(Object.keys(materialLibrary).length);
+
 	if (child.material.map !== null)
 	{
-		let mat = new THREE.MeshPhongMaterial();
-		mat.shininess = 0;
-		mat.name = child.material.name;
-		mat.map = child.material.map;
-		mat.map.anisotropy = 4;
-		mat.aoMap = child.material.aoMap;
-		mat.transparent = child.material.transparent;
-		mat.skinning = child.material.skinning;
-		// mat.map.encoding = THREE.LinearEncoding;
-		child.material = mat;
+		const name = child.material.name;
+		if (name in materialLibrary)
+		{
+			child.material = materialLibrary[name];
+		}
+		else
+		{
+			let mat = new THREE.MeshPhongMaterial();
+			mat.name = name;
+			mat.map = child.material.map;
+			mat.map.anisotropy = 4;
+			mat.shininess = 0;
+			mat.aoMap = child.material.aoMap;
+			mat.transparent = child.material.transparent;
+			mat.skinning = child.material.skinning;
+			// mat.map.encoding = THREE.LinearEncoding;
+			child.material = mat;
+			materialLibrary[name] = mat;
+		}
 	}
 }
 

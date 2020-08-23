@@ -16,7 +16,7 @@ export class CharacterSpawnPoint implements ISpawnPoint
 	{
 		world.loadingManager.loadGLTF('build/assets/boxman.glb', (model) =>
 		{
-			let player = new Character(model);
+			let player = new Character(model, world.materialLibrary);
 			
 			let worldPos = new THREE.Vector3();
 			this.object.getWorldPosition(worldPos);
