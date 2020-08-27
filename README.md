@@ -7,7 +7,7 @@
 
 [![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
 [![badge](https://img.shields.io/travis/swift502/sketchbook?style=flat-square)](https://travis-ci.org/swift502/Sketchbook)
-[![badge](https://img.shields.io/discord/730763393325334628?label=discord&logo=discord&style=flat-square)](https://discord.gg/kRjrd4b)
+[![badge](https://img.shields.io/discord/730763393325334628?label=discord&logo=discord&style=flat-square)](https://discord.gg/fGuEqCe)
 
 
 # 📒 Sketchbook
@@ -15,8 +15,6 @@
 Simple web based game engine built on [three.js](https://github.com/mrdoob/three.js) and [cannon.js](https://github.com/schteppe/cannon.js) focused on third-person character controls and related gameplay mechanics.
 
 Mostly a playground for exploring how conventional third person gameplay mechanics found in modern games work and recreating them in a general way.
-
-If you have any further questions about the project, feel free create an issue or stop by our discord server https://discord.gg/kRjrd4b.
 
 ## Features
 
