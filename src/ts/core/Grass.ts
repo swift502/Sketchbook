@@ -3,7 +3,7 @@ import { Noise } from '../../lib/utils/perlin.js';
 import { GrassShader } from '../../lib/shaders/GrassShader';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { World } from './World';
-import { LOD } from 'three';
+import { LOD, IUniform } from 'three';
 
 export class Grass implements IWorldEntity
 {
@@ -167,8 +167,8 @@ export class Grass implements IWorldEntity
 			uniforms: {
 				map: { value: texture },
 				alphaMap: { value: alphaMap },
-				time: { type: 'float', value: 0 },
-				playerPos: { type: 'vec3', value: new THREE.Vector3() }
+				time: { type: 'float', value: 0 } as IUniform,
+				playerPos: { type: 'vec3', value: new THREE.Vector3() } as IUniform
 			},
 			vertexShader: GrassShader.vertexShader,
 			fragmentShader: GrassShader.fragmentShader,

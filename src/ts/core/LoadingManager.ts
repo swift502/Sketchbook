@@ -114,6 +114,8 @@ export class LoadingManager
 		{
 			document.getElementById('progress-text').innerText = text;
 		}
+
+		this.world.loadingScreen.displayStartBtn();
 	}
 
 	private getLoadingPercentage(): number

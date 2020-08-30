@@ -53,7 +53,6 @@ export let WaterShader = {
     const int NUM_STEPS = 8;
     const float PI	 	= 3.1415;
     const float EPSILON	= 1e-3;
-    float EPSILON_NRM	= 0.1 / iResolution.x;
   
     // sea variables
     const int ITER_GEOMETRY = 3;
@@ -64,7 +63,6 @@ export let WaterShader = {
     const float SEA_FREQ = 0.16;
     const vec3 SEA_BASE = vec3(0.1,0.19,0.22);
     const vec3 SEA_WATER_COLOR = vec3(0.8,0.9,0.6);
-    float SEA_TIME = iGlobalTime * SEA_SPEED;
     mat2 octave_m = mat2(1.6,1.2,-1.2,1.6);
   
     mat3 fromEuler(vec3 ang) {
@@ -140,6 +138,7 @@ export let WaterShader = {
       vec2 uv = p.xz; 
       uv.x *= 0.75;
   
+	  float SEA_TIME = iGlobalTime * SEA_SPEED;
       float d, h = 0.0;    
       for(int i = 0; i < ITER_GEOMETRY; i++) {        
         d = sea_octave((uv + SEA_TIME) * freq, choppy);
@@ -160,6 +159,7 @@ export let WaterShader = {
         vec2 uv = p.xz;
         uv.x *= 0.75;
   
+		float SEA_TIME = iGlobalTime * SEA_SPEED;
         float d, h = 0.0;    
         for(int i = 0; i < ITER_FRAGMENT; i++) {        
           d = sea_octave((uv+SEA_TIME) * freq, choppy);
@@ -254,7 +254,8 @@ export let WaterShader = {
       // tracing
       vec3 p;
       heightMapTracing(cameraPos,dir,p);
-      vec3 dist = vWorldPosition - cameraPos;
+	  vec3 dist = vWorldPosition - cameraPos;
+	  float EPSILON_NRM	= 0.1 / iResolution.x;
       vec3 n = getNormal(
         p,
         dot(dist,dist) * EPSILON_NRM

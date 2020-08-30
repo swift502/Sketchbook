@@ -3,10 +3,10 @@ import * as CANNON from 'cannon';
 
 import { CameraOperator } from './CameraOperator';
 import { FXAAShader } from '../../lib/shaders/FXAAShader';
-import EffectComposer, {
-	RenderPass,
-	ShaderPass,
-} from '@johh/three-effectcomposer';
+// import EffectComposer, {
+// 	RenderPass,
+// 	ShaderPass,
+// } from '@johh/three-effectcomposer';
 import { default as CSM } from 'three-csm';
 
 import { WaterShader } from '../../lib/shaders/WaterShader';
@@ -37,7 +37,7 @@ export class World
 {
 	public renderer: THREE.WebGLRenderer;
 	public camera: THREE.PerspectiveCamera;
-	public composer: EffectComposer;
+	// public composer: EffectComposer;
 	public stats: Stats;
 	public graphicsWorld: THREE.Scene;
 	public sky: Sky;
@@ -95,8 +95,8 @@ export class World
 			scope.camera.aspect = window.innerWidth / window.innerHeight;
 			scope.camera.updateProjectionMatrix();
 			scope.renderer.setSize(window.innerWidth, window.innerHeight);
-			effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
-			scope.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
+			// effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
+			// scope.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
 		}
 		window.addEventListener('resize', onWindowResize, false);
 
@@ -110,19 +110,17 @@ export class World
 		this.sky = new Sky(this);
 		this.graphicsWorld.add(this.sky);
 
-		let splitsCallback = (amount, near, far) =>
+		let splitsCallback = (amount, near, far, target) =>
 		{
-			return [
-				Math.pow(1 / 3, 3),
-				Math.pow(1 / 3, 2),
-				Math.pow(1 / 3, 1),
-				Math.pow(1 / 3, 0)
-			];
+			for (let i = amount - 1; i >= 0; i--)
+			{
+				target.push(Math.pow(1 / 3, i));
+			}
 		};
 
 		this.csm = new CSM({
 			fov: 80,
-			far: 300,
+			maxFar: 300,
 			lightIntensity: 2.5,
 			cascades: 4,
 			shadowMapSize: 2048,
@@ -131,16 +129,17 @@ export class World
 			mode: 'custom',
 			customSplitsCallback: splitsCallback
 		});
+		this.csm.fade = true;
 
 		// FXAA
-		let effectFXAA = new ShaderPass(FXAAShader);
-		let dpr = (window.devicePixelRatio !== undefined) ? window.devicePixelRatio : 1;
-		effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
+		// let effectFXAA = new ShaderPass(FXAAShader);
+		// let dpr = (window.devicePixelRatio !== undefined) ? window.devicePixelRatio : 1;
+		// effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
 
 		// Setup composer
-		this.composer = new EffectComposer(this.renderer);
-		this.composer.addPass(new RenderPass(this.graphicsWorld, this.camera));
-		this.composer.addPass(effectFXAA);
+		// this.composer = new EffectComposer(this.renderer);
+		// this.composer.addPass(new RenderPass(this.graphicsWorld, this.camera));
+		// this.composer.addPass(effectFXAA);
 
 		// Physics
 		this.physicsWorld = new CANNON.World();
@@ -237,8 +236,6 @@ export class World
 			{
 				this['grassMat'].uniforms.playerPos.value.copy(this.characters[0].position);
 			}
-
-			// console.log(this['grassMat'].uniforms.playerPos.value);
 		}
 
 		this.sky.update();
@@ -357,8 +354,8 @@ export class World
 			this.sinceLastFrame %= interval;
 
 			// Actual rendering with a FXAA ON/OFF switch
-			if (this.params.FXAA) this.composer.render();
-			else this.renderer.render(this.graphicsWorld, this.camera);
+			// if (this.params.FXAA) this.composer.render();
+			/*else*/ this.renderer.render(this.graphicsWorld, this.camera);
 
 			// Stats end
 			this.stats.end();
