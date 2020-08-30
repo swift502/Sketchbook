@@ -94,7 +94,7 @@ export class World
 			scope.camera.aspect = window.innerWidth / window.innerHeight;
 			scope.camera.updateProjectionMatrix();
 			scope.renderer.setSize(window.innerWidth, window.innerHeight);
-			fxaaPass.uniforms.resolution.value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
+			fxaaPass.uniforms['resolution'].value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
 			scope.composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
 		}
 		window.addEventListener('resize', onWindowResize, false);
@@ -109,17 +109,29 @@ export class World
 		this.sky = new Sky(this);
 		this.graphicsWorld.add(this.sky);
 
-		let splitsCallback = (amount, near, far, target) =>
+		// let splitsCallback = (amount, near, far, target) =>
+		// {
+		// 	for (let i = amount - 1; i >= 0; i--)
+		// 	{
+		// 		target.push(Math.pow(1 / 3, i));
+		// 	}
+		// };
+
+		let splitsCallback = (amount, near, far) =>
 		{
+			let arr = [];
+
 			for (let i = amount - 1; i >= 0; i--)
 			{
-				target.push(Math.pow(1 / 3, i));
+				arr.push(Math.pow(1 / 3, i));
 			}
+
+			return arr;
 		};
 
 		this.csm = new CSM({
 			fov: 80,
-			maxFar: 300,
+			far: 300,	// maxFar
 			lightIntensity: 2.5,
 			cascades: 4,
 			shadowMapSize: 2048,
@@ -136,8 +148,8 @@ export class World
 
 		// FXAA
 		let pixelRatio = this.renderer.getPixelRatio();
-		fxaaPass.material.uniforms.resolution.value.x = 1 / ( window.innerWidth * pixelRatio );
-		fxaaPass.material.uniforms.resolution.value.y = 1 / ( window.innerHeight * pixelRatio );
+		fxaaPass.material['uniforms'].resolution.value.x = 1 / ( window.innerWidth * pixelRatio );
+		fxaaPass.material['uniforms'].resolution.value.y = 1 / ( window.innerHeight * pixelRatio );
 
 		// Composer
 		this.composer = new EffectComposer( this.renderer );
