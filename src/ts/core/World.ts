@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 import { CameraOperator } from './CameraOperator';
-import { FXAAShader } from '../../lib/shaders/FXAAShader';
-// import EffectComposer, {
-// 	RenderPass,
-// 	ShaderPass,
-// } from '@johh/three-effectcomposer';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
+import { FXAAShader  } from 'three/examples/jsm/shaders/FXAAShader';
 import { default as CSM } from 'three-csm';
 
 import { WaterShader } from '../../lib/shaders/WaterShader';
@@ -31,13 +31,12 @@ import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { CustomConsole } from '../ui/CustomConsole';
-import { times } from 'lodash';
 
 export class World
 {
 	public renderer: THREE.WebGLRenderer;
 	public camera: THREE.PerspectiveCamera;
-	// public composer: EffectComposer;
+	public composer: any;
 	public stats: Stats;
 	public graphicsWorld: THREE.Scene;
 	public sky: Sky;
@@ -95,8 +94,8 @@ export class World
 			scope.camera.aspect = window.innerWidth / window.innerHeight;
 			scope.camera.updateProjectionMatrix();
 			scope.renderer.setSize(window.innerWidth, window.innerHeight);
-			// effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
-			// scope.composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
+			fxaaPass.uniforms.resolution.value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
+			scope.composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
 		}
 		window.addEventListener('resize', onWindowResize, false);
 
@@ -131,15 +130,19 @@ export class World
 		});
 		this.csm.fade = true;
 
-		// FXAA
-		// let effectFXAA = new ShaderPass(FXAAShader);
-		// let dpr = (window.devicePixelRatio !== undefined) ? window.devicePixelRatio : 1;
-		// effectFXAA.uniforms.resolution.value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
+		// Passes
+		let renderPass = new RenderPass( this.graphicsWorld, this.camera );
+		let fxaaPass = new ShaderPass( FXAAShader );
 
-		// Setup composer
-		// this.composer = new EffectComposer(this.renderer);
-		// this.composer.addPass(new RenderPass(this.graphicsWorld, this.camera));
-		// this.composer.addPass(effectFXAA);
+		// FXAA
+		let pixelRatio = this.renderer.getPixelRatio();
+		fxaaPass.material.uniforms.resolution.value.x = 1 / ( window.innerWidth * pixelRatio );
+		fxaaPass.material.uniforms.resolution.value.y = 1 / ( window.innerHeight * pixelRatio );
+
+		// Composer
+		this.composer = new EffectComposer( this.renderer );
+		this.composer.addPass( renderPass );
+		this.composer.addPass( fxaaPass );
 
 		// Physics
 		this.physicsWorld = new CANNON.World();
@@ -354,8 +357,8 @@ export class World
 			this.sinceLastFrame %= interval;
 
 			// Actual rendering with a FXAA ON/OFF switch
-			// if (this.params.FXAA) this.composer.render();
-			/*else*/ this.renderer.render(this.graphicsWorld, this.camera);
+			if (this.params.FXAA) this.composer.render();
+			else this.renderer.render(this.graphicsWorld, this.camera);
 
 			// Stats end
 			this.stats.end();
