@@ -1,14 +1,9 @@
-const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const path = require('path');
 
 module.exports = {
-	optimization: {
-		minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
-	},
 	plugins: [new MiniCssExtractPlugin({
-		filename: 'style.min.css',
+		filename: './build/style.min.css',
 	})],
     entry: {
 		app: './src/ts/sketchbook.ts'

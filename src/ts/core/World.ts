@@ -29,7 +29,8 @@ import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
-import { CustomConsole } from '../ui/CustomConsole';
+import { CustomConsole } from './CustomConsole';
+import { LoadingScreenMode } from '../enums/LoadingScreenMode';
 
 export class World
 {
@@ -55,8 +56,6 @@ export class World
 	public cameraOperator: CameraOperator;
 	public timeScaleTarget: number = 1;
 	public csm: CSM;
-	public loadingManager: LoadingManager;
-	public loadingScreen: LoadingScreen;
 	public customConsole: CustomConsole;
 	public cannonDebugRenderer: CannonDebugRenderer;
 	public scenarios: Scenario[] = [];
@@ -67,7 +66,7 @@ export class World
 
 	private lastScenarioID: string;
 
-	constructor()
+	constructor(path?: any)
 	{
 		const scope = this;
 
@@ -200,10 +199,19 @@ export class World
 		// Initialization
 		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
 		this.inputManager = new InputManager(this, this.renderer.domElement);
-		this.loadingManager = new LoadingManager(this);
+
+		if (path !== undefined)
+		{
+			let loadingManager = new LoadingManager(LoadingScreenMode.Full);
+			loadingManager.loadGLTF(path, (gltf) =>
+				{
+					this.loadScene(loadingManager, gltf);
+				}
+			);
+		}
 
 		// UI
-		this.loadingScreen = new LoadingScreen(this);
+		// this.loadingScreen = new LoadingScreen(this);
 		this.customConsole = new CustomConsole();
 
 		this.render(this);
@@ -228,7 +236,6 @@ export class World
 		});
 
 		this.inputManager.update(timeStep, unscaledTimeStep);
-		this.loadingManager.update(unscaledTimeStep);
 
 		// Lerp parameters
 		this.params.Time_Scale = THREE.MathUtils.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
@@ -393,7 +400,7 @@ export class World
 		object.removeFromWorld(this);
 	}
 
-	public loadScene(gltf: any): void
+	public loadScene(loadingManager: LoadingManager, gltf: any): void
 	{
 		gltf.scene.traverse((child) => {
 			if (child.hasOwnProperty('userData'))
@@ -479,7 +486,7 @@ export class World
 		for (const scenario of this.scenarios) {
 			if (scenario.default || scenario.spawnAlways) {
 				if (scenario.default) this.lastScenarioID = scenario.id;
-				scenario.launch(this);
+				scenario.launch(loadingManager, this);
 			}
 		}
 	}
@@ -491,9 +498,10 @@ export class World
 		this.clearEntities();
 
 		// Launch default scenario
+		let loadingManager = new LoadingManager(LoadingScreenMode.Overlay);
 		for (const scenario of this.scenarios) {
 			if (scenario.id === scenarioID || scenario.spawnAlways) {
-				scenario.launch(this);
+				scenario.launch(loadingManager, this);
 			}
 		}
 	}

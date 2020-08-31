@@ -3,13 +3,13 @@
 			perspective: 800px;
 	width: 300px;
 	overflow: hidden;
-	position: absolute;
+	/* position: absolute; */
 	-webkit-animation: bouncy 2s ease forwards;
 			animation: bouncy 2s ease forwards;
   }
   
   .cube {
-	margin: 8em auto;
+	margin: 3em auto;
 	width: 6em;
 	height: 6em;
 	-webkit-transform-style: preserve-3d;

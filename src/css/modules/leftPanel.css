@@ -51,8 +51,3 @@
 	margin-left: 5px;
 	/* font-size: 18px; */
 }
-
-#scenarios li:hover {
-	text-decoration: underline;
-	cursor: pointer;
-}

@@ -2,6 +2,7 @@ import { ISpawnPoint } from '../interfaces/ISpawnPoint';
 import { VehicleSpawnPoint } from '../vehicles/VehicleSpawnPoint';
 import { CharacterSpawnPoint } from '../characters/CharacterSpawnPoint';
 import { World } from './World';
+import { LoadingManager } from './LoadingManager';
 
 export class Scenario
 {
@@ -88,10 +89,10 @@ export class Scenario
 		this.world.scenarioGUIFolder.add(this.world.params, this.name);
 	}
 
-	public launch(world: World): void
+	public launch(loadingManager: LoadingManager, world: World): void
 	{
 		this.spawnPoints.forEach((sp) => {
-			sp.spawn(world);
+			sp.spawn(loadingManager, world);
 		});
 	}
 }
