@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
+import Swal from 'sweetalert2';
 
 import { CameraOperator } from './CameraOperator';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -30,6 +31,7 @@ import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { CustomConsole } from './CustomConsole';
 import { LoadingScreenMode } from '../enums/LoadingScreenMode';
+import { UIManager } from './UIManager';
 
 export class World
 {
@@ -70,9 +72,13 @@ export class World
 		const scope = this;
 
 		// WebGL not supported
-		if (!Detector.webgl)
+		if (!Detector.webgl || true)
 		{
-			Detector.addGetWebGLMessage();
+			Swal.fire(
+				'WebGL compatibility',
+				'This browser doesn\'t seem to have the required WebGL capabilities. The application may not work correctly. <a href="https://get.webgl.org/" target="_blank">Click here for more information</a>.',
+				'warning'
+			);
 		}
 
 		// Renderer
@@ -207,6 +213,11 @@ export class World
 					this.loadScene(loadingManager, gltf);
 				}
 			);
+		}
+		else
+		{
+			UIManager.setUserInterfaceVisible(true);
+			UIManager.setLoadingScreenVisible(false);
 		}
 
 		// UI

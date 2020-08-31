@@ -1,7 +1,7 @@
 {
   "name": "sketchbook",
   "version": "0.4.0",
-  "description": "Three.js and Cannon.js sandbox",
+  "description": "3D playground built on three.js and cannon.js",
   "keywords": [
     "3d",
     "threejs",
@@ -25,9 +25,9 @@
   "author": "swift502 <blaha.j502@gmail.com> (http://jblaha.art/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/swift502/sketchbook/issues"
+    "url": "https://github.com/swift502/Sketchbook/issues"
   },
-  "homepage": "https://github.com/swift502/sketchbook",
+  "homepage": "https://github.com/swift502/Sketchbook",
   "devDependencies": {
     "@types/dat.gui": "^0.7.5",
     "@types/lodash": "^4.14.149",
@@ -37,6 +37,7 @@
     "mini-css-extract-plugin": "^0.11.0",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "style-loader": "^1.0.2",
+    "sweetalert2": "^9.17.1",
     "three": "^0.113.0",
     "three-csm": "^1.0.2",
     "ts-loader": "^6.2.1",
