@@ -20,22 +20,22 @@
 }(this, (function () {
     'use strict';
 
-    function ___$insertStyle(css) {
-        if (!css) {
-            return;
-        }
-        if (typeof window === 'undefined') {
-            return;
-        }
+    // function ___$insertStyle(css) {
+    //     if (!css) {
+    //         return;
+    //     }
+    //     if (typeof window === 'undefined') {
+    //         return;
+    //     }
 
-        var style = document.createElement('style');
+    //     var style = document.createElement('style');
 
-        style.setAttribute('type', 'text/css');
-        style.innerHTML = css;
-        document.head.appendChild(style);
+    //     style.setAttribute('type', 'text/css');
+    //     style.innerHTML = css;
+    //     document.head.appendChild(style);
 
-        return css;
-    }
+    //     return css;
+    // }
 
     function colorToString(color, forceCSSHex) {
         var colorFormat = color.__state.conversionName.toString();

@@ -11,7 +11,6 @@ export var Stats = function () {
 	var container = document.createElement('div');
     container.classList.add('statsBox');
 	document.getElementById('ui-container').appendChild(container);
-	console.log(document.getElementById('ui-container').children);
     // container.addEventListener('click', function (event) {
 
     //     event.preventDefault();
@@ -37,8 +36,6 @@ export var Stats = function () {
         mode = id;
 
     }
-
-    //
 
     var beginTime = (performance || Date).now(),
         prevTime = beginTime,

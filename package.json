@@ -34,6 +34,8 @@
     "@types/stats": "^0.16.30",
     "css-loader": "^3.4.0",
     "lodash": "^4.17.19",
+    "mini-css-extract-plugin": "^0.11.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.4",
     "style-loader": "^1.0.2",
     "three": "^0.113.0",
     "three-csm": "^1.0.2",

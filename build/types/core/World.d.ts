@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { CameraOperator } from './CameraOperator';
-import EffectComposer from '@johh/three-effectcomposer';
 import { default as CSM } from 'three-csm';
 import { Stats } from '../../lib/utils/Stats';
 import { InputManager } from './InputManager';
@@ -18,7 +17,7 @@ import { CustomConsole } from '../ui/CustomConsole';
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.PerspectiveCamera;
-    composer: EffectComposer;
+    composer: any;
     stats: Stats;
     graphicsWorld: THREE.Scene;
     sky: Sky;
@@ -30,6 +29,7 @@ export declare class World {
     clock: THREE.Clock;
     renderDelta: number;
     logicDelta: number;
+    requestDelta: number;
     sinceLastFrame: number;
     justRendered: boolean;
     params: any;
@@ -45,6 +45,7 @@ export declare class World {
     characters: Character[];
     vehicles: Vehicle[];
     paths: Path[];
+    scenarioGUIFolder: any;
     private lastScenarioID;
     constructor();
     update(timeStep: number, unscaledTimeStep: number): void;
