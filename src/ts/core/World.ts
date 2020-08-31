@@ -72,7 +72,7 @@ export class World
 		const scope = this;
 
 		// WebGL not supported
-		if (!Detector.webgl || true)
+		if (!Detector.webgl)
 		{
 			Swal.fire(
 				'WebGL compatibility',
