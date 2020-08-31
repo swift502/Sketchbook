@@ -1,4 +1,5 @@
 import { World } from './World';
+import { LoadingManager } from './LoadingManager';
 export declare class Scenario {
     id: string;
     name: string;
@@ -10,5 +11,5 @@ export declare class Scenario {
     private world;
     constructor(root: THREE.Object3D, world: World);
     createLaunchLink(): void;
-    launch(world: World): void;
+    launch(loadingManager: LoadingManager, world: World): void;
 }

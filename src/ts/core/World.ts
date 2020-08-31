@@ -23,7 +23,6 @@ import { Grass } from './Grass';
 import { Path } from './Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { LoadingManager } from './LoadingManager';
-import { LoadingScreen } from '../ui/LoadingScreen';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';

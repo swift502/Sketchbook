@@ -9,11 +9,10 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import { Path } from './Path';
 import { LoadingManager } from './LoadingManager';
-import { LoadingScreen } from '../ui/LoadingScreen';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
-import { CustomConsole } from '../ui/CustomConsole';
+import { CustomConsole } from './CustomConsole';
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.PerspectiveCamera;
@@ -37,8 +36,6 @@ export declare class World {
     cameraOperator: CameraOperator;
     timeScaleTarget: number;
     csm: CSM;
-    loadingManager: LoadingManager;
-    loadingScreen: LoadingScreen;
     customConsole: CustomConsole;
     cannonDebugRenderer: CannonDebugRenderer;
     scenarios: Scenario[];
@@ -47,7 +44,7 @@ export declare class World {
     paths: Path[];
     scenarioGUIFolder: any;
     private lastScenarioID;
-    constructor();
+    constructor(path?: any);
     update(timeStep: number, unscaledTimeStep: number): void;
     updatePhysics(timeStep: number): void;
     isOutOfBounds(position: CANNON.Vec3): boolean;
@@ -62,7 +59,7 @@ export declare class World {
     setTimeScale(value: number): void;
     add(object: IWorldEntity): void;
     remove(object: IWorldEntity): void;
-    loadScene(gltf: any): void;
+    loadScene(loadingManager: LoadingManager, gltf: any): void;
     launchScenario(scenarioID: string): void;
     restartScenario(): void;
     clearEntities(): void;

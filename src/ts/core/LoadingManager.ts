@@ -1,6 +1,7 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LoadingTrackerEntry } from './LoadingTrackerEntry';
 import { LoadingScreenMode } from '../enums/LoadingScreenMode';
+import { UIManager } from './UIManager';
 
 export class LoadingManager
 {
@@ -15,10 +16,9 @@ export class LoadingManager
 	{
 		this.gltfLoader = new GLTFLoader();
 
-		document.getElementById('main-title').style.display = mode === LoadingScreenMode.Full ? 'block' : 'none';
-		document.getElementById('loading-screen-background').style.display = mode === LoadingScreenMode.Full ? 'block' : 'none';
-		document.getElementById('ui-container').style.display = 'none';
-		document.getElementById('loading-screen').style.display = 'flex';
+		UIManager.setLoadingScreenMode(mode);
+		UIManager.setUserInterfaceVisible(false);
+		UIManager.setLoadingScreenVisible(true);
 	}
 
 	public loadGLTF(path: string, onLoadingFinished: (gltf: any) => void): void
@@ -59,8 +59,8 @@ export class LoadingManager
 
 		if (this.isLoadingDone())
 		{
-			document.getElementById('ui-container').style.display = 'block';
-			document.getElementById('loading-screen').style.display = 'none';
+			UIManager.setLoadingScreenVisible(false);
+			UIManager.setUserInterfaceVisible(true);
 
 			if (this.onFinishedCallback !== undefined) this.onFinishedCallback();
 		}
