@@ -21,12 +21,12 @@ export class Sitting extends CharacterStateBase
 
 		this.character.world.updateControls([
 			{
-				keys: ['F'],
-				desc: 'Leave seat',
-			},
-			{
 				keys: ['X'],
 				desc: 'Switch seats',
+			},
+			{
+				keys: ['F'],
+				desc: 'Leave seat',
 			}
 		]);
 		
@@ -49,6 +49,7 @@ export class Sitting extends CharacterStateBase
 				{
 					if (possibleDriverSeat.type === SeatType.Driver)
 					{
+						if (this.seat.door?.rotation > 0) this.seat.door.physicsEnabled = true;
 						this.character.setState(new SwitchingSeats(this.character, this.seat, possibleDriverSeat));
 						break;
 					}

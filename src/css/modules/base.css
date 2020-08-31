@@ -4,8 +4,12 @@ body {
     background-color: #ffffff;
     overflow: hidden;
     margin: 0;
-    font-family: 'Averia Libre', cursive;
-    font-size: larger;
+	/* font-family: 'Averia Libre', cursive; */
+	/* font-family: 'Hammersmith One', sans-serif; */
+	/* font-family: 'Allerta Stencil', sans-serif; */
+	font-family: 'Allerta', sans-serif;
+	/* font-family: 'Jua', sans-serif; */
+    /* font-size: larger; */
     color: white;
     text-shadow: 1px 1px 1px #000, 0px 1px 3px #000;
 }
@@ -16,7 +20,9 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-weight: bold;
+	font-family: 'Patua One', cursive;
+	/* font-family: 'Allerta Stencil', sans-serif; */
+	font-weight: normal;
 }
 
 #canvas {

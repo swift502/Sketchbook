@@ -81,11 +81,11 @@ export class Scenario
 
 	public createLaunchLink(): void
 	{
-		let li = document.createElement('li');
-		li.innerText = this.name;
-		li.setAttribute('onclick', `world.launchScenario('${this.id}');`);
-		
-		document.getElementById('scenarios').append(li);
+		this.world.params[this.name] = () =>
+		{
+			this.world.launchScenario(this.id);
+		};
+		this.world.scenarioGUIFolder.add(this.world.params, this.name);
 	}
 
 	public launch(world: World): void

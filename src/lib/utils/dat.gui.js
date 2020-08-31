@@ -1421,7 +1421,7 @@
                 textAlign: 'center',
                 color: '#fff',
                 border: 0,
-                fontWeight: 'bold',
+                // fontWeight: 'bold',
                 textShadow: _this2.__input_textShadow + 'rgba(0,0,0,0.7)'
             });
             dom.bind(_this2.__saturation_field, 'mousedown', fieldDown);
@@ -1751,7 +1751,7 @@
     var GUI = function GUI(pars) {
         var _this = this;
         var params = pars || {};
-        this.domElement = document.createElement('div');
+		this.domElement = document.createElement('div');
         this.__ul = document.createElement('ul');
         this.domElement.appendChild(this.__ul);
         dom.addClass(this.domElement, CSS_NAMESPACE);
@@ -1932,10 +1932,11 @@
         if (params.autoPlace) {
             if (Common.isUndefined(params.parent)) {
                 if (autoPlaceVirgin) {
-                    autoPlaceContainer = document.createElement('div');
+					autoPlaceContainer = document.createElement('div');
                     dom.addClass(autoPlaceContainer, CSS_NAMESPACE);
                     dom.addClass(autoPlaceContainer, GUI.CLASS_AUTO_PLACE_CONTAINER);
-                    document.body.appendChild(autoPlaceContainer);
+					// document.body.appendChild(autoPlaceContainer);
+					document.getElementById('ui-container').appendChild(autoPlaceContainer);
                     autoPlaceVirgin = false;
                 }
                 autoPlaceContainer.appendChild(this.domElement);
@@ -1990,7 +1991,7 @@
     GUI.CLASS_CLOSE_TOP = 'close-top';
     GUI.CLASS_CLOSE_BOTTOM = 'close-bottom';
     GUI.CLASS_DRAG = 'drag';
-    GUI.DEFAULT_WIDTH = 240;
+    GUI.DEFAULT_WIDTH = 300;
     GUI.TEXT_CLOSED = 'Close Controls';
     GUI.TEXT_OPEN = 'Open Controls';
     GUI._keydownHandler = function (e) {

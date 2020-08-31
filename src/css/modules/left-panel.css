@@ -44,7 +44,8 @@
 }
 
 .ctrl-desc {
-    margin-left: 5px;
+	margin-left: 5px;
+	/* font-size: 18px; */
 }
 
 #scenarios li:hover {

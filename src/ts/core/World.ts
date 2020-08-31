@@ -5,7 +5,6 @@ import { CameraOperator } from './CameraOperator';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader  } from 'three/examples/jsm/shaders/FXAAShader';
 import { default as CSM } from 'three-csm';
 
@@ -48,6 +47,7 @@ export class World
 	public clock: THREE.Clock;
 	public renderDelta: number;
 	public logicDelta: number;
+	public requestDelta: number;
 	public sinceLastFrame: number;
 	public justRendered: boolean;
 	public params: any;
@@ -63,6 +63,7 @@ export class World
 	public characters: Character[] = [];
 	public vehicles: Vehicle[] = [];
 	public paths: Path[] = [];
+	public scenarioGUIFolder: any;
 
 	private lastScenarioID: string;
 
@@ -101,7 +102,7 @@ export class World
 
 		// Stats (FPS, Frame time, Memory)
 		this.stats = Stats();
-		document.body.appendChild(this.stats.dom);
+		// document.body.appendChild(this.stats.dom);
 
 		// Three.js scene
 		this.graphicsWorld = new THREE.Scene();
@@ -109,6 +110,7 @@ export class World
 		this.sky = new Sky(this);
 		this.graphicsWorld.add(this.sky);
 
+		// New version
 		// let splitsCallback = (amount, near, far, target) =>
 		// {
 		// 	for (let i = amount - 1; i >= 0; i--)
@@ -117,6 +119,7 @@ export class World
 		// 	}
 		// };
 
+		// Legacy
 		let splitsCallback = (amount, near, far) =>
 		{
 			let arr = [];
@@ -178,19 +181,16 @@ export class World
 		//#region ParamGUI
 
 		// Variables
-		let params = {
+		this.params = {
 			Pointer_Lock: true,
 			Mouse_Sensitivity: 0.3,
-			FPS_Limit: 60,
 			Time_Scale: 1,
 			Shadows: true,
 			FXAA: true,
 			Draw_Physics: false,
-			RayCast_Debug: false,
-			Phi: 60,
-			Theta: 225,
+			Sun_Phi: 60,
+			Sun_Theta: 225,
 		};
-		this.params = params;
 
 		let gui = this.getGUI(scope);
 		gui.open();
@@ -336,24 +336,23 @@ export class World
 	public render(world: World): void
 	{
 		// Stats begin
-		if (this.justRendered)
-		{
-			this.justRendered = false;
-			this.stats.begin();
-		}
+		// if (this.justRendered)
+		// {
+		// 	this.justRendered = false;
+		// 	this.stats.begin();
+		// }
+
+		this.requestDelta = this.clock.getDelta();
 
 		requestAnimationFrame(() =>
 		{
 			world.render(world);
 		});
 
-		// Measuring render time
-		this.renderDelta = this.clock.getDelta();
-
 		// Getting timeStep
-		let unscaledTimeStep = (this.renderDelta + this.logicDelta) ;
+		let unscaledTimeStep = (this.requestDelta + this.renderDelta + this.logicDelta) ;
 		let timeStep = unscaledTimeStep * this.params.Time_Scale;
-		timeStep = Math.min(timeStep, 1 / 30);    // min 15 fps
+		timeStep = Math.min(timeStep, 1 / 30);    // min 30 fps
 
 		// Logic
 		world.update(timeStep, unscaledTimeStep);
@@ -362,20 +361,20 @@ export class World
 		this.logicDelta = this.clock.getDelta();
 
 		// Frame limiting
-		let interval = 1 / this.params.FPS_Limit;
-		this.sinceLastFrame += this.renderDelta + this.logicDelta;
-		if (this.sinceLastFrame > interval)
-		{
-			this.sinceLastFrame %= interval;
+		let interval = 1 / 60;
+		this.sinceLastFrame += this.requestDelta + this.renderDelta + this.logicDelta;
+		this.sinceLastFrame %= interval;
 
-			// Actual rendering with a FXAA ON/OFF switch
-			if (this.params.FXAA) this.composer.render();
-			else this.renderer.render(this.graphicsWorld, this.camera);
+		// Stats end
+		this.stats.end();
+		this.stats.begin();
 
-			// Stats end
-			this.stats.end();
-			this.justRendered = true;
-		}
+		// Actual rendering with a FXAA ON/OFF switch
+		if (this.params.FXAA) this.composer.render();
+		else this.renderer.render(this.graphicsWorld, this.camera);
+
+		// Measuring render time
+		this.renderDelta = this.clock.getDelta();
 	}
 
 	public setTimeScale(value: number): void
@@ -534,14 +533,13 @@ export class World
 			this.timeScaleTarget *= timeScaleChangeSpeed;
 			if (this.timeScaleTarget < timeScaleBottomLimit) this.timeScaleTarget = timeScaleBottomLimit;
 			this.timeScaleTarget = Math.min(this.timeScaleTarget, 1);
-			// if (this.params.Time_Scale > 0.9) this.params.Time_Scale *= timeScaleChangeSpeed;
 		}
 	}
 
 	public updateControls(controls: any): void
 	{
 		let html = '';
-		html += '<h3>Controls:</h3>';
+		html += '<h2>Controls:</h2>';
 
 		controls.forEach((row) =>
 		{
@@ -576,12 +574,6 @@ export class World
 
 		// Graphics
 		let graphicsFolder = gui.addFolder('Rendering');
-		graphicsFolder.add(this.params, 'FPS_Limit', 0, 60);
-		graphicsFolder.add(this.params, 'Time_Scale', 0, 1).listen()
-			.onChange((value) =>
-			{
-				scope.timeScaleTarget = value;
-			});
 		graphicsFolder.add(this.params, 'Shadows')
 			.onChange((enabled) =>
 			{
@@ -601,8 +593,7 @@ export class World
 		graphicsFolder.add(this.params, 'FXAA');
 
 		// Debug
-		let debugFolder = gui.addFolder('Debug');
-		debugFolder.add(this.params, 'Draw_Physics')
+		graphicsFolder.add(this.params, 'Draw_Physics')
 			.onChange((enabled) =>
 			{
 				if (enabled)
@@ -614,29 +605,33 @@ export class World
 					this.cannonDebugRenderer.clearMeshes();
 					this.cannonDebugRenderer = undefined;
 				}
-			});
-		debugFolder.add(this.params, 'RayCast_Debug')
-			.onChange((enabled) =>
-			{
+
 				scope.characters.forEach((char) =>
 				{
-					if (enabled) char.raycastBox.visible = true;
-					else char.raycastBox.visible = false;
+					char.raycastBox.visible = enabled;
 				});
 			});
 			
-		// Debug
-		let skyFolder = gui.addFolder('Sky');
-		skyFolder.add(this.params, 'Phi', 0, 180).listen()
+		// Sky
+		let worldFolder = gui.addFolder('World');
+		worldFolder.add(this.params, 'Time_Scale', 0, 1).listen()
+		.onChange((value) =>
+		{
+			scope.timeScaleTarget = value;
+		});
+		worldFolder.add(this.params, 'Sun_Phi', 0, 180).listen()
 			.onChange((value) =>
 			{
 				scope.sky.phi = value;
 			});
-		skyFolder.add(this.params, 'Theta', 0, 360).listen()
+		worldFolder.add(this.params, 'Sun_Theta', 0, 360).listen()
 			.onChange((value) =>
 			{
 				scope.sky.theta = value;
 			});
+
+		this.scenarioGUIFolder = gui.addFolder('Scenarios');
+		this.scenarioGUIFolder.open();
 
 		return gui;
 	}

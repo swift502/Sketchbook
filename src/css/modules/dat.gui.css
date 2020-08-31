@@ -117,9 +117,9 @@
 
 .dg li:not(.folder) {
     cursor: auto;
-    height: 27px;
-    line-height: 27px;
-    padding: 0 4px 0 5px
+    height: 33px;
+    line-height: 33px;
+    padding: 0 10px 0 10px
 }
 
 .dg li.folder {
@@ -128,6 +128,8 @@
 }
 
 .dg li.title {
+	/* font-family: 'Allerta Stencil', sans-serif; */
+	font-family: 'Patua One', cursive;
     cursor: pointer;
     margin-left: -4px
 }
@@ -148,12 +150,18 @@
 }
 
 .dg .property-name {
+	font-size: 80%;
     cursor: default;
     float: left;
     clear: left;
     width: 40%;
-    overflow: hidden;
+	overflow: hidden;
+	white-space: nowrap;
     text-overflow: ellipsis
+}
+
+.dg .cr.function .property-name {
+	width: 100%;
 }
 
 .dg .c {
@@ -275,8 +283,9 @@
 
 .dg {
     color: #eee;
-    font: 11px 'Lucida Grande', sans-serif;
-    text-shadow: 0 -1px 0 #111
+    /* font-family: 'Cutive Mono', sans-serif; */
+	/* text-shadow: 0 -1px 0 #111 */
+	text-shadow: none;
 }
 
 .dg.main::-webkit-scrollbar {
@@ -340,8 +349,10 @@
 }
 
 .dg li.title {
-    padding-left: 16px;
-    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+	height: 36px;
+	line-height: 36px;
+    padding-left: 20px;
+    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 8px 16px no-repeat;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2)
 }
@@ -425,7 +436,6 @@
     right: 15px;
     opacity: 0.9;
     z-index: 10000;
-    cursor: cell;
 }
 
 .statsBox,

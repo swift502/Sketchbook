@@ -121,9 +121,9 @@ export abstract class Vehicle extends THREE.Object3D
 
 	public onInputChange(): void
 	{
-		if (this.actions.seat_switch.justPressed &&
-			this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
+		if (this.actions.seat_switch.justPressed && this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
 		{
+			this.controllingCharacter.modelContainer.visible = true;
 			this.controllingCharacter.setState(
 				new SwitchingSeats(
 					this.controllingCharacter,

@@ -375,11 +375,11 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		this.world.updateControls([
 			{
 				keys: ['Shift'],
-				desc: 'Speed up'
+				desc: 'Accelerate'
 			},
 			{
 				keys: ['Space'],
-				desc: 'Slow down'
+				desc: 'Decelerate'
 			},
 			{
 				keys: ['W', 'S'],

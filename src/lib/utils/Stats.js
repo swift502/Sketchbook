@@ -8,8 +8,10 @@ export var Stats = function () {
 
     var mode = 0;
 
-    var container = document.createElement('div');
+	var container = document.createElement('div');
     container.classList.add('statsBox');
+	document.getElementById('ui-container').appendChild(container);
+	console.log(document.getElementById('ui-container').children);
     // container.addEventListener('click', function (event) {
 
     //     event.preventDefault();
@@ -118,19 +120,19 @@ Stats.Panel = function (name, fg, bg) {
         round = Math.round;
     var PR = round(window.devicePixelRatio || 1);
 
-    var WIDTH = 80 * PR,
+    var WIDTH = 100 * PR,
         HEIGHT = 48 * PR,
         TEXT_X = 3 * PR,
         TEXT_Y = 2 * PR,
         GRAPH_X = 3 * PR,
         GRAPH_Y = 15 * PR,
-        GRAPH_WIDTH = 74 * PR,
+        GRAPH_WIDTH = 94 * PR,
         GRAPH_HEIGHT = 30 * PR;
 
     var canvas = document.createElement('canvas');
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
-    canvas.style.cssText = 'width:80px;height:48px';
+    canvas.style.cssText = 'width:100px;height:48px';
 
     var context = canvas.getContext('2d');
     context.font = 'bold ' + (9 * PR) + 'px Helvetica,Arial,sans-serif';
