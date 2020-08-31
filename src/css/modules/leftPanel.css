@@ -20,6 +20,10 @@
     justify-content: flex-end;
 }
 
+.controls-title {
+	margin-bottom: 5px;
+}
+
 .ctrl-row {
     margin-bottom: 6px;
     display: flex;

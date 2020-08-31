@@ -4,25 +4,23 @@
 <head>
     <title>Sketchbook 0.4 Alpha</title>
     <link href="https://fonts.googleapis.com/css?family=Cutive+Mono" rel="stylesheet">
-	<!-- <link href="https://fonts.googleapis.com/css2?family=Averia+Libre:wght@300;400;700&display=swap" rel="stylesheet"> -->
-	<link href="https://fonts.googleapis.com/css2?family=Patua+One&display=swap" rel="stylesheet">
-	<!-- <link href="https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap" rel="stylesheet"> -->
-	<link href="https://fonts.googleapis.com/css2?family=Allerta+Stencil&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Allerta&display=swap" rel="stylesheet">
-	<!-- <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet"> -->
+	<link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
     <div id="loading-screen">
-        <div class="text-block">
+        <div class="text-block" style="margin-bottom: 50px;">
             <h1>Sketchbook 0.4</h1>
         </div>
         <div id="loader">
-            <div id="progress">
-                <div id="progress-bar"></div>
-            </div>
-            <div id="progress-text">Loading...</div>
+            <div class="cubeWrap">
+				<div class="cube">
+					<div class="faces1"></div>
+					<div class="faces2"></div>     
+				</div> 
+			</div> 
+            <!-- <div id="progress-text">Loading...</div> -->
         </div>
         <button onclick="world.loadingScreen.hideWelcomeScreen()" id="start-btn" class="button">play</button>
     </div>

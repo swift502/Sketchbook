@@ -129,7 +129,9 @@
 
 .dg li.title {
 	/* font-family: 'Allerta Stencil', sans-serif; */
-	font-family: 'Patua One', cursive;
+	/* font-family: 'Patua One', cursive; */
+	/* font-family: 'Fredoka One', cursive; */
+	font-weight: 600;
     cursor: pointer;
     margin-left: -4px
 }
@@ -150,7 +152,7 @@
 }
 
 .dg .property-name {
-	font-size: 80%;
+	font-size: 85%;
     cursor: default;
     float: left;
     clear: left;

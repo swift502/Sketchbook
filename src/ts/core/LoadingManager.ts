@@ -89,33 +89,33 @@ export class LoadingManager
 			}
 
 			this.loadingTracker = [];
-			document.getElementById('loader').style.display = 'none';
+			// document.getElementById('loader').style.display = 'none';
 			// Display Start Button
-			this.world.loadingScreen.displayStartBtn();
+			// this.world.loadingScreen.displayStartBtn();
 		}
 	}
 
 	public update(timeStep: number): void
 	{
-		let percentage = this.getLoadingPercentage();
-		this.progressBarSimulator.target = percentage;
-		this.progressBarSimulator.simulate(timeStep);
+		// let percentage = this.getLoadingPercentage();
+		// this.progressBarSimulator.target = percentage;
+		// this.progressBarSimulator.simulate(timeStep);
 
-		document.getElementById('progress-bar').style.width = this.progressBarSimulator.position + '%';
+		// document.getElementById('progress-bar').style.width = this.progressBarSimulator.position + '%';
 
-		let text = '';
+		// let text = '';
 
-		for (const item of this.loadingTracker)
-		{
-			text += item.path + (item.finished ? ' finished' : ' loading...') + '\n';
-		}
+		// for (const item of this.loadingTracker)
+		// {
+		// 	text += item.path + (item.finished ? ' finished' : ' loading...') + '\n';
+		// }
 
-		if (document.getElementById('progress-text').innerText !== text)
-		{
-			document.getElementById('progress-text').innerText = text;
-		}
+		// if (document.getElementById('progress-text').innerText !== text)
+		// {
+		// 	document.getElementById('progress-text').innerText = text;
+		// }
 
-		this.world.loadingScreen.displayStartBtn();
+		// this.world.loadingScreen.displayStartBtn();
 	}
 
 	private getLoadingPercentage(): number

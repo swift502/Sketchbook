@@ -539,7 +539,7 @@ export class World
 	public updateControls(controls: any): void
 	{
 		let html = '';
-		html += '<h2>Controls:</h2>';
+		html += '<h2 class="controls-title">Controls:</h2>';
 
 		controls.forEach((row) =>
 		{
