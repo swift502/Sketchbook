@@ -219,8 +219,8 @@ export class World
 				Swal.fire({
 					title: 'Welcome to Sketchbook!',
 					text: 'Feel free to explore the world and interact with available vehicles. There are also various scenarios ready to launch from the right panel.',
-					footer: '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><span class="horizontal-padding"></span><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
-					confirmButtonText: 'Play',
+					footer: '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
+					confirmButtonText: 'Okay',
 					buttonsStyling: false,
 					onClose: () => {
 						UIManager.setUserInterfaceVisible(true);

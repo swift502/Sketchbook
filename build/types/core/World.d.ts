@@ -44,7 +44,7 @@ export declare class World {
     paths: Path[];
     scenarioGUIFolder: any;
     private lastScenarioID;
-    constructor(path?: any);
+    constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;
     updatePhysics(timeStep: number): void;
     isOutOfBounds(position: CANNON.Vec3): boolean;
@@ -60,7 +60,7 @@ export declare class World {
     add(object: IWorldEntity): void;
     remove(object: IWorldEntity): void;
     loadScene(loadingManager: LoadingManager, gltf: any): void;
-    launchScenario(scenarioID: string): void;
+    launchScenario(scenarioID: string, _loadingManager?: LoadingManager): void;
     restartScenario(): void;
     clearEntities(): void;
     scrollTheTimeScale(scrollAmount: number): void;
