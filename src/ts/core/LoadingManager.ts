@@ -1,22 +1,25 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LoadingTrackerEntry } from './LoadingTrackerEntry';
-import { LoadingScreenMode } from '../enums/LoadingScreenMode';
 import { UIManager } from './UIManager';
+import { Scenario } from './Scenario';
+import Swal from 'sweetalert2';
+import { World } from './World';
 
 export class LoadingManager
 {
 	public firstLoad: boolean = true;
-
+	public onFinishedCallback: () => void;
+	
+	private world: World;
 	private gltfLoader: GLTFLoader;
 	private loadingTracker: LoadingTrackerEntry[] = [];
 
-	private onFinishedCallback: () => void;
-
-	constructor(mode: LoadingScreenMode)
+	constructor(world: World)
 	{
+		this.world = world;
 		this.gltfLoader = new GLTFLoader();
 
-		UIManager.setLoadingScreenMode(mode);
+		this.world.setTimeScale(0);
 		UIManager.setUserInterfaceVisible(false);
 		UIManager.setLoadingScreenVisible(true);
 	}
@@ -59,10 +62,38 @@ export class LoadingManager
 
 		if (this.isLoadingDone())
 		{
-			UIManager.setLoadingScreenVisible(false);
-			UIManager.setUserInterfaceVisible(true);
+			if (this.onFinishedCallback !== undefined) 
+			{
+				this.onFinishedCallback();
+			}
+			else
+			{
+				UIManager.setUserInterfaceVisible(true);
+			}
 
-			if (this.onFinishedCallback !== undefined) this.onFinishedCallback();
+			UIManager.setLoadingScreenVisible(false);
+		}
+	}
+
+	public createWelcomeScreenCallback(scenario: Scenario): void
+	{
+		if (this.onFinishedCallback === undefined)
+		{
+			this.onFinishedCallback = () =>
+			{
+				this.world.update(1, 1);
+	
+				Swal.fire({
+					title: scenario.descriptionTitle,
+					html: scenario.descriptionContent,
+					confirmButtonText: 'Play',
+					buttonsStyling: false,
+					onClose: () => {
+						this.world.setTimeScale(1);
+						UIManager.setUserInterfaceVisible(true);
+					}
+				});
+			};
 		}
 	}
 

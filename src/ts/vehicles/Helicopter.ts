@@ -116,16 +116,16 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 		let vertDamping = new THREE.Vector3(0, body.velocity.y, 0).multiplyScalar(-0.01);
 		let vertStab = up.clone();
 		vertStab.multiplyScalar(gravityCompensation);
-		vertStab.multiplyScalar(Math.pow(heli.enginePower, 3));
 		vertStab.add(vertDamping);
+		vertStab.multiplyScalar(heli.enginePower);
 
 		body.velocity.x += vertStab.x;
 		body.velocity.y += vertStab.y;
 		body.velocity.z += vertStab.z;
 
 		// Positional damping
-		body.velocity.x *= 0.995;
-		body.velocity.z *= 0.995;
+		body.velocity.x *= THREE.MathUtils.lerp(1, 0.995, this.enginePower);
+		body.velocity.z *= THREE.MathUtils.lerp(1, 0.995, this.enginePower);
 
 		// Rotation stabilization
 		if (this.controllingCharacter !== undefined)
@@ -137,9 +137,9 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 			rotStabVelocity.w *= 0.3;
 			let rotStabEuler = new THREE.Euler().setFromQuaternion(rotStabVelocity);
 			
-			body.angularVelocity.x += rotStabEuler.x;
-			body.angularVelocity.y += rotStabEuler.y;
-			body.angularVelocity.z += rotStabEuler.z;
+			body.angularVelocity.x += rotStabEuler.x * this.enginePower;
+			body.angularVelocity.y += rotStabEuler.y * this.enginePower;
+			body.angularVelocity.z += rotStabEuler.z * this.enginePower;
 		}
 
 		// Pitch

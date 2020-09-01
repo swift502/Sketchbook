@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { World } from '../core/World';
 import { Character } from './Character';
 import { LoadingManager } from '../core/LoadingManager';
+import * as Utils from '../core/FunctionLibrary';
 
 export class CharacterSpawnPoint implements ISpawnPoint
 {
@@ -23,8 +24,10 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			this.object.getWorldPosition(worldPos);
 			player.setPosition(worldPos.x, worldPos.y, worldPos.z);
 			
+			let forward = Utils.getForward(this.object);
+			player.setOrientation(forward, true);
+			
 			world.add(player);
-			player.setOrientation(new THREE.Vector3(1, 0, 0), true);
 			player.takeControl();
 		});
 	}

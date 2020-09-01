@@ -30,7 +30,6 @@ import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { CustomConsole } from './CustomConsole';
-import { LoadingScreenMode } from '../enums/LoadingScreenMode';
 import { UIManager } from './UIManager';
 
 export class World
@@ -67,18 +66,21 @@ export class World
 
 	private lastScenarioID: string;
 
-	constructor(path?: any)
+	constructor(worldScenePath?: any)
 	{
 		const scope = this;
 
 		// WebGL not supported
 		if (!Detector.webgl)
 		{
-			Swal.fire(
-				'WebGL compatibility',
-				'This browser doesn\'t seem to have the required WebGL capabilities. The application may not work correctly. <a href="https://get.webgl.org/" target="_blank">Click here for more information</a>.',
-				'warning'
-			);
+			Swal.fire({
+				icon: 'warning',
+				title: 'WebGL compatibility',
+				text: 'This browser doesn\'t seem to have the required WebGL capabilities. The application may not work correctly.',
+				footer: '<a href="https://get.webgl.org/" target="_blank">Click here for more information</a>',
+				showConfirmButton: false,
+				buttonsStyling: false
+			});
 		}
 
 		// Renderer
@@ -204,11 +206,28 @@ export class World
 		// Initialization
 		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
 		this.inputManager = new InputManager(this, this.renderer.domElement);
+		this.customConsole = new CustomConsole();
 
-		if (path !== undefined)
+		if (worldScenePath !== undefined)
 		{
-			let loadingManager = new LoadingManager(LoadingScreenMode.Full);
-			loadingManager.loadGLTF(path, (gltf) =>
+			let loadingManager = new LoadingManager(this);
+			loadingManager.onFinishedCallback = () =>
+			{
+				this.update(1, 1);
+				this.setTimeScale(1);
+	
+				Swal.fire({
+					title: 'Welcome to Sketchbook!',
+					text: 'Feel free to explore the world and interact with available vehicles. There are also various scenarios ready to launch from the right panel.',
+					footer: '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><span class="horizontal-padding"></span><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
+					confirmButtonText: 'Play',
+					buttonsStyling: false,
+					onClose: () => {
+						UIManager.setUserInterfaceVisible(true);
+					}
+				});
+			};
+			loadingManager.loadGLTF(worldScenePath, (gltf) =>
 				{
 					this.loadScene(loadingManager, gltf);
 				}
@@ -218,11 +237,13 @@ export class World
 		{
 			UIManager.setUserInterfaceVisible(true);
 			UIManager.setLoadingScreenVisible(false);
+			Swal.fire({
+				icon: 'success',
+				title: 'Hello world!',
+				text: 'Empty Sketchbook world was succesfully initialized. Enjoy the blueness of the sky.',
+				buttonsStyling: false
+			});
 		}
-
-		// UI
-		// this.loadingScreen = new LoadingScreen(this);
-		this.customConsole = new CustomConsole();
 
 		this.render(this);
 	}
@@ -493,22 +514,24 @@ export class World
 		this.graphicsWorld.add(gltf.scene);
 
 		// Launch default scenario
+		let defaultScenarioID: string;
 		for (const scenario of this.scenarios) {
-			if (scenario.default || scenario.spawnAlways) {
-				if (scenario.default) this.lastScenarioID = scenario.id;
-				scenario.launch(loadingManager, this);
+			if (scenario.default) {
+				defaultScenarioID = scenario.id;
+				break;
 			}
 		}
+		if (defaultScenarioID !== undefined) this.launchScenario(defaultScenarioID, loadingManager);
 	}
 	
-	public launchScenario(scenarioID: string): void
+	public launchScenario(scenarioID: string, _loadingManager?: LoadingManager): void
 	{
 		this.lastScenarioID = scenarioID;
 
 		this.clearEntities();
 
 		// Launch default scenario
-		let loadingManager = new LoadingManager(LoadingScreenMode.Overlay);
+		let loadingManager = (_loadingManager) ? _loadingManager : new LoadingManager(this);
 		for (const scenario of this.scenarios) {
 			if (scenario.id === scenarioID || scenario.spawnAlways) {
 				scenario.launch(loadingManager, this);
@@ -518,8 +541,15 @@ export class World
 
 	public restartScenario(): void
 	{
-		if (this.lastScenarioID !== undefined) this.launchScenario(this.lastScenarioID);
-		else console.warn('Can\'t restart scenario. Last scenarioID is undefined.');
+		if (this.lastScenarioID !== undefined)
+		{
+			document.exitPointerLock();
+			this.launchScenario(this.lastScenarioID);
+		}
+		else
+		{
+			console.warn('Can\'t restart scenario. Last scenarioID is undefined.');
+		}
 	}
 
 	public clearEntities(): void

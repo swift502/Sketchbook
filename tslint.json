@@ -5,7 +5,8 @@
     ],
     "jsRules": {},
     "rules": {
-        "one-line": false,
+		"one-line": false,
+		"no-empty": false,
 		"no-console": false,
 		"indent": [true, "tabs"],
 		"object-literal-shorthand": false,

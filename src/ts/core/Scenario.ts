@@ -10,11 +10,14 @@ export class Scenario
 	public name: string;
 	public spawnAlways: boolean = false;
 	public default: boolean = false;
-
+	public world: World;
+	public descriptionTitle: string;
+	public descriptionContent: string;
+	
 	private rootNode: THREE.Object3D;
 	private spawnPoints: ISpawnPoint[] = [];
 	private invisible: boolean = false;
-	private world: World;
+	private initialCameraAngle: number;
 
 	constructor(root: THREE.Object3D, world: World)
 	{
@@ -30,7 +33,6 @@ export class Scenario
 		if (root.userData.hasOwnProperty('default') && root.userData.default === 'true') 
 		{
 			this.default = true;
-			this.name += ' (default)';
 		}
 		if (root.userData.hasOwnProperty('spawn_always') && root.userData.spawn_always === 'true') 
 		{
@@ -39,6 +41,18 @@ export class Scenario
 		if (root.userData.hasOwnProperty('invisible') && root.userData.invisible === 'true') 
 		{
 			this.invisible = true;
+		}
+		if (root.userData.hasOwnProperty('desc_title')) 
+		{
+			this.descriptionTitle = root.userData.desc_title;
+		}
+		if (root.userData.hasOwnProperty('desc_content')) 
+		{
+			this.descriptionContent = root.userData.desc_content;
+		}
+		if (root.userData.hasOwnProperty('camera_angle')) 
+		{
+			this.initialCameraAngle = root.userData.camera_angle;
 		}
 
 		if (!this.invisible) this.createLaunchLink();
@@ -94,5 +108,13 @@ export class Scenario
 		this.spawnPoints.forEach((sp) => {
 			sp.spawn(loadingManager, world);
 		});
+
+		if (!this.spawnAlways)
+		{
+			loadingManager.createWelcomeScreenCallback(this);
+
+			world.cameraOperator.theta = this.initialCameraAngle;
+			world.cameraOperator.phi = 15;
+		}
 	}
 }
