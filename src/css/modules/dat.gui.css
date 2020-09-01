@@ -152,7 +152,7 @@
 }
 
 .dg .property-name {
-	font-size: 85%;
+	font-size: 82%;
     cursor: default;
     float: left;
     clear: left;
@@ -351,10 +351,11 @@
 }
 
 .dg li.title {
-	height: 36px;
-	line-height: 36px;
+	font-size: 90%;
+	height: 33px;
+	line-height: 33px;
     padding-left: 20px;
-    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 8px 16px no-repeat;
+    background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 8px 14px no-repeat;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2)
 }

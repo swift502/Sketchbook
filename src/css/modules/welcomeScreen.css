@@ -1,0 +1,39 @@
+.swal2-container {
+	text-shadow: none;
+}
+
+.swal2-confirm {
+	display: inline-block;
+    background: #FFB900;
+    border: none;
+    padding: 12px 28px;
+    color: #222;
+    outline: none;
+    border-radius: 4px;
+    font-family: 'Solway', serif;
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    margin: 0 0 4px 0;
+	box-shadow: 0 4px 0 0 rgb(228 158 0);
+}
+
+.swal2-confirm:active {
+	margin: 4px 0 0 0;
+	box-shadow: 0 0px 0 0 rgb(228 158 0);
+}
+
+div.swal2-footer {
+	justify-content: space-evenly;
+}
+
+.button {
+    opacity: 0;
+    background: black;
+    padding: 12px 15px 12px 15px;
+    font-family: "Cutive Mono", monospace;
+    font-size: 1.2rem;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
