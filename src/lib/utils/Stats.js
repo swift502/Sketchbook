@@ -9,7 +9,8 @@ export var Stats = function () {
     var mode = 0;
 
 	var container = document.createElement('div');
-    container.classList.add('statsBox');
+	container.id = 'statsBox';
+	container.style.display = 'none';
 	document.getElementById('ui-container').appendChild(container);
     // container.addEventListener('click', function (event) {
 

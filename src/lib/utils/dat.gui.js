@@ -1933,6 +1933,7 @@
             if (Common.isUndefined(params.parent)) {
                 if (autoPlaceVirgin) {
 					autoPlaceContainer = document.createElement('div');
+					autoPlaceContainer.id = 'dat-gui-container';
                     dom.addClass(autoPlaceContainer, CSS_NAMESPACE);
                     dom.addClass(autoPlaceContainer, GUI.CLASS_AUTO_PLACE_CONTAINER);
 					// document.body.appendChild(autoPlaceContainer);

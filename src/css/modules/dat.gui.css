@@ -432,7 +432,7 @@
 
 /* Stats box */
 
-.statsBox {
+#statsBox {
     position: fixed;
     top: 15px;
     height: 48px;
@@ -441,13 +441,13 @@
     z-index: 10000;
 }
 
-.statsBox,
+#statsBox,
 .dg.ac .dg.main.a .dg .title {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .dg.ac {
-    top: 48px;
+    /* top: 48px; */
     user-select: none;
 }
 

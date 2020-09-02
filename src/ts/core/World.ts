@@ -193,9 +193,10 @@ export class World
 			Time_Scale: 1,
 			Shadows: true,
 			FXAA: true,
-			Draw_Physics: false,
-			Sun_Phi: 60,
-			Sun_Theta: 225,
+			Debug_Physics: false,
+			Debug_FPS: false,
+			Sun_Elevation: 60,
+			Sun_Rotation: 225,
 		};
 
 		let gui = this.getGUI(scope);
@@ -309,7 +310,7 @@ export class World
 		//     if (body.sleepState === 2) asleep++;
 		// });
 
-		if (this.params.Draw_Physics) this.cannonDebugRenderer.update();
+		if (this.params.Debug_Physics) this.cannonDebugRenderer.update();
 
 		// document.getElementById('car-debug').innerHTML = '';
 		// document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
@@ -373,13 +374,6 @@ export class World
 	 */
 	public render(world: World): void
 	{
-		// Stats begin
-		// if (this.justRendered)
-		// {
-		// 	this.justRendered = false;
-		// 	this.stats.begin();
-		// }
-
 		this.requestDelta = this.clock.getDelta();
 
 		requestAnimationFrame(() =>
@@ -607,22 +601,31 @@ export class World
 	{
 		const gui = new GUI.GUI();
 
-		// Input
-		let inputFolder = gui.addFolder('Input');
-		inputFolder.add(this.params, 'Pointer_Lock')
-			.onChange((enabled) =>
-			{
-				scope.inputManager.setPointerLock(enabled);
-			});
-		inputFolder.add(this.params, 'Mouse_Sensitivity', 0, 1)
+		// Scenario
+		this.scenarioGUIFolder = gui.addFolder('Scenarios');
+
+		// World
+		let worldFolder = gui.addFolder('World');
+		worldFolder.add(this.params, 'Time_Scale', 0, 1).listen()
 			.onChange((value) =>
 			{
-				scope.cameraOperator.setSensitivity(value, value * 0.8);
+				scope.timeScaleTarget = value;
+			});
+		worldFolder.add(this.params, 'Sun_Elevation', 0, 180).listen()
+			.onChange((value) =>
+			{
+				scope.sky.phi = value;
+			});
+		worldFolder.add(this.params, 'Sun_Rotation', 0, 360).listen()
+			.onChange((value) =>
+			{
+				scope.sky.theta = value;
 			});
 
-		// Graphics
-		let graphicsFolder = gui.addFolder('Rendering');
-		graphicsFolder.add(this.params, 'Shadows')
+		// Input
+		let settingsFolder = gui.addFolder('Settings');
+		settingsFolder.add(this.params, 'FXAA');
+		settingsFolder.add(this.params, 'Shadows')
 			.onChange((enabled) =>
 			{
 				if (enabled)
@@ -638,10 +641,17 @@ export class World
 					});
 				}
 			});
-		graphicsFolder.add(this.params, 'FXAA');
-
-		// Debug
-		graphicsFolder.add(this.params, 'Draw_Physics')
+		settingsFolder.add(this.params, 'Pointer_Lock')
+			.onChange((enabled) =>
+			{
+				scope.inputManager.setPointerLock(enabled);
+			});
+		settingsFolder.add(this.params, 'Mouse_Sensitivity', 0, 1)
+			.onChange((value) =>
+			{
+				scope.cameraOperator.setSensitivity(value, value * 0.8);
+			});
+		settingsFolder.add(this.params, 'Debug_Physics')
 			.onChange((enabled) =>
 			{
 				if (enabled)
@@ -659,26 +669,12 @@ export class World
 					char.raycastBox.visible = enabled;
 				});
 			});
-			
-		// Sky
-		let worldFolder = gui.addFolder('World');
-		worldFolder.add(this.params, 'Time_Scale', 0, 1).listen()
-		.onChange((value) =>
-		{
-			scope.timeScaleTarget = value;
-		});
-		worldFolder.add(this.params, 'Sun_Phi', 0, 180).listen()
-			.onChange((value) =>
+		settingsFolder.add(this.params, 'Debug_FPS')
+			.onChange((enabled) =>
 			{
-				scope.sky.phi = value;
-			});
-		worldFolder.add(this.params, 'Sun_Theta', 0, 360).listen()
-			.onChange((value) =>
-			{
-				scope.sky.theta = value;
+				UIManager.setFPSVisible(enabled);
 			});
 
-		this.scenarioGUIFolder = gui.addFolder('Scenarios');
 		this.scenarioGUIFolder.open();
 
 		return gui;
