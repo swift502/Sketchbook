@@ -6,7 +6,6 @@ import { IUpdatable } from '../interfaces/IUpdatable';
 export class InputManager implements IUpdatable
 {
 	public updateOrder: number = 3;
-	public entityType: EntityType;
 
 	public world: World;
 	public domElement: any;

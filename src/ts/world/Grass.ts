@@ -17,7 +17,6 @@ import { IUpdatable } from '../interfaces/IUpdatable.js';
 export class Grass implements IUpdatable
 {
 	public updateOrder: number = 10;
-	public entityType: EntityType = EntityType.Decoration;
 
 	// public groundMaterial: THREE.MeshBasicMaterial;
 	public grassMaterial: THREE.ShaderMaterial;
@@ -193,6 +192,10 @@ export class Grass implements IUpdatable
 		grassLod.position.copy(object.position);
 
 		this.meshes.push(grassLod);
+
+		this.meshes.forEach((mesh) => {
+			world.graphicsWorld.add(mesh);
+		});
 	}
 
 	public update(timeStep: number): void
@@ -203,19 +206,5 @@ export class Grass implements IUpdatable
 		{
 			this.grassMaterial.uniforms.playerPos.value.copy(this.playerPosition);
 		}
-	}
-
-	public addToWorld(world: World): void
-	{
-		this.meshes.forEach((mesh) => {
-			world.graphicsWorld.add(mesh);
-		});
-	}
-
-	public removeFromWorld(world: World): void
-	{
-		this.meshes.forEach((mesh) => {
-			world.graphicsWorld.remove(mesh);
-		});
 	}
 }
