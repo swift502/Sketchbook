@@ -1,10 +1,10 @@
-import { CustomConsole } from './CustomConsole';
-export declare class CustomConsoleMessage {
+import { InfoStack } from './InfoStack';
+export declare class InfoStackMessage {
     domElement: HTMLElement;
     private customConsole;
     private elapsedTime;
     private removalTriggered;
-    constructor(console: CustomConsole, domElement: HTMLElement);
+    constructor(console: InfoStack, domElement: HTMLElement);
     update(timeStep: number): void;
     private triggerRemoval;
 }

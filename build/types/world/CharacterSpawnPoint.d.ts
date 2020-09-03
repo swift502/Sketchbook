@@ -1,6 +1,6 @@
 import { ISpawnPoint } from '../interfaces/ISpawnPoint';
 import * as THREE from 'three';
-import { World } from '../core/World';
+import { World } from './World';
 import { LoadingManager } from '../core/LoadingManager';
 export declare class CharacterSpawnPoint implements ISpawnPoint {
     private object;

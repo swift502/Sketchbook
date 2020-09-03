@@ -1,2 +1,2 @@
 import '../css/main.css';
-export { World } from './core/World';
+export { World } from './world/World';

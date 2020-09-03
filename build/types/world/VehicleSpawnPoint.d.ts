@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ISpawnPoint } from '../interfaces/ISpawnPoint';
-import { World } from '../core/World';
+import { World } from '../world/World';
 import { LoadingManager } from '../core/LoadingManager';
 export declare class VehicleSpawnPoint implements ISpawnPoint {
     type: string;

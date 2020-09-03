@@ -43,3 +43,5 @@ export declare function getRight(obj: THREE.Object3D, space?: Space): THREE.Vect
 export declare function getUp(obj: THREE.Object3D, space?: Space): THREE.Vector3;
 export declare function getForward(obj: THREE.Object3D, space?: Space): THREE.Vector3;
 export declare function getBack(obj: THREE.Object3D, space?: Space): THREE.Vector3;
+export declare function getMatrix(obj: THREE.Object3D, space: Space): THREE.Matrix4;
+export declare function countSleepyBodies(): any;

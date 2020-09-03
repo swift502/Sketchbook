@@ -1,18 +1,18 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { CameraOperator } from './CameraOperator';
-import { default as CSM } from 'three-csm';
+import { CameraOperator } from '../core/CameraOperator';
 import { Stats } from '../../lib/utils/Stats';
-import { InputManager } from './InputManager';
+import { InputManager } from '../core/InputManager';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import { Path } from './Path';
-import { LoadingManager } from './LoadingManager';
+import { LoadingManager } from '../core/LoadingManager';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
-import { CustomConsole } from './CustomConsole';
+import { InfoStack } from '../core/InfoStack';
+import { IUpdatable } from '../interfaces/IUpdatable';
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.PerspectiveCamera;
@@ -35,14 +35,14 @@ export declare class World {
     inputManager: InputManager;
     cameraOperator: CameraOperator;
     timeScaleTarget: number;
-    csm: CSM;
-    customConsole: CustomConsole;
+    console: InfoStack;
     cannonDebugRenderer: CannonDebugRenderer;
     scenarios: Scenario[];
     characters: Character[];
     vehicles: Vehicle[];
     paths: Path[];
     scenarioGUIFolder: any;
+    updatables: IUpdatable[];
     private lastScenarioID;
     constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;
@@ -57,13 +57,15 @@ export declare class World {
      */
     render(world: World): void;
     setTimeScale(value: number): void;
-    add(object: IWorldEntity): void;
-    remove(object: IWorldEntity): void;
+    add(worldEntity: IWorldEntity): void;
+    registerUpdatable(registree: IUpdatable): void;
+    remove(worldEntity: IWorldEntity): void;
+    unregisterUpdatable(registree: IUpdatable): void;
     loadScene(loadingManager: LoadingManager, gltf: any): void;
-    launchScenario(scenarioID: string, _loadingManager?: LoadingManager): void;
+    launchScenario(scenarioID: string, loadingManager?: LoadingManager): void;
     restartScenario(): void;
     clearEntities(): void;
     scrollTheTimeScale(scrollAmount: number): void;
     updateControls(controls: any): void;
-    private getGUI;
+    private createParamsGUI;
 }

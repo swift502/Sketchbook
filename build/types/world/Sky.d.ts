@@ -1,7 +1,11 @@
 import * as THREE from 'three';
 import { World } from './World';
-export declare class Sky extends THREE.Object3D {
-    sun: THREE.DirectionalLight;
+import { IUpdatable } from '../interfaces/IUpdatable';
+import { default as CSM } from 'three-csm';
+export declare class Sky extends THREE.Object3D implements IUpdatable {
+    updateOrder: number;
+    sunPosition: THREE.Vector3;
+    csm: CSM;
     set theta(value: number);
     set phi(value: number);
     private _phi;
@@ -9,12 +13,11 @@ export declare class Sky extends THREE.Object3D {
     private hemiLight;
     private maxHemiIntensity;
     private minHemiIntensity;
-    private sunTarget;
     private skyMesh;
     private skyMaterial;
     private world;
     constructor(world: World);
-    update(): void;
+    update(timeScale: number): void;
     refreshSunPosition(): void;
     refreshHemiIntensity(): void;
 }

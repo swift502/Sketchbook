@@ -1,9 +1,11 @@
 import * as THREE from 'three';
-import { World } from './World';
+import { World } from '../world/World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
 import { Character } from '../characters/Character';
-export declare class CameraOperator implements IInputReceiver {
+import { IUpdatable } from '../interfaces/IUpdatable';
+export declare class CameraOperator implements IInputReceiver, IUpdatable {
+    updateOrder: number;
     world: World;
     camera: THREE.Camera;
     target: THREE.Vector3;
@@ -28,7 +30,7 @@ export declare class CameraOperator implements IInputReceiver {
     setSensitivity(sensitivityX: number, sensitivityY?: number): void;
     setRadius(value: number, instantly?: boolean): void;
     move(deltaX: number, deltaY: number): void;
-    update(): void;
+    update(timeScale: number): void;
     handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void;
     handleMouseWheel(event: WheelEvent, value: number): void;
     handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void;

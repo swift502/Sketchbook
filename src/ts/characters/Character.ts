@@ -60,7 +60,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public viewVector: THREE.Vector3;
 	public actions: { [action: string]: KeyBinding };
 	public characterCapsule: CapsuleCollider;
-
+	
 	// Ray casting
 	public rayResult: CANNON.RaycastResult = new CANNON.RaycastResult();
 	public rayHasHit: boolean = false;
@@ -69,18 +69,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public wantsToJump: boolean = false;
 	public initJumpSpeed: number = -1;
 	public groundImpactData: GroundImpactData = new GroundImpactData();
-
-	public controlledObject: IControllable;
-
 	public raycastBox: THREE.Mesh;
+	
+	public world: World;
 	public charState: ICharacterState;
 	public behaviour: ICharacterAI;
-	public world: World;
-
+	
 	// Vehicles
+	public controlledObject: IControllable;
 	public occupyingSeat: VehicleSeat = null;
 	public vehicleEntryInstance: VehicleEntryInstance = null;
-
+	
 	private physicsEnabled: boolean = true;
 
 	constructor(gltf: any)

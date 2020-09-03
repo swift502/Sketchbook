@@ -406,14 +406,14 @@ export class World
 		if (defaultScenarioID !== undefined) this.launchScenario(defaultScenarioID, loadingManager);
 	}
 	
-	public launchScenario(scenarioID: string, _loadingManager?: LoadingManager): void
+	public launchScenario(scenarioID: string, loadingManager?: LoadingManager): void
 	{
 		this.lastScenarioID = scenarioID;
 
 		this.clearEntities();
 
 		// Launch default scenario
-		let loadingManager = (_loadingManager) ? _loadingManager : new LoadingManager(this);
+		if (!loadingManager) loadingManager = new LoadingManager(this);
 		for (const scenario of this.scenarios) {
 			if (scenario.id === scenarioID || scenario.spawnAlways) {
 				scenario.launch(loadingManager, this);

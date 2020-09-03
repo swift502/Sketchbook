@@ -1,5 +1,5 @@
-import { World } from './World';
-import { LoadingManager } from './LoadingManager';
+import { World } from '../world/World';
+import { LoadingManager } from '../core/LoadingManager';
 export declare class Scenario {
     id: string;
     name: string;

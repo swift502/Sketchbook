@@ -1,6 +1,8 @@
-import { World } from './World';
+import { World } from '../world/World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
-export declare class InputManager {
+import { IUpdatable } from '../interfaces/IUpdatable';
+export declare class InputManager implements IUpdatable {
+    updateOrder: number;
     world: World;
     domElement: any;
     pointerLock: any;
