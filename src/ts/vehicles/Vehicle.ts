@@ -15,6 +15,7 @@ import { IWorldEntity } from '../interfaces/IWorldEntity';
 
 export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 {
+	public updateOrder: number = 2;
 	public abstract entityType: EntityType;
 	
 	public controllingCharacter: Character;
@@ -112,6 +113,8 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			let upAxisWorld = new CANNON.Vec3();
 			this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
 		}
+
+		this.updateMatrixWorld();
 	}
 
 	public forceCharacterOut(): void
@@ -337,7 +340,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 
 			this.materials.forEach((mat) =>
 			{
-				world.csm.setupMaterial(mat);
+				world.sky.csm.setupMaterial(mat);
 			});
 		}
 	}

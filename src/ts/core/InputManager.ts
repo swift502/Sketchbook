@@ -1,8 +1,13 @@
 import { World } from '../world/World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
+import { EntityType } from '../enums/EntityType';
+import { IUpdatable } from '../interfaces/IUpdatable';
 
-export class InputManager
+export class InputManager implements IUpdatable
 {
+	public updateOrder: number = 3;
+	public entityType: EntityType;
+
 	public world: World;
 	public domElement: any;
 	public pointerLock: any;
@@ -21,8 +26,8 @@ export class InputManager
 	constructor(world: World, domElement: HTMLElement)
 	{
 		this.world = world;
+		this.pointerLock = world.params.Pointer_Lock;
 		this.domElement = domElement || document.body;
-		this.pointerLock = this.world.params.Pointer_Lock;
 		this.isLocked = false;
 		
 		// Bindings for later event use
@@ -50,6 +55,8 @@ export class InputManager
 		// Keys
 		document.addEventListener('keydown', this.boundOnKeyDown, false);
 		document.addEventListener('keyup', this.boundOnKeyUp, false);
+
+		world.registerUpdatable(this);
 	}
 
 	public update(timestep: number, unscaledTimeStep: number): void

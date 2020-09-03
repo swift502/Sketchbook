@@ -1,26 +1,34 @@
 import * as THREE from 'three';
 import { Noise } from '../../lib/utils/perlin.js';
 import { GrassShader } from '../../lib/shaders/GrassShader';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { World } from '../world/World';
 import { LOD, IUniform } from 'three';
+import { EntityType } from '../enums/EntityType';
+import { IUpdatable } from '../interfaces/IUpdatable.js';
 
-export class Grass implements IWorldEntity
+// Based on:
+// "Realistic real-time grass rendering" by Eddie Lee, 2010
+// https://www.eddietree.com/grass
+// https://medium.com/@Zadvorsky/into-vertex-shaders-594e6d8cd804u
+// https://github.com/zadvorsky/three.bas
+// https://github.com/mrdoob/three.js/blob/master/examples/webgl_buffergeometry_instancing_dynamic.html
+// https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
+
+export class Grass implements IUpdatable
 {
-	public groundMaterial: THREE.Material;
-	public grassMaterial: THREE.Material;
+	public updateOrder: number = 10;
+	public entityType: EntityType = EntityType.Decoration;
 
+	// public groundMaterial: THREE.MeshBasicMaterial;
+	public grassMaterial: THREE.ShaderMaterial;
+	public playerPosition: THREE.Vector3;
+	
 	private meshes: any[] = [];
+	private world: World;
 
-	constructor(transform: any)
+	constructor(object: any, world: World)
 	{
-		// Based on:
-		// "Realistic real-time grass rendering" by Eddie Lee, 2010
-		// https://www.eddietree.com/grass
-		// https://medium.com/@Zadvorsky/into-vertex-shaders-594e6d8cd804u
-		// https://github.com/zadvorsky/three.bas
-		// https://github.com/mrdoob/three.js/blob/master/examples/webgl_buffergeometry_instancing_dynamic.html
-		// https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
+		this.world = world;
 
 		// Variables for blade mesh
 		let joints = 3;
@@ -46,8 +54,8 @@ export class Grass implements IWorldEntity
 		noise.seed(Math.random());
 
 		// The ground
-		let ground_geometry = new THREE.PlaneGeometry(transform.scale.x * 2, transform.scale.z * 2);
-		this.groundMaterial = new THREE.MeshBasicMaterial({ color: 0x002300 });
+		let ground_geometry = new THREE.PlaneGeometry(object.scale.x * 2, object.scale.z * 2);
+		object.groundMaterial = new THREE.MeshBasicMaterial({ color: 0x002300 });
 
 		// Define base geometry that will be instanced. We use a plane for an individual blade of grass
 		let base_geometry = new THREE.PlaneBufferGeometry(w_, h_, 1, joints);
@@ -86,8 +94,8 @@ export class Grass implements IWorldEntity
 		for (let i = 0; i < instances; i++)
 		{
 			// Offset of the roots
-			x = Math.random() * transform.scale.x * 2 - transform.scale.x;
-			z = Math.random() * transform.scale.z * 2 - transform.scale.z;
+			x = Math.random() * object.scale.x * 2 - object.scale.x;
+			z = Math.random() * object.scale.z * 2 - object.scale.z;
 			y = 0;
 			offsets.push(x, y, z);
 
@@ -182,9 +190,19 @@ export class Grass implements IWorldEntity
 		grassLod.addLevel(grassMesh, 0);
 		grassLod.addLevel(new THREE.Mesh(), 30);
 
-		grassLod.position.copy(transform.position);
+		grassLod.position.copy(object.position);
 
 		this.meshes.push(grassLod);
+	}
+
+	public update(timeStep: number): void
+	{
+		this.grassMaterial.uniforms.time.value += timeStep;
+
+		if (this.playerPosition)
+		{
+			this.grassMaterial.uniforms.playerPos.value.copy(this.playerPosition);
+		}
 	}
 
 	public addToWorld(world: World): void

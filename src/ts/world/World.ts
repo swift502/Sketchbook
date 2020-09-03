@@ -7,9 +7,6 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { FXAAShader  } from 'three/examples/jsm/shaders/FXAAShader';
-import { default as CSM } from 'three-csm';
-
-import { WaterShader } from '../../lib/shaders/WaterShader';
 
 import { Detector } from '../../lib/utils/Detector';
 import { Stats } from '../../lib/utils/Stats';
@@ -20,7 +17,7 @@ import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
 import * as Utils from '../core/FunctionLibrary';
-import { Grass } from '../entities/Grass';
+import { Grass } from '../world/Grass';
 import { Path } from './Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { LoadingManager } from '../core/LoadingManager';
@@ -31,6 +28,8 @@ import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
 import { InfoStack } from '../core/InfoStack';
 import { UIManager } from '../core/UIManager';
+import { Ocean } from './Ocean';
+import { IUpdatable } from '../interfaces/IUpdatable';
 
 export class World
 {
@@ -55,14 +54,14 @@ export class World
 	public inputManager: InputManager;
 	public cameraOperator: CameraOperator;
 	public timeScaleTarget: number = 1;
-	public csm: CSM;
-	public customConsole: InfoStack;
+	public console: InfoStack;
 	public cannonDebugRenderer: CannonDebugRenderer;
 	public scenarios: Scenario[] = [];
 	public characters: Character[] = [];
 	public vehicles: Vehicle[] = [];
 	public paths: Path[] = [];
 	public scenarioGUIFolder: any;
+	public updatables: IUpdatable[] = [];
 
 	private lastScenarioID: string;
 
@@ -106,50 +105,9 @@ export class World
 		}
 		window.addEventListener('resize', onWindowResize, false);
 
-		// Stats (FPS, Frame time, Memory)
-		this.stats = Stats();
-		// document.body.appendChild(this.stats.dom);
-
 		// Three.js scene
 		this.graphicsWorld = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1010);
-		this.sky = new Sky(this);
-		this.graphicsWorld.add(this.sky);
-
-		// New version
-		// let splitsCallback = (amount, near, far, target) =>
-		// {
-		// 	for (let i = amount - 1; i >= 0; i--)
-		// 	{
-		// 		target.push(Math.pow(1 / 3, i));
-		// 	}
-		// };
-
-		// Legacy
-		let splitsCallback = (amount, near, far) =>
-		{
-			let arr = [];
-
-			for (let i = amount - 1; i >= 0; i--)
-			{
-				arr.push(Math.pow(1 / 3, i));
-			}
-
-			return arr;
-		};
-
-		this.csm = new CSM({
-			fov: 80,
-			far: 300,	// maxFar
-			lightIntensity: 2.5,
-			cascades: 4,
-			shadowMapSize: 2048,
-			camera: this.camera,
-			parent: this.graphicsWorld,
-			mode: 'custom',
-			customSplitsCallback: splitsCallback
-		});
-		this.csm.fade = true;
 
 		// Passes
 		let renderPass = new RenderPass( this.graphicsWorld, this.camera );
@@ -184,31 +142,17 @@ export class World
 		this.sinceLastFrame = 0;
 		this.justRendered = false;
 
-		//#region ParamGUI
-
-		// Variables
-		this.params = {
-			Pointer_Lock: true,
-			Mouse_Sensitivity: 0.3,
-			Time_Scale: 1,
-			Shadows: true,
-			FXAA: true,
-			Debug_Physics: false,
-			Debug_FPS: false,
-			Sun_Elevation: 60,
-			Sun_Rotation: 225,
-		};
-
-		let gui = this.getGUI(scope);
-		gui.open();
-
-		//#endregion
+		// Stats (FPS, Frame time, Memory)
+		this.stats = Stats();
+		// Create right panel GUI
+		this.createParamsGUI(scope);
 
 		// Initialization
-		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
 		this.inputManager = new InputManager(this, this.renderer.domElement);
-		this.customConsole = new InfoStack();
-
+		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
+		this.sky = new Sky(this);
+		
+		// Load scene if path is supplied
 		if (worldScenePath !== undefined)
 		{
 			let loadingManager = new LoadingManager(this);
@@ -255,69 +199,16 @@ export class World
 	{
 		this.updatePhysics(timeStep);
 
-		// Characters
-		this.characters.forEach((char) =>
-		{
-			char.update(timeStep);
-			char.updateMatrixWorld();
+		// Update registred objects
+		this.updatables.forEach((entity) => {
+			entity.update(timeStep, unscaledTimeStep);
 		});
 
-		this.vehicles.forEach((vehicle) => {
-			vehicle.update(timeStep);
-			// vehicle.updateMatrixWorld();
-		});
-
-		this.inputManager.update(timeStep, unscaledTimeStep);
-
-		// Lerp parameters
+		// Lerp time scale
 		this.params.Time_Scale = THREE.MathUtils.lerp(this.params.Time_Scale, this.timeScaleTarget, 0.2);
 
-		// Rotate and position camera
-		this.cameraOperator.update();
-
-		if (this['waterMat'] !== undefined)
-		{
-			this['waterMat'].uniforms.cameraPos.value.copy(this.camera.position);
-			this['waterMat'].uniforms.lightDir.value.copy(new THREE.Vector3().copy(this.sky.sun.position).normalize());
-			this['waterMat'].uniforms.iGlobalTime.value += timeStep;
-		}
-
-		if (this['grassMat'] !== undefined)
-		{
-			this['grassMat'].uniforms.time.value += timeStep;
-
-			if (this.characters.length > 0)
-			{
-				this['grassMat'].uniforms.playerPos.value.copy(this.characters[0].position);
-			}
-		}
-
-		this.sky.update();
-
-		this.csm.update(this.camera.matrix);
-		this.csm.lightDirection = new THREE.Vector3(-this.sky.sun.position.x, -this.sky.sun.position.y, -this.sky.sun.position.z).normalize();
-
-		// UI
-		this.customConsole.update(timeStep);
-
-		// let awake = 0;
-		// let sleepy = 0;
-		// let asleep = 0;
-		// this.physicsWorld.bodies.forEach((body) =>
-		// {
-		//     if (body.sleepState === 0) awake++;
-		//     if (body.sleepState === 1) sleepy++;
-		//     if (body.sleepState === 2) asleep++;
-		// });
-
+		// Physics debug
 		if (this.params.Debug_Physics) this.cannonDebugRenderer.update();
-
-		// document.getElementById('car-debug').innerHTML = '';
-		// document.getElementById('car-debug').innerHTML += 'awake: ' + awake;
-		// document.getElementById('car-debug').innerHTML += '<br>';
-		// document.getElementById('car-debug').innerHTML += 'sleepy: ' + sleepy;
-		// document.getElementById('car-debug').innerHTML += '<br>';
-		// document.getElementById('car-debug').innerHTML += 'asleep: ' + asleep;
 	}
 
 	public updatePhysics(timeStep: number): void
@@ -415,14 +306,27 @@ export class World
 		this.timeScaleTarget = value;
 	}
 
-	public add(object: IWorldEntity): void
+	public add(worldEntity: IWorldEntity): void
 	{
-		object.addToWorld(this);
+		worldEntity.addToWorld(this);
+		this.registerUpdatable(worldEntity);
 	}
 
-	public remove(object: IWorldEntity): void
+	public registerUpdatable(registree: IUpdatable): void
 	{
-		object.removeFromWorld(this);
+		this.updatables.push(registree);
+		this.updatables.sort((a, b) => (a.updateOrder > b.updateOrder) ? 1 : -1);
+	}
+
+	public remove(worldEntity: IWorldEntity): void
+	{
+		worldEntity.removeFromWorld(this);
+		this.unregisterUpdatable(worldEntity);
+	}
+
+	public unregisterUpdatable(registree: IUpdatable): void
+	{
+		_.pull(this.updatables, registree);
 	}
 
 	public loadScene(loadingManager: LoadingManager, gltf: any): void
@@ -433,32 +337,16 @@ export class World
 				if (child.type === 'Mesh')
 				{
 					Utils.setupMeshProperties(child);
-					this.csm.setupMaterial(child.material);
+					this.sky.csm.setupMaterial(child.material);
 
 					if (child.material.name === 'grass')
 					{
-						let grass = new Grass(child);
-						this.add(grass);
-
-						// child.material = grass.groundMaterial;
-						this['grassMat'] = grass.grassMaterial;
+						this.registerUpdatable(new Grass(child, this));
 					}
 
 					if (child.material.name === 'ocean')
 					{
-						let uniforms = THREE.UniformsUtils.clone(WaterShader.uniforms);
-						uniforms.iResolution.value.x = window.innerWidth;
-						uniforms.iResolution.value.y = window.innerHeight;
-
-						child.material = new THREE.ShaderMaterial({
-							uniforms: uniforms,
-							fragmentShader: WaterShader.fragmentShader,
-							vertexShader: WaterShader.vertexShader,
-						});
-
-						child.material.transparent = true;
-
-						this['waterMat'] = child.material;
+						this.registerUpdatable(new Ocean(child, this));
 					}
 				}
 
@@ -597,12 +485,25 @@ export class World
 		document.getElementById('controls').innerHTML = html;
 	}
 
-	private getGUI(scope: World): GUI
+	private createParamsGUI(scope: World): void
 	{
+		this.params = {
+			Pointer_Lock: true,
+			Mouse_Sensitivity: 0.3,
+			Time_Scale: 1,
+			Shadows: true,
+			FXAA: true,
+			Debug_Physics: false,
+			Debug_FPS: false,
+			Sun_Elevation: 60,
+			Sun_Rotation: 225,
+		};
+
 		const gui = new GUI.GUI();
 
 		// Scenario
 		this.scenarioGUIFolder = gui.addFolder('Scenarios');
+		this.scenarioGUIFolder.open();
 
 		// World
 		let worldFolder = gui.addFolder('World');
@@ -630,13 +531,13 @@ export class World
 			{
 				if (enabled)
 				{
-					this.csm.lights.forEach((light) => {
+					this.sky.csm.lights.forEach((light) => {
 						light.castShadow = true;
 					});
 				}
 				else
 				{
-					this.csm.lights.forEach((light) => {
+					this.sky.csm.lights.forEach((light) => {
 						light.castShadow = false;
 					});
 				}
@@ -675,8 +576,6 @@ export class World
 				UIManager.setFPSVisible(enabled);
 			});
 
-		this.scenarioGUIFolder.open();
-
-		return gui;
+		gui.open();
 	}
 }

@@ -5,9 +5,12 @@ import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
 import { Character } from '../characters/Character';
 import _ = require('lodash');
+import { IUpdatable } from '../interfaces/IUpdatable';
 
-export class CameraOperator implements IInputReceiver
+export class CameraOperator implements IInputReceiver, IUpdatable
 {
+	public updateOrder: number = 4;
+
 	public world: World;
 	public camera: THREE.Camera;
 	public target: THREE.Vector3;
@@ -56,6 +59,8 @@ export class CameraOperator implements IInputReceiver
 			'down': new KeyBinding('KeyQ'),
 			'fast': new KeyBinding('ShiftLeft'),
 		};
+
+		world.registerUpdatable(this);
 	}
 
 	public setSensitivity(sensitivityX: number, sensitivityY: number = sensitivityX): void
@@ -80,7 +85,7 @@ export class CameraOperator implements IInputReceiver
 		this.phi = Math.min(85, Math.max(-85, this.phi));
 	}
 
-	public update(): void
+	public update(timeScale: number): void
 	{
 		if (this.followMode === true)
 		{
@@ -192,8 +197,8 @@ export class CameraOperator implements IInputReceiver
 		this.forwardVelocity = THREE.MathUtils.lerp(this.forwardVelocity, +this.actions.forward.isPressed - +this.actions.back.isPressed, 0.3);
 		this.rightVelocity = THREE.MathUtils.lerp(this.rightVelocity, +this.actions.right.isPressed - +this.actions.left.isPressed, 0.3);
 
-		this.world.cameraOperator.target.add(up.multiplyScalar(speed * this.upVelocity));
-		this.world.cameraOperator.target.add(forward.multiplyScalar(speed * this.forwardVelocity));
-		this.world.cameraOperator.target.add(right.multiplyScalar(speed * this.rightVelocity));
+		this.target.add(up.multiplyScalar(speed * this.upVelocity));
+		this.target.add(forward.multiplyScalar(speed * this.forwardVelocity));
+		this.target.add(right.multiplyScalar(speed * this.rightVelocity));
 	}
 }

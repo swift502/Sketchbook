@@ -348,13 +348,26 @@ export function getBack(obj: THREE.Object3D, space: Space = Space.Global): THREE
 		);
 }
 
-function getMatrix(obj: THREE.Object3D, space: Space): THREE.Matrix4
+export function getMatrix(obj: THREE.Object3D, space: Space): THREE.Matrix4
 {
 	switch (space)
 	{
 		case Space.Local: return obj.matrix;
 		case Space.Global: return obj.matrixWorld;
 	}
+}
+
+export function countSleepyBodies(): any
+{
+	// let awake = 0;
+	// let sleepy = 0;
+	// let asleep = 0;
+	// this.physicsWorld.bodies.forEach((body) =>
+	// {
+	//     if (body.sleepState === 0) awake++;
+	//     if (body.sleepState === 1) sleepy++;
+	//     if (body.sleepState === 2) asleep++;
+	// });
 }
 
 //#endregion

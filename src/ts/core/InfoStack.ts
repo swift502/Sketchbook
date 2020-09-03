@@ -1,7 +1,13 @@
 import { InfoStackMessage } from './InfoStackMessage';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
+import { EntityType } from '../enums/EntityType';
+import { World } from '../world/World';
 
-export class InfoStack
+export class InfoStack implements IWorldEntity
 {
+	public updateOrder: number = 3;
+	public entityType: EntityType = EntityType.System;
+
 	public messages: InfoStackMessage[] = [];
 	public entranceAnimation: string = 'animate__slideInLeft';
 	public exitAnimation: string = 'animate__backOutDown';
@@ -24,5 +30,13 @@ export class InfoStack
 		for (const message of this.messages) {
 			message.update(timeStep);
 		}
+	}
+
+	public addToWorld(world: World): void
+	{
+	}
+
+	public removeFromWorld(world: World): void
+	{
 	}
 }

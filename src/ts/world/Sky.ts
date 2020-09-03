@@ -1,10 +1,16 @@
 import { SkyShader } from '../../lib/shaders/SkyShader';
 import * as THREE from 'three';
 import { World } from './World';
+import { EntityType } from '../enums/EntityType';
+import { IUpdatable } from '../interfaces/IUpdatable';
+import { default as CSM } from 'three-csm';
 
-export class Sky extends THREE.Object3D
+export class Sky extends THREE.Object3D implements IUpdatable
 {
-	public sun: THREE.DirectionalLight;
+	public updateOrder: number = 5;
+
+	public sunPosition: THREE.Vector3 = new THREE.Vector3();
+	public csm: CSM;
 
 	set theta(value: number) {
 		this._theta = value;
@@ -24,7 +30,6 @@ export class Sky extends THREE.Object3D
 	private maxHemiIntensity: number = 0.9;
 	private minHemiIntensity: number = 0.3;
 
-	private sunTarget: THREE.Object3D;
 	private skyMesh: THREE.Mesh;
 	private skyMaterial: THREE.ShaderMaterial;
 
@@ -35,7 +40,8 @@ export class Sky extends THREE.Object3D
 		super();
 
 		this.world = world;
-
+		
+		// Sky material
 		this.skyMaterial = new THREE.ShaderMaterial({
 			uniforms: THREE.UniformsUtils.clone(SkyShader.uniforms),
 			fragmentShader: SkyShader.fragmentShader,
@@ -43,12 +49,14 @@ export class Sky extends THREE.Object3D
 			side: THREE.BackSide
 		});
 
+		// Mesh
 		this.skyMesh = new THREE.Mesh(
 			new THREE.SphereBufferGeometry(1000, 24, 12),
 			this.skyMaterial
 		);
 		this.attach(this.skyMesh);
 
+		// Ambient light
 		this.hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.0 );
 		this.refreshHemiIntensity();
 		this.hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
@@ -56,42 +64,66 @@ export class Sky extends THREE.Object3D
 		this.hemiLight.position.set( 0, 50, 0 );
 		this.world.graphicsWorld.add( this.hemiLight );
 
-		// Sun light with shadowmap
-		this.sun = new THREE.DirectionalLight(0xffffff);
-		this.sun.castShadow = true;
+		// CSM
+		// New version
+		// let splitsCallback = (amount, near, far, target) =>
+		// {
+		// 	for (let i = amount - 1; i >= 0; i--)
+		// 	{
+		// 		target.push(Math.pow(1 / 3, i));
+		// 	}
+		// };
 
-		this.sun.shadow.mapSize.width = 2048;
-		this.sun.shadow.mapSize.height = 2048;
-		this.sun.shadow.camera.near = 1;
-		this.sun.shadow.camera.far = 50;
+		// Legacy
+		let splitsCallback = (amount, near, far) =>
+		{
+			let arr = [];
 
-		this.sun.shadow.camera.top = 15;
-		this.sun.shadow.camera.right = 15;
-		this.sun.shadow.camera.bottom = -15;
-		this.sun.shadow.camera.left = -15;
+			for (let i = amount - 1; i >= 0; i--)
+			{
+				arr.push(Math.pow(1 / 3, i));
+			}
 
-		this.sunTarget = new THREE.Object3D();
-		this.sun.target = this.sunTarget;
-		this.attach(this.sunTarget);
+			return arr;
+		};
+
+		this.csm = new CSM({
+			fov: 80,
+			far: 300,	// maxFar
+			lightIntensity: 2.5,
+			cascades: 4,
+			shadowMapSize: 2048,
+			camera: world.camera,
+			parent: world.graphicsWorld,
+			mode: 'custom',
+			customSplitsCallback: splitsCallback
+		});
+		this.csm.fade = true;
 
 		this.refreshSunPosition();
+		
+		world.graphicsWorld.add(this);
+		world.registerUpdatable(this);
 	}
 
-	public update(): void
+	public update(timeScale: number): void
 	{
 		this.position.copy(this.world.camera.position);
 		this.refreshSunPosition();
+
+		this.csm.update(this.world.camera.matrix);
+		this.csm.lightDirection = new THREE.Vector3(-this.sunPosition.x, -this.sunPosition.y, -this.sunPosition.z).normalize();
 	}
 
 	public refreshSunPosition(): void
 	{
 		const sunDistance = 10;
 
-		this.sun.position.x = sunDistance * Math.sin(this._theta * Math.PI / 180) * Math.cos(this._phi * Math.PI / 180);
-		this.sun.position.y = sunDistance * Math.sin(this._phi * Math.PI / 180);
-		this.sun.position.z = sunDistance * Math.cos(this._theta * Math.PI / 180) * Math.cos(this._phi * Math.PI / 180);
+		this.sunPosition.x = sunDistance * Math.sin(this._theta * Math.PI / 180) * Math.cos(this._phi * Math.PI / 180);
+		this.sunPosition.y = sunDistance * Math.sin(this._phi * Math.PI / 180);
+		this.sunPosition.z = sunDistance * Math.cos(this._theta * Math.PI / 180) * Math.cos(this._phi * Math.PI / 180);
 
-		this.skyMaterial.uniforms.sunPosition.value.copy(this.sun.position);
+		this.skyMaterial.uniforms.sunPosition.value.copy(this.sunPosition);
 		this.skyMaterial.uniforms.cameraPos.value.copy(this.world.camera.position);
 	}
 

@@ -30,7 +30,9 @@ import { EntityType } from '../enums/EntityType';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
-	public isCharacter: boolean = true;
+	public updateOrder: number = 1;
+	public entityType: EntityType = EntityType.Character;
+
 	public height: number = 0;
 	public tiltContainer: THREE.Group;
 	public modelContainer: THREE.Group;
@@ -282,11 +284,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 		else
 		{
-			// Console debug
-			// if (code === 'KeyT' && pressed === true)
-			// {
-			// 	this.world.customConsole.addMessage('This is a console message!');
-			// } 
 			// Free camera
 			if (code === 'KeyC' && pressed === true && event.shiftKey === true)
 			{
@@ -436,6 +433,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			this.characterCapsule.body.position.copy(Utils.cannonVector(newPos));
 			this.characterCapsule.body.interpolatedPosition.copy(Utils.cannonVector(newPos));
 		}
+
+		this.updateMatrixWorld();
 	}
 
 	public inputReceiverInit(): void
@@ -493,11 +492,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		{
 			// Look in camera's direction
 			this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
-
-			this.updateMatrixWorld();
-			if (this.vehicleEntryInstance !== null) (this.vehicleEntryInstance.targetSeat.vehicle as unknown as THREE.Object3D).updateMatrixWorld();
-			else if (this.occupyingSeat !== null) (this.occupyingSeat.vehicle as unknown as THREE.Object3D).updateMatrixWorld();
-
 			this.getWorldPosition(this.world.cameraOperator.target);
 		}
 		
@@ -962,7 +956,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			// Shadow cascades
 			this.materials.forEach((mat) =>
 			{
-				world.csm.setupMaterial(mat);
+				world.sky.csm.setupMaterial(mat);
 			});
 		}
 	}
