@@ -6,7 +6,7 @@ import { KeyBinding } from '../core/KeyBinding';
 import * as THREE from 'three';
 import * as Utils from '../core/FunctionLibrary';
 import { SpringSimulator } from '../physics/spring_simulation/SpringSimulator';
-import { World } from '../core/World';
+import { World } from '../world/World';
 import { EntityType } from '../enums/EntityType';
 
 export class Car extends Vehicle implements IControllable

@@ -6,7 +6,7 @@ import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { KeyBinding } from '../core/KeyBinding';
-import { World } from '../core/World';
+import { World } from '../world/World';
 import { EntityType } from '../enums/EntityType';
 
 export class Helicopter extends Vehicle implements IControllable, IWorldEntity

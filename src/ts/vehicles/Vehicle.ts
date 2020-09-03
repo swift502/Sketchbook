@@ -1,7 +1,7 @@
 import { Character } from '../characters/Character';
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { World } from '../core/World';
+import { World } from '../world/World';
 import _ = require('lodash');
 import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';
@@ -11,8 +11,9 @@ import * as Utils from '../core/FunctionLibrary';
 import { CollisionGroups } from '../enums/CollisionGroups';
 import { SwitchingSeats } from '../characters/character_states/vehicles/SwitchingSeats';
 import { EntityType } from '../enums/EntityType';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 
-export abstract class Vehicle extends THREE.Object3D
+export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 {
 	public abstract entityType: EntityType;
 	

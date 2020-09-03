@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { ISpawnPoint } from '../interfaces/ISpawnPoint';
-import { World } from '../core/World';
-import { Helicopter } from './Helicopter';
-import { Airplane } from './Airplane';
-import { Car } from './Car';
+import { World } from '../world/World';
+import { Helicopter } from '../vehicles/Helicopter';
+import { Airplane } from '../vehicles/Airplane';
+import { Car } from '../vehicles/Car';
 import * as Utils from '../core/FunctionLibrary';
-import { Vehicle } from './Vehicle';
+import { Vehicle } from '../vehicles/Vehicle';
 import { Character } from '../characters/Character';
 import { FollowPath } from '../characters/character_ai/FollowPath';
 import { LoadingManager } from '../core/LoadingManager';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 
 export class VehicleSpawnPoint implements ISpawnPoint
 {
@@ -27,7 +28,7 @@ export class VehicleSpawnPoint implements ISpawnPoint
 	{
 		loadingManager.loadGLTF('build/assets/' + this.type + '.glb', (model: any) =>
 		{
-			let vehicle = this.getNewVehicleByType(model, this.type);
+			let vehicle: Vehicle = this.getNewVehicleByType(model, this.type);
 			vehicle.spawnPoint = this.object;
 
 			let worldPos = new THREE.Vector3();

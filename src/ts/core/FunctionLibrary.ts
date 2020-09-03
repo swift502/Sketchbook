@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
-import { World } from './World';
+import { World } from '../world/World';
 import { Side } from '../enums/Side';
 import { Object3D } from 'three';
 import { Space } from '../enums/Space';

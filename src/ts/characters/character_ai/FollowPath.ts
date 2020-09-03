@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { FollowTarget } from './FollowTarget';
 import { ICharacterAI } from '../../interfaces/ICharacterAI';
-import { PathNode } from '../../core/PathNode';
+import { PathNode } from '../../world/PathNode';
 
 export class FollowPath extends FollowTarget implements ICharacterAI
 {

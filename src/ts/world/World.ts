@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import Swal from 'sweetalert2';
 
-import { CameraOperator } from './CameraOperator';
+import { CameraOperator } from '../core/CameraOperator';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
@@ -15,22 +15,22 @@ import { Detector } from '../../lib/utils/Detector';
 import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
 import * as _ from 'lodash';
-import { InputManager } from './InputManager';
+import { InputManager } from '../core/InputManager';
 import { Character } from '../characters/Character';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { Sky } from './Sky';
-import * as Utils from './FunctionLibrary';
-import { Grass } from './Grass';
+import * as Utils from '../core/FunctionLibrary';
+import { Grass } from '../entities/Grass';
 import { Path } from './Path';
 import { CollisionGroups } from '../enums/CollisionGroups';
-import { LoadingManager } from './LoadingManager';
+import { LoadingManager } from '../core/LoadingManager';
 import { BoxCollider } from '../physics/colliders/BoxCollider';
 import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
 import { Vehicle } from '../vehicles/Vehicle';
 import { Scenario } from './Scenario';
-import { CustomConsole } from './CustomConsole';
-import { UIManager } from './UIManager';
+import { InfoStack } from '../core/InfoStack';
+import { UIManager } from '../core/UIManager';
 
 export class World
 {
@@ -56,7 +56,7 @@ export class World
 	public cameraOperator: CameraOperator;
 	public timeScaleTarget: number = 1;
 	public csm: CSM;
-	public customConsole: CustomConsole;
+	public customConsole: InfoStack;
 	public cannonDebugRenderer: CannonDebugRenderer;
 	public scenarios: Scenario[] = [];
 	public characters: Character[] = [];
@@ -207,7 +207,7 @@ export class World
 		// Initialization
 		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
 		this.inputManager = new InputManager(this, this.renderer.domElement);
-		this.customConsole = new CustomConsole();
+		this.customConsole = new InfoStack();
 
 		if (worldScenePath !== undefined)
 		{

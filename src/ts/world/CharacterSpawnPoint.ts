@@ -1,7 +1,7 @@
 import { ISpawnPoint } from '../interfaces/ISpawnPoint';
 import * as THREE from 'three';
-import { World } from '../core/World';
-import { Character } from './Character';
+import { World } from './World';
+import { Character } from '../characters/Character';
 import { LoadingManager } from '../core/LoadingManager';
 import * as Utils from '../core/FunctionLibrary';
 

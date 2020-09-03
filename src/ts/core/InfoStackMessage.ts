@@ -1,14 +1,14 @@
-import { CustomConsole } from './CustomConsole';
+import { InfoStack } from './InfoStack';
 
-export class CustomConsoleMessage
+export class InfoStackMessage
 {
 	public domElement: HTMLElement;
 
-	private customConsole: CustomConsole;
+	private customConsole: InfoStack;
 	private elapsedTime: number = 0;
 	private removalTriggered: boolean = false;
 
-	constructor(console: CustomConsole, domElement: HTMLElement)
+	constructor(console: InfoStack, domElement: HTMLElement)
 	{
 		this.customConsole = console;
 		this.domElement = domElement;

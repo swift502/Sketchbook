@@ -1,4 +1,4 @@
-import { World } from '../core/World';
+import { World } from '../world/World';
 
 export interface IWorldEntity {
 	addToWorld(world: World): void;

@@ -13,7 +13,7 @@ import { OpenVehicleDoor as OpenVehicleDoor } from './character_states/vehicles/
 import { Driving } from './character_states/vehicles/Driving';
 import { ExitingAirplane } from './character_states/vehicles/ExitingAirplane';
 import { ICharacterAI } from '../interfaces/ICharacterAI';
-import { World } from '../core/World';
+import { World } from '../world/World';
 import { IControllable } from '../interfaces/IControllable';
 import { ICharacterState } from '../interfaces/ICharacterState';
 import { IWorldEntity } from '../interfaces/IWorldEntity';

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as Utils from './FunctionLibrary';
-import { World } from './World';
+import { World } from '../world/World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
 import { KeyBinding } from './KeyBinding';
 import { Character } from '../characters/Character';

@@ -1,4 +1,4 @@
-import { World } from './World';
+import { World } from '../world/World';
 import { IInputReceiver } from '../interfaces/IInputReceiver';
 
 export class InputManager

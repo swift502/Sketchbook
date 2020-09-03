@@ -1,8 +1,8 @@
-import { CustomConsoleMessage } from './CustomConsoleMessage';
+import { InfoStackMessage } from './InfoStackMessage';
 
-export class CustomConsole
+export class InfoStack
 {
-	public messages: CustomConsoleMessage[] = [];
+	public messages: InfoStackMessage[] = [];
 	public entranceAnimation: string = 'animate__slideInLeft';
 	public exitAnimation: string = 'animate__backOutDown';
 
@@ -16,7 +16,7 @@ export class CustomConsole
 		let textElement = document.createTextNode(text);
 		messageElement.appendChild(textElement);
 		document.getElementById('console').prepend(messageElement);
-		this.messages.push(new CustomConsoleMessage(this, messageElement));
+		this.messages.push(new InfoStackMessage(this, messageElement));
 	}
 
 	public update(timeStep: number): void
