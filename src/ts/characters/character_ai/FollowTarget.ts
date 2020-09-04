@@ -3,6 +3,8 @@ import { ICharacterAI } from '../../interfaces/ICharacterAI';
 import * as Utils from '../../core/FunctionLibrary';
 import { Vehicle } from '../../vehicles/Vehicle';
 import { Character } from '../Character';
+import { Car } from '../../vehicles/Car';
+import { EntityType } from '../../enums/EntityType';
 
 export class FollowTarget implements ICharacterAI
 {
@@ -46,10 +48,14 @@ export class FollowTarget implements ICharacterAI
 			}
 
 			let forward = new THREE.Vector3(0, 0, 1).applyQuaternion((this.character.controlledObject as unknown as THREE.Object3D).quaternion);
+			viewVector.y = 0;
 			viewVector.normalize();
 			let angle = Utils.getSignedAngleBetweenVectors(forward, viewVector);
 
-			if (forward.dot(viewVector) < 0)
+			let goingForward = forward.dot(Utils.threeVector((this.character.controlledObject as unknown as Vehicle).collision.velocity)) > 0;
+			let speed = (this.character.controlledObject as unknown as Vehicle).collision.velocity.length();
+
+			if (forward.dot(viewVector) < 0.0)
 			{
 				this.character.controlledObject.triggerAction('reverse', true);
 				this.character.controlledObject.triggerAction('throttle', false);
@@ -60,10 +66,9 @@ export class FollowTarget implements ICharacterAI
 				this.character.controlledObject.triggerAction('reverse', false);
 			}
 
-			if (Math.abs(angle) > 0.3)
+			if (Math.abs(angle) > 0.15)
 			{
-				let goingForward = forward.dot(Utils.threeVector((this.character.controlledObject as unknown as Vehicle).collision.velocity));
-				if (forward.dot(viewVector) > 0 || goingForward > 0)
+				if (forward.dot(viewVector) > 0 || goingForward)
 				{
 					if (angle > 0)
 					{
