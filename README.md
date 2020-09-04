@@ -1,7 +1,7 @@
 <p align="center">
-    <a href="https://jblaha.art/sketchbook"><img src="./src/img/thumbnail.png"></a>
+    <a href="https://jblaha.art/sketchbook/latest"><img src="./src/img/thumbnail.png"></a>
     <br>
-    <a href="https://jblaha.art/sketchbook">Launch in-browser demo</a>
+    <a href="https://jblaha.art/sketchbook/latest">Launch in-browser demo</a>
     <br>
 </p>
 
