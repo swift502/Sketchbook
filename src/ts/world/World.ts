@@ -11,25 +11,25 @@ import { FXAAShader  } from 'three/examples/jsm/shaders/FXAAShader';
 import { Detector } from '../../lib/utils/Detector';
 import { Stats } from '../../lib/utils/Stats';
 import * as GUI from '../../lib/utils/dat.gui';
-import * as _ from 'lodash';
-import { InputManager } from '../core/InputManager';
-import { Character } from '../characters/Character';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
-import { Sky } from './Sky';
-import * as Utils from '../core/FunctionLibrary';
-import { Grass } from '../world/Grass';
-import { Path } from './Path';
-import { CollisionGroups } from '../enums/CollisionGroups';
-import { LoadingManager } from '../core/LoadingManager';
-import { BoxCollider } from '../physics/colliders/BoxCollider';
-import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
-import { Vehicle } from '../vehicles/Vehicle';
-import { Scenario } from './Scenario';
+import * as _ from 'lodash';
+
+import { InputManager } from '../core/InputManager';
+import * as Utils from '../core/FunctionLibrary';
+import { LoadingManager } from '../core/LoadingManager';
 import { InfoStack } from '../core/InfoStack';
 import { UIManager } from '../core/UIManager';
-import { Ocean } from './Ocean';
+import { IWorldEntity } from '../interfaces/IWorldEntity';
 import { IUpdatable } from '../interfaces/IUpdatable';
+import { Character } from '../characters/Character';
+import { Path } from './Path';
+import { CollisionGroups } from '../enums/CollisionGroups';
+import { BoxCollider } from '../physics/colliders/BoxCollider';
+import { TrimeshCollider } from '../physics/colliders/TrimeshCollider';
+import { Vehicle } from '../vehicles/Vehicle';
+import { Scenario } from './Scenario';
+import { Sky } from './Sky';
+import { Ocean } from './Ocean';
 
 export class World
 {
@@ -339,11 +339,6 @@ export class World
 					Utils.setupMeshProperties(child);
 					this.sky.csm.setupMaterial(child.material);
 
-					if (child.material.name === 'grass')
-					{
-						this.registerUpdatable(new Grass(child, this));
-					}
-
 					if (child.material.name === 'ocean')
 					{
 						this.registerUpdatable(new Ocean(child, this));
@@ -495,8 +490,8 @@ export class World
 			FXAA: true,
 			Debug_Physics: false,
 			Debug_FPS: false,
-			Sun_Elevation: 60,
-			Sun_Rotation: 225,
+			Sun_Elevation: 50,
+			Sun_Rotation: 145,
 		};
 
 		const gui = new GUI.GUI();

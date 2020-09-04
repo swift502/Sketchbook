@@ -24,7 +24,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 	}
 
 	private _phi: number = 50;
-	private _theta: number = 215;
+	private _theta: number = 145;
 
 	private hemiLight: THREE.HemisphereLight;
 	private maxHemiIntensity: number = 0.9;
