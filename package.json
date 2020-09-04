@@ -8,9 +8,8 @@
     "cannonjs",
     "game",
     "engine",
-    "characters",
-    "vehicles",
-    "physics"
+    "typescript",
+    "sketchbook"
   ],
   "main": "build/sketchbook.min.js",
   "types": "build/types/sketchbook.d.ts",
