@@ -47,9 +47,9 @@ export class FollowPath extends FollowTarget implements ICharacterAI
 			this.character.controlledObject.triggerAction('throttle', false);
 		}
 
-		if (speed < 1) this.staleTimer += timeStep;
+		if (speed < 1 || (this.character.controlledObject as unknown as Vehicle).rayCastVehicle.numWheelsOnGround === 0) this.staleTimer += timeStep;
 		else this.staleTimer = 0;
-		if (this.staleTimer > 3)
+		if (this.staleTimer > 5)
 		{
 			let worldPos = new THREE.Vector3();
 			this.targetNode.object.getWorldPosition(worldPos);
