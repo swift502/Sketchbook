@@ -5,9 +5,10 @@
     <br>
 </p>
 
-<a href="https://www.npmjs.com/package/sketchbook" target="_blank">![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)</a>
-<a href="https://travis-ci.org/swift502/Sketchbook" target="_blank">![badge](https://img.shields.io/travis/swift502/sketchbook?style=flat-square)</a>
-<a href="https://discord.gg/fGuEqCe" target="_blank">![badge](https://img.shields.io/discord/730763393325334628?label=discord&logo=discord&style=flat-square)</a>
+[![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
+[![badge](https://img.shields.io/travis/swift502/sketchbook?style=flat-square)](https://travis-ci.org/swift502/Sketchbook)
+[![badge](https://img.shields.io/discord/730763393325334628?label=discord&logo=discord&style=flat-square)](https://discord.gg/fGuEqCe)
+
 
 # 📒 Sketchbook
 
