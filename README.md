@@ -38,26 +38,31 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 
 ## Usage
 
-1. Import Sketchbook via script tag:
+### NPM
 
-```html
-<script src="sketchbook.min.js"></script>
-```
-
-or using NPM:
+1. Install:
 
 ```
 npm i sketchbook
 ```
 
+2. Import and load a glb scene defined in Blender:
+
 ```javascript
 import * as Sketchbook from 'sketchbook';
+
+const world = new Sketchbook.World('scene.glb');
 ```
 
-2. Load a glb scene defined in Blender:
+### Script tag
 
-```javascript
-const world = new Sketchbook.World('world.glb');
+Import and load a glb scene defined in Blender:
+
+```html
+<script src="sketchbook.min.js"></script>
+<script>
+	const world = new Sketchbook.World('scene.glb');
+</script>
 ```
 
 ## Contributing
