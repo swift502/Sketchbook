@@ -36,6 +36,24 @@ Mostly a playground for exploring how conventional third person gameplay mechani
 
 All planned features can be found in the [GitHub Projects](https://github.com/swift502/Sketchbook/projects).
 
+## Usage
+
+1. Import Sketchbook:
+
+```html
+<!-- Via script tag -->
+<script src="sketchbook.min.js"></script>
+```
+```javascript
+// Or via NPM
+import * as Sketchbook from 'sketchbook';
+```
+2. Load a scene defined in Blender:
+
+```javascript
+const world = new Sketchbook.World('world.glb');
+```
+
 ## Contributing
 
 1. Get latest [Node.js](https://nodejs.org/en/)

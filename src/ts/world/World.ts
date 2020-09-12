@@ -487,13 +487,6 @@ export class World
 		$('head').append('<link href="https://fonts.googleapis.com/css2?family=Solway:wght@400;500;700&display=swap" rel="stylesheet">');
 		$('head').append('<link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap" rel="stylesheet">');
 
-		// Css
-
-
-		// Canvas
-		document.body.appendChild(this.renderer.domElement);
-		this.renderer.domElement.id = 'canvas';
-
 		// Loader
 		$(`	<div id="loading-screen">
 				<div id="loading-screen-background"></div>
@@ -526,6 +519,10 @@ export class World
 				</div>
 			</div>
 		`).appendTo('body');
+
+		// Canvas
+		document.body.appendChild(this.renderer.domElement);
+		this.renderer.domElement.id = 'canvas';
 	}
 
 	private createParamsGUI(scope: World): void
