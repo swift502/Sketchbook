@@ -44,6 +44,6 @@
     "lodash": "^4.17.20",
     "sweetalert2": "^9.17.1",
     "three": "0.113.0",
-    "three-csm": "^1.0.2"
+    "three-csm": "1.0.2"
   }
 }
