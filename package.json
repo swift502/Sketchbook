@@ -28,14 +28,10 @@
   },
   "homepage": "https://github.com/swift502/Sketchbook",
   "devDependencies": {
+    "@types/jquery": "^3.5.1",
     "@types/lodash": "^4.14.149",
     "css-loader": "^3.4.0",
-    "lodash": "^4.17.19",
-    "mini-css-extract-plugin": "^0.11.0",
-    "optimize-css-assets-webpack-plugin": "^5.0.4",
-    "sweetalert2": "^9.17.1",
-    "three": "^0.113.0",
-    "three-csm": "^1.0.2",
+    "style-loader": "^1.2.1",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.3",
     "webpack": "^4.41.3",
@@ -43,5 +39,11 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "jquery": "^3.5.1",
+    "lodash": "^4.17.20",
+    "sweetalert2": "^9.17.1",
+    "three": "0.113.0",
+    "three-csm": "^1.0.2"
+  }
 }

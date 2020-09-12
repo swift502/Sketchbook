@@ -1,10 +1,6 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
 module.exports = {
-	plugins: [new MiniCssExtractPlugin({
-		filename: './build/style.min.css',
-	})],
     entry: {
 		app: './src/ts/sketchbook.ts'
     },
@@ -28,11 +24,14 @@ module.exports = {
             exclude: /node_modules/,
         },
 		{
-			test: /\.css$/i,
-			use: [MiniCssExtractPlugin.loader, 'css-loader'],
-		},
+            test: /\.css$/,
+            use: [
+            	{ loader: 'style-loader', options: { injectType: 'singletonStyleTag' } },
+				{ loader: 'css-loader' },
+            ]
+        }
       ]
-    },
+	},
     performance: {
         hints: false
     }

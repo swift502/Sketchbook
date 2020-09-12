@@ -67,5 +67,6 @@ export declare class World {
     clearEntities(): void;
     scrollTheTimeScale(scrollAmount: number): void;
     updateControls(controls: any): void;
+    private generateHTML;
     private createParamsGUI;
 }

@@ -26,6 +26,7 @@ h1 {
 }
 
 #ui-container {
-    position: absolute;
+	position: absolute;
+	top: 0;
     height: 100vh;
 }
