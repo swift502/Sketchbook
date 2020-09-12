@@ -38,17 +38,23 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 
 ## Usage
 
-1. Import Sketchbook:
+1. Import Sketchbook via script tag:
 
 ```html
-<!-- Via script tag -->
 <script src="sketchbook.min.js"></script>
 ```
+
+or using NPM:
+
+```
+npm i sketchbook
+```
+
 ```javascript
-// Or via NPM
 import * as Sketchbook from 'sketchbook';
 ```
-2. Load a scene defined in Blender:
+
+2. Load a glb scene defined in Blender:
 
 ```javascript
 const world = new Sketchbook.World('world.glb');
@@ -61,8 +67,7 @@ const world = new Sketchbook.World('world.glb');
 3. Run `npm install`
 4. Run `npm run dev`
 5. Make changes and test them out at http://localhost:8080
-6. Run `npm run build`
-7. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
+6. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
 ## Blender source files
 
