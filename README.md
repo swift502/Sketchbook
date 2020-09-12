@@ -38,6 +38,8 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 
 ## Usage
 
+It's possible to define your own scenes in Blender, and then read them with Sketchbook. Sketchbook needs to run on a local server such as [http-server](https://www.npmjs.com/package/http-server) or [webpack-dev-server](https://github.com/webpack/webpack-dev-server) to be able to load external assets.
+
 ### Script tag
 
 1. Import:
@@ -81,11 +83,11 @@ const world = new World('scene.glb');
 5. Make changes and test them out at http://localhost:8080
 6. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
-## Blender source files
+## Source `.blend` files
 
-Blender source files and other graphical assets used by the main demo are kept separately from this repository: https://drive.google.com/drive/folders/1ZbziXLAW3yAn3e_s-6UO6jMIJWaglqDG?usp=sharing
+Source `.blend` files, including the main demo scene, and other graphical assets used by the main demo are available here: https://drive.google.com/drive/folders/1ZbziXLAW3yAn3e_s-6UO6jMIJWaglqDG?usp=sharing
 
-## Contributors
+## Credits
 
 Big thank you to each of the following github users for contributing to Sketchbook:
 
