@@ -1,1 +1,1 @@
-src/lib/* linguist-vendored=true
+*.js linguist-detectable=false
