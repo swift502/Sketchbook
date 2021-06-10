@@ -82,10 +82,6 @@ const world = new World('scene.glb');
 5. Make changes and test them out at http://localhost:8080
 6. Commit and [make a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)!
 
-## Blender source files
-
-Source `.blend` files, including the main demo scene, and other graphical assets used by the main demo are available here: https://drive.google.com/drive/folders/1ZbziXLAW3yAn3e_s-6UO6jMIJWaglqDG?usp=sharing
-
 ## Credits
 
 Big thank you to each of the following github users for contributing to Sketchbook:
