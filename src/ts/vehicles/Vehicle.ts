@@ -32,8 +32,6 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 	public spawnPoint: THREE.Object3D;
 	private modelContainer: THREE.Group;
 
-	private firstPerson: boolean = false;
-
 	constructor(gltf: any, handlingSetup?: any)
 	{
 		super();
@@ -186,26 +184,6 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public setFirstPersonView(value: boolean): void
-	{
-		this.firstPerson = value;
-		if (this.controllingCharacter !== undefined) this.controllingCharacter.modelContainer.visible = !value;
-
-		if (value)
-		{
-			this.world.cameraOperator.setRadius(0, true);
-		}
-		else
-		{
-			this.world.cameraOperator.setRadius(3, true);
-		}
-	}
-
-	public toggleFirstPersonView(): void
-	{
-		this.setFirstPersonView(!this.firstPerson);
-	}
-	
 	public triggerAction(actionName: string, value: boolean): void
 	{
 		// Get action and set it's parameters
@@ -250,32 +228,16 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 	public inputReceiverInit(): void
 	{
 		this.collision.allowSleep = false;
-		this.setFirstPersonView(false);
 	}
 
 	public inputReceiverUpdate(timeStep: number): void
 	{
-		if (this.firstPerson)
-		{
-			// this.world.cameraOperator.target.set(
-			//     this.position.x + this.camera.position.x,
-			//     this.position.y + this.camera.position.y,
-			//     this.position.z + this.camera.position.z
-			// );
-
-			let temp = new THREE.Vector3().copy(this.camera.position);
-			temp.applyQuaternion(this.quaternion);
-			this.world.cameraOperator.target.copy(temp.add(this.position));
-		}
-		else
-		{
-			// Position camera
-			this.world.cameraOperator.target.set(
-				this.position.x,
-				this.position.y + 0.5,
-				this.position.z
-			);
-		}
+    // Position camera
+    this.world.cameraOperator.target.set(
+      this.position.x,
+      this.position.y + 0.5,
+      this.position.z
+    );
 	}
 
 	public setPosition(x: number, y: number, z: number): void

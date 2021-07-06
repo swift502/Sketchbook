@@ -34,7 +34,6 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 			'rollRight': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
 			'seat_switch': new KeyBinding('KeyX'),
-			'view': new KeyBinding('KeyV'),
 		};
 	}
 
@@ -77,10 +76,7 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 		{
 			this.forceCharacterOut();
 		}
-		if (this.actions.view.justPressed)
-		{
-			this.toggleFirstPersonView();
-		}
+
 	}
 
 	public physicsPreStep(body: CANNON.Body, heli: Helicopter): void
@@ -230,10 +226,6 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 			{
 				keys: ['A', 'D'],
 				desc: 'Roll'
-			},
-			{
-				keys: ['V'],
-				desc: 'View select'
 			},
 			{
 				keys: ['F'],

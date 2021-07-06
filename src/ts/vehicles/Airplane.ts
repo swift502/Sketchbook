@@ -55,7 +55,6 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 			'rollRight': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
 			'seat_switch': new KeyBinding('KeyX'),
-			'view': new KeyBinding('KeyV'),
 		};
 
 		this.steeringSimulator = new SpringSimulator(60, 10, 0.6); 
@@ -324,10 +323,6 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 		{
 			this.setBrake(0);
 		}
-		if (this.actions.view.justPressed)
-		{
-			this.toggleFirstPersonView();
-		}
 	}
 
 	public readAirplaneData(gltf: any): void
@@ -396,10 +391,6 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 			{
 				keys: ['B'],
 				desc: 'Brake'
-			},
-			{
-				keys: ['V'],
-				desc: 'View select'
 			},
 			{
 				keys: ['F'],

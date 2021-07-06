@@ -57,7 +57,6 @@ export class Car extends Vehicle implements IControllable
 			'right': new KeyBinding('KeyD'),
 			'exitVehicle': new KeyBinding('KeyF'),
 			'seat_switch': new KeyBinding('KeyX'),
-			'view': new KeyBinding('KeyV'),
 		};
 
 		this.steeringSimulator = new SpringSimulator(60, 10, 0.6);
@@ -285,10 +284,6 @@ export class Car extends Vehicle implements IControllable
 		{
 			this.setBrake(0, 'rwd');
 		}
-		if (this.actions.view.justPressed)
-		{
-			this.toggleFirstPersonView();
-		}
 	}
 
 	public inputReceiverInit(): void
@@ -307,10 +302,6 @@ export class Car extends Vehicle implements IControllable
 			{
 				keys: ['Space'],
 				desc: 'Handbrake'
-			},
-			{
-				keys: ['V'],
-				desc: 'View select'
 			},
 			{
 				keys: ['F'],
