@@ -50,6 +50,7 @@ export class VehicleSpawnPoint implements ISpawnPoint
 
 					if (this.driver === 'player')
 					{
+						world.player_id = character.uuid;
 						character.takeControl();
 					}
 					else if (this.driver === 'ai')

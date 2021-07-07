@@ -82,6 +82,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	
 	private physicsEnabled: boolean = true;
 
+	public get classname(): string
+	{
+		return 'Character';
+	}
+
 	constructor(gltf: any)
 	{
 		super();
@@ -277,37 +282,46 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
 	{
+
 		if (this.controlledObject !== undefined)
 		{
 			this.controlledObject.handleKeyboardEvent(event, code, pressed);
-		}
-		else
-		{
-			// Free camera
-			if (code === 'KeyC' && pressed === true && event.shiftKey === true)
-			{
-				this.resetControls();
-				this.world.cameraOperator.characterCaller = this;
-				this.world.inputManager.setInputReceiver(this.world.cameraOperator);
-			}
-			else if (code === 'KeyR' && pressed === true && event.shiftKey === true)
-			{
-				this.world.restartScenario();
-			}
-			else
-			{
-				for (const action in this.actions) {
-					if (this.actions.hasOwnProperty(action)) {
-						const binding = this.actions[action];
+		} else {
+			for (const action in this.actions) {
+				if (this.actions.hasOwnProperty(action)) {
+					const binding = this.actions[action];
 	
-						if (_.includes(binding.eventCodes, code))
-						{
-							this.triggerAction(action, pressed);
-						}
+					if (_.includes(binding.eventCodes, code))
+					{
+						this.triggerAction(action, pressed);
 					}
 				}
 			}
 		}
+
+		// Change camera
+		if (code === 'KeyV' && pressed === true && event.ctrlKey === true)
+		{
+			this.world.cameraOperator.nextCamType();
+
+			if( this.world.cameraOperator.currentCamType === 'free'){
+				this.resetControls();
+				this.world.cameraOperator.characterCaller = this;
+				this.world.inputManager.setInputReceiver(this.world.cameraOperator);
+			}
+
+		}
+		// Change view
+		else if (code === 'KeyV' && pressed === true )
+		{
+			this.world.cameraOperator.nextView();
+		}
+
+		if (code === 'KeyR' && pressed === true && event.shiftKey === true)
+		{
+			this.world.restartScenario();
+		}
+
 	}
 
 	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
@@ -475,8 +489,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 				desc: 'Respawn'
 			},
 			{
-				keys: ['Shift', '+', 'C'],
-				desc: 'Free camera'
+				keys: ['Ctrl', '+', 'V'],
+				desc: 'Change camera'
+			},
+			{
+				keys: ['V'],
+				desc: 'Change point of view'
 			},
 		]);
 	}

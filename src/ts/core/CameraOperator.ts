@@ -34,6 +34,21 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public characterCaller: Character;
 
+	private _viewpoint: any = {
+		position:  THREE.Vector3,
+		direction:  THREE.Vector3,
+	};
+	private _viewpoints: any;
+
+	private _currentCam: any = {
+		name: String,
+		type: 0,
+		types: [ 'follow', 'free', 'orbital' ],
+		view: 0,
+		views: Array,
+	}
+
+
 	constructor(world: World, camera: THREE.Camera, sensitivityX: number = 1, sensitivityY: number = sensitivityX * 0.8)
 	{
 		this.world = world;
@@ -61,6 +76,128 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 		};
 
 		world.registerUpdatable(this);
+		this.initViews();
+	}
+
+	private initViews(){
+		this._viewpoint.position = new THREE.Vector3();
+		this._viewpoint.direction = new THREE.Vector3();
+		this._viewpoints = {
+			shared: [
+				// {
+				//   position: new THREE.Vector3( 0, 3, -5),
+				//   direction: new THREE.Vector3(0, 3, 5),
+				//   desc: 'Far'
+				// },
+				// {
+				//   position: new THREE.Vector3( 0, 10, 0),
+				//   direction: new THREE.Vector3(0, -20, 0),
+				//   desc: 'Far top'
+				// },
+			],
+			defaults: [
+				{
+					position: new THREE.Vector3( 0, 3, -5),
+					direction: new THREE.Vector3(0, 3, 5),
+				},
+				{
+					position: new THREE.Vector3( 0, 1, -5),
+					direction: new THREE.Vector3(0, 3, 5),
+				},
+				{
+					position: new THREE.Vector3( 0, .7, -.005),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Inside'
+				},
+			],
+			Airplane: [
+				{
+					position: new THREE.Vector3( 0, 3, -5),
+					direction: new THREE.Vector3(0, 3, 5),
+				},
+				{
+					position: new THREE.Vector3( 0, .7, -.15),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Pilot'
+				},
+				{
+					position: new THREE.Vector3( 0, 1, -5),
+					direction: new THREE.Vector3(0, 3, 5),
+				},
+				{
+					position: new THREE.Vector3( 0, .7, .2),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Front'
+				},
+				{
+					position: new THREE.Vector3( 0, 1, -1),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Back'
+				},
+			],
+			Character: [
+				{
+					position: new THREE.Vector3( 0, .5, -1.5),
+					direction: new THREE.Vector3(0, .5, .5),
+					desc: 'Third person'
+				},
+				{
+					position: new THREE.Vector3( 0, .3, -.3),
+					direction: new THREE.Vector3(0, 0, 10),
+					lerp: false,
+					desc: 'First person'
+				},
+				{
+					position: new THREE.Vector3( -.5, .4, -1),
+					direction: new THREE.Vector3(-.8, .4, .2),
+					desc: 'Over the shoulder'
+				},
+		 ],
+			Car: [
+				{
+					position: new THREE.Vector3( 0, 1, -3),
+					direction: new THREE.Vector3(0, 1, 1),
+					desc: 'Behind'
+				},
+				{
+					position: new THREE.Vector3( .15, .6, .07),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Driver'
+				},
+				{
+					position: new THREE.Vector3( -.2, .6, 0),
+					direction: new THREE.Vector3(3.14, 0, 0),
+					lerp: false,
+					desc: 'Passenger sit'
+				},
+				{
+					position: new THREE.Vector3( 0, .5, 1),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Front'
+				},
+			],
+			Helicopter:
+			[
+				{
+				position: new THREE.Vector3( 0, 2, -3),
+				direction: new THREE.Vector3(0, 1, 1),
+				},
+				{
+					position: new THREE.Vector3( .15, .3, .1),
+					direction: new THREE.Vector3(0, 0, 0),
+					lerp: false,
+					desc: 'Pilot'
+				},
+			]
+		}
+		this._currentCam.name = 'Character';
+		this._currentCam.views = [ ...this._viewpoints.Character, ...this._viewpoints.shared ];
 	}
 
 	public setSensitivity(sensitivityX: number, sensitivityY: number = sensitivityX): void
@@ -84,39 +221,134 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 		this.phi += deltaY * (this.sensitivity.y / 2);
 		this.phi = Math.min(85, Math.max(-85, this.phi));
 	}
+	public nextCamType(){
+		this._currentCam.type++;
+		this._currentCam.view = 0;
+		if( ! this._currentCam.types[ this._currentCam.type ] )
+		{
+			this._currentCam.type = 0;
+		}
+
+		return this._currentCam.types[ this._currentCam.type ];
+	}
+
+	public nextView(){
+		if( this._currentCam.views[ this._currentCam.view + 1 ]){
+			this._currentCam.view++;
+		} else {
+			this._currentCam.view = 0;
+		}
+		return this._currentCam.view;
+	}
+
+	public get currentCamType(){
+		return this._currentCam.types[ this._currentCam.type ];
+	}
+
+	public get currentCam(){
+		return this._viewpoints[ this._currentCam.name ][ this._currentCam.view ];
+	}
 
 	public update(timeScale: number): void
 	{
-		if (this.followMode === true)
-		{
-			this.camera.position.y = THREE.MathUtils.clamp(this.camera.position.y, this.target.y, Number.POSITIVE_INFINITY);
-			this.camera.lookAt(this.target);
-			let newPos = this.target.clone().add(new THREE.Vector3().subVectors(this.camera.position, this.target).normalize().multiplyScalar(this.targetRadius));
-			this.camera.position.x = newPos.x;
-			this.camera.position.y = newPos.y;
-			this.camera.position.z = newPos.z;
+
+		switch ( this.currentCamType ) {
+			case 'follow':
+				this.followCam( timeScale );
+				break;
+			case 'free':
+				this.freeCam();
+				break;
+				default:
+				this.freeCam();
+				break;
 		}
-		else 
-		{
-			this.radius = THREE.MathUtils.lerp(this.radius, this.targetRadius, 0.1);
-	
-			this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
-			this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 180);
-			this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
-			this.camera.updateMatrix();
-			this.camera.lookAt(this.target);
+
+	}
+
+	private freeCam( ){
+		this.radius = THREE.MathUtils.lerp(this.radius, this.targetRadius, 0.1);
+		this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+		this.camera.position.y = this.target.y + this.radius * Math.sin(this.phi * Math.PI / 180);
+		this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+		this.camera.updateMatrix();
+		this.camera.lookAt(this.target);
+	}
+
+	private _viewpointRelativeTo(target: any){
+		let name = target.classname;
+		name = this._viewpoints[ name ] ? name : 'defaults';
+		this._currentCam.name = name;
+		this._currentCam.views = [ ...this._viewpoints[ this._currentCam.name ], ...this._viewpoints.shared ];
+
+		const pov = this._currentCam.views[ this._currentCam.view ] ?? this._currentCam.views[ this._currentCam.views.length - 1 ];
+
+		const position = pov.position.clone();
+		position.applyQuaternion( target.quaternion );
+		position.add( target.position );
+
+		const direction = pov.direction.clone();
+		direction.applyQuaternion( target.quaternion );
+		direction.add( target.position );
+
+		return { position, direction, lerp: pov.lerp };
+	}
+
+	private followCam( timeScale: number ){
+		let player = this.world.characters.find( char => char.uuid === this.world.player_id );
+
+		if( !player ) {
+			return;
 		}
+
+		const t = 1.0 - Math.pow( 0.001, timeScale ) ;
+		let pov: any;
+
+		if( player.controlledObject ){
+			pov = this._viewpointRelativeTo( player.controlledObject );
+			this.camera.setRotationFromQuaternion( player.controlledObject.quaternion );
+			let rot = player.controlledObject.quaternion.clone();
+			rot.setFromAxisAngle( new THREE.Vector3(0,1,0), Math.PI  );
+			this.camera.quaternion.multiplyQuaternions( rot, this.camera.quaternion );
+			this.camera.rotation.x = - this.camera.rotation.x;
+
+			if( player.controlledObject.speed >= -2.8 )
+			{
+				this.camera.rotation.z = - this.camera.rotation.z;
+			}
+			else
+			{
+				this.camera.rotation.y += Math.PI;
+			}
+
+		} else if( player.parent instanceof THREE.Scene ) {
+
+			pov = this._viewpointRelativeTo( player );
+			this._viewpoint.direction.lerp( pov.direction, t );
+			this.camera.lookAt( this._viewpoint.direction );
+
+		} else {
+			this.camera.lookAt( this.target );
+			return;
+		}
+		if( pov.lerp === false ){
+			this._viewpoint.position.copy( pov.position );
+		} else {
+			this._viewpoint.position.lerp( pov.position, t );
+		}
+		this.camera.position.copy( this._viewpoint.position );
 	}
 
 	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
 	{
-		// Free camera
-		if (code === 'KeyC' && pressed === true && event.shiftKey === true)
+		// Exit free camera
+		if (code === 'KeyV' && pressed === true && event.ctrlKey === true)
 		{
 			if (this.characterCaller !== undefined)
 			{
 				this.world.inputManager.setInputReceiver(this.characterCaller);
 				this.characterCaller = undefined;
+				this.nextCamType();
 			}
 		}
 		else
@@ -133,6 +365,7 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 			}
 		}
 	}
+
 
 	public handleMouseWheel(event: WheelEvent, value: number): void
 	{
@@ -178,9 +411,9 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 				desc: 'Speed up'
 			},
 			{
-				keys: ['Shift', '+', 'C'],
-				desc: 'Exit free camera mode'
-			},
+				keys: ['Ctrl', '+', 'V'],
+				desc: 'Change camera'
+			}
 		]);
 	}
 

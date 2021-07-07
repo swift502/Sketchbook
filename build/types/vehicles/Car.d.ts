@@ -5,8 +5,6 @@ import { EntityType } from '../enums/EntityType';
 export declare class Car extends Vehicle implements IControllable {
     entityType: EntityType;
     drive: string;
-    get speed(): number;
-    private _speed;
     private steeringWheel;
     private airSpinTimer;
     private steeringSimulator;
@@ -15,6 +13,9 @@ export declare class Car extends Vehicle implements IControllable {
     private timeToShift;
     private canTiltForwards;
     private characterWantsToExit;
+    private _speed;
+    get speed(): number;
+    get classname(): string;
     constructor(gltf: any);
     noDirectionPressed(): boolean;
     update(timeStep: number): void;

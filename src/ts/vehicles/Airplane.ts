@@ -26,6 +26,11 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 	private enginePower: number = 0;
 	private lastDrag: number = 0;
 
+	public get classname(): string
+	{
+		return 'Airplane';
+	}
+
 	constructor(gltf: any)
 	{
 		super(gltf, {
@@ -401,8 +406,12 @@ export class Airplane extends Vehicle implements IControllable, IWorldEntity
 				desc: 'Respawn'
 			},
 			{
-				keys: ['Shift', '+', 'C'],
-				desc: 'Free camera'
+				keys: ['Ctrl', '+', 'V'],
+				desc: 'Change camera'
+			},
+			{
+				keys: ['V'],
+				desc: 'Change point of view'
 			},
 		]);
 	}

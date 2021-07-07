@@ -7,6 +7,8 @@ export interface IControllable extends IInputReceiver {
     seats: VehicleSeat[];
     position: THREE.Vector3;
     controllingCharacter: Character;
+    quaternion: THREE.Quaternion;
+    speed: Number;
     triggerAction(actionName: string, value: boolean): void;
     resetControls(): void;
     allowSleep(value: boolean): void;

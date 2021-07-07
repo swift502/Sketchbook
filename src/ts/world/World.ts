@@ -63,6 +63,7 @@ export class World
 	public paths: Path[] = [];
 	public scenarioGUIFolder: any;
 	public updatables: IUpdatable[] = [];
+  public player_id: String;
 
 	private lastScenarioID: string;
 

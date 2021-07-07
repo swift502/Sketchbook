@@ -31,6 +31,10 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 	public materials: THREE.Material[] = [];
 	public spawnPoint: THREE.Object3D;
 	private modelContainer: THREE.Group;
+  public quaternion: THREE.Quaternion;
+	public get speed(): number{
+		return 0;
+	}
 
 	constructor(gltf: any, handlingSetup?: any)
 	{
@@ -158,14 +162,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 
 	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
 	{
-		// Free camera
-		if (code === 'KeyC' && pressed === true && event.shiftKey === true)
-		{
-			this.resetControls();
-			this.world.cameraOperator.characterCaller = this.controllingCharacter;
-			this.world.inputManager.setInputReceiver(this.world.cameraOperator);
-		}
-		else if (code === 'KeyR' && pressed === true && event.shiftKey === true)
+		if (code === 'KeyR' && pressed === true && event.shiftKey === true)
 		{
 			this.world.restartScenario();
 		}
@@ -232,12 +229,12 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 
 	public inputReceiverUpdate(timeStep: number): void
 	{
-    // Position camera
-    this.world.cameraOperator.target.set(
-      this.position.x,
-      this.position.y + 0.5,
-      this.position.z
-    );
+		// Position camera
+		this.world.cameraOperator.target.set(
+			this.position.x,
+			this.position.y + 0.5,
+			this.position.z
+		);
 	}
 
 	public setPosition(x: number, y: number, z: number): void

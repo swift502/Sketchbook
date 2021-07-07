@@ -8,6 +8,7 @@ export declare class Helicopter extends Vehicle implements IControllable, IWorld
     entityType: EntityType;
     rotors: THREE.Object3D[];
     private enginePower;
+    get classname(): string;
     constructor(gltf: any);
     noDirectionPressed(): boolean;
     update(timeStep: number): void;

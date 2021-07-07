@@ -28,6 +28,7 @@ export class CharacterSpawnPoint implements ISpawnPoint
 			player.setOrientation(forward, true);
 			
 			world.add(player);
+			world.player_id = player.uuid;
 			player.takeControl();
 		});
 	}

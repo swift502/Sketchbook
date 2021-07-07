@@ -14,6 +14,11 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 	public entityType: EntityType = EntityType.Helicopter;
 	public rotors: THREE.Object3D[] = [];
 	private enginePower: number = 0;
+	
+	public get classname(): string
+	{
+		return 'Helicopter';
+	}
 
 	constructor(gltf: any)
 	{
@@ -236,8 +241,12 @@ export class Helicopter extends Vehicle implements IControllable, IWorldEntity
 				desc: 'Respawn'
 			},
 			{
-				keys: ['Shift', '+', 'C'],
-				desc: 'Free camera'
+				keys: ['Ctrl', '+', 'V'],
+				desc: 'Change camera'
+			},
+			{
+				keys: ['V'],
+				desc: 'Change point of view'
 			},
 		]);
 	}
