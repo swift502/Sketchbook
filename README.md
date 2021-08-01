@@ -1,8 +1,8 @@
 <p align="center">
-    <a href="https://jblaha.art/sketchbook/latest"><img src="./src/img/thumbnail.png"></a>
-    <br>
-    <a href="https://jblaha.art/sketchbook/latest">Live demo</a>
-    <br>
+	<a href="https://jblaha.art/sketchbook/latest"><img src="./src/img/thumbnail.png"></a>
+	<br>
+	<a href="https://jblaha.art/sketchbook/latest">Live demo</a>
+	<br>
 </p>
 
 [![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
@@ -18,20 +18,20 @@ Mostly a playground for exploring how conventional third person gameplay mechani
 ## Features
 
 * World
-    * Three.js scene
-    * Cannon.js physics
-    * Variable timescale
-    * Frame skipping
-    * FXAA anti-aliasing
+	* Three.js scene
+	* Cannon.js physics
+	* Variable timescale
+	* Frame skipping
+	* FXAA anti-aliasing
 * Characters
-    * Third-person camera
-    * Raycast character controller with capsule collisions
-    * General state system
-    * Character AI
+	* Third-person camera
+	* Raycast character controller with capsule collisions
+	* General state system
+	* Character AI
 * Vehicles
-    * Cars
-    * Airplanes
-    * Helicopters
+	* Cars
+	* Airplanes
+	* Helicopters
 
 All planned features can be found in the [GitHub Projects](https://github.com/swift502/Sketchbook/projects).
 
@@ -87,4 +87,5 @@ const world = new World('scene.glb');
 Big thank you to each of the following github users for contributing to Sketchbook:
 
 - [aleqsunder](https://github.com/aleqsunder)
+- [barhatsor](https://github.com/barhatsor)
 - [danshuri](https://github.com/danshuri)
