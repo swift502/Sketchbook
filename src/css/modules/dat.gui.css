@@ -76,9 +76,9 @@
     float: right;
     margin-top: 15px;
     margin-right: 15px;
-	border-radius: 5px;
-  	box-shadow: 0 1px 3px 0 rgb(0 0 0 / 30%);
-	overflow-x: hidden;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 30%);
+    overflow-x: hidden;
     overflow-y: visible
 }
 
@@ -131,10 +131,10 @@
 }
 
 .dg li.title {
-	/* font-family: 'Allerta Stencil', sans-serif; */
-	/* font-family: 'Patua One', cursive; */
-	/* font-family: 'Fredoka One', cursive; */
-	font-weight: 500;
+    /* font-family: 'Allerta Stencil', sans-serif; */
+    /* font-family: 'Patua One', cursive; */
+    /* font-family: 'Fredoka One', cursive; */
+    font-weight: 500;
     cursor: pointer;
     margin-left: -4px
 }
@@ -155,18 +155,18 @@
 }
 
 .dg .property-name {
-	font-size: 82%;
+    font-size: 82%;
     cursor: default;
     float: left;
     clear: left;
     width: 40%;
-	overflow: hidden;
-	white-space: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis
 }
 
 .dg .cr.function .property-name {
-	width: 100%;
+    width: 100%;
 }
 
 .dg .c {
@@ -289,8 +289,8 @@
 .dg {
     color: #eee;
     /* font-family: 'Cutive Mono', sans-serif; */
-	/* text-shadow: 0 -1px 0 #111 */
-	text-shadow: none;
+    /* text-shadow: 0 -1px 0 #111 */
+    text-shadow: none;
 }
 
 .dg.main::-webkit-scrollbar {
@@ -357,14 +357,14 @@
 }
 
 .dg li.title {
-	font-size: 90%;
-	height: 33px;
-	line-height: 33px;
+    font-size: 90%;
+    height: 33px;
+    line-height: 33px;
     padding-left: 20px;
     background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 8px 14px no-repeat;
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  	background-color: rgb(0 0 0 / 92%);
+    background-color: rgb(0 0 0 / 92%);
 }
 
 .dg .closed li.title {
@@ -461,4 +461,3 @@
 .dg.ac .close-button.close-bottom {
     display: none;
 }
-
