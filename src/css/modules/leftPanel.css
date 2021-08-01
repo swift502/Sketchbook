@@ -1,11 +1,13 @@
 /* Left panel */
 
 .left-panel {
+	position: fixed;
 	height: calc(100% - 70px);
 	padding-top: 70px;
 	flex-direction: column;
 	display: flex;
 	justify-content: space-between;
+	pointer-events: none;
 }
 
 .left-panel .panel-segment {
