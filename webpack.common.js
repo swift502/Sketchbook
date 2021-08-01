@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-		app: './src/ts/sketchbook.ts'
+        app: './src/ts/sketchbook.ts'
     },
     output: {
         filename: './build/sketchbook.min.js',
@@ -15,7 +15,7 @@ module.exports = {
           cannon: path.resolve(__dirname, './src/lib/cannon/cannon.js')
         },
         extensions: [ '.tsx', '.ts', '.js' ],
-      },
+    },
     module: {
         rules: [
         {
@@ -23,15 +23,15 @@ module.exports = {
             use: 'ts-loader',
             exclude: /node_modules/,
         },
-		{
+        {
             test: /\.css$/,
             use: [
-            	{ loader: 'style-loader', options: { injectType: 'singletonStyleTag' } },
-				{ loader: 'css-loader' },
+                { loader: 'style-loader', options: { injectType: 'singletonStyleTag' } },
+                { loader: 'css-loader' },
             ]
         }
       ]
-	},
+    },
     performance: {
         hints: false
     }
