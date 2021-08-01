@@ -76,6 +76,9 @@
     float: right;
     margin-top: 15px;
     margin-right: 15px;
+	border-radius: 5px;
+  	box-shadow: 0 1px 3px 0 rgb(0 0 0 / 30%);
+	overflow-x: hidden;
     overflow-y: visible
 }
 
@@ -306,8 +309,11 @@
 }
 
 .dg li:not(.folder) {
-    background: #1a1a1a;
-    border-bottom: 1px solid #2c2c2c
+    background: rgb(26 26 26 / 92%);
+    border-bottom: 1px solid #2c2c2c;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    margin-left: -4px;
 }
 
 .dg li.save-row {
@@ -357,7 +363,8 @@
     padding-left: 20px;
     background: #000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 8px 14px no-repeat;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2)
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  	background-color: rgb(0 0 0 / 92%);
 }
 
 .dg .closed li.title {
