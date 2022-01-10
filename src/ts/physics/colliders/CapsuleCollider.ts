@@ -42,5 +42,9 @@ export class CapsuleCollider implements ICollider
 		capsuleBody.addShape(sphereShape, new CANNON.Vec3(0, -options.height / 2, 0));
 
 		this.body = capsuleBody;
+
+		capsuleBody.addEventListener("collide", (event)=>{
+			console.log(event);
+		})
 	}
 }

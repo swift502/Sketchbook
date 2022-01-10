@@ -43,5 +43,9 @@ export class TrimeshCollider implements ICollider
 		physBox.material = mat;
 
 		this.body = physBox;
+
+		// physBox.addEventListener("collide", (event)=>{
+		// 	console.log(event);
+		// })
 	}
 }

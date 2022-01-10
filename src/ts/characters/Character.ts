@@ -132,6 +132,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			segments: 8,
 			friction: 0.0
 		});
+
+		this.characterCapsule.body.addEventListener("collide", (event)=>{
+			console.log("body", event);
+		})
+
 		// capsulePhysics.physical.collisionFilterMask = ~CollisionGroups.Trimesh;
 		this.characterCapsule.body.shapes.forEach((shape) => {
 			// tslint:disable-next-line: no-bitwise
@@ -152,7 +157,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			color: 0xff0000
 		});
 		this.raycastBox = new THREE.Mesh(boxGeo, boxMat);
-		this.raycastBox.visible = false;
+		this.raycastBox.visible = true;
 
 		// Physics pre/post step callback bindings
 		this.characterCapsule.body.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
