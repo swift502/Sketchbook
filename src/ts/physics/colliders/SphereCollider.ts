@@ -35,9 +35,5 @@ export class SphereCollider implements ICollider
 		physSphere.material = mat;
 
 		this.body = physSphere;
-
-		physSphere.addEventListener("collide", (event)=>{
-			console.log(event);
-		})
 	}
 }
