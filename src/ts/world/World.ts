@@ -3,7 +3,7 @@ import * as CANNON from 'cannon';
 import Swal from 'sweetalert2';
 import * as $ from 'jquery';
 
-import { CameraOperator } from '../core/CameraOperator';
+import { CameraOperator, CameraType } from '../core/CameraOperator';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
@@ -63,10 +63,12 @@ export class World
 	public paths: Path[] = [];
 	public scenarioGUIFolder: any;
 	public updatables: IUpdatable[] = [];
+	public cameraType: CameraType;
 
 	private lastScenarioID: string;
+	
 
-	constructor(worldScenePath?: any)
+	constructor(worldScenePath?: any, cameraTypeArg?:any)
 	{
 		const scope = this;
 
@@ -148,8 +150,15 @@ export class World
 		this.createParamsGUI(scope);
 
 		// Initialization
+		this.cameraType = cameraTypeArg === 'demo' ? CameraType.Demo: CameraType.Player;
 		this.inputManager = new InputManager(this, this.renderer.domElement);
-		this.cameraOperator = new CameraOperator(this, this.camera, this.params.Mouse_Sensitivity);
+		this.cameraOperator = new CameraOperator(this, this.camera, this.cameraType,  this.params.Mouse_Sensitivity);
+		if(this.cameraType === CameraType.Demo){
+			const target = new THREE.Vector3(-10, 30, 10);
+			const lookAt = new THREE.Vector3(10, 20, 0);
+			this.cameraOperator.setTarget(target, lookAt);
+		}
+		
 		this.sky = new Sky(this);
 		
 		// Load scene if path is supplied

@@ -268,7 +268,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			this.world.cameraOperator.target.copy(temp.add(this.position));
 		}
 		else
-		{
+		{	
 			// Position camera
 			this.world.cameraOperator.target.set(
 				this.position.x,

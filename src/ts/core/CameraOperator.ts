@@ -6,6 +6,14 @@ import { KeyBinding } from './KeyBinding';
 import { Character } from '../characters/Character';
 import _ = require('lodash');
 import { IUpdatable } from '../interfaces/IUpdatable';
+import { Vector3 } from 'three';
+
+
+export enum CameraType {
+	Player = 1,
+	Free,
+	Demo,
+}
 
 export class CameraOperator implements IInputReceiver, IUpdatable
 {
@@ -13,6 +21,7 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public world: World;
 	public camera: THREE.Camera;
+	public cameraType: CameraType;
 	public target: THREE.Vector3;
 	public sensitivity: THREE.Vector2;
 	public radius: number = 1;
@@ -34,8 +43,12 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public characterCaller: Character;
 
-	constructor(world: World, camera: THREE.Camera, sensitivityX: number = 1, sensitivityY: number = sensitivityX * 0.8)
+	private demoX: number = 0;
+	private demoDir: number = 0.125;
+
+	constructor(world: World, camera: THREE.Camera, cameraType: CameraType, sensitivityX: number = 1, sensitivityY: number = sensitivityX * 0.8)
 	{
+		this.cameraType = cameraType;
 		this.world = world;
 		this.camera = camera;
 		this.target = new THREE.Vector3();
@@ -87,6 +100,20 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public update(timeScale: number): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			if(this.demoX > 36 || this.demoX < -36){
+				this.demoDir = -1*this.demoDir;
+			}
+			this.demoX += 1*this.demoDir;
+			this.move(this.demoDir, 0);
+			this.camera.position.x = this.target.x + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+			this.camera.position.y = this.target.y  + this.radius * Math.sin(this.phi * Math.PI / 180);
+			this.camera.position.z = this.target.z + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+			this.camera.updateMatrix();
+			this.camera.lookAt(this.target);
+			return;
+		}
+
 		if (this.followMode === true)
 		{
 			this.camera.position.y = THREE.MathUtils.clamp(this.camera.position.y, this.target.y, Number.POSITIVE_INFINITY);
@@ -110,6 +137,9 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			return;
+		}
 		// Free camera
 		if (code === 'KeyC' && pressed === true && event.shiftKey === true)
 		{
@@ -136,11 +166,17 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public handleMouseWheel(event: WheelEvent, value: number): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			return;
+		}
 		this.world.scrollTheTimeScale(value);
 	}
 
 	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			return;
+		}
 		for (const action in this.actions) {
 			if (this.actions.hasOwnProperty(action)) {
 				const binding = this.actions[action];
@@ -155,11 +191,17 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			return;
+		}
 		this.move(deltaX, deltaY);
 	}
 
 	public inputReceiverInit(): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			return;
+		}
 		this.target.copy(this.camera.position);
 		this.setRadius(0, true);
 		// this.world.dirLight.target = this.world.camera;
@@ -186,6 +228,9 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 
 	public inputReceiverUpdate(timeStep: number): void
 	{
+		if(this.cameraType === CameraType.Demo){
+			return;
+		}
 		// Set fly speed
 		let speed = this.movementSpeed * (this.actions.fast.isPressed ? timeStep * 600 : timeStep * 60);
 
@@ -200,5 +245,20 @@ export class CameraOperator implements IInputReceiver, IUpdatable
 		this.target.add(up.multiplyScalar(speed * this.upVelocity));
 		this.target.add(forward.multiplyScalar(speed * this.forwardVelocity));
 		this.target.add(right.multiplyScalar(speed * this.rightVelocity));
+	}
+
+	public setTarget = (target: THREE.Vector3, lookAt: THREE.Vector3) => {
+		if(this.cameraType === CameraType.Demo){
+			this.target.set(target.x, target.y, target.z);
+			console.log(this.target);
+			this.camera.position.x = this.target.x; // + this.radius * Math.sin(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+			this.camera.position.y = this.target.y; //  + this.radius * Math.sin(this.phi * Math.PI / 180);
+			this.camera.position.z = this.target.z; // + this.radius * Math.cos(this.theta * Math.PI / 180) * Math.cos(this.phi * Math.PI / 180);
+			this.camera.updateMatrix();
+			this.camera.lookAt(lookAt);
+		}else{
+			throw new Error("Call setTarget only with this.cameraType === CameraType.Demo");
+		}
+		
 	}
 }

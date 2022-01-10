@@ -27,6 +27,7 @@ import { GroundImpactData } from './GroundImpactData';
 import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 import { Object3D } from 'three';
 import { EntityType } from '../enums/EntityType';
+import { CameraType } from '../core/CameraOperator';
 
 export class Character extends THREE.Object3D implements IWorldEntity
 {
@@ -282,6 +283,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
 	{
+		if(this.world.cameraType === CameraType.Demo){
+			return;
+		}
+
 		if (this.controlledObject !== undefined)
 		{
 			this.controlledObject.handleKeyboardEvent(event, code, pressed);
@@ -292,6 +297,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			if (code === 'KeyC' && pressed === true && event.shiftKey === true)
 			{
 				this.resetControls();
+				console.log("Character to free camera");
 				this.world.cameraOperator.characterCaller = this;
 				this.world.inputManager.setInputReceiver(this.world.cameraOperator);
 			}
@@ -317,6 +323,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
 	{
+		if(this.world.cameraType === CameraType.Demo){
+			return;
+		}
+
 		if (this.controlledObject !== undefined)
 		{
 			this.controlledObject.handleMouseButton(event, code, pressed);
@@ -338,6 +348,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 	public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
 	{
+		if(this.world.cameraType === CameraType.Demo){
+			return;
+		}
+
 		if (this.controlledObject !== undefined)
 		{
 			this.controlledObject.handleMouseMove(event, deltaX, deltaY);
@@ -350,6 +364,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	
 	public handleMouseWheel(event: WheelEvent, value: number): void
 	{
+		if(this.world.cameraType === CameraType.Demo){
+			return;
+		}
 		if (this.controlledObject !== undefined)
 		{
 			this.controlledObject.handleMouseWheel(event, value);
@@ -496,7 +513,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		{
 			// Look in camera's direction
 			this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
-			this.getWorldPosition(this.world.cameraOperator.target);
+			if(this.world.cameraType !== CameraType.Demo){ 
+				this.getWorldPosition(this.world.cameraOperator.target);
+			}
 		}
 		
 	}
