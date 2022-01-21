@@ -75,7 +75,7 @@ const world = new World('scene.glb');
 
 ## Contributing
 
-1. Get latest [Node.js](https://nodejs.org/en/)
+1. Get the LTS version of [Node.js](https://nodejs.org/en/) 16
 2. [Fork this repository](https://help.github.com/en/github/getting-started-with-github/fork-a-repo)
 3. Run `npm install`
 4. Run `npm run dev`
