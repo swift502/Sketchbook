@@ -39,7 +39,7 @@ All planned features can be found in the [GitHub Projects](https://github.com/sw
 
 You can define your own scenes in Blender, and then read them with Sketchbook. Sketchbook needs to run on a local server such as [http-server](https://www.npmjs.com/package/http-server) or [webpack-dev-server](https://github.com/webpack/webpack-dev-server) to be able to load external assets.
 
-#### Script tag
+<!-- #### Script tag -->
 
 1. Import:
 
@@ -52,6 +52,8 @@ You can define your own scenes in Blender, and then read them with Sketchbook. S
 ```javascript
 const world = new Sketchbook.World('scene.glb');
 ```
+
+<!--
 
 #### NPM
 
@@ -72,6 +74,8 @@ import { World } from 'sketchbook';
 ```javascript
 const world = new World('scene.glb');
 ```
+
+-->
 
 ## Contributing
 
