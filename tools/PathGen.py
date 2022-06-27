@@ -1,6 +1,6 @@
 # Script aiding the creation of Sketchbook AI paths in Blender.
 # Converts a vertex chain to a linked list of Sketchbook path nodes
-# with the nodes' object data in the correct forat.
+# with the nodes' object data in the correct format.
 
 import bpy
 
