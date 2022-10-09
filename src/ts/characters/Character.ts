@@ -25,7 +25,7 @@ import { VehicleEntryInstance } from './VehicleEntryInstance';
 import { SeatType } from '../enums/SeatType';
 import { GroundImpactData } from './GroundImpactData';
 import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
-import { Object3D } from 'three';
+import { AnimationAction, AnimationClip, Object3D } from 'three';
 import { EntityType } from '../enums/EntityType';
 
 export class Character extends THREE.Object3D implements IWorldEntity
@@ -38,7 +38,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public modelContainer: THREE.Group;
 	public materials: THREE.Material[] = [];
 	public mixer: THREE.AnimationMixer;
-	public animations: any[];
+	public animations: AnimationClip[];
+	public actionClips = {};
+	// public currentAnimation: string = "idle";
+	// public previousAnimation: AnimationAction;
+
 
 	// Movement
 	public acceleration: THREE.Vector3 = new THREE.Vector3();
@@ -87,6 +91,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		super();
 
 		this.readCharacterData(gltf);
+		this.mixer = new THREE.AnimationMixer(gltf.scene);
 		this.setAnimations(gltf.animations);
 
 		// The visuals group is centered for easy character tilting
@@ -98,8 +103,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.modelContainer.position.y = -0.57;
 		this.tiltContainer.add(this.modelContainer);
 		this.modelContainer.add(gltf.scene);
-
-		this.mixer = new THREE.AnimationMixer(gltf.scene);
 
 		this.velocitySimulator = new VectorSpringSimulator(60, this.defaultVelocitySimulatorMass, this.defaultVelocitySimulatorDamping);
 		this.rotationSimulator = new RelativeSpringSimulator(60, this.defaultRotationSimulatorMass, this.defaultRotationSimulatorDamping);
@@ -162,9 +165,21 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.setState(new Idle(this));
 	}
 
-	public setAnimations(animations: []): void
-	{
+	public setAnimations(animations: any[]): void {
 		this.animations = animations;
+		this.animations.map(e => {
+			const action = this.mixer.clipAction(e);
+			this.actionClips[e.name] = action;
+
+			if (action.getClip().name == "idle") {
+				// this.previousAnimation = action;
+				action.setEffectiveWeight(1);
+			}
+			else {
+				action.setEffectiveWeight(0);
+			}
+			action.play()
+		})
 	}
 
 	public setArcadeVelocityInfluence(x: number, y: number = x, z: number = x): void
@@ -501,25 +516,37 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		if (this.mixer !== undefined)
 		{
 			// gltf
-			let clip = THREE.AnimationClip.findByName( this.animations, clipName );
+			// let clip = THREE.AnimationClip.findByName( this.animations, clipName );
 
-			let action = this.mixer.clipAction(clip);
-			if (action === null)
-			{
+			let action = this.actionClips[clipName];
+			if (action === null) {
 				console.error(`Animation ${clipName} not found!`);
 				return 0;
 			}
 
-			this.mixer.stopAllAction();
+			// Seems like stopAllAction behaviour was changed from fading out to cancelling all fade operations.
+			for (const key in this.actionClips) {
+				if (Object.prototype.hasOwnProperty.call(this.actionClips, key)) {
+					const element = this.actionClips[key] as AnimationAction;
+					element.fadeOut(0.2);
+				}
+			}
+			this.setWeight(action, 1);
+			action.reset();
 			action.fadeIn(fadeIn);
-			action.play();
 
 			return action.getClip().duration;
 		}
 	}
 
-	public springMovement(timeStep: number): void
-	{
+	public setWeight(action, weight: number) {
+		action.enabled = true;
+		// Need to reduce the speed of animation for it so non-loopable animations dont overflow.
+		action.setEffectiveTimeScale(0.7);
+		action.setEffectiveWeight(weight);
+	}
+
+	public springMovement(timeStep: number): void {
 		// Simulator
 		this.velocitySimulator.target.copy(this.velocityTarget);
 		this.velocitySimulator.simulate(timeStep);
