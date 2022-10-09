@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import * as CANNON from 'cannon';
-import { quickhull } from './THREE.quickhull';
+import * as THREE from "three";
+import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils";
+import * as CANNON from "cannon";
 
 var PI_2 = Math.PI / 2;
 
@@ -74,7 +74,7 @@ threeToCannon.Type = Type;
  */
 
  /**
-  * @param  {THREE.Geometry} geometry
+  * @param  {THREE.BufferGeometry} geometry
   * @return {CANNON.Shape}
   */
  function createBoxShape (geometry) {
@@ -142,7 +142,8 @@ function createConvexPolyhedron (object) {
   }
 
   // Compute the 3D convex hull.
-  hull = quickhull(geometry);
+  // TODO: quickhull needs rework for BufferGeometry.
+  // hull = quickhull(geometry);
 
   // Convert from THREE.Vector3 to CANNON.Vec3.
   vertices = new Array(hull.vertices.length);
@@ -160,7 +161,7 @@ function createConvexPolyhedron (object) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createCylinderShape (geometry) {
@@ -183,7 +184,7 @@ function createCylinderShape (geometry) {
   shape.numSegments = params.radialSegments;
 
   shape.orientation = new CANNON.Quaternion();
-  shape.orientation.setFromEuler(THREE.Math.degToRad(90), 0, 0, 'XYZ').normalize();
+  shape.orientation.setFromEuler(THREE.MathUtils.degToRad(90), 0, 0, 'XYZ').normalize();
   return shape;
 }
 
@@ -230,7 +231,7 @@ function createBoundingCylinderShape (object, options) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createPlaneShape (geometry) {
@@ -244,7 +245,7 @@ function createPlaneShape (geometry) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createSphereShape (geometry) {
@@ -269,16 +270,18 @@ function createBoundingSphereShape (object, options) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
-function createTrimeshShape (geometry) {
-  var indices,
-      vertices = getVertices(geometry);
-
-  if (!vertices.length) return null;
-
-  indices = Object.keys(vertices).map(Number);
+function createTrimeshShape(geometry) {
+  let vertices;
+  if (geometry.index === null) {
+    vertices = geometry.attributes.position.array;
+  } else {
+    vertices = geometry.clone().toNonIndexed().attributes.position.array;
+  }
+  let indices = Object.keys(vertices).map(Number);
+  indices = indices.slice(0, indices.length / 3);
   return new CANNON.Trimesh(vertices, indices);
 }
 
@@ -290,29 +293,30 @@ function createTrimeshShape (geometry) {
  * Returns a single geometry for the given object. If the object is compound,
  * its geometries are automatically merged.
  * @param {THREE.Object3D} object
- * @return {THREE.Geometry}
+ * @return {THREE.BufferGeometry}
  */
 function getGeometry (object) {
   var matrix, mesh,
       meshes = getMeshes(object),
-      tmp = new THREE.Geometry(),
-      combined = new THREE.Geometry();
+      tmp = new THREE.BufferGeometry(),
+      combined = new THREE.BufferGeometry();
 
   if (meshes.length === 0) return null;
 
   // Apply scale  – it can't easily be applied to a CANNON.Shape later.
   if (meshes.length === 1) {
     var position = new THREE.Vector3(),
-        quaternion = new THREE.Quaternion(),
-        scale = new THREE.Vector3();
-    if (meshes[0].geometry.isBufferGeometry) {
-      if (meshes[0].geometry.attributes.position
-          && meshes[0].geometry.attributes.position.itemSize > 2) {
-        tmp.fromBufferGeometry(meshes[0].geometry);
-      }
-    } else {
-      tmp = meshes[0].geometry.clone();
+      quaternion = new THREE.Quaternion(),
+      scale = new THREE.Vector3();
+
+    if (
+      meshes[0].geometry.attributes.position &&
+      meshes[0].geometry.attributes.position.itemSize > 2
+    ) {
+      tmp = meshes[0].geometry;
     }
+
+    // tmp.metadata = meshes;
     tmp.metadata = meshes[0].geometry.metadata;
     meshes[0].updateMatrixWorld();
     meshes[0].matrixWorld.decompose(position, quaternion, scale);
@@ -322,16 +326,14 @@ function getGeometry (object) {
   // Recursively merge geometry, preserving local transforms.
   while ((mesh = meshes.pop())) {
     mesh.updateMatrixWorld();
-    if (mesh.geometry.isBufferGeometry) {
-      if (mesh.geometry.attributes.position
-          && mesh.geometry.attributes.position.itemSize > 2) {
-        var tmpGeom = new THREE.Geometry();
-        tmpGeom.fromBufferGeometry(mesh.geometry);
-        combined.merge(tmpGeom, mesh.matrixWorld);
-        tmpGeom.dispose();
-      }
-    } else {
-      combined.merge(mesh.geometry, mesh.matrixWorld);
+    if (
+      mesh.geometry.attributes.position &&
+      mesh.geometry.attributes.position.itemSize > 2
+    ) {
+      var tmpGeom = mesh.geometry;
+      combined = BufferGeometryUtils.mergeBufferGeometries([combined,tmpGeom])
+      // combined.merge(tmpGeom, mesh.matrixWorld);
+      tmpGeom.dispose();
     }
   }
 
@@ -342,7 +344,7 @@ function getGeometry (object) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {Array<number>}
  */
 function getVertices (geometry) {

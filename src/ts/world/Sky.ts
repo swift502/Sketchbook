@@ -51,7 +51,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 		// Mesh
 		this.skyMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(1000, 24, 12),
+			new THREE.SphereGeometry(1000, 24, 12),
 			this.skyMaterial
 		);
 		this.attach(this.skyMesh);
@@ -66,39 +66,26 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 		// CSM
 		// New version
-		// let splitsCallback = (amount, near, far, target) =>
-		// {
-		// 	for (let i = amount - 1; i >= 0; i--)
-		// 	{
-		// 		target.push(Math.pow(1 / 3, i));
-		// 	}
-		// };
-
-		// Legacy
-		let splitsCallback = (amount, near, far) =>
+		let splitsCallback = (amount, near, far, target) =>
 		{
-			let arr = [];
-
 			for (let i = amount - 1; i >= 0; i--)
 			{
-				arr.push(Math.pow(1 / 4, i));
+				target.push(Math.pow(1 / 4, i));
 			}
-
-			return arr;
 		};
 
 		this.csm = new CSM({
 			fov: 80,
-			far: 250,	// maxFar
-			lightIntensity: 2.5,
+			far: 300,	// maxFar
+			lightIntensity: 0.8,
 			cascades: 3,
-			shadowMapSize: 2048,
+			shadowMapSize: 4096,
 			camera: world.camera,
 			parent: world.graphicsWorld,
 			mode: 'custom',
 			customSplitsCallback: splitsCallback
 		});
-		this.csm.fade = true;
+		this.csm.fade = false;
 
 		this.refreshSunPosition();
 		

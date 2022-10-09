@@ -128,82 +128,84 @@ CannonDebugRenderer.prototype = {
         case CANNON.Shape.types.PLANE:
             mesh = new THREE.Mesh(this._planeGeometry, yellow);
             break;
-
+        
+        // Test with convexPolyhedron from .glb file
         case CANNON.Shape.types.CONVEXPOLYHEDRON:
-            // Create mesh
-            var geo = new THREE.Geometry();
-
+            var points = [];
+            var vertices = [];
             // Add vertices
             for (var i = 0; i < shape.vertices.length; i++) {
-                var v = shape.vertices[i];
-                geo.vertices.push(new THREE.Vector3(v.x, v.y, v.z));
+              var v = shape.vertices[i];
+              points.push(new THREE.Vector3(v.x, v.y, v.z));
             }
-
-            for(var i=0; i < shape.faces.length; i++){
-                var face = shape.faces[i];
-
-                // add triangles
-                var a = face[0];
-                for (var j = 1; j < face.length - 1; j++) {
-                    var b = face[j];
-                    var c = face[j + 1];
-                    geo.faces.push(new THREE.Face3(a, b, c));
-                }
+    
+            for (var i = 0; i < shape.faces.length; i++) {
+              var face = shape.faces[i];
+    
+              // add triangles
+              var a = face[0];
+              for (var j = 1; j < face.length - 1; j++) {
+                var b = face[j];
+                var c = face[j + 1];
+                vertices.push(points[a], points[b], points[c]);
+              }
             }
+            // Create mesh
+            var geo = new THREE.BufferGeometry().setFromPoints(vertices);
+    
             geo.computeBoundingSphere();
             geo.computeFaceNormals();
-
+    
             mesh = new THREE.Mesh(geo, cyan);
             shape.geometryId = geo.id;
             break;
 
         case CANNON.Shape.types.TRIMESH:
-            var geometry = new THREE.Geometry();
+            var points = [];
+            var vertices = [];
             var v0 = this.tmpVec0;
-            var v1 = this.tmpVec1;
-            var v2 = this.tmpVec2;
-            for (var i = 0; i < shape.indices.length / 3; i++) {
-                shape.getTriangleVertices(i, v0, v1, v2);
-                geometry.vertices.push(
-                    new THREE.Vector3(v0.x, v0.y, v0.z),
-                    new THREE.Vector3(v1.x, v1.y, v1.z),
-                    new THREE.Vector3(v2.x, v2.y, v2.z)
-                );
-                var j = geometry.vertices.length - 3;
-                geometry.faces.push(new THREE.Face3(j, j+1, j+2));
+
+            for (let index = 0; index < shape.indices.length; index++) {
+            const element = shape.indices[index];
+            shape.getVertex(element, v0);
+            points.push(new THREE.Vector3(v0.x, v0.y, v0.z));
             }
+            var geometry = new THREE.BufferGeometry().setFromPoints(points);
             geometry.computeBoundingSphere();
-            geometry.computeFaceNormals();
             mesh = new THREE.Mesh(geometry, purple);
             shape.geometryId = geometry.id;
             break;
 
+        // TODO: Test with a heightfield object from .glb file
         case CANNON.Shape.types.HEIGHTFIELD:
-            var geometry = new THREE.Geometry();
-
+            var points = [];
+            var vertices = [];
+            
             var v0 = this.tmpVec0;
             var v1 = this.tmpVec1;
             var v2 = this.tmpVec2;
+            
             for (var xi = 0; xi < shape.data.length - 1; xi++) {
-                for (var yi = 0; yi < shape.data[xi].length - 1; yi++) {
-                    for (var k = 0; k < 2; k++) {
-                        shape.getConvexTrianglePillar(xi, yi, k===0);
-                        v0.copy(shape.pillarConvex.vertices[0]);
-                        v1.copy(shape.pillarConvex.vertices[1]);
-                        v2.copy(shape.pillarConvex.vertices[2]);
-                        v0.vadd(shape.pillarOffset, v0);
-                        v1.vadd(shape.pillarOffset, v1);
-                        v2.vadd(shape.pillarOffset, v2);
-                        geometry.vertices.push(
-                            new THREE.Vector3(v0.x, v0.y, v0.z),
-                            new THREE.Vector3(v1.x, v1.y, v1.z),
-                            new THREE.Vector3(v2.x, v2.y, v2.z)
-                        );
-                        var i = geometry.vertices.length - 3;
-                        geometry.faces.push(new THREE.Face3(i, i+1, i+2));
-                    }
+              for (var yi = 0; yi < shape.data[xi].length - 1; yi++) {
+                for (var k = 0; k < 2; k++) {
+                  shape.getConvexTrianglePillar(xi, yi, k === 0);
+                  v0.copy(shape.pillarConvex.vertices[0]);
+                  v1.copy(shape.pillarConvex.vertices[1]);
+                  v2.copy(shape.pillarConvex.vertices[2]);
+                  v0.vadd(shape.pillarOffset, v0);
+                  v1.vadd(shape.pillarOffset, v1);
+                  v2.vadd(shape.pillarOffset, v2);
+                  points.push(
+                    new THREE.Vector3(v0.x, v0.y, v0.z),
+                    new THREE.Vector3(v1.x, v1.y, v1.z),
+                    new THREE.Vector3(v2.x, v2.y, v2.z)
+                  );
+                  var i = points.length - 3;
+                  vertices.push(points[i], points[i + 1], points[i + 2]);
                 }
+              }
             }
+            var geometry = new THREE.BufferGeometry().setFromPoints(vertices);
             geometry.computeBoundingSphere();
             geometry.computeFaceNormals();
             mesh = new THREE.Mesh(geometry, purple);

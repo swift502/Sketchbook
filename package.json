@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/jquery": "^3.5.5",
     "@types/lodash": "^4.14.168",
+    "@types/three": "^0.144.0",
     "css-loader": "^6.7.1",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.1",
@@ -43,7 +44,7 @@
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
     "sweetalert2": "^11.4.37",
-    "three": "0.113.0",
-    "three-csm": "1.0.2"
+    "three": "^0.145.0",
+    "three-csm": "^2.0.0"
   }
 }
