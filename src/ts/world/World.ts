@@ -167,9 +167,10 @@ export class World
 					footer: '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
 					confirmButtonText: 'Okay',
 					buttonsStyling: false,
-					onClose: () => {
-						UIManager.setUserInterfaceVisible(true);
-					}
+				}).then((result) => {
+
+					UIManager.setUserInterfaceVisible(true);
+
 				});
 			};
 			loadingManager.loadGLTF(worldScenePath, (gltf) =>

@@ -42,7 +42,7 @@
   "dependencies": {
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
-    "sweetalert2": "^9.17.2",
+    "sweetalert2": "^11.4.37",
     "three": "0.113.0",
     "three-csm": "1.0.2"
   }
