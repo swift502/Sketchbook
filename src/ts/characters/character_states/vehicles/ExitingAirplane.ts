@@ -46,7 +46,7 @@ export class ExitingAirplane extends ExitingStateBase
 
 			// Rotation
 			this.updateEndRotation();
-			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, smoothFactor);
+			this.character.quaternion.slerpQuaternions(this.startRotation, this.endRotation, smoothFactor);
 		}
 	}
 }

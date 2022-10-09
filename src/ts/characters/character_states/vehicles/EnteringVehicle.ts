@@ -93,8 +93,8 @@ export class EnteringVehicle extends CharacterStateBase
 			let currentPosOffset = new THREE.Vector3().lerpVectors(this.initialPositionOffset, new THREE.Vector3(), this.factorSimulator.position);
 			let lerpPosition = new THREE.Vector3().lerpVectors(this.startPosition.clone().sub(currentPosOffset), this.endPosition, sineFactor);
 			this.character.setPosition(lerpPosition.x, lerpPosition.y, lerpPosition.z);
-
-			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, this.factorSimulator.position);
+			
+			this.character.quaternion.slerpQuaternions(this.startRotation,this.endRotation,this.factorSimulator.position)
 		}
 	}
 
