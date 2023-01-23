@@ -46,8 +46,10 @@ export class Car extends Vehicle implements IControllable
 		});
 
 		this.readCarData(gltf);
+		
+		// preStep is deprecated 
 
-		this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
+		// this.collision.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
 
 		this.actions = {
 			'throttle': new KeyBinding('KeyW'),

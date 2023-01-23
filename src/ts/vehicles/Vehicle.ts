@@ -111,11 +111,20 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			wheelObject.quaternion.copy(Utils.threeQuat(transform.quaternion));
 
 			let upAxisWorld = new CANNON.Vec3();
-			this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
+			this.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
 		}
 
 		this.updateMatrixWorld();
 	}
+
+	public getVehicleAxisWorld(axisIndex: number, result: CANNON.Vec3){
+		result.set(
+			axisIndex === 0 ? 1 : 0,
+			axisIndex === 1 ? 1 : 0,
+			axisIndex === 2 ? 1 : 0
+		);
+		this.rayCastVehicle.chassisBody.vectorToWorldFrame(result, result);
+	};
 
 	public forceCharacterOut(): void
 	{
@@ -278,6 +287,8 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
+	abstract 
+
 	public setPosition(x: number, y: number, z: number): void
 	{
 		this.collision.position.x = x;
@@ -292,6 +303,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			if (wheel.steering) this.rayCastVehicle.setSteeringValue(val, wheel.rayCastWheelInfoIndex);
 		});
 	}
+	public abstract physicsPreStep(body: CANNON.Body, car: Vehicle): void
 
 	public applyEngineForce(force: number): void
 	{
@@ -342,6 +354,10 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			{
 				world.sky.csm.setupMaterial(mat);
 			});
+
+			this.world.physicsWorld.addEventListener("preStep",()=>{
+				this.physicsPreStep(this.collision, this);
+			})
 		}
 	}
 

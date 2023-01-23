@@ -127,7 +127,9 @@ export class World
 		this.physicsWorld = new CANNON.World();
 		this.physicsWorld.gravity.set(0, -9.81, 0);
 		this.physicsWorld.broadphase = new CANNON.SAPBroadphase(this.physicsWorld);
-		this.physicsWorld.solver.iterations = 10;
+		const solver = new CANNON.GSSolver();
+		solver.iterations = 10
+		this.physicsWorld.solver = solver;
 		this.physicsWorld.allowSleep = true;
 
 		this.parallelPairs = [];
@@ -358,7 +360,7 @@ export class World
 								let phys = new BoxCollider({size: new THREE.Vector3(child.scale.x, child.scale.y, child.scale.z)});
 								phys.body.position.copy(Utils.cannonVector(child.position));
 								phys.body.quaternion.copy(Utils.cannonQuat(child.quaternion));
-								phys.body.computeAABB();
+								phys.body.updateAABB();
 
 								phys.body.shapes.forEach((shape) => {
 									shape.collisionFilterMask = ~CollisionGroups.TrimeshColliders;

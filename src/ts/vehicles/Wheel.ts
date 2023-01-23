@@ -1,4 +1,4 @@
-import { WheelInfo } from 'cannon';
+import { WheelInfo } from 'cannon-es';
 
 export class Wheel
 {

@@ -157,10 +157,6 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.raycastBox = new THREE.Mesh(boxGeo, boxMat);
 		this.raycastBox.visible = false;
 
-		// Physics pre/post step callback bindings
-		this.characterCapsule.body.preStep = (body: CANNON.Body) => { this.physicsPreStep(body, this); };
-		this.characterCapsule.body.postStep = (body: CANNON.Body) => { this.physicsPostStep(body, this); };
-
 		// States
 		this.setState(new Idle(this));
 	}
@@ -270,7 +266,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 		else
 		{
-			this.world.physicsWorld.remove(this.characterCapsule.body);
+			this.world.physicsWorld.removeBody(this.characterCapsule.body);
 		}
 	}
 
@@ -974,6 +970,14 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 			// Register physics
 			world.physicsWorld.addBody(this.characterCapsule.body);
+			
+			// Physics pre/post step callback bindings
+			this.world.physicsWorld.addEventListener("preStep", () => {
+				this.physicsPreStep(this.characterCapsule.body, this);
+			});
+			this.world.physicsWorld.addEventListener("postStep", () => {
+				this.physicsPostStep(this.characterCapsule.body, this);
+			});
 
 			// Add to graphicsWorld
 			world.graphicsWorld.add(this);
@@ -1006,7 +1010,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			_.pull(world.characters, this);
 
 			// Remove physics
-			world.physicsWorld.remove(this.characterCapsule.body);
+			world.physicsWorld.removeBody(this.characterCapsule.body);
 
 			// Remove visuals
 			world.graphicsWorld.remove(this);

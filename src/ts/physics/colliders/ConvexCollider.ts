@@ -29,12 +29,12 @@ export class ConvexCollider implements ICollider
 		// mat.restitution = 0.7;
 
 		const vertices = []
-		const faces = []
+		const faces: number[][] = []
 		
 		const positions = this.mesh.geometry.getAttribute('position').array;
 		for (let i = 0; i < positions.array.length; i + 3) {
 			vertices.push(new Vector3(positions[i], positions[i + 1], positions[i + 2]))
-			faces.push(new Vector3(i, i + 1, i + 2))
+			faces.push([i, i + 1, i + 2])
 		}
 
 		let cannonPoints = vertices.map((v: Vector3) => {
@@ -44,7 +44,7 @@ export class ConvexCollider implements ICollider
 		let cannonFaces = faces
 
 
-		let shape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
+		let shape = new CANNON.ConvexPolyhedron({vertices:cannonPoints, faces:cannonFaces});
 		// shape.material = mat;
 
 		// Add phys sphere
