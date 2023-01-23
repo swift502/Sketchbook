@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import Swal from 'sweetalert2';
 import * as $ from 'jquery';
 

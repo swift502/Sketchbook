@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import * as _ from 'lodash';
 import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { World } from '../world/World';

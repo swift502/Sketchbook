@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils";
-import * as CANNON from "cannon";
+import * as CANNON from "cannon-es";
 
 var PI_2 = Math.PI / 2;
 

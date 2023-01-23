@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { KeyBinding } from '../core/KeyBinding';
 import { VectorSpringSimulator } from '../physics/spring_simulation/VectorSpringSimulator';
 import { RelativeSpringSimulator } from '../physics/spring_simulation/RelativeSpringSimulator';

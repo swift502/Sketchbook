@@ -41,6 +41,7 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "cannon-es": "^0.20.0",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
     "sweetalert2": "^11.4.37",

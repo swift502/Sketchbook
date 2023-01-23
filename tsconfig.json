@@ -10,7 +10,7 @@
         "declarationDir": "build/types",
         "baseUrl": ".",
         "paths": {
-            "cannon" : ["src/lib/cannon/cannon"]
+            // "cannon" : ["src/lib/cannon/cannon"]
         }
     }
 }

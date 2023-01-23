@@ -1,4 +1,4 @@
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { Vehicle } from './Vehicle';
 import { IControllable } from '../interfaces/IControllable';
 import { EntityType } from '../enums/EntityType';

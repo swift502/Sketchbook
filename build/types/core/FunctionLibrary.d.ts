@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { Side } from '../enums/Side';
 import { Object3D } from 'three';

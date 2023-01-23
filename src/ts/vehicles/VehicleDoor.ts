@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { Vehicle } from './Vehicle';
 import * as Utils from '../core/FunctionLibrary';
 import { VehicleSeat } from './VehicleSeat';

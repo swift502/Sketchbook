@@ -1,6 +1,6 @@
 import { Character } from '../characters/Character';
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { World } from '../world/World';
 import { KeyBinding } from '../core/KeyBinding';
 import { VehicleSeat } from './VehicleSeat';

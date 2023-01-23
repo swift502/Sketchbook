@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { CameraOperator } from '../core/CameraOperator';
 import { Stats } from '../../lib/utils/Stats';
 import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';

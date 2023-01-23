@@ -1,4 +1,4 @@
-import * as CANNON from 'cannon';
+import * as CANNON from 'cannon-es';
 import { ICollider } from '../../interfaces/ICollider';
 export declare class CapsuleCollider implements ICollider {
     options: any;
