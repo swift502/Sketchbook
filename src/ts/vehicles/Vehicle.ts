@@ -21,6 +21,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 	public controllingCharacter: Character;
 	public actions: { [action: string]: KeyBinding; } = {};
 	public rayCastVehicle: CANNON.RaycastVehicle;
+	private preStep: () => void;
 	public seats: VehicleSeat[] = [];
 	public wheels: Wheel[] = [];
 	public drive: string;
@@ -355,9 +356,10 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 				world.sky.csm.setupMaterial(mat);
 			});
 
-			this.world.physicsWorld.addEventListener("preStep",()=>{
+			this.preStep =()=>{
 				this.physicsPreStep(this.collision, this);
-			})
+			}
+			this.world.physicsWorld.addEventListener("preStep",this.preStep)
 		}
 	}
 
@@ -369,6 +371,10 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 		else
 		{
+
+			// Remove physics pre/post step callback bindings
+			this.world.physicsWorld.removeEventListener("preStep", this.preStep);
+
 			this.world = undefined;
 			_.pull(world.vehicles, this);
 			world.graphicsWorld.remove(this);

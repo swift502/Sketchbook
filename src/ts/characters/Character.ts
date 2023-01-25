@@ -85,6 +85,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public vehicleEntryInstance: VehicleEntryInstance = null;
 	
 	private physicsEnabled: boolean = true;
+	private preStep: () => void;
+	private postStep: () => void;
 
 	constructor(gltf: any)
 	{
@@ -972,12 +974,14 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			world.physicsWorld.addBody(this.characterCapsule.body);
 			
 			// Physics pre/post step callback bindings
-			this.world.physicsWorld.addEventListener("preStep", () => {
+			this.preStep=() => {
 				this.physicsPreStep(this.characterCapsule.body, this);
-			});
-			this.world.physicsWorld.addEventListener("postStep", () => {
-				this.physicsPostStep(this.characterCapsule.body, this);
-			});
+			}
+			this.postStep =() => {
+				this.physicsPreStep(this.characterCapsule.body, this);
+			}
+			this.world.physicsWorld.addEventListener("preStep", this.preStep);
+			this.world.physicsWorld.addEventListener("postStep", this.postStep);
 
 			// Add to graphicsWorld
 			world.graphicsWorld.add(this);
@@ -1003,6 +1007,10 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			{
 				world.inputManager.inputReceiver = undefined;
 			}
+
+			// Physics pre/post step callback bindings
+			this.world.physicsWorld.removeEventListener("preStep", this.preStep);
+			this.world.physicsWorld.removeEventListener("postStep", this.postStep);
 
 			this.world = undefined;
 
