@@ -15,7 +15,7 @@ Sketchbook is now archived. As I have no more interest in developing this projec
 
 - If you wish to modify Sketchbook feel free to fork it.
 - To see if someone is currently maintaining a fork, check out the [Network Graph](https://github.com/swift502/Sketchbook/network).
-- The [NPM package](https://www.npmjs.com/package/sketchbook) name available, and I'll give it away to anyone who asks for it. The package has never worked properly.
+- The [NPM package](https://www.npmjs.com/package/sketchbook) name is available, and I'll give it away to anyone who asks for it. The package has never worked properly.
 
 # 📒 Sketchbook
 
