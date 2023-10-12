@@ -11,7 +11,7 @@
 
 # Final update (20. Feb 2023)
 
-Sketchbook is now archived. As I have no more interest in developing this project, it comes to a conclusion. In order to remain honest about the true state of the project, I am archiving this repository. I've put the project in the public domain, it now belongs to you. You can burn it on DVDs and sell it.
+As I have no more interest in developing this project, it comes to a conclusion. In order to remain honest about the true state of the project, I am archiving this repository.
 
 - If you wish to modify Sketchbook feel free to fork it.
 - To see if someone is currently maintaining a fork, check out the [Network Graph](https://github.com/swift502/Sketchbook/network).
