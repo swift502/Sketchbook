@@ -5,8 +5,6 @@
 	<br>
 </p>
 
-[![badge](https://img.shields.io/npm/v/sketchbook?style=flat-square)](https://www.npmjs.com/package/sketchbook)
-
 # Final update (20. Feb 2023)
 
 As I have no more interest in developing this project, it comes to a conclusion. In order to remain honest about the true state of the project, I am archiving this repository.
